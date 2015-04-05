@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>description</key>
+		<string>Kernel Extension</string>
+		<key>paths</key>
+		<array>
+			<string>/Users/patrick/Projects/Personal/obj-c/BlockBlock/watchDir</string>
+		</array>
+		<key>class</key>
+		<string>Kext</string>
+		<key>alert</key>
+		<string>installed a kernel extention</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Launch D &amp; A</string>
+		<key>paths</key>
+		<array>
+			<string>/System/Library/LaunchDaemons</string>
+			<string>/Library/LaunchDaemons</string>
+			<string>/System/Library/LaunchAgents </string>
+			<string>/Library/LaunchAgents</string>
+			<string>~/Library/LaunchAgents</string>
+		</array>
+		<key>class</key>
+		<string>Launchd</string>
+		<key>alert</key>
+		<string>installed a launch daemon or agent</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Login Item</string>
+		<key>paths</key>
+		<array>
+			<string>~/Library/Preferences/com.apple.loginitems.plist</string>
+		</array>
+		<key>class</key>
+		<string>LoginItem</string>
+		<key>alert</key>
+		<string>installed a login item</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
+</array>
+</plist>

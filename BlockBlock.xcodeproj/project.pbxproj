@@ -1,0 +1,651 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CD06BD211A6C5D7C00DE285A /* LoginItem.m */; };
+		CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */; };
+		CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */; };
+		CD3CE68F1A22D3FA00B4F940 /* Install.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE68E1A22D3FA00B4F940 /* Install.m */; };
+		CD3CE6951A23010B00B4F940 /* Uninstall.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE6941A23010B00B4F940 /* Uninstall.m */; };
+		CD5C998319D672CC0015232A /* NSMutableArray+QueueAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998219D672CC0015232A /* NSMutableArray+QueueAdditions.m */; };
+		CD5C998619D6752B0015232A /* Queue.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998519D6752B0015232A /* Queue.m */; };
+		CD5C998919D6810C0015232A /* WatchEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998819D6810C0015232A /* WatchEvent.m */; };
+		CD5C998C19D73B7D0015232A /* AlertWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998B19D73B7D0015232A /* AlertWindow.m */; };
+		CD5C998F19D73C380015232A /* AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998E19D73C380015232A /* AlertView.m */; };
+		CD5C999519D8B84B0015232A /* AlertViewBottom.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C999419D8B84B0015232A /* AlertViewBottom.m */; };
+		CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD6090C51A7DBDA300E091CD /* itemIcon.png */; };
+		CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD6090C61A7DBDA300E091CD /* processIcon.png */; };
+		CD7C871519D43EAD00EC7F0A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C871419D43EAD00EC7F0A /* AppDelegate.m */; };
+		CD7C871C19D43F0200EC7F0A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C871A19D43F0200EC7F0A /* main.m */; };
+		CD7C871F19D43F9C00EC7F0A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */; };
+		CD7C872619D4432C00EC7F0A /* Watcher.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C872519D4432C00EC7F0A /* Watcher.m */; };
+		CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD7C872719D4459A00EC7F0A /* watchList.plist */; };
+		CD7C874119D4C58700EC7F0A /* AlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C873F19D4C58700EC7F0A /* AlertWindowController.m */; };
+		CD7C874C19D50F3B00EC7F0A /* Kext.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C874B19D50F3B00EC7F0A /* Kext.m */; };
+		CD7C874F19D51F8900EC7F0A /* PluginBase.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C874E19D51F8900EC7F0A /* PluginBase.m */; };
+		CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */; };
+		CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD8381291A7D94FA00AC0D96 /* Images.xcassets */; };
+		CD83813B1A7DAA1F00AC0D96 /* icon_128.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381391A7DAA1F00AC0D96 /* icon_128.png */; };
+		CD83813C1A7DAA1F00AC0D96 /* icon_128@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD83813A1A7DAA1F00AC0D96 /* icon_128@2x.png */; };
+		CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */ = {isa = PBXBuildFile; fileRef = CD83813F1A7DAEE700AC0D96 /* statusOFF.png */; };
+		CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */; };
+		CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381411A7DAEE700AC0D96 /* statusON.png */; };
+		CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381421A7DAEE700AC0D96 /* statusON@2x.png */; };
+		CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381471A7DB29800AC0D96 /* upArrow.png */; };
+		CD83814A1A7DB2B200AC0D96 /* upArrowSmall@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */; };
+		CD8401331A044B0B000A1C5A /* Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8401311A044B0B000A1C5A /* Utilities.m */; };
+		CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD855A7A1A773D7F00A13C5C /* ErrorWindowController.m */; };
+		CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */; };
+		CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD855A801A773EA700A13C5C /* AlertWindowController.xib */; };
+		CDACB9271A2EF3330088CC30 /* InterProcComms.m in Sources */ = {isa = PBXBuildFile; fileRef = CDACB9261A2EF3330088CC30 /* InterProcComms.m */; };
+		CDB4D9DD19F4CDE90069BE62 /* ProcessMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = CDB4D9DC19F4CDE90069BE62 /* ProcessMonitor.m */; };
+		CDB4D9DF19F4D44F0069BE62 /* libdtrace.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB4D9DE19F4D44F0069BE62 /* libdtrace.dylib */; };
+		CDB4D9E219F61E480069BE62 /* OrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = CDB4D9E119F61E480069BE62 /* OrderedDictionary.m */; };
+		CDB4D9E519FCD9410069BE62 /* Process.m in Sources */ = {isa = PBXBuildFile; fileRef = CDB4D9E419FCD9410069BE62 /* Process.m */; };
+		CDCA50091A3187D20086B4D3 /* Control.m in Sources */ = {isa = PBXBuildFile; fileRef = CDCA50081A3187D20086B4D3 /* Control.m */; };
+		CDCA50851A47DA700086B4D3 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = CDCA50831A47DA700086B4D3 /* Logging.m */; };
+		CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD5681E1A5E37770094BC3A /* Launchd.m */; };
+		CDD738BD1A5F7D0500B825BA /* StatusBarCustomView.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD738B81A5F7D0500B825BA /* StatusBarCustomView.m */; };
+		CDD738BF1A5F7D0500B825BA /* StatusBarPopoverController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */; };
+		CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C41A5F7FE800B825BA /* MainMenu.xib */; };
+		CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C71A5F7FE800B825BA /* Credits.rtf */; };
+		CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C91A5F7FE800B825BA /* InfoPlist.strings */; };
+		CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */ = {isa = PBXBuildFile; fileRef = CDD738D41A5F7FE800B825BA /* launchAgent.plist */; };
+		CDD7390C1A5FABB800B825BA /* NSWindow+BugFix.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */; };
+		CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */; };
+		CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */; };
+		CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */; };
+		CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		CD06BD201A6C5D7C00DE285A /* LoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginItem.h; path = BlockBlock/plugins/LoginItem.h; sourceTree = "<group>"; };
+		CD06BD211A6C5D7C00DE285A /* LoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginItem.m; path = BlockBlock/plugins/LoginItem.m; sourceTree = "<group>"; };
+		CD3CE6871A22C53400B4F940 /* ConfigureWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigureWindowController.h; path = BlockBlock/ui/ConfigureWindowController.h; sourceTree = "<group>"; };
+		CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ConfigureWindowController.m; path = BlockBlock/ui/ConfigureWindowController.m; sourceTree = "<group>"; };
+		CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = launchItem.plist; path = BlockBlock/launchItem.plist; sourceTree = "<group>"; };
+		CD3CE68E1A22D3FA00B4F940 /* Install.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Install.m; path = BlockBlock/Install.m; sourceTree = "<group>"; };
+		CD3CE6901A22D42700B4F940 /* Install.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Install.h; path = BlockBlock/Install.h; sourceTree = "<group>"; };
+		CD3CE6911A22D9A700B4F940 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Consts.h; path = BlockBlock/Consts.h; sourceTree = "<group>"; };
+		CD3CE6931A23010B00B4F940 /* Uninstall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Uninstall.h; path = BlockBlock/Uninstall.h; sourceTree = "<group>"; };
+		CD3CE6941A23010B00B4F940 /* Uninstall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Uninstall.m; path = BlockBlock/Uninstall.m; sourceTree = "<group>"; };
+		CD5C998019D6684F0015232A /* fsEvents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fsEvents.h; path = BlockBlock/fsEvents.h; sourceTree = "<group>"; };
+		CD5C998119D672CC0015232A /* NSMutableArray+QueueAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+QueueAdditions.h"; path = "BlockBlock/NSMutableArray+QueueAdditions.h"; sourceTree = "<group>"; };
+		CD5C998219D672CC0015232A /* NSMutableArray+QueueAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+QueueAdditions.m"; path = "BlockBlock/NSMutableArray+QueueAdditions.m"; sourceTree = "<group>"; };
+		CD5C998419D6752B0015232A /* Queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Queue.h; path = BlockBlock/Queue.h; sourceTree = "<group>"; };
+		CD5C998519D6752B0015232A /* Queue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Queue.m; path = BlockBlock/Queue.m; sourceTree = "<group>"; };
+		CD5C998719D6810C0015232A /* WatchEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WatchEvent.h; path = BlockBlock/WatchEvent.h; sourceTree = "<group>"; };
+		CD5C998819D6810C0015232A /* WatchEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WatchEvent.m; path = BlockBlock/WatchEvent.m; sourceTree = "<group>"; };
+		CD5C998A19D73B7D0015232A /* AlertWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlertWindow.h; path = BlockBlock/AlertWindow.h; sourceTree = "<group>"; };
+		CD5C998B19D73B7D0015232A /* AlertWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AlertWindow.m; path = BlockBlock/AlertWindow.m; sourceTree = "<group>"; };
+		CD5C998D19D73C380015232A /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlertView.h; path = BlockBlock/AlertView.h; sourceTree = "<group>"; };
+		CD5C998E19D73C380015232A /* AlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AlertView.m; path = BlockBlock/AlertView.m; sourceTree = "<group>"; };
+		CD5C999319D8B84B0015232A /* AlertViewBottom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlertViewBottom.h; path = BlockBlock/ui/AlertViewBottom.h; sourceTree = "<group>"; };
+		CD5C999419D8B84B0015232A /* AlertViewBottom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AlertViewBottom.m; path = BlockBlock/ui/AlertViewBottom.m; sourceTree = "<group>"; };
+		CD6090C51A7DBDA300E091CD /* itemIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = itemIcon.png; path = BlockBlock/images/itemIcon.png; sourceTree = "<group>"; };
+		CD6090C61A7DBDA300E091CD /* processIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = processIcon.png; path = BlockBlock/images/processIcon.png; sourceTree = "<group>"; };
+		CD7C871319D43EAD00EC7F0A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = BlockBlock/AppDelegate.h; sourceTree = SOURCE_ROOT; };
+		CD7C871419D43EAD00EC7F0A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = BlockBlock/AppDelegate.m; sourceTree = SOURCE_ROOT; };
+		CD7C871819D43F0200EC7F0A /* BlockBlock-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "BlockBlock-Info.plist"; path = "BlockBlock/BlockBlock-Info.plist"; sourceTree = SOURCE_ROOT; };
+		CD7C871919D43F0200EC7F0A /* BlockBlock-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "BlockBlock-Prefix.pch"; path = "BlockBlock/BlockBlock-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		CD7C871A19D43F0200EC7F0A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BlockBlock/main.m; sourceTree = SOURCE_ROOT; };
+		CD7C871E19D43F9C00EC7F0A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = BlockBlock/Base.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
+		CD7C872419D4432C00EC7F0A /* Watcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Watcher.h; path = BlockBlock/Watcher.h; sourceTree = SOURCE_ROOT; };
+		CD7C872519D4432C00EC7F0A /* Watcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Watcher.m; path = BlockBlock/Watcher.m; sourceTree = SOURCE_ROOT; };
+		CD7C872719D4459A00EC7F0A /* watchList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = watchList.plist; path = BlockBlock/watchList.plist; sourceTree = SOURCE_ROOT; };
+		CD7C873E19D4C58700EC7F0A /* AlertWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlertWindowController.h; path = BlockBlock/AlertWindowController.h; sourceTree = "<group>"; };
+		CD7C873F19D4C58700EC7F0A /* AlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AlertWindowController.m; path = BlockBlock/AlertWindowController.m; sourceTree = "<group>"; };
+		CD7C874A19D50F3B00EC7F0A /* Kext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kext.h; path = BlockBlock/plugins/Kext.h; sourceTree = "<group>"; };
+		CD7C874B19D50F3B00EC7F0A /* Kext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kext.m; path = BlockBlock/plugins/Kext.m; sourceTree = "<group>"; };
+		CD7C874D19D51F8900EC7F0A /* PluginBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginBase.h; path = BlockBlock/PluginBase.h; sourceTree = "<group>"; };
+		CD7C874E19D51F8900EC7F0A /* PluginBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PluginBase.m; path = BlockBlock/PluginBase.m; sourceTree = "<group>"; };
+		CD7F088819AE6DCA00FF00FC /* BlockBlock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlockBlock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		CD7F088E19AE6DCA00FF00FC /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		CD7F089019AE6DCA00FF00FC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		CD8381291A7D94FA00AC0D96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BlockBlock/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		CD8381391A7DAA1F00AC0D96 /* icon_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_128.png; path = BlockBlock/images/icon/icon_128.png; sourceTree = "<group>"; };
+		CD83813A1A7DAA1F00AC0D96 /* icon_128@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon_128@2x.png"; path = "BlockBlock/images/icon/icon_128@2x.png"; sourceTree = "<group>"; };
+		CD83813F1A7DAEE700AC0D96 /* statusOFF.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusOFF.png; path = BlockBlock/images/icon/statusOFF.png; sourceTree = "<group>"; };
+		CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusOFF@2x.png"; path = "BlockBlock/images/icon/statusOFF@2x.png"; sourceTree = "<group>"; };
+		CD8381411A7DAEE700AC0D96 /* statusON.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusON.png; path = BlockBlock/images/icon/statusON.png; sourceTree = "<group>"; };
+		CD8381421A7DAEE700AC0D96 /* statusON@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusON@2x.png"; path = "BlockBlock/images/icon/statusON@2x.png"; sourceTree = "<group>"; };
+		CD8381471A7DB29800AC0D96 /* upArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = upArrow.png; path = BlockBlock/images/upArrow.png; sourceTree = "<group>"; };
+		CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "upArrowSmall@2x.png"; path = "BlockBlock/images/upArrowSmall@2x.png"; sourceTree = "<group>"; };
+		CD8401311A044B0B000A1C5A /* Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utilities.m; path = BlockBlock/Utilities.m; sourceTree = "<group>"; };
+		CD8401321A044B0B000A1C5A /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utilities.h; path = BlockBlock/Utilities.h; sourceTree = "<group>"; };
+		CD855A791A773D7F00A13C5C /* ErrorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ErrorWindowController.h; path = BlockBlock/ErrorWindowController.h; sourceTree = "<group>"; };
+		CD855A7A1A773D7F00A13C5C /* ErrorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ErrorWindowController.m; path = BlockBlock/ErrorWindowController.m; sourceTree = "<group>"; };
+		CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ErrorWindowController.xib; path = BlockBlock/ui/ErrorWindowController.xib; sourceTree = SOURCE_ROOT; };
+		CD855A801A773EA700A13C5C /* AlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AlertWindowController.xib; path = BlockBlock/ui/AlertWindowController.xib; sourceTree = SOURCE_ROOT; };
+		CDACB9261A2EF3330088CC30 /* InterProcComms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InterProcComms.m; path = BlockBlock/InterProcComms.m; sourceTree = "<group>"; };
+		CDACB9281A2EF3460088CC30 /* InterProcComms.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InterProcComms.h; path = BlockBlock/InterProcComms.h; sourceTree = "<group>"; };
+		CDB4D9DB19F4CDE90069BE62 /* ProcessMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessMonitor.h; path = BlockBlock/ProcessMonitor.h; sourceTree = "<group>"; };
+		CDB4D9DC19F4CDE90069BE62 /* ProcessMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcessMonitor.m; path = BlockBlock/ProcessMonitor.m; sourceTree = "<group>"; };
+		CDB4D9DE19F4D44F0069BE62 /* libdtrace.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libdtrace.dylib; path = usr/lib/libdtrace.dylib; sourceTree = SDKROOT; };
+		CDB4D9E019F61E480069BE62 /* OrderedDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrderedDictionary.h; path = BlockBlock/OrderedDictionary.h; sourceTree = "<group>"; };
+		CDB4D9E119F61E480069BE62 /* OrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OrderedDictionary.m; path = BlockBlock/OrderedDictionary.m; sourceTree = "<group>"; };
+		CDB4D9E319FCD9410069BE62 /* Process.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Process.h; path = BlockBlock/Process.h; sourceTree = "<group>"; };
+		CDB4D9E419FCD9410069BE62 /* Process.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Process.m; path = BlockBlock/Process.m; sourceTree = "<group>"; };
+		CDCA50071A3187D20086B4D3 /* Control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Control.h; path = BlockBlock/Control.h; sourceTree = "<group>"; };
+		CDCA50081A3187D20086B4D3 /* Control.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Control.m; path = BlockBlock/Control.m; sourceTree = "<group>"; };
+		CDCA50831A47DA700086B4D3 /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logging.m; path = BlockBlock/Logging.m; sourceTree = "<group>"; };
+		CDCA50841A47DA700086B4D3 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = BlockBlock/Logging.h; sourceTree = "<group>"; };
+		CDD5681D1A5E37770094BC3A /* Launchd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Launchd.h; path = BlockBlock/plugins/Launchd.h; sourceTree = "<group>"; };
+		CDD5681E1A5E37770094BC3A /* Launchd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Launchd.m; path = BlockBlock/plugins/Launchd.m; sourceTree = "<group>"; };
+		CDD738B71A5F7D0500B825BA /* StatusBarCustomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarCustomView.h; path = BlockBlock/StatusBarCustomView.h; sourceTree = "<group>"; };
+		CDD738B81A5F7D0500B825BA /* StatusBarCustomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarCustomView.m; path = BlockBlock/StatusBarCustomView.m; sourceTree = "<group>"; };
+		CDD738BA1A5F7D0500B825BA /* StatusBarPopoverController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarPopoverController.h; path = BlockBlock/StatusBarPopoverController.h; sourceTree = "<group>"; };
+		CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarPopoverController.m; path = BlockBlock/StatusBarPopoverController.m; sourceTree = "<group>"; };
+		CDD738C51A5F7FE800B825BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
+		CDD738C81A5F7FE800B825BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
+		CDD738CA1A5F7FE800B825BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
+		CDD738D41A5F7FE800B825BA /* launchAgent.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = launchAgent.plist; path = BlockBlock/launchAgent.plist; sourceTree = "<group>"; };
+		CDD7390A1A5FABB800B825BA /* NSWindow+BugFix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSWindow+BugFix.h"; path = "BlockBlock/NSWindow+BugFix.h"; sourceTree = "<group>"; };
+		CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+BugFix.m"; path = "BlockBlock/NSWindow+BugFix.m"; sourceTree = "<group>"; };
+		CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ConfigureWindowController.xib; path = BlockBlock/ui/ConfigureWindowController.xib; sourceTree = SOURCE_ROOT; };
+		CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarPopover.xib; path = BlockBlock/ui/StatusBarPopover.xib; sourceTree = SOURCE_ROOT; };
+		CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarMenu.h; path = BlockBlock/ui/StatusBarMenu.h; sourceTree = "<group>"; };
+		CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarMenu.m; path = BlockBlock/ui/StatusBarMenu.m; sourceTree = "<group>"; };
+		CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarMenu.xib; path = BlockBlock/ui/StatusBarMenu.xib; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CD7F088519AE6DCA00FF00FC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDB4D9DF19F4D44F0069BE62 /* libdtrace.dylib in Frameworks */,
+				CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CD3CE6921A2300F600B4F940 /* configure */ = {
+			isa = PBXGroup;
+			children = (
+				CDCA50071A3187D20086B4D3 /* Control.h */,
+				CDCA50081A3187D20086B4D3 /* Control.m */,
+				CD3CE6901A22D42700B4F940 /* Install.h */,
+				CD3CE68E1A22D3FA00B4F940 /* Install.m */,
+				CD3CE6931A23010B00B4F940 /* Uninstall.h */,
+				CD3CE6941A23010B00B4F940 /* Uninstall.m */,
+			);
+			name = configure;
+			sourceTree = "<group>";
+		};
+		CD7C872019D4428100EC7F0A /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				CD855A801A773EA700A13C5C /* AlertWindowController.xib */,
+				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
+				CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */,
+				CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */,
+				CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */,
+				CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */,
+			);
+			name = ui;
+			sourceTree = "<group>";
+		};
+		CD7C874919D50F1200EC7F0A /* plugins */ = {
+			isa = PBXGroup;
+			children = (
+				CD06BD201A6C5D7C00DE285A /* LoginItem.h */,
+				CD06BD211A6C5D7C00DE285A /* LoginItem.m */,
+				CDD5681D1A5E37770094BC3A /* Launchd.h */,
+				CDD5681E1A5E37770094BC3A /* Launchd.m */,
+				CD7C874A19D50F3B00EC7F0A /* Kext.h */,
+				CD7C874B19D50F3B00EC7F0A /* Kext.m */,
+			);
+			name = plugins;
+			sourceTree = "<group>";
+		};
+		CD7F087F19AE6DCA00FF00FC = {
+			isa = PBXGroup;
+			children = (
+				CD8381371A7DAA0F00AC0D96 /* images */,
+				CDD7390A1A5FABB800B825BA /* NSWindow+BugFix.h */,
+				CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */,
+				CDD738D41A5F7FE800B825BA /* launchAgent.plist */,
+				CDD738B71A5F7D0500B825BA /* StatusBarCustomView.h */,
+				CDD738B81A5F7D0500B825BA /* StatusBarCustomView.m */,
+				CDD738BA1A5F7D0500B825BA /* StatusBarPopoverController.h */,
+				CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */,
+				CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */,
+				CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */,
+				CDCA50831A47DA700086B4D3 /* Logging.m */,
+				CDCA50841A47DA700086B4D3 /* Logging.h */,
+				CDACB9281A2EF3460088CC30 /* InterProcComms.h */,
+				CDACB9261A2EF3330088CC30 /* InterProcComms.m */,
+				CD3CE6921A2300F600B4F940 /* configure */,
+				CD3CE6911A22D9A700B4F940 /* Consts.h */,
+				CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */,
+				CD3CE6871A22C53400B4F940 /* ConfigureWindowController.h */,
+				CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */,
+				CD855A791A773D7F00A13C5C /* ErrorWindowController.h */,
+				CD855A7A1A773D7F00A13C5C /* ErrorWindowController.m */,
+				CD8401311A044B0B000A1C5A /* Utilities.m */,
+				CD8401321A044B0B000A1C5A /* Utilities.h */,
+				CDB4D9E319FCD9410069BE62 /* Process.h */,
+				CDB4D9E419FCD9410069BE62 /* Process.m */,
+				CDB4D9E019F61E480069BE62 /* OrderedDictionary.h */,
+				CDB4D9E119F61E480069BE62 /* OrderedDictionary.m */,
+				CDB4D9DB19F4CDE90069BE62 /* ProcessMonitor.h */,
+				CDB4D9DC19F4CDE90069BE62 /* ProcessMonitor.m */,
+				CD5C999319D8B84B0015232A /* AlertViewBottom.h */,
+				CD5C999419D8B84B0015232A /* AlertViewBottom.m */,
+				CD5C998D19D73C380015232A /* AlertView.h */,
+				CD5C998E19D73C380015232A /* AlertView.m */,
+				CD5C998A19D73B7D0015232A /* AlertWindow.h */,
+				CD5C998B19D73B7D0015232A /* AlertWindow.m */,
+				CD5C998719D6810C0015232A /* WatchEvent.h */,
+				CD5C998819D6810C0015232A /* WatchEvent.m */,
+				CD5C998419D6752B0015232A /* Queue.h */,
+				CD5C998519D6752B0015232A /* Queue.m */,
+				CD5C998119D672CC0015232A /* NSMutableArray+QueueAdditions.h */,
+				CD5C998219D672CC0015232A /* NSMutableArray+QueueAdditions.m */,
+				CD5C998019D6684F0015232A /* fsEvents.h */,
+				CD7C874D19D51F8900EC7F0A /* PluginBase.h */,
+				CD7C874E19D51F8900EC7F0A /* PluginBase.m */,
+				CD7C874919D50F1200EC7F0A /* plugins */,
+				CD7C873E19D4C58700EC7F0A /* AlertWindowController.h */,
+				CD7C873F19D4C58700EC7F0A /* AlertWindowController.m */,
+				CD7F089119AE6DCA00FF00FC /* BlockBlock */,
+				CD7F088A19AE6DCA00FF00FC /* Frameworks */,
+				CD7F088919AE6DCA00FF00FC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CD7F088919AE6DCA00FF00FC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD7F088819AE6DCA00FF00FC /* BlockBlock.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD7F088A19AE6DCA00FF00FC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CDB4D9DE19F4D44F0069BE62 /* libdtrace.dylib */,
+				CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */,
+				CD7F088D19AE6DCA00FF00FC /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CD7F088D19AE6DCA00FF00FC /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CD7F088E19AE6DCA00FF00FC /* AppKit.framework */,
+				CD7F089019AE6DCA00FF00FC /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		CD7F089119AE6DCA00FF00FC /* BlockBlock */ = {
+			isa = PBXGroup;
+			children = (
+				CD8381291A7D94FA00AC0D96 /* Images.xcassets */,
+				CDD738C31A5F7FE800B825BA /* Base.lproj */,
+				CDD738C61A5F7FE800B825BA /* en.lproj */,
+				CDD738CB1A5F7FE800B825BA /* images */,
+				CD7C871319D43EAD00EC7F0A /* AppDelegate.h */,
+				CD7C871419D43EAD00EC7F0A /* AppDelegate.m */,
+				CD7C872419D4432C00EC7F0A /* Watcher.h */,
+				CD7C872519D4432C00EC7F0A /* Watcher.m */,
+				CD7F089219AE6DCA00FF00FC /* Supporting Files */,
+				CD7C872019D4428100EC7F0A /* ui */,
+				CD7C872719D4459A00EC7F0A /* watchList.plist */,
+			);
+			name = BlockBlock;
+			path = KnockKnock;
+			sourceTree = "<group>";
+		};
+		CD7F089219AE6DCA00FF00FC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CD7C871819D43F0200EC7F0A /* BlockBlock-Info.plist */,
+				CD7C871919D43F0200EC7F0A /* BlockBlock-Prefix.pch */,
+				CD7C871A19D43F0200EC7F0A /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CD8381371A7DAA0F00AC0D96 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				CD6090C51A7DBDA300E091CD /* itemIcon.png */,
+				CD6090C61A7DBDA300E091CD /* processIcon.png */,
+				CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */,
+				CD8381471A7DB29800AC0D96 /* upArrow.png */,
+				CD8381381A7DAA1300AC0D96 /* icons */,
+			);
+			name = images;
+			sourceTree = "<group>";
+		};
+		CD8381381A7DAA1300AC0D96 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				CD83813F1A7DAEE700AC0D96 /* statusOFF.png */,
+				CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */,
+				CD8381411A7DAEE700AC0D96 /* statusON.png */,
+				CD8381421A7DAEE700AC0D96 /* statusON@2x.png */,
+				CD8381391A7DAA1F00AC0D96 /* icon_128.png */,
+				CD83813A1A7DAA1F00AC0D96 /* icon_128@2x.png */,
+			);
+			name = icons;
+			sourceTree = "<group>";
+		};
+		CDD738C31A5F7FE800B825BA /* Base.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				CDD738C41A5F7FE800B825BA /* MainMenu.xib */,
+			);
+			name = Base.lproj;
+			path = ../BlockBlock/Base.lproj;
+			sourceTree = "<group>";
+		};
+		CDD738C61A5F7FE800B825BA /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				CDD738C71A5F7FE800B825BA /* Credits.rtf */,
+				CDD738C91A5F7FE800B825BA /* InfoPlist.strings */,
+			);
+			name = en.lproj;
+			path = ../BlockBlock/en.lproj;
+			sourceTree = "<group>";
+		};
+		CDD738CB1A5F7FE800B825BA /* images */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = images;
+			path = ../BlockBlock/images;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CD7F088719AE6DCA00FF00FC /* BlockBlock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD7F08B919AE6DCA00FF00FC /* Build configuration list for PBXNativeTarget "BlockBlock" */;
+			buildPhases = (
+				CD7F088419AE6DCA00FF00FC /* Sources */,
+				CD7F088519AE6DCA00FF00FC /* Frameworks */,
+				CD7F088619AE6DCA00FF00FC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BlockBlock;
+			productName = KnockKnock;
+			productReference = CD7F088819AE6DCA00FF00FC /* BlockBlock.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CD7F088019AE6DCA00FF00FC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = Synack;
+			};
+			buildConfigurationList = CD7F088319AE6DCA00FF00FC /* Build configuration list for PBXProject "BlockBlock" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CD7F087F19AE6DCA00FF00FC;
+			productRefGroup = CD7F088919AE6DCA00FF00FC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CD7F088719AE6DCA00FF00FC /* BlockBlock */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CD7F088619AE6DCA00FF00FC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */,
+				CD7C871F19D43F9C00EC7F0A /* MainMenu.xib in Resources */,
+				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
+				CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */,
+				CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */,
+				CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */,
+				CD83814A1A7DB2B200AC0D96 /* upArrowSmall@2x.png in Resources */,
+				CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */,
+				CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */,
+				CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */,
+				CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */,
+				CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */,
+				CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */,
+				CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */,
+				CD83813B1A7DAA1F00AC0D96 /* icon_128.png in Resources */,
+				CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */,
+				CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */,
+				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
+				CD83813C1A7DAA1F00AC0D96 /* icon_128@2x.png in Resources */,
+				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
+				CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */,
+				CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */,
+				CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CD7F088419AE6DCA00FF00FC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */,
+				CDD738BD1A5F7D0500B825BA /* StatusBarCustomView.m in Sources */,
+				CDB4D9E519FCD9410069BE62 /* Process.m in Sources */,
+				CD7C874C19D50F3B00EC7F0A /* Kext.m in Sources */,
+				CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */,
+				CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */,
+				CD8401331A044B0B000A1C5A /* Utilities.m in Sources */,
+				CD7C872619D4432C00EC7F0A /* Watcher.m in Sources */,
+				CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */,
+				CD5C998C19D73B7D0015232A /* AlertWindow.m in Sources */,
+				CD7C871C19D43F0200EC7F0A /* main.m in Sources */,
+				CD5C998F19D73C380015232A /* AlertView.m in Sources */,
+				CDD7390C1A5FABB800B825BA /* NSWindow+BugFix.m in Sources */,
+				CD3CE6951A23010B00B4F940 /* Uninstall.m in Sources */,
+				CD7C874119D4C58700EC7F0A /* AlertWindowController.m in Sources */,
+				CD5C998919D6810C0015232A /* WatchEvent.m in Sources */,
+				CD5C999519D8B84B0015232A /* AlertViewBottom.m in Sources */,
+				CDACB9271A2EF3330088CC30 /* InterProcComms.m in Sources */,
+				CDD738BF1A5F7D0500B825BA /* StatusBarPopoverController.m in Sources */,
+				CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */,
+				CD7C871519D43EAD00EC7F0A /* AppDelegate.m in Sources */,
+				CDB4D9DD19F4CDE90069BE62 /* ProcessMonitor.m in Sources */,
+				CD7C874F19D51F8900EC7F0A /* PluginBase.m in Sources */,
+				CDB4D9E219F61E480069BE62 /* OrderedDictionary.m in Sources */,
+				CD3CE68F1A22D3FA00B4F940 /* Install.m in Sources */,
+				CD5C998319D672CC0015232A /* NSMutableArray+QueueAdditions.m in Sources */,
+				CDCA50851A47DA700086B4D3 /* Logging.m in Sources */,
+				CDCA50091A3187D20086B4D3 /* Control.m in Sources */,
+				CD5C998619D6752B0015232A /* Queue.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CD7C871E19D43F9C00EC7F0A /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		CDD738C41A5F7FE800B825BA /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CDD738C51A5F7FE800B825BA /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		CDD738C71A5F7FE800B825BA /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CDD738C81A5F7FE800B825BA /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		CDD738C91A5F7FE800B825BA /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CDD738CA1A5F7FE800B825BA /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CD7F08B719AE6DCA00FF00FC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CD7F08B819AE6DCA00FF00FC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CD7F08BA19AE6DCA00FF00FC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
+				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
+				PRODUCT_NAME = BlockBlock;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		CD7F08BB19AE6DCA00FF00FC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
+				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
+				PRODUCT_NAME = BlockBlock;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CD7F088319AE6DCA00FF00FC /* Build configuration list for PBXProject "BlockBlock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD7F08B719AE6DCA00FF00FC /* Debug */,
+				CD7F08B819AE6DCA00FF00FC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD7F08B919AE6DCA00FF00FC /* Build configuration list for PBXNativeTarget "BlockBlock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD7F08BA19AE6DCA00FF00FC /* Debug */,
+				CD7F08BB19AE6DCA00FF00FC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CD7F088019AE6DCA00FF00FC /* Project object */;
+}
