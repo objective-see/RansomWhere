@@ -15,9 +15,6 @@
 // ->default to syslog, and if an err msg, to disk
 void logMsg(int level, NSString* msg)
 {
-    //TODO: disable debug logging for release build
-    //if(releaseBUILD)
-    
     
     //log prefix
     NSMutableString* logPrefix = nil;
@@ -33,13 +30,18 @@ void logMsg(int level, NSString* msg)
         [logPrefix appendString:@" ERROR"];
     }
     
-    //TOOD: only do this in debug build
-    //hack!!
-    // -> OS X only shows LOG_NOTICE and above~
+    //debug mode logic
+    #ifdef DEBUG
+    
+    //in debug mode promote debug msgs to LOG_NOTICE
+    // ->OS X only shows LOG_NOTICE and above~
     if(LOG_DEBUG == level)
     {
+        //promote
         level = LOG_NOTICE;
     }
+    
+    #endif
     
     //log to syslog
     syslog(level, "%s: %s", [logPrefix UTF8String], [msg UTF8String]);

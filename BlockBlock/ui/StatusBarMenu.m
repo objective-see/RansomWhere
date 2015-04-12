@@ -11,7 +11,9 @@
 #import "Utilities.h"
 #import "AppDelegate.h"
 #import "StatusBarMenu.h"
+
 #import "ConfigureWindowController.h"
+
 
 
 @implementation StatusBarMenu
@@ -20,6 +22,7 @@
 @synthesize controlObj;
 @synthesize shouldOpen;
 @synthesize viewController;
+@synthesize infoWindowController;
 
 //configure
 // ->set initial state, etc
@@ -289,14 +292,17 @@
 // ->load objective-see's documentation for BlockBlock
 -(void)about:(id)sender
 {
-    //dbg msg
-    logMsg(LOG_DEBUG, @"user clicked about");
+    //alloc/init about window
+    infoWindowController = [[InfoWindowController alloc] initWithWindowNibName:@"InfoWindow"];
     
-    NSURL *URL = [NSURL URLWithString:@"http://synack.com"];
+    //configure label and button
+    [self.infoWindowController configure:[NSString stringWithFormat:@"version: %@", getAppVersion()] buttonTitle:@"more info"];
     
-    //open URL
-    // ->invokes user's default browser
-    [[NSWorkspace sharedWorkspace] openURL:URL];
+    //center window
+    [[self.infoWindowController window] center];
+    
+    //show it
+    [self.infoWindowController showWindow:self];
     
     return;
 }

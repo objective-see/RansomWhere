@@ -65,6 +65,13 @@ NSDictionary* getOSVersion();
 //get path to app's (self) 'Info.plist' file
 NSString* infoPlistFile();
 
+//get app's version
+// ->extracted from Info.plist
+NSString* getAppVersion();
+
+//given a pid, get its parent (ppid)
+pid_t getParentID(int pid);
+
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive);
 

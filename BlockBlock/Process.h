@@ -31,10 +31,14 @@
     //icon
     NSImage* icon;
     
+    //parent id
+    pid_t parentID;
+    
 }
 
 @property pid_t pid;
 @property uid_t uid;
+@property pid_t ppid;
 @property (nonatomic, retain)NSImage* icon;
 @property (nonatomic, retain)NSString* path;
 @property (nonatomic, retain)NSString* name;
@@ -42,9 +46,6 @@
 
 //init function
 -(id)initWithPid:(pid_t)processID infoDictionary:(NSDictionary*)infoDictionary;
-
-//gets an icon path for an app
-//-(NSString*)getIconPath;
 
 //get an icon for a process
 -(NSImage*)getIconForProcess;

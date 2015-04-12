@@ -177,7 +177,6 @@
     return;
 }
 
-//TODO: make sure we remove some!?
 //for any old reported watch events
 // ->remove em, to keep numbers in check!
 -(void)pruneWatchEvents:(NSMutableDictionary*)reportedWatchEvents
@@ -198,12 +197,11 @@
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"obj: %@", reportedWatchEvents[key]]);
         
-        //check for old ones
-        // ->1 hr?
+        //check for old events
+        // ->anything over 1 hr
         if(60*60 <= [[NSDate date] timeIntervalSinceDate:((WatchEvent*)reportedWatchEvents[key]).timestamp])
         {
-            //old!!
-            // ->remove
+            //old, so remove
             [reportedWatchEvents removeObjectForKey:key];
         }
     }

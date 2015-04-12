@@ -12,17 +12,11 @@
 #import "Control.h"
 #import "Utilities.h"
 #import "Uninstall.h"
-#import "AppDelegate.h"
+#import "AlertView.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
+#import "AppDelegate.h"
 #import "ProcessMonitor.h"
-
-#import "AlertView.h"
-
-
-
-#import <syslog.h>
-
 
 @implementation AppDelegate
 
@@ -33,6 +27,8 @@
 @synthesize processMonitor;
 @synthesize interProcComms;
 @synthesize reportedWatchEvents;
+@synthesize infoWindowController;
+@synthesize errorWindowController;
 
 
 //automatically invoked when app is loaded
@@ -50,9 +46,6 @@
     
     //exit status
     int exitStatus = -1;
-    
-    //error window
-    ErrorWindowController* errorWindowController = nil;
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"applicationDidFinishLaunching: loaded in process %d as %d\n", getpid(), geteuid()]);
@@ -84,10 +77,10 @@
             
             //display it
             // ->call this first to so that outlets are connected (not nil)
-            [errorWindowController display];
+            [self.errorWindowController display];
             
             //configure it
-            [errorWindowController configure:@"your OS version is unsupported" shouldExit:YES];
+            [self.errorWindowController configure:@"your OS version is unsupported" shouldExit:YES];
             
             //bail
             // ->won't exit, since want user to see window, then click 'close'
@@ -238,6 +231,14 @@
             //dbg msg
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: starting BLOCKBLOCK (agent)");
             
+            //after a minute
+            //->check for updates in background
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+            {
+               //check
+               [self checkForUpdate];
+            });
+            
             //and run
             // ->shouldn't error
             [self startBlockBlocking_Agent];
@@ -385,6 +386,86 @@ bail:
     return;
 }
 
+//AGENT METHOD
+//check for update
+-(void)checkForUpdate
+{
+    //installed version
+    NSString* installedVersion = nil;
+    
+    //version data
+    NSData* versionData = nil;
+    
+    //version dictionary
+    NSDictionary* versionDictionary = nil;
+    
+    //latest version
+    NSString* latestVersion = nil;
+    
+    //get installed version
+    installedVersion = getAppVersion();
+    
+    //get version from remote URL
+    versionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSION_URL]];
+    
+    //sanity check
+    if(nil == versionData)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //convert JSON to dictionary
+    versionDictionary = [NSJSONSerialization JSONObjectWithData:versionData options:0 error:nil];
+    
+    //sanity check
+    if(nil == versionDictionary)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //extract latest version
+    latestVersion = versionDictionary[@"latestVersion"];
+    
+    //sanity check
+    if(nil == latestVersion)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //check if available version is newer
+    // ->show update window
+    if(NSOrderedAscending == [installedVersion compare:latestVersion options:NSNumericSearch])
+    {
+        //new version!
+        // ->show update popup on main thread
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            
+            //alloc/init about window
+            infoWindowController = [[InfoWindowController alloc] initWithWindowNibName:@"InfoWindow"];
+            
+            //configure
+            [self.infoWindowController configure:[NSString stringWithFormat:@"a new version (%@) is available", latestVersion] buttonTitle:@"update"];
+            
+            //center window
+            [[self.infoWindowController window] center];
+            
+            //show it
+            [self.infoWindowController showWindow:self];
+            
+            
+        });
+    }
+    
+//bail
+bail:
+    
+    return;
+}
+
+//AGENT METHOD
 //exec agent logic
 // ->init status bar and enable IPC
 -(void)startBlockBlocking_Agent

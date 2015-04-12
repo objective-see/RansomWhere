@@ -25,6 +25,16 @@
 @synthesize windowTitle;
 @synthesize moreInfoButton;
 
+//when window is shown
+// ->make white
+-(void)windowDidLoad
+{
+    //make white
+    [self.window setBackgroundColor: NSColor.whiteColor];
+    
+    return;
+}
+
 //configure window/buttons
 // ->also brings to front
 -(void)configure:(NSString*)title action:(NSUInteger)requestedAction
@@ -85,7 +95,7 @@
             if(YES == [detailedStatus isEqualToString:ACTION_REINSTALL])
             {
                 //init status msg
-                [self.statusMsg setStringValue:@"this version already installed"];
+                [self.statusMsg setStringValue:@"this version is already installed"];
             }
             
             //set msg about upgrading
@@ -245,6 +255,10 @@ bail:
     //handle non-'close' clicks
     if(YES != [button isEqualToString:ACTION_CLOSE])
     {
+        //disable 'x' button
+        // ->don't want user killing app during install/upgrade
+        [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:NO];
+        
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing BlockBlock", button]);
         
@@ -253,10 +267,10 @@ bail:
         {
             //err msg
             logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to %@", self.buttonTitle]);
-            
-            //bail
-            goto bail;
         }
+        
+        //ok to re-enable 'x' button
+        [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:YES];
     }
     
     //handle 'close'
@@ -282,16 +296,15 @@ bail:
 // ->load objective-see's documentation for BlockBlock error(s)
 -(IBAction)handleInfoClick:(id)sender
 {
-    //dbg msg
-    logMsg(LOG_DEBUG, @"user clicked more info button");
+    //url
+    NSURL *helpURL = nil;
     
-    //TODO get erorr and append it to url as anchor?
-    
-    NSURL *URL = [NSURL URLWithString:@"http://google.com"];
+    //build help URL
+    helpURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@#errors", PRODUCT_URL]];
     
     //open URL
     // ->invokes user's default browser
-    [[NSWorkspace sharedWorkspace] openURL:URL];
+    [[NSWorkspace sharedWorkspace] openURL:helpURL];
     
     return;
 }
@@ -305,14 +318,14 @@ bail:
     //control object
     Control* controlObj;
     
-    //action (for UI)
-    //NSString* action = nil;
-    
     //status msg frame
     CGRect statusMsgFrame = {0};
-    
+
     //result msg
     NSString* resultMsg = nil;
+    
+    //msg font
+    NSColor* resultMsgColor = nil;
     
     //dbg msg
     logMsg(LOG_DEBUG, @"handling life cycle event");
@@ -360,8 +373,11 @@ bail:
         logMsg(LOG_ERR, @"ERROR: failed to perform life cycle event");
         
         //set result msg
-        resultMsg = [NSString stringWithFormat:@"error: %@ failed", self.buttonTitle];
-    
+        resultMsg = [[NSString stringWithFormat:@"error: %@ failed", self.buttonTitle] lowercaseString];
+        
+        //set font to red
+        resultMsgColor = [NSColor redColor];
+        
         //show 'get more info' button
         // -> don't have to worry about (re)hiding since the only option is to close the app
         [self.moreInfoButton setHidden:NO];
@@ -376,6 +392,9 @@ bail:
     {
         //set result msg
         resultMsg = [NSString stringWithFormat:@"BlockBlock %@ed", self.buttonTitle];
+        
+        //set font to black
+        resultMsgColor = [NSColor blackColor];
         
         //set return var/flag
         bRet = YES;
@@ -396,7 +415,11 @@ bail:
     //update frame to align
     self.statusMsg.frame = statusMsgFrame;
     
-    [self.statusMsg setFont:[NSFont boldSystemFontOfSize:13]];
+    //set font to bold
+    [self.statusMsg setFont:[NSFont fontWithName:@"Menlo-Bold" size:13]];
+    
+    //set msg color
+    [self.statusMsg setTextColor:resultMsgColor];
     
     //set status msg
     [self.statusMsg setStringValue:resultMsg];

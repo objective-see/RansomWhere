@@ -77,7 +77,7 @@
     //case 4:
     // ->watch items paths aren't related means unrelated watch events
     // TODO: use 'in directory' code - google this!
-    // check both paths to make sure a isn't in b and b isnt' in a
+    // check both paths to make sure a isn't in b and b isn't in a
     
     
     
@@ -126,7 +126,11 @@
     //set binary (path) of startup item
     alertInfo[@"itemBinary"] = [self valueForStringItem: [self.plugin startupItemBinary:self]];
     
+    //add process pid
+    alertInfo[@"parentID"] = [NSString stringWithFormat:@"%d", self.process.ppid];
+    
     //dbg msg
+    // ->here since don't want to print out icon!
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"ALERT INFO dictionary: %@", alertInfo]);
     
     //add icon

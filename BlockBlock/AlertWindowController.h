@@ -72,8 +72,6 @@
 @property (weak) IBOutlet NSTextField *itemBinary;
 
 
-
-
 //bottom
 // ->block button
 @property (weak) IBOutlet NSButton *blockButton;
@@ -81,6 +79,9 @@
 //bottom
 // ->allow button
 @property (weak) IBOutlet NSButton *allowButton;
+
+//parent ID
+@property (nonatomic, retain)NSString* parentID;
 
 //uuid of watch event
 @property (nonatomic, retain)NSString* watchEventUUID;

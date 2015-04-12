@@ -9,6 +9,12 @@
 #ifndef BlockBlock_Consts_h
 #define BlockBlock_Consts_h
 
+//product url
+#define PRODUCT_URL @"https://objective-see.com/products/blockblock.html"
+
+//product verison url
+#define PRODUCT_VERSION_URL @"https://objective-see.com/products/blockblockVersion.json"
+
 //wait interval
 #define WAIT_INTERVAL 0.1f
 

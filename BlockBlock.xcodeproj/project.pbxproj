@@ -30,8 +30,6 @@
 		CD7C874F19D51F8900EC7F0A /* PluginBase.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C874E19D51F8900EC7F0A /* PluginBase.m */; };
 		CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */; };
 		CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD8381291A7D94FA00AC0D96 /* Images.xcassets */; };
-		CD83813B1A7DAA1F00AC0D96 /* icon_128.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381391A7DAA1F00AC0D96 /* icon_128.png */; };
-		CD83813C1A7DAA1F00AC0D96 /* icon_128@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD83813A1A7DAA1F00AC0D96 /* icon_128@2x.png */; };
 		CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */ = {isa = PBXBuildFile; fileRef = CD83813F1A7DAEE700AC0D96 /* statusOFF.png */; };
 		CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */; };
 		CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381411A7DAEE700AC0D96 /* statusON.png */; };
@@ -59,6 +57,10 @@
 		CDD7390C1A5FABB800B825BA /* NSWindow+BugFix.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */; };
 		CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */; };
 		CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */; };
+		CDE36C921AD3B67B00371F4E /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C911AD3B67B00371F4E /* icon.png */; };
+		CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */; };
+		CDE36C971AD4FEFB00371F4E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */; };
+		CDE36C991AD500EE00371F4E /* bbText.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C981AD500EE00371F4E /* bbText.png */; };
 		CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */; };
 		CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */; };
 /* End PBXBuildFile section */
@@ -109,8 +111,6 @@
 		CD7F088E19AE6DCA00FF00FC /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		CD7F089019AE6DCA00FF00FC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		CD8381291A7D94FA00AC0D96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BlockBlock/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		CD8381391A7DAA1F00AC0D96 /* icon_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_128.png; path = BlockBlock/images/icon/icon_128.png; sourceTree = "<group>"; };
-		CD83813A1A7DAA1F00AC0D96 /* icon_128@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon_128@2x.png"; path = "BlockBlock/images/icon/icon_128@2x.png"; sourceTree = "<group>"; };
 		CD83813F1A7DAEE700AC0D96 /* statusOFF.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusOFF.png; path = BlockBlock/images/icon/statusOFF.png; sourceTree = "<group>"; };
 		CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusOFF@2x.png"; path = "BlockBlock/images/icon/statusOFF@2x.png"; sourceTree = "<group>"; };
 		CD8381411A7DAEE700AC0D96 /* statusON.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusON.png; path = BlockBlock/images/icon/statusON.png; sourceTree = "<group>"; };
@@ -150,6 +150,11 @@
 		CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+BugFix.m"; path = "BlockBlock/NSWindow+BugFix.m"; sourceTree = "<group>"; };
 		CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ConfigureWindowController.xib; path = BlockBlock/ui/ConfigureWindowController.xib; sourceTree = SOURCE_ROOT; };
 		CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarPopover.xib; path = BlockBlock/ui/StatusBarPopover.xib; sourceTree = SOURCE_ROOT; };
+		CDE36C911AD3B67B00371F4E /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = BlockBlock/images/icon/icon.png; sourceTree = "<group>"; };
+		CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = InfoWindow.xib; path = BlockBlock/ui/InfoWindow.xib; sourceTree = SOURCE_ROOT; };
+		CDE36C941AD4FEFB00371F4E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = BlockBlock/ui/InfoWindowController.h; sourceTree = SOURCE_ROOT; };
+		CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = BlockBlock/ui/InfoWindowController.m; sourceTree = SOURCE_ROOT; };
+		CDE36C981AD500EE00371F4E /* bbText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bbText.png; path = BlockBlock/images/bbText.png; sourceTree = "<group>"; };
 		CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarMenu.h; path = BlockBlock/ui/StatusBarMenu.h; sourceTree = "<group>"; };
 		CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarMenu.m; path = BlockBlock/ui/StatusBarMenu.m; sourceTree = "<group>"; };
 		CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarMenu.xib; path = BlockBlock/ui/StatusBarMenu.xib; sourceTree = SOURCE_ROOT; };
@@ -184,6 +189,7 @@
 		CD7C872019D4428100EC7F0A /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */,
 				CD855A801A773EA700A13C5C /* AlertWindowController.xib */,
 				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
 				CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */,
@@ -257,6 +263,8 @@
 				CD7C874919D50F1200EC7F0A /* plugins */,
 				CD7C873E19D4C58700EC7F0A /* AlertWindowController.h */,
 				CD7C873F19D4C58700EC7F0A /* AlertWindowController.m */,
+				CDE36C941AD4FEFB00371F4E /* InfoWindowController.h */,
+				CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */,
 				CD7F089119AE6DCA00FF00FC /* BlockBlock */,
 				CD7F088A19AE6DCA00FF00FC /* Frameworks */,
 				CD7F088919AE6DCA00FF00FC /* Products */,
@@ -322,6 +330,7 @@
 		CD8381371A7DAA0F00AC0D96 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CDE36C981AD500EE00371F4E /* bbText.png */,
 				CD6090C51A7DBDA300E091CD /* itemIcon.png */,
 				CD6090C61A7DBDA300E091CD /* processIcon.png */,
 				CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */,
@@ -334,12 +343,11 @@
 		CD8381381A7DAA1300AC0D96 /* icons */ = {
 			isa = PBXGroup;
 			children = (
+				CDE36C911AD3B67B00371F4E /* icon.png */,
 				CD83813F1A7DAEE700AC0D96 /* statusOFF.png */,
 				CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */,
 				CD8381411A7DAEE700AC0D96 /* statusON.png */,
 				CD8381421A7DAEE700AC0D96 /* statusON@2x.png */,
-				CD8381391A7DAA1F00AC0D96 /* icon_128.png */,
-				CD83813A1A7DAA1F00AC0D96 /* icon_128@2x.png */,
 			);
 			name = icons;
 			sourceTree = "<group>";
@@ -428,20 +436,21 @@
 				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
 				CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */,
 				CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */,
+				CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */,
 				CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */,
+				CDE36C921AD3B67B00371F4E /* icon.png in Resources */,
 				CD83814A1A7DB2B200AC0D96 /* upArrowSmall@2x.png in Resources */,
 				CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */,
 				CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */,
 				CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */,
 				CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */,
 				CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */,
+				CDE36C991AD500EE00371F4E /* bbText.png in Resources */,
 				CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */,
 				CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */,
-				CD83813B1A7DAA1F00AC0D96 /* icon_128.png in Resources */,
 				CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */,
 				CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */,
 				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
-				CD83813C1A7DAA1F00AC0D96 /* icon_128@2x.png in Resources */,
 				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
 				CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */,
 				CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */,
@@ -467,6 +476,7 @@
 				CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */,
 				CD5C998C19D73B7D0015232A /* AlertWindow.m in Sources */,
 				CD7C871C19D43F0200EC7F0A /* main.m in Sources */,
+				CDE36C971AD4FEFB00371F4E /* InfoWindowController.m in Sources */,
 				CD5C998F19D73C380015232A /* AlertView.m in Sources */,
 				CDD7390C1A5FABB800B825BA /* NSWindow+BugFix.m in Sources */,
 				CD3CE6951A23010B00B4F940 /* Uninstall.m in Sources */,

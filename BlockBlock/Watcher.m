@@ -9,6 +9,7 @@
 #import "Consts.h"
 #import "Watcher.h"
 #import "Logging.h"
+#import "Utilities.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
@@ -435,7 +436,6 @@ bail:
     
     //should never exit
     // ->so log error here
-    //TODO: test if this get printed on shutdown
     logMsg(LOG_ERR, @"fs event watcher thread is returning...not good!");
     
     return;
@@ -461,6 +461,9 @@ bail:
     //global process list
     OrderedDictionary* processList = nil;
     
+    //parent ID
+    pid_t parentID = -1;
+    
     //process (from dtrace or app callback)
     Process* processFromList = nil;
     
@@ -476,11 +479,14 @@ bail:
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"creating watch event for %@ (%d)", path, fsEvent->pid]);
     
+    //try get parent
+    parentID = getParentID(fsEvent->pid);
+    
     //grab global process list
     processList = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList;
     
     //get process path
-    // ->will fail if process exited (this is handled in 'else' clause)
+    // ->will fail if process exited (this is handled in 'else' clause below)
     if(0 != proc_pidpath(fsEvent->pid, pidPath, PROC_PIDPATHINFO_MAXSIZE))
     {
         //alloc process info dictionary
@@ -492,8 +498,11 @@ bail:
         //set path
         processInfo[@"path"] = [NSString stringWithUTF8String:pidPath];
         
+        //set parent
+        processInfo[@"ppid"] = [NSNumber numberWithInt:parentID];
+        
         //try see if process monitor(s) grabbed it too
-        // ->they have more info, so preferred
+        // ->they have more info, so preferred to use that
         do
         {
             //always sync
@@ -540,7 +549,6 @@ bail:
         
     }//got pid from path
     
-    
     //couldn't get path (process likely already exited)
     // ->try lookup from process list (contains process objects from dtrace, etc)
     else
@@ -573,11 +581,11 @@ bail:
         } while(count++ < 1.0f/WAIT_INTERVAL);
         
         //if lookup (still) failed
-        // ->just create a process object with only a pid :/
+        // ->just create a process object with only a pid/ppid :/
         if(nil == watchEvent.process)
         {
             //create process object
-            watchEvent.process = [[Process alloc] initWithPid:fsEvent->pid infoDictionary:nil];
+            watchEvent.process = [[Process alloc] initWithPid:fsEvent->pid infoDictionary:@{@"ppid": [NSNumber numberWithInt:parentID]}];
         }
     }
     

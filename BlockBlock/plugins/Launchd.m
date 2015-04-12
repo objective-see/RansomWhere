@@ -15,8 +15,7 @@
 
 @implementation Launchd
 
-@synthesize itemBinary;
-
+//init
 -(id)initWithParams:(NSDictionary*)watchItemInfo
 {
     //init super
@@ -44,13 +43,20 @@
     // ->default to ignore
     BOOL shouldIgnore = YES;
     
+    //dbg msg
+    //TODO: remove
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"launchd plugin, watch flags for event: %lu", (unsigned long)watchEvent.flags]);
+    
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"launchd plugin, path: %@", watchEvent.path]);
+    
     //check creation of file
-    // ->just looking for the create of the launch item plist
-    if((FSE_CREATE_FILE == watchEvent.flags) &&
-       [[watchEvent.path pathExtension] isEqualToString:@"plist"] )
+    // ->just looking for the create/rename of the launch item plist
+    //   note: rename, to account for atomically created files
+    if( ( (FSE_CREATE_FILE == watchEvent.flags) || (FSE_RENAME == watchEvent.flags) ) &&
+        [[watchEvent.path pathExtension] isEqualToString:@"plist"] )
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE' set and is a plist (not ignoring)", watchEvent.path]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE || FSE_RENAME' set and is a plist (not ignoring)", watchEvent.path]);
         
         //don't ignore
         shouldIgnore = NO;
@@ -67,6 +73,9 @@
     //return var
     BOOL wasBlocked = NO;
     
+    //binary (path) of launch item
+    NSString* itemBinary = nil;
+    
     //error
     NSError* error = nil;
     
@@ -77,6 +86,8 @@
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
     
     //STEP 1: unload launch item via launchctl
+    
+    //unload via 'launchctl'
     status = execTask(LAUNCHCTL, @[@"unload", watchEvent.path], YES);
     if(STATUS_SUCCESS != status)
     {
@@ -93,21 +104,18 @@
     }
     
     //STEP 2: delete launch item binary
-    if(nil == self.itemBinary)
-    {
-        //try to get it
-        // ->set's 'itemBinary' iVar
-        [self startupItemBinary:watchEvent];
-    }
+   
+    //get name of startup binary
+    itemBinary = [self startupItemBinary:watchEvent];
     
     //delete binary
-    if(nil != self.itemBinary)
+    if(nil != itemBinary)
     {
         //delete
-        if(YES != [[NSFileManager defaultManager] removeItemAtPath:self.itemBinary error:&error])
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:itemBinary error:&error])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete %@ (%@)", self.itemBinary, error]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete %@ (%@)", itemBinary, error]);
             
             //don't bail since still want to delete plist...
         }
@@ -115,11 +123,19 @@
         else
         {
             //dbg msg
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", self.itemBinary]);
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", itemBinary]);
         }
+    }
+    //couldn't get path to binary
+    // ->just log msg (since still want to try delete plist)
+    else
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to find launch item binary in %@", watchEvent.path]);
     }
     
     //STEP 3: delete the launch item's plist
+    
     //delete
     if(YES != [[NSFileManager defaultManager] removeItemAtPath:watchEvent.path error:&error])
     {
@@ -159,28 +175,25 @@
     return itemName;
 }
 
-//get the binary of the launch item
-//TODO: i don't think we should use an iVar for item name? like what if its another name?
+//get the binary (path) of the launch item
 -(NSString*)startupItemBinary:(WatchEvent*)watchEvent
 {
+    //path to launch item binary
+    NSString* itemBinary = nil;
+    
     //array of 'ProgramArguments'
     NSArray* programArgs = nil;
     
-    //only look up if not already found
-    if(nil == self.itemBinary)
+    //get program args
+    // ->path is in args[0]
+    programArgs = getValueFromPlist(watchEvent.path, @"ProgramArguments", 1.0f);
+    if(nil != programArgs)
     {
-        //get program args
-        // ->path is in args[0]
-        programArgs = getValueFromPlist(watchEvent.path, @"ProgramArguments", 1.0f);
-        if(nil != programArgs)
-        {
-            //extract path to binary
-            // ->save it into iVar
-            self.itemBinary = programArgs[0];
-        }
+        //extract path to binary
+        // ->save it into iVar
+        itemBinary = programArgs[0];
     }
     
-    return self.itemBinary;
-    
+    return itemBinary;
 }
 @end

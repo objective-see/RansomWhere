@@ -36,25 +36,42 @@
 
 //take a closer look to make sure watch event is really one we care about
 // for kext, only care about the creation of the .kext directory (not files under it)
-
 // TODO: add support modifications of existing .kexts
-// TODO: check for dir .kext in name!? (is this required to load ASK GOOGLE!? test!!)
 -(BOOL)shouldIgnore:(WatchEvent*)watchEvent
 {
     //flag
     // ->default to ignore
     BOOL shouldIgnore = YES;
     
-    //check creation of directory
-    // ->a .kext is bundle
-    if(FSE_CREATE_DIR == watchEvent.flags)
+    //directory flag
+    BOOL isDirectory = NO;
+    
+    //ignore anything that's not a directory
+    // ->since .kexts are bundles (directories)
+    if( (YES != [[NSFileManager defaultManager] fileExistsAtPath:watchEvent.path isDirectory:&isDirectory]) ||
+        (YES != isDirectory) )
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_DIR' set (not ignoring)", watchEvent.path]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is not a directory, so ignoring", watchEvent.path]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //check creation of directory or rename
+    //  note: rename, to account for atomically created dirs?
+    if( (FSE_CREATE_DIR == watchEvent.flags) ||
+        (FSE_RENAME == watchEvent.flags) )
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is a directory and has 'FSE_CREATE_DIR/FSE_RENAME' set (not ignoring)", watchEvent.path]);
         
         //don't ignore
         shouldIgnore = NO;
     }
+
+//bail
+bail:
     
     return shouldIgnore;
 }
@@ -141,8 +158,6 @@ bail:
     return wasBlocked;
 }
 
-//TODO: initWithIconRef for iCONS (for apps)
-
 //get the name of the kext
 // note: manually load/parse Info.plist (instead of using bundle) since it might not be on disk yet...
 -(NSString*)startupItemName:(WatchEvent*)watchEvent
@@ -200,7 +215,6 @@ bail:
 
 //get the binary of the kext
 // ->parse
-//TODO: need to handle case where trigger is: /Users/patrick/Desktop/watchDir/unsigned.kext/Contents/Resources/en.lproj
 -(NSString*)startupItemBinary:(WatchEvent*)watchEvent
 {
     //name of kext

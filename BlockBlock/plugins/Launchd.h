@@ -14,7 +14,4 @@
     
 }
 
-//launch item binary
-@property (nonatomic, retain)NSString* itemBinary;
-
 @end

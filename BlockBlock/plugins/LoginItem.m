@@ -43,7 +43,7 @@
     BOOL shouldIgnore = YES;
     
     //rename or modification of file
-    // ->OS does a rename (TODO: test how this is affected programmatically, make sure we still detect!)
+    // ->OS does a rename
     if( (FSE_CREATE_FILE == watchEvent.flags) ||
         (FSE_RENAME == watchEvent.flags) )
     {
@@ -107,9 +107,6 @@
         //iterate over all watch paths to find those that belong to user
         for(NSString* watchPath in self.watchPaths)
         {
-            //TODO: remove
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking %@ vs %@", watchPath, homeDirectory]);
-            
             //check if its a user path
             // ->then update originals
             if(YES == [watchPath hasPrefix:@"~"])
@@ -142,10 +139,6 @@
     {
         //load into originals
         [((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals setObject:loginItems forKey:path];
-        
-        //TODO: rmeove
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updating: %@", ((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals[path]]);
-        
     }
 
     return;
@@ -262,16 +255,18 @@
     //parse alias data to get path
     loginItemPath = [self getPath:aliasData];
     
-    //add path
+    //set path
     if(nil != loginItemPath)
     {
-        //add
+        //set
         newLoginItem[@"path"] = loginItemPath;
     }
+    //couldn't find path
+    // ->just set to 'unknown'
     else
     {
-        //TODO set to 'unknown'?!?
-        ;
+        //set
+        newLoginItem[@"path"] = @"unknown";
     }
     
     //dbg msg
@@ -500,13 +495,6 @@ bail:
     {
         //save name
         itemName = newLoginItem[@"name"];
-    }
-    
-    //sanity check
-    //TODO: this should be done at a higher level!!
-    if(nil == itemName)
-    {
-        itemName = @"unknownz";
     }
     
     return itemName;

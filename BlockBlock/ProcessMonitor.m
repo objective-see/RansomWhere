@@ -101,7 +101,7 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
             
             //app path
             processInfo[@"appPath"] = [notification userInfo][@"NSApplicationPath"];
-            
+        
             //create process
             process = [[Process alloc] initWithPid:[processID intValue] infoDictionary:processInfo];
             
@@ -117,7 +117,6 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
             
             //insert process at end
             [self.processList insertObject:process forKey:processID atIndex:self.processList.count];
-            
         }
 
     }//sync
@@ -444,7 +443,8 @@ bail:
                     if( (nil == processInfo[@"pid"]) ||
                         (nil == processInfo[@"uid"]) ||
                         (nil == processInfo[@"name"]) ||
-                        (nil == processInfo[@"path"]) )
+                        (nil == processInfo[@"path"]) ||
+                        (nil == processInfo[@"ppid"]) )
                     {
                         //err msg
                         logMsg(LOG_ERR, [NSString stringWithFormat:@"process dictionary appears incomplete: %@", processInfo]);
@@ -462,10 +462,8 @@ bail:
                         fullPath = getFullPath(processInfo[@"pid"], processInfo[@"path"]);
                         if(nil != fullPath)
                         {
-                            
                             //dbg msg
                             //logMsg(LOG_ERR, [NSString stringWithFormat:@"updating short path (%@) with long path (%@)", processInfo[@"path"], fullPath]);
-                            
                             
                             //save
                             processInfo[@"path"] = fullPath;

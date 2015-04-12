@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Synack. All rights reserved.
 //
 
+#import "Consts.h"
 #import "Logging.h"
 #import "ErrorWindowController.h"
 
@@ -19,8 +20,6 @@
 @synthesize shouldExit;
 @synthesize closeButton;
 
-@synthesize instance;
-
 //configure the object/window
 -(void)configure:(NSString*)errorMessage shouldExit:(BOOL)exitOnClose
 {
@@ -29,10 +28,6 @@
     
     //save exit
     self.shouldExit = exitOnClose;
-    
-    //save instance
-    // ->needed to ensure window isn't ARC-dealloc'd when this function returns
-    self.instance = self;
     
     //set delegate
     [self.window setDelegate:self];
@@ -58,36 +53,35 @@
     //make close button active
     [self.window makeFirstResponder:closeButton];
     
+    //make white
+    [self.window setBackgroundColor: NSColor.whiteColor];
+    
     return;
 }
 
 //invoked when user clicks '?' (help button)
+// ->error situation
 - (IBAction)help:(id)sender
 {
-    //load website w/ #anchor
-    
-    //TODO get erorr and append it to url as anchor?
-    
-    NSURL *URL = [NSURL URLWithString:@"http://google.com"];
+    //url
+    NSURL *helpURL = nil;
+
+    //build help URL
+    helpURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@#errors", PRODUCT_URL]];
     
     //open URL
     // ->invokes user's default browser
-    [[NSWorkspace sharedWorkspace] openURL:URL];
+    [[NSWorkspace sharedWorkspace] openURL:helpURL];
+    
+    return;
 }
 
 //invoked when user clicks 'Close'
-// ->close window and exit process if 'shouldExit' iVar is set
+// ->tell window to close
 -(IBAction)close:(id)sender
 {
     //close
     [self.window close];
-    
-    //check if should exit process
-    if(YES == self.shouldExit)
-    {
-        //exit
-        [NSApp terminate:self];
-    }
     
     return;
 }
@@ -97,9 +91,6 @@
 // ->tell OS that we are done with window so it can (now) be freed
 -(void)windowWillClose:(NSNotification *)notification
 {
-    //bdg msg
-    logMsg(LOG_DEBUG, @"error popup window - windowWillClose()");
-    
     //check if should exit process
     // ->e.g. an error during install, etc
     if(YES == self.shouldExit)
@@ -110,7 +101,7 @@
     
     //set strong instance var to nil
     // ->will tell ARC, its finally ok to release us :)
-    self.instance = nil;
+    //self.instance = nil;
     
     return;
 }

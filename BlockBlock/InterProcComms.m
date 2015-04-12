@@ -24,6 +24,7 @@
 @implementation InterProcComms
 
 @synthesize registeredAgents;
+@synthesize errorWindowController;
 
 -(id)init
 {
@@ -312,7 +313,7 @@ bail:
 
 //daemon method
 // ->send the alert request to agent
--(void)sendAlertToAgent:(WatchEvent*) watchEvent userInfo:(NSMutableDictionary*)userInfo
+-(void)sendAlertToAgent:(WatchEvent*)watchEvent userInfo:(NSMutableDictionary*)userInfo
 {
     //add session id to dictionary that is sent to agents
     // ->allows correct one to display alert
@@ -446,9 +447,6 @@ bail:
 // ->display an error popup
 -(void)displayErrorViaIPC:(NSNotification *)notification
 {
-    //error popop
-    ErrorWindowController* errorWindowController = nil;
-    
     //user info dictionary
     NSDictionary* userInfo = nil;
     
@@ -488,17 +486,16 @@ bail:
     
     //display it
     // ->call this first to so that outlets are connected (not nil)
-    [errorWindowController display];
+    [self.errorWindowController display];
     
     //configure it
-    [errorWindowController configure:userInfo[KEY_ERROR_MSG] shouldExit:NO];
+    [self.errorWindowController configure:userInfo[KEY_ERROR_MSG] shouldExit:NO];
     
 //bail
 bail:
     
     return;
 }
-
 
 //AGENT METHOD
 // ->perform some action in user's session
@@ -512,9 +509,6 @@ bail:
     
     //action
     NSUInteger action = -1;
-    
-    //error popop
-    ErrorWindowController* errorWindowController = nil;
     
     //grab script info
     actionInfo = notification.userInfo;
@@ -557,37 +551,38 @@ bail:
     switch(action)
     {
         //delete a login item
+        // ->accomplished by executing apple script cmd in user's session
         case ACTION_DELETE_LOGIN_ITEM:
         {
             //dbg msg
             logMsg(LOG_DEBUG, @"blocking/deleting login item");
             
             //delete login item
-            //TODO: test error case~
             if(YES != [LoginItem deleteLoginItem:actionInfo[KEY_ACTION_PARAM_ONE]])
             {
                 //err msg
-                logMsg(LOG_ERR, @"failed to delete login item!");
+                logMsg(LOG_ERR, @"failed to delete login item");
                 
                 //alloc error window
                 errorWindowController = [[ErrorWindowController alloc] initWithWindowNibName:@"ErrorWindowController"];
                 
                 //display it
                 // ->call this first to so that outlets are connected (not nil)
-                [errorWindowController display];
+                [self.errorWindowController display];
                 
                 //configure it
-                [errorWindowController configure:actionInfo[KEY_ERROR_MSG] shouldExit:NO];
+                [self.errorWindowController configure:actionInfo[KEY_ERROR_MSG] shouldExit:NO];
                 
                 //bail
                 goto bail;
             }
-            //deleted item
+            
+            //deleted item ok
+            // ->just log dbg msg
             else
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, @"deleted login item!");
-                
             }
         
             break;
@@ -604,12 +599,9 @@ bail:
 }
 
 
-
-
-/* DAEMON CODE */
-
-//handle user selection
-// ->invoked from UI (agent) on daemon
+//DAEMON CODE
+// ->handle user selection
+//   invoked from UI (agent) on daemon
 -(void)handleAlertViaIPC:(NSNotification *)notification
 {
     //reported watch event

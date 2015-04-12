@@ -5,14 +5,15 @@
 //  Created by Patrick Wardle on 8/27/14.
 //  Copyright (c) 2014 Synack. All rights reserved.
 //
-
 #import <Cocoa/Cocoa.h>
-#import "Watcher.h"
+
 #import "Control.h"
-#import "InterProcComms.h"
-#import "ConfigureWindowController.h"
+#import "Watcher.h"
 #import "StatusBarMenu.h"
+#import "InterProcComms.h"
+#import "InfoWindowController.h"
 #import "ErrorWindowController.h"
+#import "ConfigureWindowController.h"
 
 @class ProcessMonitor;
 @class WatchEvent;
@@ -40,6 +41,13 @@
     Control* controlObj;
     
 }
+
+//error window
+@property(nonatomic, retain) ErrorWindowController* errorWindowController;
+
+//info window
+@property(nonatomic, retain)InfoWindowController* infoWindowController;
+
 //IPC object
 @property (nonatomic, retain)Control* controlObj;
 
@@ -66,14 +74,26 @@
 @property(nonatomic,retain)NSMutableDictionary* orginals;
 
 /* METHODS */
-//TODO: update
-
-//display configuration window to w/ 'install' || 'uninstall' button
--(void)displayConfigureWindow:(NSString*)windowTitle action:(NSUInteger)action;
 
 //make the instance of the uninstall process foreground
 // ->then show the 'configure' window (w/ 'uninstall' button)
 -(BOOL)initUninstall;
+
+//exec daemon logic
+// ->init watchers/queue/etc and enable IPC
+-(void)startBlockBlocking_Daemon;
+
+//exec agent logic
+// ->init status bar and enable IPC
+-(void)startBlockBlocking_Agent;
+
+//display configuration window to w/ 'install' || 'uninstall' button
+-(void)displayConfigureWindow:(NSString*)windowTitle action:(NSUInteger)action;
+
+//initialize status menu bar
+-(void)loadStatusBar;
+
+
 
 
 

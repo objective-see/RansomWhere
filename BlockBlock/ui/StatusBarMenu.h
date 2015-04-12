@@ -10,6 +10,7 @@
 #import "InterProcComms.h"
 
 #import "StatusBarCustomView.h"
+#import "InfoWindowController.h"
 #import "StatusBarPopoverController.h"
 
 #import <Cocoa/Cocoa.h>
@@ -50,6 +51,9 @@
 -(IBAction)uninstallHandler:(id)sender;
 -(IBAction)about:(id)sender;
 
+
+//about window controller
+@property(nonatomic, retain)InfoWindowController* infoWindowController;
 
 //(top) status bar item
 @property (strong, nonatomic)NSStatusItem* statusBarItem;

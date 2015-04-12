@@ -23,8 +23,9 @@
 @synthesize pid;
 @synthesize uid;
 @synthesize icon;
-@synthesize path;
 @synthesize name;
+@synthesize path;
+@synthesize ppid;
 @synthesize bundle;
 
 //init w/ a pid
@@ -45,51 +46,14 @@
         //save pid
         self.pid = processID;
         
-        //if other info was provided
-        // ->save it
-        if(nil != infoDictionary)
+        //init parent id
+        self.ppid = -1;
+        
+        //process name
+        if(nil != infoDictionary[@"name"])
         {
-            //TODO: use: infoDictionary[@"key"] format!
-            
-            //process name
-            if(nil != [infoDictionary objectForKey:@"name"])
-            {
-                //save name
-                self.name = [infoDictionary objectForKey:@"name"];
-            }
-            
-            //process uid
-            if(nil != infoDictionary[@"uid"])
-            {
-                //save uid
-                self.uid = [infoDictionary[@"uid"] intValue];
-            }
-            
-            //process (binary) path
-            if(nil != [infoDictionary objectForKey:@"path"])
-            {
-                //save path
-                self.path = [infoDictionary objectForKey:@"path"];
-            }
-            
-            //process bundle
-            // ->direct load via app path
-            if(nil != [infoDictionary objectForKey:@"appPath"])
-            {
-                //load app bundle
-                // ->path will be set for 'apps'
-                self.bundle = [NSBundle bundleWithPath:[infoDictionary objectForKey:@"appPath"]];
-            }
-            
-            //process bundle
-            // ->indirect load via binary path
-            if( (nil == self.bundle) &&
-                (nil != self.path) )
-            {
-                //try to get app's bundle from binary path
-                // ->of course, will only succeed for apps
-                self.bundle = findAppBundle(self.path);
-            }
+            //save name
+            self.name = infoDictionary[@"name"];
         }
         
         //name still blank?
@@ -100,12 +64,11 @@
             [self determineName];
         }
         
-        //path still blank?
-        // ->try to determine it
-        if(nil == self.path)
+        //process uid
+        if(nil != infoDictionary[@"uid"])
         {
-            //resolve name
-            [self determinePath];
+            //save uid
+            self.uid = [infoDictionary[@"uid"] intValue];
         }
         
         //uid still unknown?
@@ -114,6 +77,47 @@
         {
             //resolve UID
             [self determineUID];
+        }
+        
+        //process (binary) path
+        if(nil != [infoDictionary objectForKey:@"path"])
+        {
+            //save path
+            self.path = [infoDictionary objectForKey:@"path"];
+        }
+        
+        //path still blank?
+        // ->try to determine it
+        if(nil == self.path)
+        {
+            //resolve name
+            [self determinePath];
+        }
+        
+        //process bundle
+        // ->direct load via app path
+        if(nil != [infoDictionary objectForKey:@"appPath"])
+        {
+            //load app bundle
+            // ->path will be set for 'apps'
+            self.bundle = [NSBundle bundleWithPath:[infoDictionary objectForKey:@"appPath"]];
+        }
+        
+        //process bundle
+        // ->indirect load via binary path
+        if( (nil == self.bundle) &&
+            (nil != self.path) )
+        {
+            //try to get app's bundle from binary path
+            // ->of course, will only succeed for apps
+            self.bundle = findAppBundle(self.path);
+        }
+    
+        //parent id
+        if(nil != infoDictionary[@"ppid"])
+        {
+            //save ppid
+            self.ppid = [infoDictionary[@"ppid"] intValue];
         }
         
     }//init self
@@ -156,21 +160,13 @@
     }
     
     //try to get path from name
-    // ->use 'which'?
+    // ->use 'which' helper function
     else if(nil != self.name)
     {
-        //if its relative
-        //TODO: how to check?
-        // i believe elsewhere we use fileExists as path - so find and replace this too!!
-        //if !isRelative // isFullPath
-        //self.path = self.name;
-        
-        //else
-        //resolve using 'which' helper function
+        //resolve
         self.path = which(self.name);
     }
-    
-    
+
     return;
 }
 
@@ -218,7 +214,6 @@
         
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted UID for process: %d", self.uid]);
-
     }
     else
     {
@@ -272,34 +267,8 @@
 -(NSString *)description
 {
     //pretty print
-    return [NSString stringWithFormat: @"pid:%d name=%@ path=%@, bundle=%@", self.pid, self.name, self.path, self.bundle];
+    return [NSString stringWithFormat: @"pid:%d ppid=%d name=%@ path=%@, bundle=%@", self.pid, self.ppid, self.name, self.path, self.bundle];
 }
-
-/*
-//TODO: might not need this, if icon is ok to pass thru the notification center
-//gets an icon path for an app
--(NSString*)getIconPath
-{
-    //icon's path
-    NSString* iconPath = nil;
-    
-    //icon's file name
-    NSString* iconFile = nil;
-    
-    //for app's
-    // ->extract their icon
-    if(nil != self.bundle)
-    {
-        //get file
-        iconFile = self.bundle.infoDictionary[@"CFBundleIconFile"];
-        
-        //set full path
-        iconPath = [self.bundle pathForResource:[iconFile stringByDeletingPathExtension] ofType:[iconFile pathExtension]];
-    }
-    
-    return iconPath;
-}
-*/
 
 //get an icon for a process
 // ->for apps, this will be app's icon, otherwise just a standard system one

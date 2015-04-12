@@ -38,30 +38,6 @@
 @synthesize instance;
 
 
-/*
--(id)init
-{
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"ALERT WINDOW: init callled!!!");
-    
-    //init super
-    self = [super init];
-    if(nil != self)
-    {
-        
-        self.windowController = [[NSWindowController alloc] initWithWindowNibName:@"AlertWindowController"];
-        
-        //initWithWindowNibName:@"AlertWindowController"]
-        //alloc
-        alertWindowController = self;
-    }
-    
-    return self;
-}
- 
-*/
-
 //configure the alert with the info from the daemon
 -(void)configure:(NSDictionary*)alertInfo
 {
@@ -82,7 +58,7 @@
     self.window.delegate = self;
 
     //iterate over all keys
-    // ->add value from dictionar into object
+    // ->add value from dictionary into object
     for(NSString* key in alertInfo)
     {
         //process icon is special case
@@ -104,7 +80,16 @@
             //set 'watchEventUUID' iVar
             self.watchEventUUID = alertInfo[key];
             
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watchEvent ID: %@/%@", alertInfo[key], self.watchEventUUID]);
+            //next
+            continue;
+        }
+        
+        //parent ID isn't a UI element (for now)
+        // ->so just save it here
+        else if(YES == [key isEqualToString:@"parentID"])
+        {
+            //set 'watchEventUUID' iVar
+            self.parentID = alertInfo[key];
             
             //next
             continue;
@@ -119,9 +104,6 @@
         // ->this is ok if this fails since passed keys aren't needed/used by the window
         if(NULL == instanceVariable)
         {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"%@ isn't a key in object", key]);
-            
             //next
             continue;
         }
@@ -137,6 +119,9 @@
             ((NSTextField*)iVarObj).stringValue = alertInfo[key];
         }
     }
+    
+    //append process id and parent id
+    [self.processID setStringValue:[NSString stringWithFormat:@"%@ (parent: %@)", [self.processID stringValue], self.parentID]];
     
     //make sure text's fits
     // ->some might be multiple lines...
@@ -404,9 +389,21 @@
     //dbg msg
     //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"substring: %@", subString]);
     
-    //width
-    // ->first line string, then rest of last line
-    width = [subString sizeWithAttributes: @{NSFontAttributeName: textField.font}].width + textField.frame.size.width;
+    //NSLog(@"length: %f", [subString sizeWithAttributes: @{NSFontAttributeName: textField.font}].width);
+    
+    //if item fits in one line
+    // ->just return width as is!
+    if(1 == [(__bridge NSArray*)CTFrameGetLines(frame) count])
+    {
+        //width of just first line
+        width = [subString sizeWithAttributes: @{NSFontAttributeName: textField.font}].width;
+    }
+    else
+    {
+        //width
+        // ->first line string, then rest of last line
+        width = [subString sizeWithAttributes: @{NSFontAttributeName: textField.font}].width + textField.frame.size.width;
+    }
     
 //bail
 bail:
@@ -422,46 +419,6 @@ bail:
 
     return width;
 }
-
-//TODO: replace consolas w/ menlo!
-
-
-/*
-//configure window
-//TODO: comments
--(void)windowWillLoad
-{
-    
-    [self.processIcon setWantsLayer: YES];
-    [self.processIcon.layer setBackgroundColor: [NSColor redColor].CGColor];
-    
-
-    
-    CALayer *viewLayer1 = [CALayer layer];
-    [viewLayer1 setBackgroundColor:[NSColor colorWithCalibratedRed:0.0f green:0.0f blue:0.0f alpha:0.4f].CGColor]; //CGColorCreateGenericRGB(0.0, 0.0, 0.0, 0.4)]; //RGB plus Alpha Channel
-    [self.processIcon setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
-    [self.processIcon setLayer:viewLayer1];
-    
-    
-    CALayer *viewLayer = [CALayer layer];
-    [viewLayer setBackgroundColor:[NSColor colorWithCalibratedRed:0.0f green:0.0f blue:0.0f alpha:0.4f].CGColor];//CGColorCreateGenericRGB(0.0, 0.0, 0.0, 0.4)]; //RGB plus Alpha Channel
-    [self.bottomView setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
-    [self.bottomView setLayer:viewLayer];
-    
-    float r = (rand() % 255) / 255.0f;
-    float g = (rand() % 255) / 255.0f;
-    float b = (rand() % 255) / 255.0f;
-    
-    if(self.bottomView.layer)
-    {
-        CGColorRef color = CGColorCreateGenericRGB(r, g, b, 1.0f);
-        self.bottomView.layer.backgroundColor = color;
-        CGColorRelease(color);
-    }
-    
-}
- 
-*/
 
 //automatically invoked when user clicks 'deny'
 // invokes 'sendActionToDaemon' so that notification will be sent/handled

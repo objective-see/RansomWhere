@@ -32,7 +32,7 @@ this->ptrsize = this->isx64 ? sizeof(uint64_t) : sizeof(uint32_t); \
 this->argc=curproc->p_argc; \
 this->argv=(uint64_t)copyin(curproc->p_dtrace_argv,this->ptrsize*this->argc); \
 this->processName = this->isx64 ? copyinstr(*(uint64_t*)(this->argv)) : copyinstr(*(uint32_t*)(this->argv)); \
-printf(\"###{\\\"pid\\\": %d, \\\"uid\\\": %d, \\\"name\\\": \\\"%s\\\", \\\"path\\\": \\\"%s\\\"}\", pid, uid, execname, this->processName); \
+printf(\"###{\\\"pid\\\": %d, \\\"uid\\\": %d, \\\"name\\\": \\\"%s\\\", \\\"path\\\": \\\"%s\\\", \\\"ppid\\\": %d}\", pid, uid, execname, this->processName, ppid); \
 }";
 
 //size of dtrace output buffer

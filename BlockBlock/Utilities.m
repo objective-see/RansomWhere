@@ -12,6 +12,7 @@
 
 
 #import <libproc.h>
+#include <sys/sysctl.h>
 #import <OpenDirectory/OpenDirectory.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
@@ -126,6 +127,7 @@ id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait)
             // ->just in case its still being saved
             [NSThread sleepForTimeInterval:WAIT_INTERVAL];
             
+            //dbg msg
             logMsg(LOG_DEBUG, @"napping...plist");
             
             //try to load content's of Info.plist
@@ -775,6 +777,52 @@ bail:
     return path;
 }
 
+//get app's version
+// ->extracted from Info.plist
+NSString* getAppVersion()
+{
+    //read and return 'CFBundleVersion' from bundle
+    return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+}
+
+
+//given a pid, get its parent (ppid)
+pid_t getParentID(int pid)
+{
+    //parent id
+    pid_t parentID = -1;
+    
+    //kinfo_proc struct
+    struct kinfo_proc processStruct = {0};
+    
+    //size
+    size_t procBufferSize = sizeof(processStruct);
+    
+    //mib
+    const u_int mibLength = 4;
+    
+    //syscall result
+    int sysctlResult = -1;
+    
+    //init mib
+    int mib[mibLength] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, pid};
+    
+    //make syscall
+    sysctlResult = sysctl(mib, mibLength, &processStruct, &procBufferSize, NULL, 0);
+    
+    //check if got ppid
+    if( (STATUS_SUCCESS == sysctlResult) &&
+        (0 != procBufferSize) )
+    {
+        //save ppid
+        parentID = processStruct.kp_eproc.e_ppid;
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted parent ID %d for process: %d", parentID, pid]);
+    }
+    
+    return parentID;
+}
 
 
 //if string is too long to fit into a the (2-lines) text field
@@ -793,90 +841,9 @@ NSString* stringByTruncatingString(NSTextField* textField, float width)
     //make copy of string
     truncatedString = [[textField stringValue] mutableCopy];
    
-    /*
-    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
-    
-    [style setParagraphStyle:[NSParagraphStyle defaultParagraphStyle]];
-    [style setAlignment:NSLeftTextAlignment];
-    [style setLineBreakMode:NSLineBreakByWordWrapping];
-    
-    NSDictionary *attrDict = @{
-                           NSParagraphStyleAttributeName: style,
-                           NSFontAttributeName: textField.font
-                           };
-    
-    //NSDictionary *attrDict = [self stringAttributesDictWithFont:font];
-    NSAttributedString *attrStr = [[NSAttributedString alloc] initWithString:[textField stringValue] attributes:attrDict];
-    
-    
-    //init attributed string
-    //attributedString = [[NSAttributedString alloc] initWithString:string];
-    
-    
-    NSTextContainer* tc = [[NSTextContainer alloc] initWithContainerSize:textField.frame.size];
-    
-    
-    NSLayoutManager* lm = [NSLayoutManager new];
-    NSTextStorage* tm = [[NSTextStorage alloc] initWithAttributedString:attrStr];
-    [tm addLayoutManager:lm];
-    [lm addTextContainer:tc];
-    
-    
-    [[textField cell] setWraps:YES];
-    [[textField cell] setLineBreakMode:NSLineBreakByWordWrapping];
-    
-    
-    
-    //unsigned numberOfLines, index, numberOfGlyphs = [lm numberOfGlyphs];
-    NSRange lineRange;
-    //for (numberOfLines = 0, index = 0; index < numberOfGlyphs; numberOfLines++){
-        (void) [lm lineFragmentRectForGlyphAtIndex:0
-                                               effectiveRange:&lineRange];
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"line range: %@", NSStringFromRange(lineRange)]);
-    //}
-    
-    
-    
-    NSString* subString0 = [[textField stringValue] substringWithRange:NSMakeRange(lineRange.location, lineRange.length)];
-    
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"substring 0: %@", subString0]);
-    
-
-    CTFramesetterRef fs = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)attrStr);
-    
-    CGMutablePathRef path = CGPathCreateMutable();
-    
-    
-    CGPathAddRect(path, NULL, CGRectMake(0,0, textField.frame.size.width, textField.frame.size.height));
-    
-    CTFrameRef f = CTFramesetterCreateFrame(fs, CFRangeMake(0, 0), path, NULL);
-    CTFrameDraw(f, NULL);
-    
-    NSArray* lines = (__bridge NSArray*)CTFrameGetLines(f);
-    
-    CTLineRef theLine = (__bridge CTLineRef)[lines firstObject];
-    CFRange range = CTLineGetStringRange(theLine);
-    
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"lines: %@", lines]);
-    
-    NSLog(@"%ld %ld", range.location, range.length);
-    
-    //substring
-    // ->string on first line
-    NSString* subString = [string substringWithRange:NSMakeRange(range.location, range.length)];
-    
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"substring 1: %@", subString]);
-    
-    
-    //width
-    // ->first line string, then rest of last line
-    float width = [subString sizeWithAttributes: @{NSFontAttributeName: font}].width + textField.frame.size.width;
-    
-    */
-    
     //sanity check
     // ->make sure string needs truncating
-    if([[textField stringValue] sizeWithAttributes: @{NSFontAttributeName: textField.font}].width < width)
+    if([[textField stringValue] sizeWithAttributes: @{NSFontAttributeName: textField.font}].width <= width)
     {
         logMsg(LOG_DEBUG, @"bail here - string is not long enough! ok as is :)");
         

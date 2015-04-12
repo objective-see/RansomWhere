@@ -13,10 +13,6 @@
     
 }
 
-//pointer to self
-// ->ensure that memory isn't prematurely released
-@property (strong, nonatomic)ErrorWindowController* instance;
-
 //error msg in window
 @property (weak) IBOutlet NSTextField *errMsg;
 
