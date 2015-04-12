@@ -259,6 +259,9 @@ bail:
         // ->don't want user killing app during install/upgrade
         [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:NO];
         
+        //clear status msg
+        [self.statusMsg setStringValue:@""];
+        
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing BlockBlock", button]);
         

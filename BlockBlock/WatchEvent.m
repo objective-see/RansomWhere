@@ -164,7 +164,7 @@
 
 //for pretty print
 -(NSString *)description {
-    return [NSString stringWithFormat: @"pid:%d process=%@(%@) file path=%@, flags=%lx, timestamp: %@", self.process.pid, self.process.name, self.process.path, self.path, (unsigned long)self.flags, self.timestamp];
+    return [NSString stringWithFormat: @"process=%@, file path=%@, flags=%lx, timestamp: %@", self.process, self.path, (unsigned long)self.flags, self.timestamp];
 }
 
 

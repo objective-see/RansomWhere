@@ -35,6 +35,12 @@ this->processName = this->isx64 ? copyinstr(*(uint64_t*)(this->argv)) : copyinst
 printf(\"###{\\\"pid\\\": %d, \\\"uid\\\": %d, \\\"name\\\": \\\"%s\\\", \\\"path\\\": \\\"%s\\\", \\\"ppid\\\": %d}\", pid, uid, execname, this->processName, ppid); \
 }";
 
+/* TODO: maybe forks?
+ dtrace -n 'syscall::fork*:entry{printf("%s %d",execname,pid);}'
+ 
+ ...otherwise might miss some pIDs (e.g. run iWorms's update binary) / ppids
+ */
+
 //size of dtrace output buffer
 #define BUFFER_SIZE 512
 

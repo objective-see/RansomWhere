@@ -307,7 +307,6 @@
     return;
 }
 
-
 #pragma mark - Popover
 
 -(void)closePopover
@@ -381,7 +380,8 @@
 
 -(void)menuletClicked
 {
-    self.active = ! self.active;
+    //toggle active flag
+    self.active = !self.active;
     
     //dbg msg
     logMsg(LOG_DEBUG, @"menu clicked!");

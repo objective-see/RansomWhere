@@ -541,7 +541,6 @@ bail:
         {
             //dbg msg
             //logMsg(LOG_DEBUG, @"not found in process list, so creating just with pid/path");
-            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"proc from list %@", processFromList]);
             
             //create process object
             watchEvent.process = [[Process alloc] initWithPid:fsEvent->pid infoDictionary:processInfo];

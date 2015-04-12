@@ -56,14 +56,6 @@
             self.name = infoDictionary[@"name"];
         }
         
-        //name still blank?
-        // ->try to determine it
-        if(nil == self.name)
-        {
-            //resolve name
-            [self determineName];
-        }
-        
         //process uid
         if(nil != infoDictionary[@"uid"])
         {
@@ -71,38 +63,29 @@
             self.uid = [infoDictionary[@"uid"] intValue];
         }
         
-        //uid still unknown?
-        // ->try figure it out via syscall
-        if(-1 == self.uid)
-        {
-            //resolve UID
-            [self determineUID];
-        }
-        
         //process (binary) path
-        if(nil != [infoDictionary objectForKey:@"path"])
+        if(nil != infoDictionary[@"path"])
         {
             //save path
-            self.path = [infoDictionary objectForKey:@"path"];
-        }
-        
-        //path still blank?
-        // ->try to determine it
-        if(nil == self.path)
-        {
-            //resolve name
-            [self determinePath];
+            self.path = infoDictionary[@"path"];
         }
         
         //process bundle
         // ->direct load via app path
-        if(nil != [infoDictionary objectForKey:@"appPath"])
+        if(nil != infoDictionary[@"appPath"])
         {
             //load app bundle
             // ->path will be set for 'apps'
-            self.bundle = [NSBundle bundleWithPath:[infoDictionary objectForKey:@"appPath"]];
+            self.bundle = [NSBundle bundleWithPath:infoDictionary[@"appPath"]];
         }
         
+        //parent id
+        if(nil != infoDictionary[@"ppid"])
+        {
+            //save ppid
+            self.ppid = [infoDictionary[@"ppid"] intValue];
+        }
+
         //process bundle
         // ->indirect load via binary path
         if( (nil == self.bundle) &&
@@ -113,15 +96,32 @@
             self.bundle = findAppBundle(self.path);
         }
     
-        //parent id
-        if(nil != infoDictionary[@"ppid"])
+        //name still blank?
+        // ->try to determine it
+        if(nil == self.name)
         {
-            //save ppid
-            self.ppid = [infoDictionary[@"ppid"] intValue];
+            //resolve name
+            [self determineName];
         }
         
-    }//init self
+        //path still blank?
+        // ->try to determine it
+        if(nil == self.path)
+        {
+            //resolve name
+            [self determinePath];
+        }
+        
+        //uid still unknown?
+        // ->try figure it out via syscall
+        if(-1 == self.uid)
+        {
+            //resolve UID
+            [self determineUID];
+        }
     
+    }//init self
+
     return self;
 }
 
@@ -137,9 +137,10 @@
         self.name = [self.bundle infoDictionary][@"CFBundleName"];
     }
     
-    //try from path
-    // ->grab last component
-    else if(nil != self.path)
+    //no bundle/that fail
+    // ->try from path, by grabbing last component
+    if( (nil == self.name) &&
+        (nil != self.path) )
     {
         //extract name
         self.name = [self.path lastPathComponent];
@@ -152,9 +153,12 @@
 // ->either from bundle or via 'which'
 -(void)determinePath
 {
+    logMsg(LOG_DEBUG, @"determining path");
     //try to get path from bundle
     if(nil != self.bundle)
     {
+        logMsg(LOG_DEBUG, @"determining path from bundle");
+        
         //extract path
         self.path = self.bundle.executablePath;
     }
@@ -163,6 +167,8 @@
     // ->use 'which' helper function
     else if(nil != self.name)
     {
+        logMsg(LOG_DEBUG, @"determining path from name");
+        
         //resolve
         self.path = which(self.name);
     }

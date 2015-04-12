@@ -68,7 +68,7 @@
         
         //make foreground so it has an dock icon, etc
         transformProcess(kProcessTransformToForegroundApplication);
-                
+        
         //check if OS is supported
         if(YES != isSupportedOS())
         {
