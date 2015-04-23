@@ -7,12 +7,13 @@
 		<string>Kernel Extension</string>
 		<key>paths</key>
 		<array>
-			<string>/Users/patrick/Projects/Personal/obj-c/BlockBlock/watchDir</string>
+			<string>/System/Library/Extensions</string>
+			<string>/Library/Extensions</string>
 		</array>
 		<key>class</key>
 		<string>Kext</string>
 		<key>alert</key>
-		<string>installed a kernel extention</string>
+		<string>installed a kernel extension</string>
 		<key>ignoreKids</key>
 		<true/>
 	</dict>
