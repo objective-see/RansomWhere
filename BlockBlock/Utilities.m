@@ -567,8 +567,7 @@ BOOL isSupportedOS()
     }
     
     //gotta be OS X 10
-    // TODO: add mavericks?
-    if(10 != [osVersionInfo[@"minorVersion"] intValue])
+    if([osVersionInfo[@"minorVersion"] intValue] < 9)
     {
         //err msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS minor version %@ not supported", osVersionInfo[@"minor"]]);
@@ -898,14 +897,35 @@ NSString* stringByTruncatingString(NSTextField* textField, float width)
     //add in ellipis
     [truncatedString replaceCharactersInRange:lastSlash withString:ELLIPIS];
     
-    
 //bail
 bail:
-    
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"truncated string %@", truncatedString]);
     
     return truncatedString;
+}
+
+//determine if instance is daemon (background) instance
+BOOL isDaemonInstance()
+{
+    //flag
+    BOOL isDaemon = NO;
+    
+    //args
+    NSArray* arguments = nil;
+    
+    //grab args
+    arguments = NSProcessInfo.processInfo.arguments;
+
+    //check args for 'run daemon' flag
+    if( (2 == arguments.count) &&
+        (YES == [arguments[1] isEqualToString:ACTION_RUN_DAEMON]))
+    {
+        //daemon
+        isDaemon = YES;
+    }
+    
+    return isDaemon;
 }
 

@@ -343,7 +343,6 @@
         
         //'iconForFileType' returns small icons
         // ->so set size to 128
-        // TODO: is the size we want/match other ones?
         [self.icon setSize:NSMakeSize(128, 128)];
     }
     

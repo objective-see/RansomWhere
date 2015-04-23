@@ -60,7 +60,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "agent"
+            argument = "daemon"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

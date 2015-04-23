@@ -64,7 +64,7 @@
     
     //spawn self as r00t w/ install flag (will ask user for password)
     // ->and check
-    osStatus = AuthorizationExecuteWithPrivileges(authorizatioRef, [[NSBundle mainBundle].executablePath UTF8String], 0, (char * const *)installArgs, &commsPipe);
+    osStatus = AuthorizationExecuteWithPrivileges(authorizatioRef, [[NSBundle mainBundle].executablePath UTF8String], 0, (char* const*)installArgs, &commsPipe);
     
     //check
     if(errAuthorizationSuccess != osStatus)
@@ -100,8 +100,6 @@ bail:
 }
 
 //wait till the instance of the (auth'd) self exists
-// sets 'installerStatus' iVar
-//TODO: put sleep installer code to make sure waitpid has a chance to succeed
 -(BOOL)waitTillPau
 {
     //return/status var
@@ -141,7 +139,7 @@ bail:
     else if(WIFSIGNALED(childState))
     {
         //save
-        installerResult  = WTERMSIG(childState);
+        installerResult = WTERMSIG(childState);
     }
     
     //sanity check

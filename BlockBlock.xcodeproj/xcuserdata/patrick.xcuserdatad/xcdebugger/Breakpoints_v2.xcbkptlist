@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "24"
             endingLineNumber = "24"
-            landmarkName = "-configure:shouldExit:"
+            landmarkName = "-configure:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

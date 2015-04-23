@@ -12,6 +12,9 @@
 #import "Utilities.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
+#import "ProcessMonitor.h"
+#import "OrderedDictionary.h"
+
 
 
 @implementation LoginItem
@@ -360,8 +363,26 @@ bail:
     //login item
     NSDictionary* newLoginItem = nil;
     
+    //login item's path
+    NSString* loginItemPath = nil;
+    
     //action info dictionary
     NSMutableDictionary* actionInfo = nil;
+    
+    //error
+    NSError* error = nil;
+    
+    //global process list
+    OrderedDictionary* processList = nil;
+    
+    //process
+    Process* process = nil;
+    
+    //pid
+    pid_t loginItemPID = 0;
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
     
     //alloc dictionary
     actionInfo = [NSMutableDictionary dictionary];
@@ -382,9 +403,6 @@ bail:
     //add login item name
     actionInfo[KEY_ACTION_PARAM_ONE] = newLoginItem[@"name"];
     
-    //add error msg
-    actionInfo[KEY_ERROR_MSG] = [NSString stringWithFormat:@"failed to block %@", newLoginItem[@"name"]];
-    
     //set target UID
     actionInfo[KEY_TARGET_UID] = [NSNumber numberWithInt:watchEvent.reportedUID];
     
@@ -394,6 +412,72 @@ bail:
     //give it some time to process
     // ->allows delete to go thru, so updating list of login items below will be ok
     [NSThread sleepForTimeInterval:1.0];
+    
+    //extract path
+    loginItemPath = newLoginItem[@"path"];
+    
+    //delete the file
+    if(YES != [[NSFileManager defaultManager] removeItemAtPath:loginItemPath error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete login item %@ (%@)", loginItemPath, error]);
+        
+        //don't bail, since still want to try kill, etc
+    }
+    //deleted OK
+    // ->just log msg
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", loginItemPath]);
+    }
+    
+    //grab global process list
+    processList = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList;
+
+    //always sync
+    // ->try to find matching process
+    @synchronized(processList)
+    {
+        //iterate over all processes
+        // ->find pid of process that matches login item's path
+        for(NSString* processID in processList)
+        {
+            //extract process
+            process  = processList[processID];
+            
+            //check for match
+            if( (YES == [process.path isEqualToString:loginItemPath]) ||
+                (YES == [[process.bundle bundlePath] isEqualToString:loginItemPath]) )
+            {
+                //get pid
+                loginItemPID = process.pid;
+                
+                //bail
+                break;
+            }
+        }
+        
+    }//sync
+
+    //kill the persistent process
+    if(0 != loginItemPID)
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"killing %@ (pid: %d)", loginItemPath, loginItemPID]);
+        if(0 != kill(loginItemPID, SIGKILL))
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to kill login item %@ (pid: %d)", loginItemPath, loginItemPID]);
+        }
+    }
+    //pid not found
+    // ->just log msg about this (might not have been started yet, etc)
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find pid for %@", loginItemPath]);
+    }
     
     //happy
     wasBlocked = YES;

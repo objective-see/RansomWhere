@@ -21,7 +21,6 @@
 @implementation Install
 
 @synthesize shouldStartDaemon;
-//@synthesize installerStatus;
 @synthesize installedLaunchAgents;
 
 
@@ -111,9 +110,6 @@
             //err msg
             logMsg(LOG_ERR, @"ERROR: failed to move self into /Applications");
             
-            //set error
-            //self.installerStatus = INSTALLER_STATUS_MOVE_FAILED;
-            
             //bail
             goto bail;
         }
@@ -128,9 +124,6 @@
     {
         //err msg
         logMsg(LOG_ERR, @"ERROR: failed to install launch agent(s)");
-        
-        //set error
-        //self.installerStatus = INSTALLER_STATUS_LAUNCH_DAEMON_FAILED;
         
         //bail
         goto bail;
@@ -152,9 +145,6 @@
         {
             //err msg
             logMsg(LOG_ERR, @"ERROR: failed to install launch agent");
-            
-            //set error
-            //self.installerStatus = INSTALLER_STATUS_LAUNCH_AGENT_FAILED;
             
             //bail
             goto bail;

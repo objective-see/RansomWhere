@@ -43,12 +43,6 @@
     // ->default to ignore
     BOOL shouldIgnore = YES;
     
-    //dbg msg
-    //TODO: remove
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"launchd plugin, watch flags for event: %lu", (unsigned long)watchEvent.flags]);
-    
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"launchd plugin, path: %@", watchEvent.path]);
-    
     //check creation of file
     // ->just looking for the create/rename of the launch item plist
     //   note: rename, to account for atomically created files

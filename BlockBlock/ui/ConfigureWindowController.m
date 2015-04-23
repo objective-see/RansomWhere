@@ -25,6 +25,16 @@
 @synthesize windowTitle;
 @synthesize moreInfoButton;
 
+//automatically called when nib is loaded
+// ->center window
+-(void)awakeFromNib
+{
+    //center
+    [self.window center];
+    
+    return;
+}
+
 //when window is shown
 // ->make white
 -(void)windowDidLoad

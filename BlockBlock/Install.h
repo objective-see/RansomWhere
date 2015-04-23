@@ -14,9 +14,6 @@
 {
     /* IVARS */
         
-    //status/result of (auth'd) installer instance
-    //int installerStatus;
-
     //list of installed launch agents
     // ->during upgrade, want to upgrade all
     NSMutableArray* installedLaunchAgents;

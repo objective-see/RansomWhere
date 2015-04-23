@@ -17,8 +17,8 @@ int main(int argc, const char * argv[])
     //process ID
     pid_t processid = 0;
     
-    //for auth'd installer instance
-    // ->immediately (before any other output), write pid to stdout so that the parent can read it
+    //for auth'd installer/uninstaller instances
+    // ->immediately (before any other output), write pid to stdout so that the parent can grab it
     if( (0x2 == argc) &&
         ( (0 == strcmp(argv[1], ACTION_INSTALL.UTF8String)) || (0 == strcmp(argv[1], ACTION_UNINSTALL.UTF8String)) ) )
     {

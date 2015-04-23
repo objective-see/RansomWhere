@@ -15,6 +15,9 @@
 //product verison url
 #define PRODUCT_VERSION_URL @"https://objective-see.com/products/blockblockVersion.json"
 
+//general error URL
+#define FATAL_ERROR_URL @"https://objective-see.com/errors.html"
+
 //wait interval
 #define WAIT_INTERVAL 0.1f
 
@@ -159,8 +162,17 @@
 //error msg
 #define KEY_ERROR_MSG @"errorMsg"
 
+//sub msg
+#define KEY_ERROR_SUB_MSG @"errorSubMsg"
+
 //target UUID
 #define KEY_TARGET_UID @"targetUID"
+
+//error URL
+#define KEY_ERROR_URL @"errorURL"
+
+//flag for error popup
+#define KEY_ERROR_SHOULD_EXIT @"shouldExit"
 
 //action param
 #define KEY_ACTION_PARAM_ONE @"paramOne"
@@ -170,6 +182,9 @@
 
 //user's home directory
 #define KEY_USER_HOME_DIR @"userHomeDirectory"
+
+//flag for all sessions
+#define UID_ALL_SESSIONS -1
 
 //actions (for user session)
 

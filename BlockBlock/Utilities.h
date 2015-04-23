@@ -82,6 +82,9 @@ void setFilePermissions(NSString* file, int permissions);
 // ->truncate and insert ellipises before /file
 NSString* stringByTruncatingString(NSTextField* textField, float width);
 
+//determine if instance is daemon (background) instance
+BOOL isDaemonInstance();
+
 
 
 #endif /* defined(__BlockBlock__Utilities__) */

@@ -40,6 +40,10 @@
 //broadcast alert
 -(void)sendAlertToAgent:(WatchEvent*) watchEvent userInfo:(NSMutableDictionary*)userInfo;
 
+//DAEMON method
+// ->send request to agent to dispaly error popup
+-(void)sendErrorToAgent:(NSDictionary*)errorInfo;
+
 //find UID for the alert
 // ->since msg to generate UI alert is sent to all sessions, this will identify which one should display
 -(uid_t)uidForAlert:(WatchEvent*) watchEvent;

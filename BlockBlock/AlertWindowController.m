@@ -37,6 +37,14 @@
 
 @synthesize instance;
 
+//automatically called when nib is loaded
+// ->center window
+-(void)awakeFromNib
+{
+    //center
+    [self.window center];
+}
+
 
 //configure the alert with the info from the daemon
 -(void)configure:(NSDictionary*)alertInfo

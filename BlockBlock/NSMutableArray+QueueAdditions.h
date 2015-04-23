@@ -14,11 +14,14 @@
 }
 
 //METHODS
--(id) dequeue;
--(void) enqueue:(id)obj;
--(id) peek:(int)index;
--(id) peekHead;
--(id) peekTail;
--(BOOL) empty;
+
+//remove first object
+-(id)dequeue;
+
+//add to end
+-(void)enqueue:(id)obj;
+
+//check if empty
+-(BOOL)empty;
 
 @end

@@ -61,6 +61,7 @@
 		CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */; };
 		CDE36C971AD4FEFB00371F4E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */; };
 		CDE36C991AD500EE00371F4E /* bbText.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C981AD500EE00371F4E /* bbText.png */; };
+		CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = CDE36CCC1ADAEDE500371F4E /* Exception.m */; };
 		CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */; };
 		CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */; };
 /* End PBXBuildFile section */
@@ -155,6 +156,8 @@
 		CDE36C941AD4FEFB00371F4E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = BlockBlock/ui/InfoWindowController.h; sourceTree = SOURCE_ROOT; };
 		CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = BlockBlock/ui/InfoWindowController.m; sourceTree = SOURCE_ROOT; };
 		CDE36C981AD500EE00371F4E /* bbText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bbText.png; path = BlockBlock/images/bbText.png; sourceTree = "<group>"; };
+		CDE36CCB1ADAEDE500371F4E /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = BlockBlock/Exception.h; sourceTree = "<group>"; };
+		CDE36CCC1ADAEDE500371F4E /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = BlockBlock/Exception.m; sourceTree = "<group>"; };
 		CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarMenu.h; path = BlockBlock/ui/StatusBarMenu.h; sourceTree = "<group>"; };
 		CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarMenu.m; path = BlockBlock/ui/StatusBarMenu.m; sourceTree = "<group>"; };
 		CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarMenu.xib; path = BlockBlock/ui/StatusBarMenu.xib; sourceTree = SOURCE_ROOT; };
@@ -216,6 +219,8 @@
 		CD7F087F19AE6DCA00FF00FC = {
 			isa = PBXGroup;
 			children = (
+				CDE36CCB1ADAEDE500371F4E /* Exception.h */,
+				CDE36CCC1ADAEDE500371F4E /* Exception.m */,
 				CD8381371A7DAA0F00AC0D96 /* images */,
 				CDD7390A1A5FABB800B825BA /* NSWindow+BugFix.h */,
 				CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */,
@@ -468,6 +473,7 @@
 				CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */,
 				CDD738BD1A5F7D0500B825BA /* StatusBarCustomView.m in Sources */,
 				CDB4D9E519FCD9410069BE62 /* Process.m in Sources */,
+				CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */,
 				CD7C874C19D50F3B00EC7F0A /* Kext.m in Sources */,
 				CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */,
 				CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */,
@@ -569,7 +575,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -603,7 +609,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
 			name = Release;

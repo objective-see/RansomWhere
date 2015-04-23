@@ -10,13 +10,15 @@
 #import "Logging.h"
 #import "Install.h"
 #import "Control.h"
-#import "Utilities.h"
-#import "Uninstall.h"
 #import "AlertView.h"
+#import "Exception.h"
+#import "Uninstall.h"
+#import "Utilities.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
 #import "ProcessMonitor.h"
+
 
 @implementation AppDelegate
 
@@ -24,11 +26,14 @@
 @synthesize orginals;
 @synthesize controlObj;
 @synthesize eventQueue;
-@synthesize processMonitor;
 @synthesize interProcComms;
+@synthesize processMonitor;
 @synthesize reportedWatchEvents;
 @synthesize infoWindowController;
 @synthesize errorWindowController;
+
+//TODO: double-check versioning checks
+//TODO: watchDir for kext ->update!
 
 
 //automatically invoked when app is loaded
@@ -47,6 +52,10 @@
     //exit status
     int exitStatus = -1;
     
+    //first thing...
+    // ->install exception handlers!
+    installExceptionHandlers();
+    
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"applicationDidFinishLaunching: loaded in process %d as %d\n", getpid(), geteuid()]);
     
@@ -59,9 +68,10 @@
     //init contol object
     controlObj = [[Control alloc] init];
     
-    //when launched w/ no args (e.g. user downloaded, then double-clicked)
-    // ->begins install (kicks off auth'd self with 'install' flag)
-    if(0x1 == arguments.count)
+    //when launched w/ no args (e.g. user downloaded, then double-clicked) or -psn (lion VM, wtf?)
+    // ->begin install (kick off auth'd self with 'install' flag)
+    if( (0x1 == arguments.count) ||
+        ( (0x2 == arguments.count) && (YES == [arguments[1] hasPrefix:@"-psn"]) ))
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: kicking off initial install...");
@@ -80,8 +90,8 @@
             [self.errorWindowController display];
             
             //configure it
-            [self.errorWindowController configure:@"your OS version is unsupported" shouldExit:YES];
-            
+            [self.errorWindowController configure:@{KEY_ERROR_MSG:@"ERROR: unsupported OS", KEY_ERROR_SUB_MSG: [NSString stringWithFormat:@"OS X %@ is not supported", [[NSProcessInfo processInfo] operatingSystemVersionString]], KEY_ERROR_SHOULD_EXIT:[NSNumber numberWithBool:YES]}];
+             
             //bail
             // ->won't exit, since want user to see window, then click 'close'
             goto bail;
@@ -110,7 +120,7 @@
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: installing (and starting) BLOCKBLOCK");
             
             //ui instance is calling waitpid
-            // ->so quickly nap to give it time to enter that call...
+            // ->so briefly nap to give it time to enter that call...
             [NSThread sleepForTimeInterval:0.25f];
             
             //must be r00t
@@ -273,6 +283,13 @@
             //should always exit
             shouldExit = YES;
             
+            //dbg msg
+            logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: uninstalling BLOCKBLOCK");
+            
+            //ui instance is calling waitpid
+            // ->so briefly nap to give it time to enter that call...
+            [NSThread sleepForTimeInterval:0.25f];
+            
             //init uninstall
             // ->kick off uninstall logic
             if(YES != [self initUninstall])
@@ -289,7 +306,16 @@
             
         }//uninstall (r00t)
         
-        
+        //invalid args
+        else
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"%@ is an invalid argument", arguments[1]]);
+
+            //bail
+            goto bail;
+            
+        }
     }//2 args
 
 //bail
@@ -382,7 +408,23 @@ bail:
     //start file watching
     // ->monitors 'auto-run' locations
     [watcher watch];
-
+    
+    /* for testing exception handling
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+     
+        //int a = getpid();
+        //int b = 0;
+        
+        //printf("results: %d\n", a/b);
+    
+    
+        //NSMutableArray *a = [NSMutableArray array];
+        //[a addObject:nil];
+        
+    });
+    */
+    
     return;
 }
 

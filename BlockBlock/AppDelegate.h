@@ -73,6 +73,7 @@
 //dictionary of file path's and their original contents
 @property(nonatomic,retain)NSMutableDictionary* orginals;
 
+
 /* METHODS */
 
 //make the instance of the uninstall process foreground
@@ -92,9 +93,5 @@
 
 //initialize status menu bar
 -(void)loadStatusBar;
-
-
-
-
 
 @end

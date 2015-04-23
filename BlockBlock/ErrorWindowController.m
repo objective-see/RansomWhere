@@ -16,18 +16,54 @@
 
 @implementation ErrorWindowController
 
-@synthesize errMsg;
+@synthesize errorURL;
 @synthesize shouldExit;
 @synthesize closeButton;
 
+//automatically called when nib is loaded
+// ->center window
+-(void)awakeFromNib
+{
+    //center
+    [self.window center];
+    
+    return;
+}
+
 //configure the object/window
--(void)configure:(NSString*)errorMessage shouldExit:(BOOL)exitOnClose
+-(void)configure:(NSDictionary*)errorInfo
 {
     //set error msg
-    self.errMsg.stringValue = errorMessage;
+    self.errMsg.stringValue = errorInfo[KEY_ERROR_MSG];
+    
+    //set error sub msg
+    self.errSubMsg.stringValue = errorInfo[KEY_ERROR_SUB_MSG];
     
     //save exit
-    self.shouldExit = exitOnClose;
+    self.shouldExit = [errorInfo[KEY_ERROR_SHOULD_EXIT] boolValue];
+    
+    //grab optional error url
+    if(nil != errorInfo[KEY_ERROR_URL])
+    {
+        //extract/convert
+        self.errorURL = [NSURL URLWithString:errorInfo[KEY_ERROR_URL]];
+    }
+    
+    //when exiting
+    // ->change 'close' to 'exit'
+    if(YES == self.shouldExit)
+    {
+        //change title
+        self.closeButton.title = @"Exit";
+    }
+    
+    //for fatal errors
+    // ->change 'Info' to 'help fix'
+    if(YES == [[self.errorURL absoluteString] isEqualToString:FATAL_ERROR_URL])
+    {
+        //change title
+        self.infoButton.title = @"Help Fix";
+    }
     
     //set delegate
     [self.window setDelegate:self];
@@ -38,9 +74,6 @@
 //display (show) window
 -(void)display
 {
-    //center it
-    [self.window center];
-    
     //show (now configured), alert
     [self showWindow:self];
     
@@ -63,16 +96,30 @@
 // ->error situation
 - (IBAction)help:(id)sender
 {
-    //url
-    NSURL *helpURL = nil;
+    //if a url was specified
+    // ->use that one
+    if(nil != self.errorURL)
+    {
+        //open URL
+        // ->invokes user's default browser
+        [[NSWorkspace sharedWorkspace] openURL:self.errorURL];
+    }
+    //use default URL
+    else
+    {
+        //open URL
+        // ->invokes user's default browser
+        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@#errors", PRODUCT_URL]]];
+    }
+    
+    //when error should cause an exit
+    // ->close window here (to trigger exit)
+    if(YES == self.shouldExit)
+    {
+        //close
+        [self.window close];
+    }
 
-    //build help URL
-    helpURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@#errors", PRODUCT_URL]];
-    
-    //open URL
-    // ->invokes user's default browser
-    [[NSWorkspace sharedWorkspace] openURL:helpURL];
-    
     return;
 }
 
@@ -95,13 +142,12 @@
     // ->e.g. an error during install, etc
     if(YES == self.shouldExit)
     {
+        //dbg msg
+        logMsg(LOG_ERR, @"terminating agent");
+        
         //exit
         [NSApp terminate:self];
     }
-    
-    //set strong instance var to nil
-    // ->will tell ARC, its finally ok to release us :)
-    //self.instance = nil;
     
     return;
 }

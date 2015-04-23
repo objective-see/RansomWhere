@@ -119,6 +119,7 @@
     }
     
     //handle action-specific logic
+    // ->for now, only action is ACTION_DELETE_LOGIN_ITEM...
     switch(action)
     {
         case ACTION_DELETE_LOGIN_ITEM:
@@ -337,27 +338,14 @@ bail:
 
 //DAEMON method
 // ->send request to agent to dispaly error popup
--(void)sendErrorToAgent:(NSString*)errorMsg session:(uid_t)sessionUID
+-(void)sendErrorToAgent:(NSDictionary*)errorInfo
 {
-    //user info dictionary
-    NSMutableDictionary* userInfo = nil;
-    
-    //alloc
-    userInfo = [NSMutableDictionary dictionary];
-    
-    //add error msg
-    userInfo[KEY_ERROR_MSG] = errorMsg;
-    
-    //add session id to dictionary that is sent to agents
-    // ->allows correct one to display alert
-    userInfo[KEY_TARGET_UID] = [NSNumber numberWithInt:sessionUID];
-    
     //dbg msg
     logMsg(LOG_DEBUG, @"broadcasting request to UI agent(s) to display error");
     
     //send notification to UI (agent) to display alert to user
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:SHOULD_DISPLAY_ERROR_NOTIFICATION
-      object:nil userInfo:userInfo options:NSNotificationDeliverImmediately | NSNotificationPostToAllSessions];
+      object:nil userInfo:errorInfo options:NSNotificationDeliverImmediately | NSNotificationPostToAllSessions];
     
     return;
 }
@@ -459,6 +447,7 @@ bail:
     //sanity check
     // ->make sure received dictionary is valid
     if( (nil == userInfo[KEY_ERROR_MSG]) ||
+        (nil == userInfo[KEY_ERROR_SUB_MSG]) ||
         (nil == userInfo[KEY_TARGET_UID]) )
     {
         //bail
@@ -472,7 +461,8 @@ bail:
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking error msg is for this session: %d matches %d?", targetUID, getuid()]);
     
     //check if target UID matches UI of this session
-    if(targetUID != getuid())
+    if( (targetUID != getuid()) &&
+        (targetUID != UID_ALL_SESSIONS) )
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"error msg is *NOT* for this session! (ignoring)");
@@ -484,12 +474,36 @@ bail:
     //alloc error window
     errorWindowController = [[ErrorWindowController alloc] initWithWindowNibName:@"ErrorWindowController"];
     
-    //display it
-    // ->call this first to so that outlets are connected (not nil)
-    [self.errorWindowController display];
+    //main thread
+    // ->just show UI alert
+    if(YES == [NSThread isMainThread])
+    {
+        //display it
+        // ->call this first to so that outlets are connected (not nil)
+        [self.errorWindowController display];
+        
+        //configure it
+        [self.errorWindowController configure:userInfo];
+    }
+    //background thread
+    // ->have to show it on main thread
+    else
+    {
+        //show alert
+        // ->in main UI thread
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            //display it
+            // ->call this first to so that outlets are connected (not nil)
+            [self.errorWindowController display];
+            
+            //configure it
+            [self.errorWindowController configure:userInfo];
+            
+        });
+    }
     
-    //configure it
-    [self.errorWindowController configure:userInfo[KEY_ERROR_MSG] shouldExit:NO];
+    
     
 //bail
 bail:
@@ -507,8 +521,8 @@ bail:
     //target session uid
     uid_t targetUID = -1;
     
-    //action
-    NSUInteger action = -1;
+    //error info
+    NSMutableDictionary* errorInfo = nil;
     
     //grab script info
     actionInfo = notification.userInfo;
@@ -518,7 +532,6 @@ bail:
     
     //sanity check
     if( (nil == actionInfo[KEY_ACTION]) ||
-        (nil == actionInfo[KEY_ERROR_MSG]) ||
         (nil == actionInfo[KEY_TARGET_UID]) )
     {
         //err msg
@@ -544,11 +557,8 @@ bail:
         goto bail;
     }
     
-    //extract action
-    action = [notification.userInfo[KEY_ACTION] intValue];
-    
     //handle action
-    switch(action)
+    switch([actionInfo[KEY_ACTION] intValue])
     {
         //delete a login item
         // ->accomplished by executing apple script cmd in user's session
@@ -558,10 +568,23 @@ bail:
             logMsg(LOG_DEBUG, @"blocking/deleting login item");
             
             //delete login item
+            // ->display error if it fails
             if(YES != [LoginItem deleteLoginItem:actionInfo[KEY_ACTION_PARAM_ONE]])
             {
                 //err msg
                 logMsg(LOG_ERR, @"failed to delete login item");
+                
+                //alloc error info
+                errorInfo = [NSMutableDictionary dictionary];
+             
+                //set error msg
+                errorInfo[KEY_ERROR_MSG] = @"ERROR: failed to block item";
+                
+                //set error sub msg
+                errorInfo[KEY_ERROR_SUB_MSG] = [NSString stringWithFormat:@"item: %@", actionInfo[KEY_ACTION_PARAM_ONE]];
+                
+                //save exit
+                errorInfo[KEY_ERROR_SHOULD_EXIT] = [NSNumber numberWithBool:NO];
                 
                 //alloc error window
                 errorWindowController = [[ErrorWindowController alloc] initWithWindowNibName:@"ErrorWindowController"];
@@ -571,7 +594,7 @@ bail:
                 [self.errorWindowController display];
                 
                 //configure it
-                [self.errorWindowController configure:actionInfo[KEY_ERROR_MSG] shouldExit:NO];
+                [self.errorWindowController configure:errorInfo];
                 
                 //bail
                 goto bail;
@@ -610,8 +633,8 @@ bail:
     //alert selection
     NSDictionary* alertSelection = nil;
     
-    //error msg
-    NSString* errorMessage = nil;
+    //error info dictionary
+    NSMutableDictionary* errorInfo = nil;
     
     //reported watch events from app delegate
     // ->this var is just for convience/shorthand
@@ -662,17 +685,36 @@ bail:
             logMsg(LOG_DEBUG, @"blocking event!");
             
             //invoke plugin's block method
+            // ->send error msg if blocking fails
             if(YES != [reportedWatchEvent.plugin block:reportedWatchEvent])
             {
+                //alloc
+                errorInfo = [NSMutableDictionary dictionary];
+                
+                //add main error msg
+                errorInfo[KEY_ERROR_MSG] = @"ERROR: failed to block item";
+                
+                //add sub msg
+                errorInfo[KEY_ERROR_SUB_MSG] = [NSString stringWithFormat:@"item: %@", [reportedWatchEvent.plugin startupItemName:reportedWatchEvent]];
+                
+                //add session id to dictionary that is sent to agents
+                // ->allows correct one to display alert
+                errorInfo[KEY_TARGET_UID] = [NSNumber numberWithInt:reportedWatchEvent.reportedUID];
+                
+                //agent shouldn't exit
+                // ->not fatal error
+                errorInfo[KEY_ERROR_SHOULD_EXIT] = [NSNumber numberWithBool:NO];
+                
+                //send error to agent
+                // ->it will display the alert
+                [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendErrorToAgent:errorInfo];
+                
                 //err msg
                 logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to block, will alert agent %@", reportedWatchEvent]);
                 
-                //init error msg
-                errorMessage = [NSString stringWithFormat:@"failed to block %@", [reportedWatchEvent.plugin startupItemName:reportedWatchEvent]];
-                 
                 //send error to agent
                 // ->it will display the alert
-                [self sendErrorToAgent:errorMessage session:reportedWatchEvent.reportedUID];
+                [self sendErrorToAgent:errorInfo];
             }
             //success
             else
