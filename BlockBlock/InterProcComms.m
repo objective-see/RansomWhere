@@ -14,6 +14,8 @@
 #import "PluginBase.h"
 #import "AppDelegate.h"
 #import "InterProcComms.h"
+#import "Process.h"
+#import "Watcher.h"
 
 
 #import <Security/Security.h>
@@ -208,22 +210,22 @@
 
 //notify background (daemon) instance what user selected
 // ->notification will contain dictionary w/ watch event UUID and action (block | allow | disabled)
--(void)sendActionToDaemon:(NSString*) watchEventUUID action:(NSUInteger)action
+-(void)sendActionToDaemon:(NSDictionary*)actionInfo
 {
     //user selection
-    NSDictionary* userSelection = nil;
+    //NSDictionary* userSelection = nil;
     
     //init dictionary
     // ->contains watch event UUID and action (block | allow)
-    userSelection = @{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:action]};
+    //userSelection = @{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:action]};
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to daemon", userSelection]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to daemon", actionInfo]);
     
     //send notification to background (daemon) instance
     // ->tell it to block/allow event
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:SHOULD_HANDLE_ALERT_NOTIFICATION
-      object:nil userInfo:userSelection options:NSNotificationDeliverImmediately | NSNotificationPostToAllSessions];
+      object:nil userInfo:actionInfo options:NSNotificationDeliverImmediately | NSNotificationPostToAllSessions];
     
     return;
 }
@@ -312,7 +314,7 @@ bail:
 }
 
 
-//daemon method
+//DAEMON method
 // ->send the alert request to agent
 -(void)sendAlertToAgent:(WatchEvent*)watchEvent userInfo:(NSMutableDictionary*)userInfo
 {
@@ -403,8 +405,9 @@ bail:
         }
         
         //send off to daemon
-        // ->for now, just say it was allowed (no need for separate 'disabled' event)?
-        [self sendActionToDaemon:watchEventUUID action:ALLOW_WATCH_EVENT];
+        // ->for now, just say it was allowed
+        [self sendActionToDaemon:@{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT]}];
+         
     }
     
     //UI is enabled
@@ -672,11 +675,19 @@ bail:
     //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"registered WATCH EVENTS %@", ((AppDelegate*)[[NSApplication sharedApplication] delegate]).reportedWatchEvents]);
     
     //handle matched watch events
-    // ->only care about 'block' action....
+    // ->save 'remember' state and process 'block' requests
     if(nil != reportedWatchEvent)
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found watch event for %@", alertSelection[KEY_WATCH_EVENT_UUID]]);
+        
+        //save it if user selected 'remember'
+        if( (nil != alertSelection[KEY_REMEMBER]) &&
+            (YES == [alertSelection[KEY_REMEMBER] boolValue]) )
+        {
+            //save
+            [((NSMutableArray*)((AppDelegate*)[[NSApplication sharedApplication] delegate]).rememberedWatchEvents) addObject:reportedWatchEvent];
+        }
         
         //invoke plugin to block
         if(BLOCK_WATCH_EVENT == [alertSelection[@"action"] integerValue])

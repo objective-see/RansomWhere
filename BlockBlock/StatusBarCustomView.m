@@ -1,6 +1,10 @@
 
-#import "StatusBarCustomView.h"
 #import "Logging.h"
+#import "Utilities.h"
+#import "StatusBarCustomView.h"
+
+#import <Quartz/Quartz.h>
+
 
 
 
@@ -22,32 +26,56 @@
 }
 
 
-- (void)drawRect:(NSRect)rect
+-(void)drawRect:(NSRect)rect
 {
-    NSImage *menuletIcon;
+    //icon
+    NSImage *menuletIcon = nil;
+    
+    //clear color
     [[NSColor clearColor] set];
-    /*
-    if ([self.delegate isActive]) {
-        menuletIcon = [NSImage imageNamed:[self.delegate activeImageName]];
-    } else {
-        menuletIcon = [NSImage imageNamed:[self.delegate inactiveImageName]];
-    }
-     */
     
-    
-    if ([self.delegate isDisabled])
+    //set image for disabled mode
+    if([self.delegate isDisabled])
     {
-        menuletIcon = [NSImage imageNamed:[self.delegate inactiveImageName]];
+        //check mode
+        // ->normal
+        if(YES != isMenuDark())
+        {
+            //set normal image
+            menuletIcon = [NSImage imageNamed:@"statusOFF"];
+        }
+        //check mode
+        // ->dark
+        else
+        {
+            //set light image for dark image
+            menuletIcon = [NSImage imageNamed:@"statusOFFWhite"];
+        }
+
     }
-    
+    //set image for enabled mode
     else
     {
-        menuletIcon = [NSImage imageNamed:[self.delegate activeImageName]];
+        //check mode
+        // ->normal
+        if(YES != isMenuDark())
+        {
+            //set normal image
+            menuletIcon = [NSImage imageNamed:@"statusON"];
+        }
+        //check mode
+        // ->dark
+        else
+        {
+            //set light image for dark image
+            menuletIcon = [NSImage imageNamed:@"statusONWhite"];
+        }
     }
-     
+    
+    //draw
     [menuletIcon drawInRect:NSInsetRect(rect, 2, 2) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
     
-
+    return;
 }
 
 - (void)mouseDown:(NSEvent *)theEvent

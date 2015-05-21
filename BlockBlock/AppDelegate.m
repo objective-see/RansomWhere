@@ -10,6 +10,7 @@
 #import "Logging.h"
 #import "Install.h"
 #import "Control.h"
+#import "Watcher.h"
 #import "AlertView.h"
 #import "Exception.h"
 #import "Uninstall.h"
@@ -31,10 +32,14 @@
 @synthesize reportedWatchEvents;
 @synthesize infoWindowController;
 @synthesize errorWindowController;
+@synthesize rememberedWatchEvents;
 
-//TODO: double-check versioning checks
-//TODO: watchDir for kext ->update!
+//for testing
+//@synthesize alertWindowController;
 
+
+//TODO: dtrace perf issue :/
+//TODO: sandbox'd login items
 
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
@@ -59,6 +64,35 @@
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"applicationDidFinishLaunching: loaded in process %d as %d\n", getpid(), geteuid()]);
     
+    
+    /* BEGIN: FOR TESTING ALERT WINDOW */
+    /*
+    
+    //alloc/init
+    alertWindowController = [[AlertWindowController alloc] initWithWindowNibName:@"AlertWindowController"];
+    
+    //configure alert window with data from daemon
+    [alertWindowController configure:nil];
+    
+    alertWindowController.processHierarchy = @[@{@"name":@"1", @"index":@0, @"pid":@1},@{@"name":@"2", @"index":@1, @"pid":@2}, @{@"name":@"osxMalware", @"index":@2, @"pid":@74090}];
+    
+    //show (now configured), alert
+    [alertWindowController showWindow:self];
+    
+    //center window
+    [alertWindowController.window center];
+    
+    //make it key window
+    [self.alertWindowController.window makeKeyAndOrderFront:self];
+    
+    //make window front
+    [NSApp activateIgnoringOtherApps:YES];
+    
+    return;
+    */
+    
+    /* END: FOR TESTING ALERT WINDOW */
+
     //grab args
     arguments = NSProcessInfo.processInfo.arguments;
     
@@ -221,6 +255,9 @@
             
             //init dictionary for reported watch events
             reportedWatchEvents = [NSMutableDictionary dictionary];
+            
+            //init list for 'remembered' watch events
+            rememberedWatchEvents = [NSMutableArray array];
             
             //init dictionary for orginal file contents
             orginals = [NSMutableDictionary dictionary];
@@ -496,7 +533,6 @@ bail:
             
             //show it
             [self.infoWindowController showWindow:self];
-            
             
         });
     }

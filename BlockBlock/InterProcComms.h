@@ -68,8 +68,8 @@
 
 //AGENT METHOD
 //notify background (daemon) instance what user selected
-// ->notification will contain dictionary w/ watch event UUID and action (block | allow | disabled)
--(void)sendActionToDaemon:(NSString*) watchEventUUID action:(NSUInteger)action;
+// ->sends info such as watch event UUID, action (block | allow | disabled), and optionally 'remember' state
+-(void)sendActionToDaemon:(NSDictionary*)actionInfo;
 
 //AGENT METHOD
 //allow a agent (might be multiple in diff user sessions) to register w/ the daemon

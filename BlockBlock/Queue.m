@@ -45,7 +45,11 @@
 //process events from Q
 -(void)processQueue:(id)threadParam
 {
-    //previous watch item
+    //most recent watch event
+    WatchEvent* lastWatchEvent = nil;
+    
+    //previous watch event
+    // ->will either be 'lastWatchEvent' or 'rememberedWatchEvent'
     WatchEvent* previousWatchEvent = nil;
     
     //current watch item
@@ -69,6 +73,9 @@
         //pool
         @autoreleasepool {
             
+        //always reset this var
+        previousWatchEvent = nil;
+            
         //lock
         [self.queueCondition lock];
         
@@ -84,36 +91,61 @@
         
         //unlock
         [self.queueCondition unlock];
-        
-        //check new event is related to last one
+            
+        //check if new event is related to last one
+        if(YES == [lastWatchEvent isRelated:currentWatchEvent])
+        {
+            //set
+            previousWatchEvent = lastWatchEvent;
+        }
+        //also check if new event matches a 'remembered' one
+        else
+        {
+            //iterated over all 'remembered' watch events
+            // ->check if current watch event matches any
+            for(WatchEvent* rememberedWatchEvent in ((AppDelegate*)[[NSApplication sharedApplication] delegate]).rememberedWatchEvents)
+            {
+                //check for match
+                if(YES == [currentWatchEvent matchesRemembered:rememberedWatchEvent])
+                {
+                    //got match
+                    // ->save
+                    previousWatchEvent = rememberedWatchEvent;
+                    
+                    //bail from loop
+                    break;
+                }
+            }
+        }
+            
+        //for related/'remembered' events
         // ->handle appropriately by either automatically allowing or blocking
-        if(YES == [previousWatchEvent isRelated:currentWatchEvent])
+        if(nil != previousWatchEvent)
         {
             //dbg msg
-            logMsg(LOG_DEBUG, @"watch event is RELATED");
+            logMsg(LOG_DEBUG, @"watch event is RELATED || 'REMEMBERED'");
             
-            //last one was blocked
+            //prev. event one was blocked
             // ->block this one too
             if(YES == previousWatchEvent.wasBlocked)
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, @"automatically blocking related event");
-                
-                //TODO: error checking?
+                logMsg(LOG_DEBUG, @"automatically blocking related/remembered event");
+            
                 //automatically block it
                 // ->plugins will be same
-                [previousWatchEvent.plugin block:currentWatchEvent];
+                [lastWatchEvent.plugin block:currentWatchEvent];
             }
-            //last one was allow
-            // ->allow this one too (means, don't do anything)
+            //prev. event was allowed
+            // ->allow this one too (i.e., don't do anything)
             else
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, @"automatically allowing related event");
+                logMsg(LOG_DEBUG, @"automatically allowing related/remembered event");
             }
             
-        }//related events
-
+        }//related/'remembered' event
+    
         //its new/unrelated
         else
         {
@@ -147,7 +179,7 @@
             }
             //since current watch event was handled
             // ->save to check if event is related
-            previousWatchEvent = currentWatchEvent;
+            lastWatchEvent = currentWatchEvent;
         }
             
         //pool

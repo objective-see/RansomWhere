@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7702"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="AlertWindowController">
             <connections>
                 <outlet property="alertMsg" destination="2Bn-dp-flW" id="dFZ-3l-sBF"/>
                 <outlet property="allowButton" destination="uQN-Qh-YaV" id="UWg-LS-7FK"/>
+                <outlet property="ancestorTextCell" destination="YpH-oJ-hBl" id="JXI-sy-Hgb"/>
+                <outlet property="ancestorView" destination="NRU-Pt-FTk" id="MXK-R2-Utf"/>
+                <outlet property="ancestryOutline" destination="tjO-ag-O49" id="xPL-Mb-Oic"/>
+                <outlet property="ancestryViewController" destination="j1T-Qz-N5N" id="BHc-M0-2D0"/>
                 <outlet property="blockButton" destination="M7j-S9-XG1" id="fvN-CM-vCN"/>
                 <outlet property="bottomView" destination="nAw-rO-OXn" id="X42-ha-28s"/>
                 <outlet property="itemBinary" destination="kMW-GJ-kvr" id="eRy-Zx-7qP"/>
@@ -16,11 +20,14 @@
                 <outlet property="itemFile" destination="uyT-k8-mEe" id="Cdc-xY-gfa"/>
                 <outlet property="itemName" destination="454-RV-c8m" id="DXj-eX-Iqk"/>
                 <outlet property="mainView" destination="se5-gp-TjO" id="hHp-je-mPF"/>
+                <outlet property="parentsButton" destination="ROX-Ie-W4k" id="B66-cJ-pLQ"/>
+                <outlet property="popover" destination="8ZB-Up-P18" id="x3f-eM-s1k"/>
                 <outlet property="processID" destination="cxO-xk-kK9" id="ILG-zY-wh9"/>
                 <outlet property="processIcon" destination="wUf-2S-N1r" id="bg0-u4-aVo"/>
                 <outlet property="processLabel" destination="Bac-hQ-LrL" id="IUD-lL-0Zm"/>
                 <outlet property="processName" destination="Lfg-tW-69F" id="v4Z-kU-DdU"/>
                 <outlet property="processPath" destination="31G-Q6-fmN" id="dAT-Ey-Ged"/>
+                <outlet property="rememberButton" destination="Iv6-wW-pKy" id="mCJ-aF-HRx"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -164,6 +171,14 @@
                                     <action selector="allow:" target="-2" id="aYw-Hl-3NZ"/>
                                 </connections>
                             </button>
+                            <button id="Iv6-wW-pKy">
+                                <rect key="frame" x="334" y="21" width="85" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="remember" bezelStyle="regularSquare" imagePosition="left" alignment="center" inset="2" id="WB8-CB-M8N">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                </buttonCell>
+                            </button>
                         </subviews>
                     </customView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="2Bn-dp-flW">
@@ -179,11 +194,32 @@
                         <rect key="frame" x="40" y="242" width="640" height="1.5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView">
+                            <rect key="frame" x="1" y="1" width="638" height="0.0"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         </view>
                         <color key="borderColor" red="0.44666150090000001" green="0.82829483699999995" blue="0.46594502310000002" alpha="1" colorSpace="calibratedRGB"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Udl-dj-WGZ">
+                        <rect key="frame" x="603" y="256" width="57" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="ancestry" id="Sfj-l4-El1">
+                            <font key="font" size="11" name="Menlo-Regular"/>
+                            <color key="textColor" white="0.52269995629370625" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button tag="1002" id="ROX-Ie-W4k">
+                        <rect key="frame" x="613" y="273" width="29" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="parentsIcon" imagePosition="only" alignment="center" alternateImage="parentsIconBG" imageScaling="proportionallyDown" inset="2" id="wo1-dL-YPZ">
+                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="ancestryButtonHandler:" target="-2" id="CQA-jM-Beu"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
@@ -191,5 +227,73 @@
             </connections>
             <point key="canvasLocation" x="330" y="111"/>
         </window>
+        <viewController id="2cy-ow-KBe" userLabel="Popover View Controller">
+            <connections>
+                <outlet property="view" destination="NRU-Pt-FTk" id="AjI-uW-luV"/>
+            </connections>
+        </viewController>
+        <popover id="8ZB-Up-P18">
+            <connections>
+                <outlet property="contentViewController" destination="2cy-ow-KBe" id="7P7-pR-ldw"/>
+                <outlet property="delegate" destination="-2" id="3iy-Bx-oS0"/>
+            </connections>
+        </popover>
+        <view id="NRU-Pt-FTk" userLabel="AncestryView">
+            <rect key="frame" x="0.0" y="0.0" width="307" height="83"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="20" horizontalPageScroll="10" verticalLineScroll="20" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="gJL-BM-bP1">
+                    <rect key="frame" x="-1" y="-197" width="482" height="281"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <clipView key="contentView" id="Ip0-fE-6HY">
+                        <rect key="frame" x="1" y="1" width="415" height="133"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="18" indentationPerLevel="16" outlineTableColumn="SZa-YU-u66" id="tjO-ag-O49">
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="20"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <size key="intercellSpacing" width="3" height="2"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <tableColumns>
+                                    <tableColumn identifier="name" editable="NO" width="477" minWidth="16" maxWidth="1000" id="SZa-YU-u66">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Name">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" alignment="left" title="Text Cell" id="YpH-oJ-hBl">
+                                            <font key="font" size="13" name="Menlo-Regular"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                    </tableColumn>
+                                </tableColumns>
+                                <connections>
+                                    <outlet property="dataSource" destination="j1T-Qz-N5N" id="ny4-Uc-77V"/>
+                                    <outlet property="delegate" destination="j1T-Qz-N5N" id="sft-sw-La6"/>
+                                </connections>
+                            </outlineView>
+                        </subviews>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="0vF-fy-kNf">
+                        <rect key="frame" x="1" y="119" width="223" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="9n5-Bm-Wyt">
+                        <rect key="frame" x="224" y="17" width="15" height="102"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+            </subviews>
+            <point key="canvasLocation" x="389.5" y="389.5"/>
+        </view>
+        <customObject id="j1T-Qz-N5N" customClass="ParentsWindowController"/>
     </objects>
+    <resources>
+        <image name="parentsIcon" width="128" height="137"/>
+        <image name="parentsIconBG" width="128" height="137"/>
+    </resources>
 </document>

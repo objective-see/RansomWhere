@@ -175,17 +175,37 @@
     //path to launch item binary
     NSString* itemBinary = nil;
     
-    //array of 'ProgramArguments'
-    NSArray* programArgs = nil;
+    //value of 'ProgramArguments'
+    // ->can either be array or string
+    id programArgs = nil;
     
     //get program args
     // ->path is in args[0]
     programArgs = getValueFromPlist(watchEvent.path, @"ProgramArguments", 1.0f);
     if(nil != programArgs)
     {
-        //extract path to binary
-        // ->save it into iVar
-        itemBinary = programArgs[0];
+        //when its an array
+        // ->first object is the item binary
+        if(YES == [programArgs isKindOfClass:[NSArray class]])
+        {
+            //extract path to binary
+            itemBinary = [(NSArray*)programArgs firstObject];
+        }
+        //otherwise, its likely a string
+        // ->just use as is
+        else if(YES == [programArgs isKindOfClass:[NSString class]])
+        {
+            //assign
+            itemBinary = (NSString*)programArgs;
+        }
+    }
+    //when 'ProgramArguments' fails
+    // ->check for just 'Program'
+    else
+    {
+        //get value for 'ProgramArguments'
+        // ->always a string
+        itemBinary = getValueFromPlist(watchEvent.path, @"Program", 1.0f);
     }
     
     return itemBinary;

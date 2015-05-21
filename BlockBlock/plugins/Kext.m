@@ -221,7 +221,7 @@ bail:
     NSString* kextBinary = nil;
     
     //max wait time
-    // ->1 second
+    // ->2 second
     float maxWait = 2.0f;
     
     //bundle

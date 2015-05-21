@@ -8,7 +8,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "Control.h"
-#import "Watcher.h"
+//#import "Watcher.h"
 #import "StatusBarMenu.h"
 #import "InterProcComms.h"
 #import "InfoWindowController.h"
@@ -18,6 +18,7 @@
 @class ProcessMonitor;
 @class WatchEvent;
 @class Queue;
+@class Watcher;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSMenuDelegate, NSWindowDelegate>
 {
@@ -41,6 +42,9 @@
     Control* controlObj;
     
 }
+
+//for testing
+//@property(nonatomic, retain)AlertWindowController* alertWindowController;
 
 //error window
 @property(nonatomic, retain) ErrorWindowController* errorWindowController;
@@ -69,6 +73,10 @@
 //dictionary of watch events sent to UI
 // ->used to verify response (back from user)
 @property (nonatomic, retain)NSMutableDictionary* reportedWatchEvents;
+
+//list of 'remembered' watch events
+// ->used to automatically allow/block subsequent events
+@property (nonatomic, retain)NSMutableArray* rememberedWatchEvents;
 
 //dictionary of file path's and their original contents
 @property(nonatomic,retain)NSMutableDictionary* orginals;

@@ -25,7 +25,7 @@
 //   see: https://gist.github.com/viroos/1242279
 //   note: sticking with exec*:return since proc::posix_spawn:exec-success caused major perf issues!
 static const char *dtraceProbe =
-"syscall::exec*:return,proc::posix_spawn:exec-success  \
+"syscall::exec*:return,proc::posix_spawn:exec-success,syscall::fork:return  \
 { \
 this->isx64 = (curproc->p_flag & P_LP64) != 0; \
 this->ptrsize = this->isx64 ? sizeof(uint64_t) : sizeof(uint32_t); \
@@ -35,18 +35,11 @@ this->processName = this->isx64 ? copyinstr(*(uint64_t*)(this->argv)) : copyinst
 printf(\"###{\\\"pid\\\": %d, \\\"uid\\\": %d, \\\"name\\\": \\\"%s\\\", \\\"path\\\": \\\"%s\\\", \\\"ppid\\\": %d}\", pid, uid, execname, this->processName, ppid); \
 }";
 
-/* TODO: maybe forks?
- dtrace -n 'syscall::fork*:entry{printf("%s %d",execname,pid);}'
- 
- ...otherwise might miss some pIDs (e.g. run iWorms's update binary) / ppids
- */
-
 //size of dtrace output buffer
 #define BUFFER_SIZE 512
 
 //sleep time
 #define PSLEEP_TIME 1
-
 
 @interface ProcessMonitor : NSObject
 {

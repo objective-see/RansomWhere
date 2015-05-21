@@ -76,7 +76,7 @@ pid_t getParentID(int pid);
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive);
 
 //set permissions for file
-void setFilePermissions(NSString* file, int permissions);
+//void setFilePermissions(NSString* file, int permissions);
 
 //if string is too long to fit into a the (2-lines) text field
 // ->truncate and insert ellipises before /file
@@ -85,6 +85,12 @@ NSString* stringByTruncatingString(NSTextField* textField, float width);
 //determine if instance is daemon (background) instance
 BOOL isDaemonInstance();
 
+//determine menu mode
+BOOL isMenuDark();
+
+//wait until a window is non nil
+// ->then make it modal
+void makeModal(NSWindowController* windowController);
 
 
 #endif /* defined(__BlockBlock__Utilities__) */

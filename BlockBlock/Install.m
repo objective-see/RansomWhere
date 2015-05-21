@@ -113,11 +113,12 @@
             //bail
             goto bail;
         }
-        
-        //set group/owner to root/wheel
-        setFileOwner(APPLICATION_PATH, @0, @0, YES);
-    
     }
+    
+    //always set group/owner to root/wheel
+    // ->handles situation where app is installed directly from /Applications
+    setFileOwner(APPLICATION_PATH, @0, @0, YES);
+    
     //install as launch agent
     // ->copy launch item plist file(s) into ~/Library/LaunchAgent directory(s)
     if(YES != [self installLaunchAgent:installedUsers isUpgrade:isAnUpgrade])
@@ -275,6 +276,10 @@ bail:
     //launch item plist
     NSMutableDictionary* launchItemPlist = nil;
     
+    //user's directory permissions
+    // ->used to match any created directories
+    NSDictionary* userDirAttributes = nil;
+    
     //load launch item plist
     launchItemPlist = [self loadLaunchItemPlist];
     
@@ -335,6 +340,21 @@ bail:
                 //bail
                 goto bail;
             }
+            
+            //get permissions of one directory up
+            // -> ~/Library
+            userDirAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[launchAgentDirectory stringByDeletingLastPathComponent] error:nil];
+            
+            //assuming required attributes were found
+            // ->make sure newly created directory is owned by correct user
+            if( (nil != userDirAttributes) &&
+                (nil != userDirAttributes[@"NSFileGroupOwnerAccountID"]) &&
+                (nil != userDirAttributes[@"NSFileOwnerAccountID"]) )
+            {
+                //match newly created directory w/ user
+                setFileOwner(launchAgentDirectory, userDirAttributes[@"NSFileGroupOwnerAccountID"], userDirAttributes[@"NSFileOwnerAccountID"], NO);
+            }
+            
         }
         
         //save to disk

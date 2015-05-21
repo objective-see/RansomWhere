@@ -14,6 +14,7 @@
 #import "WatchEvent.h"
 #import "AppDelegate.h"
 #import "ProcessMonitor.h"
+#import "Process.h"
 
 
 //TODO: need [[NSNotificationCenter defaultCenter] removeObserver
@@ -249,8 +250,11 @@ bail:
 //note: http://www.opensource.apple.com/source/xnu/xnu-2782.1.97/bsd/vfs/vfs_fsevents.c "Using /dev/fsevents directly is unsupported." - can ignore this warning
 -(void)startWatch:(id)threadParam
 {
+    //file handle
+    int fsed = -1;
     
-    int fsed, cloned_fsed;
+    //cloned handle
+    int cloned_fsed = -1;
 
     //bytes read
     ssize_t bytesRead = 0;
@@ -395,7 +399,11 @@ bail:
                 //save matched path
                 // ->make a copy since matchedPath var is re-used
                 watchEvent.match = [NSString stringWithString:matchedPath];
-            
+                
+                //save item's binary
+                // ->needed to match 'remembered' items
+                watchEvent.itemBinary = [watchEvent.plugin startupItemBinary:watchEvent];
+                
                 //allow the plugin to closely examine the event
                 // ->it will know more about the details so can determine if it should be ignored
                 if(YES != [handlerPlugin shouldIgnore:watchEvent])
@@ -452,7 +460,7 @@ bail:
     NSUInteger count = 0;
     
     //buffer for call to proc_pidpath()
-    char pidPath[PROC_PIDPATHINFO_MAXSIZE];
+    char pidPath[PROC_PIDPATHINFO_MAXSIZE] = {0};
     
     //info dictionary
     // ->passed to process init
@@ -467,6 +475,9 @@ bail:
     //process (from dtrace or app callback)
     Process* processFromList = nil;
     
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"creating watch event for %@ (%d)", path, fsEvent->pid]);
+    
     //init object for watch event
     watchEvent = [[WatchEvent alloc] init];
     
@@ -475,9 +486,6 @@ bail:
     
     //add flags
     watchEvent.flags = fsEvent->type;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"creating watch event for %@ (%d)", path, fsEvent->pid]);
     
     //try get parent
     parentID = getParentID(fsEvent->pid);
@@ -522,7 +530,7 @@ bail:
             //nap for 1/10th of a second
             [NSThread sleepForTimeInterval:WAIT_INTERVAL];
             
-        //try up to a second
+        //try up to a 1/2 second
         } while(count++ < 0.5/WAIT_INTERVAL);
         
         //found one in process monitor list?

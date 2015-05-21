@@ -6,8 +6,6 @@
 
 @protocol StatusBarCustomViewDelegate <NSObject>
 
-- (NSString *)activeImageName;
-- (NSString *)inactiveImageName;
 - (BOOL)isActive;
 - (void)menuletClicked;
 - (BOOL)isDisabled;

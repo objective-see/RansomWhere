@@ -15,6 +15,7 @@
 #import "Consts.h"
 #import "Utilities.h"
 
+
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 
@@ -26,16 +27,12 @@
 
 @implementation AlertWindowController
 
-/*
-@synthesize alertMsg;
-@synthesize processLabel;
-@synthesize itemFile;
-@synthesize watchEventUUID;
-*/
 
-//alertWindowController
-
+@synthesize popover;
 @synthesize instance;
+@synthesize parentsButton;
+@synthesize rememberButton;
+@synthesize processHierarchy;
 
 //automatically called when nib is loaded
 // ->center window
@@ -45,6 +42,24 @@
     [self.window center];
 }
 
+//automatically invoked when window is loaded
+// ->set to white
+-(void)windowDidLoad
+{
+    //super
+    [super windowDidLoad];
+    
+    //tracking area for buttons
+    NSTrackingArea* trackingArea = nil;
+    
+    //init tracking area for 'show parents' button
+    trackingArea = [[NSTrackingArea alloc] initWithRect:[self.parentsButton bounds] options:(NSTrackingInVisibleRect|NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways) owner:self userInfo:nil];
+    
+    //add tracking area to 'show parents' button
+    [self.parentsButton addTrackingArea:trackingArea];
+    
+    return;
+}
 
 //configure the alert with the info from the daemon
 -(void)configure:(NSDictionary*)alertInfo
@@ -102,7 +117,18 @@
             //next
             continue;
         }
-    
+        
+        //process hierarchy isn't a UI element
+        // ->so just save it here
+        else if(YES == [key isEqualToString:@"processHierarchy"])
+        {
+            //set 'watchEventUUID' iVar
+            self.processHierarchy = alertInfo[key];
+            
+            //next
+            continue;
+        }
+        
         //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking for %@ in object", key]);
         
         //get instance variable by name
@@ -127,10 +153,7 @@
             ((NSTextField*)iVarObj).stringValue = alertInfo[key];
         }
     }
-    
-    //append process id and parent id
-    [self.processID setStringValue:[NSString stringWithFormat:@"%@ (parent: %@)", [self.processID stringValue], self.parentID]];
-    
+
     //make sure text's fits
     // ->some might be multiple lines...
     [self adjust2Fit];
@@ -204,7 +227,6 @@
         //shift down item binary
         [self shiftElementVertically:self.itemBinary shift:totalIncrease];
     }
-    
     
     //grab item binary's frame
     elementFrame = self.itemBinary.frame;
@@ -428,16 +450,53 @@ bail:
     return width;
 }
 
+//automatically invoked when mouse entered
+// ->when button isn't pressed, show mouse over effects
+-(void)mouseEntered:(NSEvent*)theEvent
+{
+    //only process if button hasn't been clicked
+    if(0 == self.parentsButton.state)
+    {
+        //mouse entered
+        // ->highlight (visual) state
+        [self.parentsButton setImage:[NSImage imageNamed:@"parentsIconOver"]];
+    }
+    
+    return;
+}
+
+//automatically invoked when mouse exits
+// ->when button isn't pressed, show mouse exit effects
+-(void)mouseExited:(NSEvent*)theEvent
+{
+    //only process if button hasn't been clicked
+    if(0 == self.parentsButton.state)
+    {
+        //mouse exited
+        // ->so reset button to original (visual) state
+        [self.parentsButton setImage:[NSImage imageNamed:@"parentsIcon"]];
+    }
+    
+    return;
+}
+
+
 //automatically invoked when user clicks 'deny'
 // invokes 'sendActionToDaemon' so that notification will be sent/handled
 -(void)deny:(id)sender
 {
+    //action info
+    NSDictionary* actionInfo = nil;
+    
     //dbg msg
     logMsg(LOG_DEBUG, @"user clicked: 'block'");
     
+    //init dictionary w/ action info
+    actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:BLOCK_WATCH_EVENT], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state]};
+    
     //send notification to daemon
     // ->block it!
-    [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendActionToDaemon:self.watchEventUUID action:BLOCK_WATCH_EVENT];
+    [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendActionToDaemon:actionInfo];
     
     //close window
     [self close];
@@ -449,13 +508,19 @@ bail:
 // invokes 'sendActionToDaemon' so that notification will be sent/handled
 -(void)allow:(id)sender
 {
+    //action info
+    NSDictionary* actionInfo = nil;
+    
     //dbg msg
     logMsg(LOG_DEBUG, @"user clicked: 'allow'");
     
+    //init dictionary w/ action info
+    actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state]};
+    
     //send notification to daemon
     // ->allow it!
-    [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendActionToDaemon:self.watchEventUUID action:ALLOW_WATCH_EVENT];
-    
+    [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendActionToDaemon:actionInfo];
+
     //close window
     [self close];
     
@@ -466,6 +531,13 @@ bail:
 // ->tell OS that we are done with window so it can (now) be freed
 -(void)windowWillClose:(NSNotification *)notification
 {
+    //always make sure popover is closed
+    if(0x1 == self.parentsButton.state)
+    {
+        //close
+        [self.popover close];
+    }
+    
     //set strong instance var to nil
     // ->will tell ARC, its finally ok to release us :)
     self.instance = nil;
@@ -473,7 +545,109 @@ bail:
     return;
 }
 
+//automatically invoked when user clicks process ancestry button
+-(IBAction)ancestryButtonHandler:(id)sender
+{
+    //when button is clicked
+    // ->open popover
+    if(0x1 == self.parentsButton.state)
+    {
+        //set process hierarchy
+        self.ancestryViewController.processHierarchy = self.processHierarchy;
+        
+        //dynamically (re)size popover
+        [self setPopoverSize];
+        
+        //auto-expand
+        [self.ancestryOutline expandItem:nil expandChildren:YES];
+    
+        //show popover
+        [self.popover showRelativeToRect:[self.parentsButton bounds] ofView:self.parentsButton preferredEdge:NSMaxYEdge];
+        
+    }
+    //otherwise
+    // ->close popover
+    else
+    {
+        //hide popover
+        [self.popover close];
+    }
+    
+    return;
+}
 
+//set the popover window size
+// ->make it roughly fit to content :)
+-(void)setPopoverSize
+{
+    //popover's frame
+    CGRect popoverFrame = {0};
+    
+    //required height
+    CGFloat popoverHeight = 0.0f;
+ 
+    //text of current row
+    NSString* currentRow = nil;
+    
+    //width of current row
+    CGFloat currentRowWidth = 0.0f;
+    
+    //length of max line
+    CGFloat maxRowWidth = 0.0f;
+    
+    //extra rows
+    NSUInteger extraRows = 0;
+    
+    //when heirarchy is less than 5
+    // ->set three extra rows
+    if(self.ancestryViewController.processHierarchy.count < 5)
+    {
+        //3 extra
+        extraRows = 3;
+    }
+    
+    //calc total window height
+    // ->number of rows + extra rows, * height
+    popoverHeight = (self.ancestryViewController.processHierarchy.count + 1 + extraRows) * [self.ancestryOutline rowHeight];
+   
+    //get window's frame
+    popoverFrame = self.ancestorView.frame;
+    
+    //calculate max line width
+    for(NSUInteger i=0; i<self.ancestryViewController.processHierarchy.count; i++)
+    {
+        //generate text of current row
+        currentRow = [NSString stringWithFormat:@"%@ (pid: %@)", self.ancestryViewController.processHierarchy[i][@"name"], [self.ancestryViewController.processHierarchy lastObject][@"pid"]];
 
+        //calculate width
+        // ->first w/ indentation
+        currentRowWidth = [self.ancestryOutline indentationPerLevel] * i;
+        
+        //calculate width
+        // ->then size of string in row
+        currentRowWidth += [currentRow sizeWithAttributes: @{NSFontAttributeName: self.ancestorTextCell.font}].width;
+        
+        //save it greater than max
+        if(maxRowWidth < currentRowWidth)
+        {
+            //save
+            maxRowWidth = currentRowWidth;
+        }
+    }
+    
+    //add some padding
+    maxRowWidth += 30;
+
+    //set height
+    popoverFrame.size.height = popoverHeight;
+    
+    //set width
+    popoverFrame.size.width = maxRowWidth;
+    
+    //set new frame
+    self.ancestorView.frame = popoverFrame;
+    
+    return;
+}
 
 @end

@@ -14,6 +14,7 @@
 #import "AppDelegate.h"
 #import "ProcessMonitor.h"
 #import "OrderedDictionary.h"
+#import "Process.h"
 
 
 
@@ -444,7 +445,7 @@ bail:
         for(NSString* processID in processList)
         {
             //extract process
-            process  = processList[processID];
+            process = processList[processID];
             
             //check for match
             if( (YES == [process.path isEqualToString:loginItemPath]) ||

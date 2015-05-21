@@ -10,6 +10,12 @@
 #import "Logging.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
+#import "AppDelegate.h"
+#import "ProcessMonitor.h"
+#import "OrderedDictionary.h"
+#import "Process.h"
+#import "Utilities.h"
+
 
 
 
@@ -22,8 +28,11 @@
 @synthesize plugin;
 @synthesize process;
 @synthesize timestamp;
+@synthesize itemBinary;
 @synthesize wasBlocked;
 @synthesize reportedUID;
+@synthesize shouldRemember;
+
 
 
 //init
@@ -45,7 +54,7 @@
     return self;
 }
 
-//determines is a (new) watch event is related
+//determines if a (new) watch event is related
 // ->checks things like process ids, plugins, paths, etc
 -(BOOL)isRelated:(WatchEvent*)newWatchEvent
 {
@@ -82,6 +91,30 @@
     
     
     //events appear to be related
+    return YES;
+}
+
+//determines if a new watch event matches a prev. 'remembered' event
+// ->checks paths, etc
+-(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent
+{
+    //check 1:
+    // ->different startup item path
+    if(YES != [self.path isEqualToString:rememberedEvent.path])
+    {
+        //nope!
+        return NO;
+    }
+    
+    //check 2:
+    // ->different startup item binary
+    if(YES != [self.itemBinary isEqualToString: rememberedEvent.itemBinary])
+    {
+        //nope!
+        return NO;
+    }
+    
+    //appears to match
     return YES;
 }
 
@@ -124,19 +157,197 @@
     alertInfo[@"itemFile"] = [self valueForStringItem:self.path];
     
     //set binary (path) of startup item
-    alertInfo[@"itemBinary"] = [self valueForStringItem: [self.plugin startupItemBinary:self]];
+    // ->when already set, can just use that
+    if(nil != self.itemBinary)
+    {
+        //set
+        alertInfo[@"itemBinary"] = self.itemBinary;
+    }
+    //when still nil
+    // ->lookup
+    else
+    {
+        //lookup
+        alertInfo[@"itemBinary"] = [self valueForStringItem:[self.plugin startupItemBinary:self]];
+    }
     
     //add process pid
     alertInfo[@"parentID"] = [NSString stringWithFormat:@"%d", self.process.ppid];
+    
+    //init process hierarchy
+    alertInfo[@"processHierarchy"] = [self buildProcessHierarchy];
     
     //dbg msg
     // ->here since don't want to print out icon!
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"ALERT INFO dictionary: %@", alertInfo]);
     
-    //add icon
+    //finally add icon
+    // note: don't try to log this!
     alertInfo[@"processIcon"] = [[self.process getIconForProcess] TIFFRepresentation];
     
     return alertInfo;
+}
+
+//get parent process
+// ->return dictionary with pid and name
+-(NSMutableDictionary*)getParentProcess:(pid_t)processID
+{
+    //dictionary for process hierarchy
+    NSMutableDictionary* parentProcess = nil;
+    
+    //child process object
+    Process* childProcessObj = nil;
+    
+    //process
+    Process* parentProcessObj = nil;
+    
+    //parent pid
+    pid_t parentID = -1;
+    
+    //buffer for call to proc_pidpath()
+    char parentPath[PROC_PIDPATHINFO_MAXSIZE+1] = {0};
+    
+    //init dictionary
+    parentProcess = [NSMutableDictionary dictionary];
+    
+    //first try existing process from process list
+    childProcessObj = [((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList objectForKey:[NSNumber numberWithInt:processID]];
+    
+    //extract ppid from child in process list
+    if(nil != childProcessObj)
+    {
+        //extract
+        parentID = childProcessObj.ppid;
+    }
+    //look it up manually
+    else
+    {
+        //try find parent pid
+        parentID = getParentID(processID);
+    }
+    
+    //sanity check
+    // ->make sure a parent was found
+    if(-1 == parentID)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //save parent pid
+    parentProcess[@"pid"] = [NSNumber numberWithInt:parentID];
+    
+    //try find parent in existing process list
+    // ->need name/path
+    parentProcessObj = [((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList objectForKey:[NSNumber numberWithInt:parentID]];
+    
+    //extract ppid/name from process obj
+    if(nil != parentProcessObj)
+    {
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got parent process from list: %@", parentProcessObj]);
+        
+        //name
+        parentProcess[@"name"] = parentProcessObj.name;
+        
+    }
+    //look it up manually
+    else
+    {
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"didn't find %d, looking up manually", processID]);
+        
+        //get path from pid
+        if(0 != proc_pidpath(parentID, parentPath, PROC_PIDPATHINFO_MAXSIZE))
+        {
+            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"pidPath %s", parentPath]);
+            
+            //save name
+            // ->since 'proc_pidpath()' returns full path strip to get name
+            parentProcess[@"name"] = [[NSString stringWithUTF8String:parentPath] lastPathComponent];
+        }
+        //failed to get path
+        else
+        {
+            //pid 0 is special case
+            // ->just set it to 'kernel_task'
+            if(0 == parentID)
+            {
+                //dunno
+                parentProcess[@"name"]  = @"kernel_task";
+            }
+            //couldn't find
+            // ->just set to 'unknown'
+            else
+            {
+                //dunno
+                parentProcess[@"name"]  = @"unknown";
+            }
+        }
+                              
+    }//manual lookup
+    
+//bail
+bail:
+    
+    return parentProcess;
+}
+
+                            
+-(NSMutableArray*)buildProcessHierarchy
+{
+    //process hierarchy
+    NSMutableArray* processHierarchy = nil;
+    
+    //dictionary for process hierarchy
+    NSMutableDictionary* parentProcessInfo = nil;
+    
+    //current process id
+    pid_t processID = -1;
+    
+    //alloc list for process hierarchy
+    processHierarchy = [NSMutableArray array];
+    
+    //start with leaf process
+    processID = self.process.pid;
+    
+    //add current (leaf) process
+    // ->always at front
+    [processHierarchy insertObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:self.process.pid], @"pid", self.process.name, @"name", nil] atIndex:0];
+  
+    //add until we get to to root (kernel_task)
+    // ->or error out
+    while(YES)
+    {
+        //get parent process
+        parentProcessInfo = [self getParentProcess:processID];
+        
+        //bail if parent process is nil
+        // ->or if process pid matches parent
+        if( (nil == parentProcessInfo) ||
+            (processID == [parentProcessInfo[@"pid"] intValue]) )
+        {
+            //bail
+            break;
+        }
+        
+        //add info
+        // ->always at front
+        [processHierarchy insertObject:parentProcessInfo atIndex:0];
+        
+        //get parent's process id
+        processID = [parentProcessInfo[@"pid"] intValue];
+    }
+    
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"FINAL processHierarchy %@", processHierarchy]);
+    
+    //add the index value to each process in the hierarchy
+    // ->used to populate outline/table
+    for(NSUInteger i = 0; i<processHierarchy.count; i++)
+    {
+        //set index
+        processHierarchy[i][@"index"] = [NSNumber numberWithInteger:i];
+    }
+    
+    return processHierarchy;
 }
 
 
@@ -164,7 +375,7 @@
 
 //for pretty print
 -(NSString *)description {
-    return [NSString stringWithFormat: @"process=%@, file path=%@, flags=%lx, timestamp: %@", self.process, self.path, (unsigned long)self.flags, self.timestamp];
+    return [NSString stringWithFormat: @"process=%@, item file path=%@, flags=%lx, timestamp=%@, item binary=%@", self.process, self.path, (unsigned long)self.flags, self.timestamp, self.itemBinary];
 }
 
 

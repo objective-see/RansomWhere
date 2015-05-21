@@ -6,12 +6,13 @@
 //  Copyright (c) 2014 Synack. All rights reserved.
 //
 
-#import "Process.h"
+@class Process;
+#import "PluginBase.h"
 
 #import <Foundation/Foundation.h>
 #import <Security/AuthSession.h>
 
-@class PluginBase;
+
 
 @interface WatchEvent : NSObject
 {
@@ -32,6 +33,9 @@
 
     //flag indicating user choose to block
     BOOL wasBlocked;
+    
+    //flag indicating user set 'remember' (action) option
+    BOOL shouldRemember;
 }
 
 /* METHODS */
@@ -40,14 +44,25 @@
 // ->checks things like process ids, plugins, paths, etc
 -(BOOL)isRelated:(WatchEvent*)newWatchEvent;
 
+//determines if a new watch event matches a prev. 'remembered' event
+// ->checks paths, etc
+-(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent;
+
 //takes a watch event and creates an alert dictionary that's serializable into a plist
 // ->needed since notification framework can only handle dictionaries of this kind
 -(NSMutableDictionary*)createAlertDictionary;
 
 @property BOOL wasBlocked;
 @property NSUInteger flags;
+@property BOOL shouldRemember;
 @property (nonatomic, retain)NSString* path;
 @property (nonatomic, retain)NSString* match;
+
+//item binary
+// ->need this for matching 'remembered' items
+@property (nonatomic, retain)NSString* itemBinary;
+
+
 @property (nonatomic, retain)Process* process;
 @property (nonatomic, retain)PluginBase* plugin;
 

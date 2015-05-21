@@ -12,13 +12,13 @@
 
 
 #import <libproc.h>
-#include <sys/sysctl.h>
+#import <sys/sysctl.h>
 #import <OpenDirectory/OpenDirectory.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <ApplicationServices/ApplicationServices.h>
+#import <CoreFoundation/CoreFoundation.h>
+#import <ApplicationServices/ApplicationServices.h>
 
 
 //return path to launch daemon's plist
@@ -159,7 +159,7 @@ NSString* getFullPath(NSNumber* processID, NSString* processName)
     NSString* fullPath = nil;
     
     //buffer for proc_pidpath()
-    char pidPath[PROC_PIDPATHINFO_MAXSIZE];
+    char pidPath[PROC_PIDPATHINFO_MAXSIZE] = {0};
 
     //first try proc_pidpath w/ pID
     if(0 != proc_pidpath([processID intValue], pidPath, PROC_PIDPATHINFO_MAXSIZE))
@@ -585,7 +585,6 @@ bail:
     return isSupported;
 }
 
-
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive)
 {
@@ -657,6 +656,7 @@ bail:
     return bRet;
 }
 
+/*
 //set permissions for file
 void setFilePermissions(NSString* file, int permissions)
 {
@@ -669,13 +669,12 @@ void setFilePermissions(NSString* file, int permissions)
     //get current file attributes
     //fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:file error:NULL];
     
-    /*
     int permissions = [[attribs objectForKey:@"NSFilePosixPermissions"] intValue];
     permissions |= (S_IRSUR | S_IRGRP | S_IROTH);
     NSDict *newattribs = [NSDict dictionaryWithObject:[NSNumber numberWithInt:permissions]
                                                forKey:NSFilePosixPermissions];
     [fm setAttributes:dict ofItemAtPath:[file path] error:&error];
-    */
+ 
     
     
     //init dictionary
@@ -696,6 +695,7 @@ void setFilePermissions(NSString* file, int permissions)
     
     return;
 }
+*/
 
 //get OS version
 NSDictionary* getOSVersion()
@@ -823,7 +823,6 @@ pid_t getParentID(int pid)
     return parentID;
 }
 
-
 //if string is too long to fit into a the (2-lines) text field
 // ->truncate and insert ellipises before /file
 NSString* stringByTruncatingString(NSTextField* textField, float width)
@@ -849,7 +848,6 @@ NSString* stringByTruncatingString(NSTextField* textField, float width)
         //bail
         goto bail;
     }
-    
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"truncating %@ (width: %f vs %f)", [textField stringValue], [[textField stringValue] sizeWithAttributes: @{NSFontAttributeName: textField.font}].width, width]);
@@ -928,4 +926,42 @@ BOOL isDaemonInstance()
     
     return isDaemon;
 }
+
+//determine menu mode
+BOOL isMenuDark()
+{
+    return [[[NSAppearance currentAppearance] name] containsString:NSAppearanceNameVibrantDark];
+}
+
+//wait until a window is non nil
+// ->then make it modal
+void makeModal(NSWindowController* windowController)
+{
+    //wait up to 1 second window to be non-nil
+    // ->then make modal
+    for(int i=0; i<20; i++)
+    {
+        //can make it modal once we have a window
+        if(nil != windowController.window)
+        {
+            //make modal on main thread
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                
+                //modal
+                [[NSApplication sharedApplication] runModalForWindow:windowController.window];
+                
+            });
+            
+            //all done
+            break;
+        }
+        
+        //nap
+        [NSThread sleepForTimeInterval:0.05f];
+        
+    }//until 1 second
+    
+    return;
+}
+
 

@@ -272,6 +272,10 @@ bail:
         //clear status msg
         [self.statusMsg setStringValue:@""];
         
+        //force redraw of status msg
+        // ->sometime doesn't refresh (e.g. slow VM)
+        [self.statusMsg setNeedsDisplay:YES];
+        
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing BlockBlock", button]);
         

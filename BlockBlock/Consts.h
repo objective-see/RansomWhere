@@ -159,6 +159,9 @@
 //action
 #define KEY_ACTION @"action"
 
+//remember action
+#define KEY_REMEMBER @"remember"
+
 //error msg
 #define KEY_ERROR_MSG @"errorMsg"
 

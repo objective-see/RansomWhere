@@ -52,22 +52,6 @@
     //disable highlighting
     [self.statusBarItem setHighlightMode:NO];
     
-    
-    
-    //set icon
-    //self.statusBarItem.image = [NSImage imageNamed:@"StatusIcon_On"];
-    
-    /*
-     // The image that will be shown in the menu bar, a 16x16 black png works best
-     _statusItem.image = [NSImage imageNamed:@"feedbin-logo"];
-     
-     // The highlighted image, use a white version of the normal image
-     _statusItem.alternateImage = [NSImage imageNamed:@"feedbin-logo-alt"];
-     
-     // The image gets a blue background when the item is selected
-     _statusItem.highlightMode = YES;
-     */
-    
     return;
 }
 
@@ -230,9 +214,6 @@
     // ->allows it to listen/show alerts from daemon (core)
     [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms setAgentStatus:UI_STATUS_ENABLED];
 
-    //set icon to on
-    self.statusBarItem.image = [NSImage imageNamed:@"statusON"];
-    
     //set status
     // ->top (disabled) menu item
     self.status.title = @"BLOCKBLOCK: enabled";
@@ -367,17 +348,6 @@
 }
 
 #pragma mark - StatusBarCustomViewDelegate
-
-- (NSString *)activeImageName
-{
-    return @"statusON";
-}
-
--(NSString *)inactiveImageName
-{
-    return @"statusOFF";
-}
-
 -(void)menuletClicked
 {
     //toggle active flag

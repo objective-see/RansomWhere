@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "ParentsWindowController.h"
+
 @class WatchEvent;
 @class AlertView;
 
@@ -40,6 +42,14 @@
 // ->process icon
 @property (weak) IBOutlet NSImageView *processIcon;
 
+//top
+// ->show parents button
+@property (weak) IBOutlet NSButton *parentsButton;
+
+//top
+// ->show parents button action/handler
+-(IBAction)ancestryButtonHandler:(id)sender;
+
 //bottom view
 @property (weak) IBOutlet NSView *bottomView;
 
@@ -71,6 +81,9 @@
 // ->path to launch item's binary
 @property (weak) IBOutlet NSTextField *itemBinary;
 
+//bottom
+// ->remember button
+@property (weak) IBOutlet NSButton *rememberButton;
 
 //bottom
 // ->block button
@@ -85,6 +98,24 @@
 
 //uuid of watch event
 @property (nonatomic, retain)NSString* watchEventUUID;
+
+//process hierarchy
+@property (nonatomic, retain)NSArray* processHierarchy;
+
+//parents window controller
+@property (strong) IBOutlet ParentsWindowController *ancestryViewController;
+
+//ancestry outline view
+@property (weak) IBOutlet NSOutlineView *ancestryOutline;
+
+//ancestry view
+@property (strong) IBOutlet NSView *ancestorView;
+
+//ancestory popover
+@property (strong) IBOutlet NSPopover *popover;
+
+//instance of single text cell (row)
+@property (weak) IBOutlet NSTextFieldCell *ancestorTextCell;
 
 
 /* METHODS */
