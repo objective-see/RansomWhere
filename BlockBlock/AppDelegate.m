@@ -41,6 +41,8 @@
 //TODO: dtrace perf issue :/
 //TODO: sandbox'd login items
 
+//TODO: https://twitter.com/JZdziarski/status/610554589872525312
+
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -235,7 +237,7 @@
         
         //DAEMON
         // ->check for root, then invoke function to exec daemon logic
-        if(YES == [arguments[1] isEqualToString:ACTION_RUN_DAEMON])
+        else if(YES == [arguments[1] isEqualToString:ACTION_RUN_DAEMON])
         {
             //dbg msg
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: starting BLOCKBLOCK (daemon)");
@@ -273,7 +275,7 @@
         
         //AGENT (UI)
         // ->invoke function to exec agent logic
-        if(YES == [arguments[1] isEqualToString:ACTION_RUN_AGENT])
+        else if(YES == [arguments[1] isEqualToString:ACTION_RUN_AGENT])
         {
             //dbg msg
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: starting BLOCKBLOCK (agent)");
@@ -311,8 +313,7 @@
             //no errors
             exitStatus = STATUS_SUCCESS;
             
-        }//uninstall
-        
+        }//uninstall (UI)
         
         //UNINSTALL
         else if(YES == [arguments[1] isEqualToString:ACTION_UNINSTALL])
@@ -353,6 +354,7 @@
             goto bail;
             
         }
+        
     }//2 args
 
 //bail
@@ -548,8 +550,37 @@ bail:
 // ->init status bar and enable IPC
 -(void)startBlockBlocking_Agent
 {
+    //current user
+    NSDictionary* currentUser = nil;
+    
     //dbg msg
     logMsg(LOG_DEBUG, @"startBlockBlocking_Agent: starting BLOCKBLOCK agent");
+    
+    //wait till user logs in
+    // ->otherwise bad things happen when trying to connect to the window server/status bar
+    do
+    {
+        //get current user
+        currentUser = getCurrentConsoleUser();
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current user: %@", currentUser]);
+        
+        //wait till target user is logged in
+        if( (nil != currentUser) &&
+            (getuid() == [currentUser[@"uid"] unsignedIntegerValue]) )
+        {
+            //yay
+            break;
+        }
+        
+        //nap for 5 seconds
+        [NSThread sleepForTimeInterval:5.0f];
+        
+    } while(YES);
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"user logged in/UI session ok!");
     
     //enable IPC notifcation for agent
     [self.interProcComms enableNotification:RUN_INSTANCE_AGENT];

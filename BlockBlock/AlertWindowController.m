@@ -30,6 +30,7 @@
 
 @synthesize popover;
 @synthesize instance;
+@synthesize pluginType;
 @synthesize parentsButton;
 @synthesize rememberButton;
 @synthesize processHierarchy;
@@ -129,6 +130,17 @@
             continue;
         }
         
+        //plugin type isn't a UI element
+        // ->so just save it here
+        else if(YES == [key isEqualToString:@"pluginType"])
+        {
+            //set ivar
+            self.pluginType = alertInfo[key];
+            
+            //next
+            continue;
+        }
+        
         //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking for %@ in object", key]);
         
         //get instance variable by name
@@ -154,6 +166,20 @@
         }
     }
 
+    //for commands (e.g. cron jobs), change label
+    // ->change to 'startup command'
+    if(PLUGIN_TYPE_CRON_JOB == [self.pluginType unsignedIntegerValue])
+    {
+        //change
+        self.itemBinaryLabel.stringValue = @"startup command:";
+    }
+    //set (back) to default
+    else
+    {
+        //(re)set
+        self.itemBinaryLabel.stringValue = @"startup binary:";
+    }
+    
     //make sure text's fits
     // ->some might be multiple lines...
     [self adjust2Fit];

@@ -116,6 +116,7 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
             }
             
             //insert process at end
+            //TODO: WILL CRASH IF ARRAY ISN'T BIG ENOUGH!
             [self.processList insertObject:process forKey:processID atIndex:self.processList.count];
         }
 
@@ -492,6 +493,7 @@ bail:
                             }
                             
                             //insert process at end
+                            //TODO: WILL CRASH IF ARRAY ISN'T BIG ENOUGH!
                             [self.processList insertObject:process forKey:processInfo[@"pid"] atIndex:self.processList.count];
                         }
                         

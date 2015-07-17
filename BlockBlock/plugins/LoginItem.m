@@ -1,5 +1,5 @@
 //
-//  kext.m
+//  LoginItem.m
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 9/25/14.
@@ -58,17 +58,20 @@
         // ->(might be another file edits which are ok to ignore)
         if(nil != [self findLoginItem:watchEvent])
         {
+            //dbg msg
             logMsg(LOG_DEBUG, @"found new login item, so NOT IGNORING");
             
             //don't ignore
             shouldIgnore = NO;
+            
+            //TODO: save this in watch event when later don't have to re-lookup (avoids race cond)
         }
     }
     //dbg
     else
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%lu is a flag the Login Item plugin doesn't care about....", (unsigned long)watchEvent.flags]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%lu is a flag the %@ plugin doesn't care about....", (unsigned long)watchEvent.flags, NSStringFromClass([self class])]);
     }
     
     //if ignoring
@@ -92,34 +95,60 @@
     return;
 }
 
-//update original login items for all users
--(void)newAgent:(NSDictionary*)registeredUsers
+//update original login items for new user
+-(void)newAgent:(NSDictionary*)newUser
 {
-    //user home directory
-    NSString* homeDirectory = nil;
-    
     //dbg msg
-    logMsg(LOG_DEBUG, @"LOGIN ITEMS, handling new agent");
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"LOGIN ITEMS, handling new agent %@/%@", newUser, self.watchPaths]);
+    
+    //iterate over plugin's watch paths
+    // ->any that are user specific (~) save original login items for new user
+    for(NSString* watchPath in self.watchPaths)
+    {
+        //save user specific (~) originals
+        if(YES == [watchPath hasPrefix:@"~"])
+        {
+            //dbg msg
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"LOGIN ITEMS, saving orginals for %@", watchPath]);
+
+            //matched
+            // ->save orginals
+            [self updateOriginals:[watchPath stringByReplacingOccurrencesOfString:@"~" withString:newUser[KEY_USER_HOME_DIR]]];
+        }
+    }
+    //check if its a user path
+    // ->then update originals
+    //if(YES == [watchPath hasPrefix:@"~"])
+    //{
+    //update
+    //[self updateOriginals:[watchPath stringByReplacingOccurrencesOfString:@"~" withString:homeDirectory]];
+    //}
+    //}
+
+
+    
+    
+    //[self updateOriginals:[watchPath stringByReplacingOccurrencesOfString:@"~" withString:homeDirectory]];
     
     //iterate over all users
     // ->save current login items
-    for(NSNumber* userID in registeredUsers)
-    {
+    //for(NSNumber* userID in newUser)
+    //{
         //extract home directory
-        homeDirectory = registeredUsers[userID][KEY_USER_HOME_DIR];
+        //homeDirectory = //newUserregisteredUsers[userID][KEY_USER_HOME_DIR];
         
         //iterate over all watch paths to find those that belong to user
-        for(NSString* watchPath in self.watchPaths)
-        {
+        //for(NSString* watchPath in self.watchPaths)
+        //{
             //check if its a user path
             // ->then update originals
-            if(YES == [watchPath hasPrefix:@"~"])
-            {
+            //if(YES == [watchPath hasPrefix:@"~"])
+            //{
                 //update
-                [self updateOriginals:[watchPath stringByReplacingOccurrencesOfString:@"~" withString:homeDirectory]];
-            }
-        }
-    }
+                //[self updateOriginals:[watchPath stringByReplacingOccurrencesOfString:@"~" withString:homeDirectory]];
+            //}
+        //}
+    //}
     
     return;
 }

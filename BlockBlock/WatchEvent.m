@@ -95,13 +95,20 @@
 }
 
 //determines if a new watch event matches a prev. 'remembered' event
-// ->checks paths, etc
+// ->checks path and item
+//   TODO: cron jobs don't have an item binary? or wait, maybe that's what's overloaded to hold ext?
 -(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent
 {
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is remembered", rememberedEvent]);
+    
     //check 1:
     // ->different startup item path
     if(YES != [self.path isEqualToString:rememberedEvent.path])
     {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"path %@ != %@", self.path, rememberedEvent.path]);
+        
         //nope!
         return NO;
     }
@@ -110,6 +117,9 @@
     // ->different startup item binary
     if(YES != [self.itemBinary isEqualToString: rememberedEvent.itemBinary])
     {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemBinary, rememberedEvent.itemBinary]);
+        
         //nope!
         return NO;
     }
@@ -130,6 +140,10 @@
     
     //save watch item ID
     alertInfo[KEY_WATCH_EVENT_UUID] = [self.uuid UUIDString];
+    
+    //add plugin type
+    // ->allows for alert info customization
+    alertInfo[@"pluginType"] = [NSNumber numberWithUnsignedInteger:self.plugin.type];
     
     /* for top of alert window */
     
@@ -152,7 +166,7 @@
     
     //set name of startup item
     alertInfo[@"itemName"] = [self valueForStringItem:[self.plugin startupItemName:self]];
-    
+        
     //set file of startup item
     alertInfo[@"itemFile"] = [self valueForStringItem:self.path];
     
@@ -174,7 +188,7 @@
     //add process pid
     alertInfo[@"parentID"] = [NSString stringWithFormat:@"%d", self.process.ppid];
     
-    //init process hierarchy
+    //init/add process hierarchy
     alertInfo[@"processHierarchy"] = [self buildProcessHierarchy];
     
     //dbg msg

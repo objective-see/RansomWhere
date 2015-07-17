@@ -125,12 +125,18 @@ bail:
     // ->instantiate a plugin for each
     for(NSDictionary* watchItem in self.watchItems)
     {
+        //dbg msg
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watch item: %@/%@", watchItem, NSClassFromString(watchItem[@"class"])]);
+        
         //init plugin
         // ->will also init paths
         plugin = [(PluginBase*)([NSClassFromString(watchItem[@"class"]) alloc]) initWithParams:watchItem];
         
         //save plugin
         [self.plugins addObject:plugin];
+        
+        //dbg msg
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"added plugin: %@", plugin]);
         
         //save plugin and files it can handle
         // ->note path's with '~' are skipped here as they are expanded at time of agent registration
@@ -171,12 +177,9 @@ bail:
 }
 
 //update the path to watch
-// ->basiscally expands all '~'s into valid (registered) users
+// ->basically expands all '~'s into valid (registered) users
 -(void)updateWatchedPaths:(NSMutableDictionary*)registeredAgents
 {
-    //registered users
-    NSMutableArray* registeredUsers = nil;
-    
     //updated mappings
     NSMutableDictionary* updatedPluginMappings = nil;
     
@@ -184,23 +187,10 @@ bail:
     NSString* expandedPath = nil;
     
     //alloc
-    registeredUsers = [NSMutableArray array];
-    
-    //alloc
     updatedPluginMappings = [NSMutableDictionary dictionary];
     
     //dbg msg
     logMsg(LOG_DEBUG, @"updating watch paths");
-    
-    //save all home paths for registered users
-    for(NSNumber* key in registeredAgents)
-    {
-        //save
-        [registeredUsers addObject:registeredAgents[key][KEY_USER_HOME_DIR]];
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"registered user paths: %@", registeredUsers]);
     
     //update plugin mappings
     for(PluginBase* plugin in self.plugins)
@@ -212,22 +202,41 @@ bail:
         // -> paths with ~s are expanded into all registered users
         for(NSString* path in plugin.watchPaths)
         {
-            //expand '~' path
+            //expand '~/' path
             if(YES == [path containsString:@"~/"])
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path: %@", path]);
                 
                 //expand all
-                for(NSString* registeredUser in registeredUsers)
+                for(NSNumber* key in registeredAgents)
                 {
                     //init expanded path
-                    expandedPath = [path stringByReplacingOccurrencesOfString:@"~" withString:registeredUser];
+                    expandedPath = [path stringByReplacingOccurrencesOfString:@"~" withString:registeredAgents[key][KEY_USER_HOME_DIR]];
                     
                     //save
                     pluginMappings[expandedPath] = plugin;
                 }
             }
+            
+            //expand ~ at end
+            // ->special case (cron jobs), replace w/ user name
+            else if(YES == [path hasSuffix:@"~"])
+            {
+                //dbg msg
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path: %@", path]);
+                
+                //expand all
+                for(NSNumber* key in registeredAgents)
+                {
+                    //init expanded path
+                    expandedPath = [path stringByReplacingCharactersInRange:NSMakeRange(path.length-1, 1) withString:registeredAgents[key][KEY_USER_NAME]];
+                    
+                    //save
+                    pluginMappings[expandedPath] = plugin;
+                }
+            }
+            
             
             //just save mapping
             // ->key is path, value is plugin
@@ -325,7 +334,7 @@ bail:
     
     //set depth
     // ->bumped this since events were being dropped
-    clonedArgs.event_queue_depth = 256;
+    clonedArgs.event_queue_depth = 512;
     
     //set list
     clonedArgs.event_list = events;

@@ -21,6 +21,7 @@
 		CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD6090C51A7DBDA300E091CD /* itemIcon.png */; };
 		CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD6090C61A7DBDA300E091CD /* processIcon.png */; };
 		CD6974FB1B013AB600CE819B /* ParentsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD6974F91B013AB600CE819B /* ParentsWindowController.m */; };
+		CD6BBBF31B52204F00506D0D /* CronJob.m in Sources */ = {isa = PBXBuildFile; fileRef = CD6BBBF21B52204F00506D0D /* CronJob.m */; };
 		CD7620A51AF3629400CFCB68 /* statusOFFWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A11AF3629400CFCB68 /* statusOFFWhite.png */; };
 		CD7620A61AF3629400CFCB68 /* statusOFFWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A21AF3629400CFCB68 /* statusOFFWhite@2x.png */; };
 		CD7620A71AF3629400CFCB68 /* statusONWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A31AF3629400CFCB68 /* statusONWhite.png */; };
@@ -102,6 +103,8 @@
 		CD6090C61A7DBDA300E091CD /* processIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = processIcon.png; path = BlockBlock/images/processIcon.png; sourceTree = "<group>"; };
 		CD6974F81B013AB600CE819B /* ParentsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParentsWindowController.h; path = BlockBlock/ParentsWindowController.h; sourceTree = "<group>"; };
 		CD6974F91B013AB600CE819B /* ParentsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ParentsWindowController.m; path = BlockBlock/ParentsWindowController.m; sourceTree = "<group>"; };
+		CD6BBBF11B52204F00506D0D /* CronJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CronJob.h; path = BlockBlock/plugins/CronJob.h; sourceTree = "<group>"; };
+		CD6BBBF21B52204F00506D0D /* CronJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CronJob.m; path = BlockBlock/plugins/CronJob.m; sourceTree = "<group>"; };
 		CD7620A11AF3629400CFCB68 /* statusOFFWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusOFFWhite.png; path = BlockBlock/images/icon/statusOFFWhite.png; sourceTree = "<group>"; };
 		CD7620A21AF3629400CFCB68 /* statusOFFWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusOFFWhite@2x.png"; path = "BlockBlock/images/icon/statusOFFWhite@2x.png"; sourceTree = "<group>"; };
 		CD7620A31AF3629400CFCB68 /* statusONWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusONWhite.png; path = BlockBlock/images/icon/statusONWhite.png; sourceTree = "<group>"; };
@@ -223,6 +226,8 @@
 		CD7C874919D50F1200EC7F0A /* plugins */ = {
 			isa = PBXGroup;
 			children = (
+				CD6BBBF11B52204F00506D0D /* CronJob.h */,
+				CD6BBBF21B52204F00506D0D /* CronJob.m */,
 				CD06BD201A6C5D7C00DE285A /* LoginItem.h */,
 				CD06BD211A6C5D7C00DE285A /* LoginItem.m */,
 				CDD5681D1A5E37770094BC3A /* Launchd.h */,
@@ -504,6 +509,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */,
+				CD6BBBF31B52204F00506D0D /* CronJob.m in Sources */,
 				CDD738BD1A5F7D0500B825BA /* StatusBarCustomView.m in Sources */,
 				CDB4D9E519FCD9410069BE62 /* Process.m in Sources */,
 				CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */,

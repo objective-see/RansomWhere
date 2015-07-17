@@ -329,6 +329,7 @@
         self.icon = [[NSWorkspace sharedWorkspace] iconForFile:self.path];
         
         //load system document icon
+        //TODO: make static!
         documentIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:
                          NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] TIFFRepresentation];
         

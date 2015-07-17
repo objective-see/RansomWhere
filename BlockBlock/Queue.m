@@ -137,11 +137,16 @@
                 [lastWatchEvent.plugin block:currentWatchEvent];
             }
             //prev. event was allowed
-            // ->allow this one too (i.e., don't do anything)
+            // ->allow this one too
             else
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, @"automatically allowing related/remembered event");
+                
+                //automatically allow it
+                // ->plugins will be same
+                [lastWatchEvent.plugin allow:currentWatchEvent];
+
             }
             
         }//related/'remembered' event

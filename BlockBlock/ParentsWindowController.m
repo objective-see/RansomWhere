@@ -68,6 +68,7 @@
     // ->return *their* child!
     else
     {
+        //child at index
         itemForRow = self.processHierarchy[[((NSDictionary*)item)[@"index"] integerValue]+1];
     }
     
@@ -88,7 +89,5 @@
     
     return rowValue;
 }
-
-
 
 @end

@@ -180,11 +180,14 @@
 //action param
 #define KEY_ACTION_PARAM_ONE @"paramOne"
 
-//user id
+//user's id
 #define KEY_USER_ID @"userID"
 
 //user's home directory
 #define KEY_USER_HOME_DIR @"userHomeDirectory"
+
+//user's name
+#define KEY_USER_NAME @"userName"
 
 //flag for all sessions
 #define UID_ALL_SESSIONS -1
@@ -199,11 +202,14 @@
 //kext
 #define PLUGIN_TYPE_KEXT 1
 
-//kext
+//launchd
 #define PLUGIN_TYPE_LAUNCHD 2
 
-//kext
+//login item
 #define PLUGIN_TYPE_LOGIN_ITEM 3
+
+//cron jobs
+#define PLUGIN_TYPE_CRON_JOB 4
 
 //ellipis
 // ->for long paths...

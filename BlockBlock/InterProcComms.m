@@ -143,11 +143,18 @@
 //IPC callback for notification from ui (agent) to register itself
 -(void)handleRegistrationViaIPC:(NSNotification *)notification
 {
+    //new user
+    NSDictionary* newUser = nil;
+    
     //dbg msg
     logMsg(LOG_DEBUG, @"got msg from UI (agent) to register agent");
     
+    //assign
+    newUser = notification.userInfo;
+    
     //save
-    self.registeredAgents[notification.userInfo[KEY_USER_ID]] = notification.userInfo;
+    // ->key is uid
+    self.registeredAgents[newUser[KEY_USER_ID]] = newUser;
         
     //update all watch paths
     // ->plugin's with watch paths containing '~' will have to be updated for new agent (user)
@@ -157,17 +164,16 @@
     logMsg(LOG_DEBUG, @"alerting all plugins of new agent");
     
     //alert all plugins of new agent
+    // ->allow them to plugin-specific logic
     for(PluginBase* plugin in ((AppDelegate*)[[NSApplication sharedApplication] delegate]).watcher.plugins)
     {
         //alert
         // ->pass in all new agents
-        [plugin newAgent:self.registeredAgents];
+        [plugin newAgent:newUser];
     }
     
     return;
 }
-
-
 
 //AGENT METHOD
 //the UI (agent) can be disabled/enabled by the user
@@ -196,6 +202,9 @@
         
     //save user home directory
     userInfo[KEY_USER_HOME_DIR] = NSHomeDirectory();
+    
+    //save user name
+    userInfo[KEY_USER_NAME] = NSUserName();
         
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to register with daemon", userInfo]);
@@ -207,7 +216,7 @@
     return;
 }
 
-
+//AGENT METHOD
 //notify background (daemon) instance what user selected
 // ->notification will contain dictionary w/ watch event UUID and action (block | allow | disabled)
 -(void)sendActionToDaemon:(NSDictionary*)actionInfo
@@ -378,7 +387,9 @@ bail:
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking alert is for this session: %d matches %d?", targetUID, getuid()]);
     
     //check if target UID matches UI of this session
-    if(targetUID != getuid())
+    // ->or also, is for all sessions
+    if( (targetUID != getuid()) &&
+        (targetUID != UID_ALL_SESSIONS) )
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"alert is *NOT* for this session! (ignoring)");
@@ -464,6 +475,7 @@ bail:
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking error msg is for this session: %d matches %d?", targetUID, getuid()]);
     
     //check if target UID matches UI of this session
+    // ->or also, is for all sessions
     if( (targetUID != getuid()) &&
         (targetUID != UID_ALL_SESSIONS) )
     {

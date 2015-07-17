@@ -51,8 +51,6 @@
         //save flag about match level
         self.ignoreKids = [watchItemInfo[@"ignoreKids"] boolValue];
         
-    
-        
     }
     
     return self;

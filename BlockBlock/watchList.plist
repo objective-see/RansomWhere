@@ -49,5 +49,20 @@
 		<key>ignoreKids</key>
 		<true/>
 	</dict>
+	<dict>
+		<key>description</key>
+		<string>Cron Job</string>
+		<key>paths</key>
+		<array>
+			<string>/private/var/at/tabs/root</string>
+			<string>/private/var/at/tabs/~</string>
+		</array>
+		<key>class</key>
+		<string>CronJob</string>
+		<key>alert</key>
+		<string>created a cron job</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
 </array>
 </plist>

@@ -102,6 +102,9 @@
 //process hierarchy
 @property (nonatomic, retain)NSArray* processHierarchy;
 
+//plugin type
+@property (nonatomic, retain)NSNumber* pluginType;
+
 //parents window controller
 @property (strong) IBOutlet ParentsWindowController *ancestryViewController;
 

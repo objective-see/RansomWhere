@@ -52,6 +52,10 @@
 // ->needed since notification framework can only handle dictionaries of this kind
 -(NSMutableDictionary*)createAlertDictionary;
 
+/* PROPERTIES */
+
+
+
 @property BOOL wasBlocked;
 @property NSUInteger flags;
 @property BOOL shouldRemember;
@@ -61,6 +65,7 @@
 //item binary
 // ->need this for matching 'remembered' items
 @property (nonatomic, retain)NSString* itemBinary;
+
 
 
 @property (nonatomic, retain)Process* process;

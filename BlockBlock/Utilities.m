@@ -151,6 +151,46 @@ id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait)
     return plistValue;
 }
 
+/*
+//load file w/ timeout
+NSData* loadFile(NSString* file, float maxWait)
+{
+    //count var for loop
+    NSUInteger count = 0;
+    
+    //file content's
+    NSData* fileContents = nil;
+    
+    //try/wait for plist to be written to disk
+    // ->then load/parse it to get value for key
+    do
+    {
+        //nap for 1/10th of a second
+        [NSThread sleepForTimeInterval:WAIT_INTERVAL];
+            
+    
+            
+        //try to load content's of Info.plist
+        plistContents = [NSDictionary dictionaryWithContentsOfFile:plistFile];
+        if( (nil != plistContents) && (nil != plistContents[key]) )
+        {
+            //extract value
+            plistValue = plistContents[key];
+            
+            //got it, so bail
+            break;
+        }
+        }
+        
+        //nap for 1/10th of a second
+        [NSThread sleepForTimeInterval:WAIT_INTERVAL];
+        
+        //try up to 1 second
+    }while(count++ < maxWait/WAIT_INTERVAL);
+    
+}
+*/
+
 //given a pid and process name, try to find full path
 // ->first tries proc_pidpath(), then 'which'
 NSString* getFullPath(NSNumber* processID, NSString* processName)
