@@ -3,7 +3,7 @@
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 9/25/14.
-//  Copyright (c) 2014 Synack. All rights reserved.
+//  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
 #import "Consts.h"
@@ -70,7 +70,7 @@
     NSString* newCronJob = nil;
     
     //dbg msg
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOB %@ flag: %lu' set", watchEvent.path, (unsigned long)watchEvent.flags]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOB %@ flag: %lu' set", watchEvent.path, (unsigned long)watchEvent.flags]);
     
     //create/modification/rename of file
     // ->note: OS does a rename
@@ -79,7 +79,7 @@
         (FSE_CONTENT_MODIFIED == watchEvent.flags) )
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE/FSE_RENAME/FSE_CONTENT_MODIFIED (%lu)' set (not maybe ignoring)", watchEvent.path, (unsigned long)watchEvent.flags]);
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE/FSE_RENAME/FSE_CONTENT_MODIFIED (%lu)' set (not maybe ignoring)", watchEvent.path, (unsigned long)watchEvent.flags]);
         
         //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current cron jobs: %@", [((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals objectForKey:watchEvent.path]]);
         
@@ -104,14 +104,14 @@
         if(nil != newCronJob)
         {
             //dbg msg
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is a new cron job so NOT ignoring....", newCronJob]);
+            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is a new cron job so NOT ignoring....", newCronJob]);
             
             //don't ignore
             shouldIgnore = NO;
             
             //set the command in the watch event
             // ->done here since we just parsed all the cron jobs etc.
-            //TODO: rename itemBinary?
+            //TODO: rename itemBinary? maybe itemObject (binary, cron job, cmd, etc)
             watchEvent.itemBinary = newCronJob;
         }
         /*
@@ -121,12 +121,14 @@
         }
         */
     }
+    /*
     //dbg
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%lu is a flag the %@ plugin doesn't care about....", (unsigned long)watchEvent.flags, NSStringFromClass([self class])]);
     }
+    */
     
     //if ignoring
     // ->still update originals
@@ -139,7 +141,6 @@
     return shouldIgnore;
 }
 
-
 //invoked when user clicks 'allow'
 // ->just update originals
 -(void)allow:(WatchEvent *)watchEvent
@@ -149,7 +150,6 @@
     
     return;
 }
-
 
 //update original cron jobs for user
 -(void)newAgent:(NSDictionary*)newUser

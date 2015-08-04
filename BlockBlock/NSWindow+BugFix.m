@@ -2,9 +2,6 @@
 //  NSWindow+BugFix.m
 //  PopoverMenulet
 //
-//  Created by Julián Romero on 17/04/14.
-//  Copyright (c) 2014 Wuonm Web Services S.L. All rights reserved.
-//
 
 #import <objc/objc-class.h>
 #import "NSWindow+BugFix.h"

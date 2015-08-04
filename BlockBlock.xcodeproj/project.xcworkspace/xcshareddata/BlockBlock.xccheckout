@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>D1869751-1AE0-41B0-BFE0-DBB2ED17FCE9</string>
 	<key>IDESourceControlProjectName</key>
-	<string>BlockBlock</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>A227E154745FB15CD9BBE8F5674A42F6E1AF298B</key>
 		<string>https://bitbucket.org/objective-see/blockblock.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>BlockBlock.xcodeproj</string>
+	<string>BlockBlock.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>A227E154745FB15CD9BBE8F5674A42F6E1AF298B</key>

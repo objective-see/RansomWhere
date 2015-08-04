@@ -3,7 +3,7 @@
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 10/19/14.
-//  Copyright (c) 2014 Synack. All rights reserved.
+//  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 #import "Process.h"
 #import "Utilities.h"
@@ -116,7 +116,6 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
             }
             
             //insert process at end
-            //TODO: WILL CRASH IF ARRAY ISN'T BIG ENOUGH!
             [self.processList insertObject:process forKey:processID atIndex:self.processList.count];
         }
 
@@ -493,7 +492,6 @@ bail:
                             }
                             
                             //insert process at end
-                            //TODO: WILL CRASH IF ARRAY ISN'T BIG ENOUGH!
                             [self.processList insertObject:process forKey:processInfo[@"pid"] atIndex:self.processList.count];
                         }
                         

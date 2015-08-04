@@ -3,7 +3,7 @@
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 10/26/14.
-//  Copyright (c) 2014 Synack. All rights reserved.
+//  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
 #import "Consts.h"
@@ -290,7 +290,7 @@
     NSString* iconExtension = nil;
     
     //system's document icon
-    NSData* documentIcon = nil;
+    static NSData* documentIcon = nil;
     
     //for app's
     // ->extract their icon
@@ -329,9 +329,13 @@
         self.icon = [[NSWorkspace sharedWorkspace] iconForFile:self.path];
         
         //load system document icon
-        //TODO: make static!
-        documentIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:
-                         NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] TIFFRepresentation];
+        // ->static var, so only load once
+        if(nil == documentIcon)
+        {
+            //load
+            documentIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:
+                             NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] TIFFRepresentation];
+        }
         
         //if 'iconForFile' method doesn't find and icon, it returns the system 'document' icon
         // ->the system 'applicaiton' icon seems more applicable, so use that here...

@@ -93,24 +93,47 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
 	return [dictionary objectForKey:aKey];
 }
 
-- (NSEnumerator *)keyEnumerator
-{
-	return [array objectEnumerator];
-}
 
-- (NSEnumerator *)reverseKeyEnumerator
-{
-	return [array reverseObjectEnumerator];
-}
-
+//insert obj
+// ->added sanity/error checking
 - (void)insertObject:(id)anObject forKey:(id)aKey atIndex:(NSUInteger)anIndex
 {
 	if ([dictionary objectForKey:aKey])
 	{
+        //remove old
 		[self removeObjectForKey:aKey];
 	}
-	[array insertObject:aKey atIndex:anIndex];
+    
+    //sanity check
+    // ->make sure index is valid
+    if(anIndex > array.count)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //special case
+    // ->add at end
+    if(anIndex == array.count)
+    {
+        //add
+        [array addObject:aKey];
+    }
+    //just insert at index
+    else
+    {
+        //insert
+        [array insertObject:aKey atIndex:anIndex];
+    }
+    
+    //set in dictionary too
 	[dictionary setObject:anObject forKey:aKey];
+
+//bail
+bail:
+    
+    return;
+    
 }
 
 - (id)keyAtIndex:(NSUInteger)anIndex

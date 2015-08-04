@@ -3,7 +3,7 @@
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 9/25/14.
-//  Copyright (c) 2014 Synack. All rights reserved.
+//  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
 #import "Consts.h"
@@ -119,14 +119,14 @@ bail:
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watchlist: %@", self.watchItems]);
+    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watchlist: %@", self.watchItems]);
     
     //iterate over all watch items from plist
     // ->instantiate a plugin for each
     for(NSDictionary* watchItem in self.watchItems)
     {
         //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watch item: %@/%@", watchItem, NSClassFromString(watchItem[@"class"])]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watch item: %@/%@", watchItem, NSClassFromString(watchItem[@"class"])]);
         
         //init plugin
         // ->will also init paths
@@ -136,14 +136,14 @@ bail:
         [self.plugins addObject:plugin];
         
         //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"added plugin: %@", plugin]);
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"added plugin: %@/%@", plugin, plugin.watchPaths]);
         
         //save plugin and files it can handle
         // ->note path's with '~' are skipped here as they are expanded at time of agent registration
         for(NSString* path in plugin.watchPaths)
         {
             //skip '~' path
-            if(YES == [path containsString:@"~/"])
+            if(NSNotFound != [path rangeOfString:@"~/"].location)
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"skipping plugin path: %@", path]);
@@ -156,15 +156,14 @@ bail:
             // ->key is path, value is plugin
             pluginMappings[path] = plugin;
         }
-        
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"registered plugins: %@", self.plugins]);
+    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"registered plugins: %@", self.plugins]);
 
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"plugin mappings: %@", self.pluginMappings]);
+    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"plugin mappings: %@", self.pluginMappings]);
     
     //no errors
     bRet = YES;
@@ -203,7 +202,7 @@ bail:
         for(NSString* path in plugin.watchPaths)
         {
             //expand '~/' path
-            if(YES == [path containsString:@"~/"])
+            if(NSNotFound != [path rangeOfString:@"~/"].location)
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path: %@", path]);
@@ -253,6 +252,7 @@ bail:
     
     return;
 }
+
 
 //TODO: close/kill thread on exit/disable?!?
 //have to use fsevents directly since the FSEvents Framework doesn't give us the pID of the creator :/

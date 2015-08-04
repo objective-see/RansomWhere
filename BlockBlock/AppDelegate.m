@@ -3,7 +3,7 @@
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 8/27/14.
-//  Copyright (c) 2014 Synack. All rights reserved.
+//  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
 #import "Consts.h"
@@ -40,8 +40,6 @@
 
 //TODO: dtrace perf issue :/
 //TODO: sandbox'd login items
-
-//TODO: https://twitter.com/JZdziarski/status/610554589872525312
 
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
@@ -591,7 +589,7 @@ bail:
     
     //register
     // ->delay to allow daemon to get up and running :)
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^
     {
         //register agent
         [self.interProcComms registerAgent];
