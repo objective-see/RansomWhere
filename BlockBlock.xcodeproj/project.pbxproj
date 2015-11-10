@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D0215131BF1D27D0005CF0F /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D0215121BF1D27D0005CF0F /* libbsm.tbd */; };
 		CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CD06BD211A6C5D7C00DE285A /* LoginItem.m */; };
 		CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */; };
 		CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */; };
@@ -76,6 +77,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7D0215121BF1D27D0005CF0F /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
 		CD06BD201A6C5D7C00DE285A /* LoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginItem.h; path = BlockBlock/plugins/LoginItem.h; sourceTree = "<group>"; };
 		CD06BD211A6C5D7C00DE285A /* LoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginItem.m; path = BlockBlock/plugins/LoginItem.m; sourceTree = "<group>"; };
 		CD3CE6871A22C53400B4F940 /* ConfigureWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigureWindowController.h; path = BlockBlock/ui/ConfigureWindowController.h; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D0215131BF1D27D0005CF0F /* libbsm.tbd in Frameworks */,
 				CDB4D9DF19F4D44F0069BE62 /* libdtrace.dylib in Frameworks */,
 				CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */,
 			);
@@ -311,6 +314,7 @@
 		CD7F088A19AE6DCA00FF00FC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7D0215121BF1D27D0005CF0F /* libbsm.tbd */,
 				CDB4D9DE19F4D44F0069BE62 /* libdtrace.dylib */,
 				CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */,
 				CD7F088D19AE6DCA00FF00FC /* Other Frameworks */,
@@ -441,7 +445,7 @@
 		CD7F088019AE6DCA00FF00FC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = Synack;
 			};
 			buildConfigurationList = CD7F088319AE6DCA00FF00FC /* Build configuration list for PBXProject "BlockBlock" */;
@@ -599,6 +603,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -662,6 +667,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
 				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.objectivesee.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = BlockBlock;
 				WRAPPER_EXTENSION = app;
 			};
@@ -675,6 +681,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
 				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.objectivesee.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = BlockBlock;
 				WRAPPER_EXTENSION = app;
 			};

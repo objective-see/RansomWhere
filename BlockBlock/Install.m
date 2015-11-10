@@ -507,13 +507,6 @@ bail:
         installedState = INSTALL_STATE_PARTIAL;
     }
     
-    //check for app
-    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
-    {
-        //set flag
-        installedState = INSTALL_STATE_PARTIAL;
-    }
-    
     //check for current user's launch agent
     // ->this implies a full install
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist(currentUserDirectory)])
@@ -521,6 +514,18 @@ bail:
         //set flag
         installedState = INSTALL_STATE_FULL;
     }
+    
+    //check for app
+    // ->handle logic where downloaded app was moved to /Application before executing
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
+    {
+        //detect 'moved manually into /Applications' by seeing if there are no other components
+        // ->and file is owned by current user (not root, which installers sets)
+        
+        //set flag
+        installedState = INSTALL_STATE_PARTIAL;
+    }
+    
     
     return installedState;
 }

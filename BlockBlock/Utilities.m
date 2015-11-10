@@ -739,7 +739,7 @@ NSDictionary* getOSVersion()
     osVersionInfo[@"minorVersion"] = [NSNumber numberWithInteger:minorVersion];
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current OS version info: %@", osVersionInfo]);
+    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current OS version info: %@", osVersionInfo]);
     
 //bail
 bail:
@@ -944,6 +944,7 @@ BOOL isMenuDark()
     // note: can use 'containsString' API since code will only execute on Yosemite+
     if([osVersionInfo[@"minorVersion"] intValue] >= 10)
     {
+        //set flag
         isDark = [[[NSAppearance currentAppearance] name] containsString:NSAppearanceNameVibrantDark];
     }
     

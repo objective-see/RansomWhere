@@ -430,7 +430,7 @@
     frame = CTFramesetterCreateFrame(frameSetter, CFRangeMake(0, 0), path, NULL);
 
     //draw
-    CTFrameDraw(frame, NULL);
+    CTFrameDraw(frame, (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort]);
     
     //get first line
     firstLine = (__bridge CTLineRef)[(__bridge NSArray*)CTFrameGetLines(frame) firstObject];

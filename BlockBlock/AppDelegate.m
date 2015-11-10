@@ -433,7 +433,7 @@ bail:
     //init event queue
     eventQueue = [[Queue alloc] init];
     
-    //enable IPC notifcation for daemon
+    //enable IPC notification for daemon
     [interProcComms enableNotification:RUN_INSTANCE_DAEMON];
     
     //create/init process monitor
@@ -580,7 +580,7 @@ bail:
     //dbg msg
     logMsg(LOG_DEBUG, @"user logged in/UI session ok!");
     
-    //enable IPC notifcation for agent
+    //enable IPC notification for agent
     [self.interProcComms enableNotification:RUN_INSTANCE_AGENT];
     
     //setup status bar
