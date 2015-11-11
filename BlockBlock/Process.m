@@ -154,6 +154,7 @@
 -(void)determinePath
 {
     logMsg(LOG_DEBUG, @"determining path");
+    
     //try to get path from bundle
     if(nil != self.bundle)
     {
@@ -224,7 +225,7 @@
     else
     {
         //dbg msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to extract UID for process: %d/%zu", sysctlResult, procBufferSize]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to extract UID for process: %d (%d/%zu)", self.pid, sysctlResult, procBufferSize]);
         
         //try (again) via global process list
         // ->really need UID to tell what session alert is for!

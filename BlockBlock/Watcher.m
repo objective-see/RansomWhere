@@ -539,10 +539,10 @@ bail:
             //nap for 1/10th of a second
             [NSThread sleepForTimeInterval:WAIT_INTERVAL];
             
-        //try up to a 1/2 second
-        } while(count++ < 0.5/WAIT_INTERVAL);
+        //try up to a 1.1 second
+        } while(count++ < 1.1/WAIT_INTERVAL);
         
-        //found one in process monitor list?
+        //hopefully (now) found one in process monitor list...
         if(nil != processFromList)
         {
             //dbg msg
@@ -594,7 +594,7 @@ bail:
             [NSThread sleepForTimeInterval:WAIT_INTERVAL];
             
         //try up to 1 second
-        } while(count++ < 1.0f/WAIT_INTERVAL);
+        } while(count++ < 1.1f/WAIT_INTERVAL);
         
         //if lookup (still) failed
         // ->just create a process object with only a pid/ppid :/

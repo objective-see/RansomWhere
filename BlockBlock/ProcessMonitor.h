@@ -88,6 +88,16 @@ printf(\"###{\\\"pid\\\": %d, \\\"uid\\\": %d, \\\"name\\\": \\\"%s\\\", \\\"ppi
     //flag indicating rootless OS
     BOOL isRootless;
     
+    //partial process (app callbacl, dtrace, & audit)
+    NSMutableDictionary* partialProcs;
+    
+    //partial processes paths
+    // ->via spawn(), only has path :/
+    NSMutableDictionary* partialProcPaths;
+    
+    //proces 'combiner' thread
+    NSThread* processCombinerThread;
+    
 }
 
 /* METHODS */
@@ -114,6 +124,10 @@ printf(\"###{\\\"pid\\\": %d, \\\"uid\\\": %d, \\\"name\\\": \\\"%s\\\", \\\"ppi
 @property (nonatomic, retain)OrderedDictionary* processList;
 @property (nonatomic, retain)NSThread* dtraceProducerThread;
 @property (nonatomic, retain)NSThread* dtraceConsumerThread;
+@property (nonatomic, retain)NSThread* processCombinerThread;
+@property (nonatomic, retain)NSMutableDictionary* partialProcs;
+@property (nonatomic, retain)NSMutableDictionary* partialProcPaths;
+
 
 
 

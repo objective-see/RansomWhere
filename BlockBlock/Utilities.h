@@ -35,7 +35,7 @@ id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait);
 NSString* which(NSString* processName);
 
 //given a pid and process name, try to find full path
-NSString* getFullPath(NSNumber* processID, NSString* processName);
+NSString* getFullPath(NSNumber* processID, NSString* processName, BOOL tryWhich);
 
 //start an NSTask
 NSUInteger execTask(NSString* path, NSArray* arguments, BOOL waitUntilExit);

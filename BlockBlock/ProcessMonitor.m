@@ -33,9 +33,14 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
 @synthesize processList;
 @synthesize outputChunk;
 @synthesize dtraceHandle;
+@synthesize partialProcs;
+@synthesize partialProcPaths;
 @synthesize dtraceProducerThread;
 @synthesize dtraceConsumerThread;
+@synthesize processCombinerThread;
 
+
+//init
 -(id)init
 {
     //OS version info
@@ -68,94 +73,17 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
             //non-rootless
             self.isRootless = NO;
         }
+        
+        //init dictionary of partial procs
+        partialProcs = [NSMutableDictionary dictionary];
+        
+        //init dictionary of partial proc paths
+        partialProcPaths = [NSMutableDictionary dictionary];
+        
     }
     
     return self;
 }
-
-//watch for apps
-// ->just apps
--(void)enableAppWatch
-{
-    //notification center
-    NSNotificationCenter* notificationCenter = nil;
-    
-    //init notification center
-    notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    
-    //install app launch notification
-    [notificationCenter addObserver:self selector:@selector(appLaunched:)
-                               name:NSWorkspaceDidLaunchApplicationNotification object:nil];
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"enabled app watch");
-
-    return;
-}
-
-//callback that's automatically invoked whenever an app is launched
-// ->instantiate a process obj and save it
--(void)appLaunched:(NSNotification *)notification
-{
-    //pid
-    NSString* processID = 0;
-    
-    //info dictionary
-    NSMutableDictionary* processInfo = nil;
-    
-    //process object
-    Process* process = nil;
-    
-    //extract process id
-    // ->key for dictionary
-    processID = [notification userInfo][@"NSApplicationProcessIdentifier"];
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"APP STARTED: %@", notification]);
-    
-    //dbg msg
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"app launched %@", [notification userInfo]]);
-    
-    //handle (possibly) new process object creation
-    // ->sync'd, since this can happen in from various places/callbacks
-    @synchronized(self.processList)
-    {
-        //TODO: actually always want this one, as it has most info?
-        //first make sure its a new process
-        // ->e.g. hasn't been detected/created by other callback/mechanism
-        if(nil == [processList objectForKey:processID])
-        {
-            //init process info
-            processInfo = [NSMutableDictionary dictionary];
-            
-            //name
-            processInfo[@"name"] = [notification userInfo][@"NSApplicationName"];
-            
-            //app path
-            processInfo[@"appPath"] = [notification userInfo][@"NSApplicationPath"];
-        
-            //create process
-            process = [[Process alloc] initWithPid:[processID intValue] infoDictionary:processInfo];
-            
-            //dbg msg
-            //logMsg(LOG_DEBUG, @"APPCALLBACK: inserting (app) process into process list");
-            
-            //trim list if needed
-            if(self.processList.count >= PROCESS_LIST_MAX_SIZE)
-            {
-                //toss first (oldest) item
-                [self.processList removeObjectForKey:[self.processList keyAtIndex:0]];
-            }
-            
-            //insert process at end
-            [self.processList insertObject:process forKey:processID atIndex:self.processList.count];
-        }
-
-    }//sync
-    
-    return;
-}
-
 
 //kick off threads to monitor
 // ->dtrace/audit pipe/app callback
@@ -165,14 +93,21 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
     BOOL bRet = NO;
     
     //init producer thread
-    self.dtraceProducerThread = [[NSThread alloc] initWithTarget:self selector:@selector(produceOutput:) object:nil];
+    //self.dtraceProducerThread = [[NSThread alloc] initWithTarget:self selector:@selector(produceOutput:) object:nil];
     
     //init consumer thread
-    self.dtraceConsumerThread = [[NSThread alloc] initWithTarget:self selector:@selector(consumeOutput:) object:nil];
+    //self.dtraceConsumerThread = [[NSThread alloc] initWithTarget:self selector:@selector(consumeOutput:) object:nil];
     
     //init audit thread
     self.auditThread = [[NSThread alloc] initWithTarget:self selector:@selector(auditProcs:) object:nil];
     
+    //init process 'combiner' thread
+    self.processCombinerThread = [[NSThread alloc] initWithTarget:self selector:@selector(combineProcs:) object:nil];
+    
+    //kick off thread to combine process objects
+    [self.processCombinerThread start];
+    
+    /*
     //install dtrace probe
     if(YES != [self installDtraceProbe])
     {
@@ -218,6 +153,7 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
     
     //start dtrace consumer thread
     [self.dtraceConsumerThread start];
+    */
     
     //register callback for (just) apps
     [self enableAppWatch];
@@ -232,6 +168,257 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
 bail:
     
     return bRet;
+}
+
+//thread function
+// ->combine procs
+-(void)combineProcs:(id)threadParam
+{
+    //partial proc dictionary
+    // timestamp & group
+    NSDictionary* partialProcEntry = nil;
+    
+    //partial proc (group)
+    NSArray* partialProcGroup = nil;
+    
+    //process info
+    NSMutableDictionary* procInfo = nil;
+    
+    //process object
+    Process* processObj = nil;
+    
+    //forever
+    // ->sleep, then combine procs
+    while(YES)
+    {
+        //nap
+        [NSThread sleepForTimeInterval:2.0];
+        
+        //sync
+        @synchronized(self.partialProcs)
+        {
+            //iterate over all partial procs
+            for(NSNumber* key in [self.partialProcs allKeys])
+            {
+                //extract partial proc entry
+                partialProcEntry = self.partialProcs[key];
+                
+                //check timestamp for initial partial process
+                // ->ignore those less than 1 second
+                if(1.5 < [partialProcEntry[@"timeStamp"] timeIntervalSinceDate:[NSDate date]])
+                {
+                    //skip
+                    continue;
+                }
+                
+                //partial proc entry is 'old'
+                // ->extract & process
+                partialProcGroup = partialProcEntry[@"procGroup"];
+                
+                //dbg msg
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"partial proc group: %@", partialProcGroup]);
+                
+                //init proc info dictionary
+                procInfo = [NSMutableDictionary dictionary];
+                
+                //save pid
+                procInfo[@"pid"] = key;
+
+                //find/combine required process components
+                // ->uid, ppid, name, & path
+                for(NSString* key in @[@"uid", @"ppid", @"name", @"path", @"appPath"])
+                {
+                    //scan each partial entry for process
+                    for(NSDictionary* procEntry in partialProcGroup)
+                    {
+                        //check for key
+                        if(nil != [procEntry objectForKey:key])
+                        {
+                            //hooray
+                            // ->save it, then go on to next key
+                            procInfo[key] = [procEntry objectForKey:key];
+                            
+                            //next
+                            break;
+                        }
+                        
+                    }//each process entry
+                    
+                }//all keys
+                
+                //when no path was found
+                // ->scan all partial process paths (from audit/spawn())
+                if( (nil == procInfo[@"path"]) &&
+                    (nil != procInfo[@"name"]) )
+                {
+                    //sync
+                    @synchronized(self.partialProcPaths)
+                    {
+                    
+                    //scan all partial paths
+                    for(NSString* path in [self.partialProcPaths allKeys])
+                    {
+                        //check if name's match
+                        // ->already tried to get path via proc_pidPath() so this is last ditch effort
+                        if(YES == [procInfo[@"name"] isEqualToString:[[path lastPathComponent] stringByDeletingPathExtension]])
+                        {
+                            //hooray
+                            // ->match
+                            procInfo[@"path"] = path;
+                            
+                            //don't remove, since might be multiple procs
+                            // ->removal is done after timeout (below)
+                            
+                            //bail
+                            break;
+                        }
+                        
+                    }//scan all partial proc paths
+                        
+                    }//sync
+                
+                }//path not found
+                
+                
+                //TODO: don't need to sync? as only code now inserting procs into self.process list? (in entire proj though?)
+                
+                //create process object
+                processObj = [[Process alloc] initWithPid:[procInfo[@"pid"] intValue] infoDictionary:procInfo];
+                
+                //dbg msg
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"inserting completed process obj into process list: %@", procInfo]);
+                
+                //trim list if needed
+                if(self.processList.count >= PROCESS_LIST_MAX_SIZE)
+                {
+                    //toss first (oldest) item
+                    [self.processList removeObjectForKey:[self.processList keyAtIndex:0]];
+                }
+                
+                //TODO ignore if already there!
+                // ->already processed from another (quicker source)
+                
+                //insert process at end
+                [self.processList insertObject:processObj forKey:procInfo[@"pid"] atIndex:self.processList.count];
+                
+                //remove from partial procs
+                [self.partialProcs removeObjectForKey:key];
+                
+            }//all partial procs
+        
+        }//sync
+        
+        //sync
+        @synchronized(self.partialProcPaths)
+        {
+        
+        //remove any old partial paths
+        for(NSString* path in [self.partialProcPaths allKeys])
+        {
+            //check timestamp for entry
+            // ->ignore those less than 3 seconds
+            if(3.0 < [self.partialProcPaths[@"timeStamp"] timeIntervalSinceDate:[NSDate date]])
+            {
+                //skip
+                continue;
+            }
+            
+            //remove entry
+            [self.partialProcPaths removeObjectForKey:path];
+            
+        }//cleanup old partial proc paths
+            
+        }//sync
+        
+    }//forever, loop
+    
+    return;
+}
+
+//watch for apps
+// ->just apps
+-(void)enableAppWatch
+{
+    //notification center
+    NSNotificationCenter* notificationCenter = nil;
+    
+    //init notification center
+    notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+    
+    //install app launch notification
+    [notificationCenter addObserver:self selector:@selector(appLaunched:)
+                               name:NSWorkspaceDidLaunchApplicationNotification object:nil];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"enabled app watch");
+    
+    return;
+}
+
+//callback that's automatically invoked whenever an app is launched
+// ->instantiate a process obj and save it
+-(void)appLaunched:(NSNotification *)notification
+{
+    //info dictionary
+    NSMutableDictionary* processInfo = nil;
+    
+    //app's bundle
+    NSBundle* appBundle = nil;
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"APP STARTED: %@", notification]);
+    
+    //add to partial process list
+    // ->process combiner thread will pick up and process
+    
+    //sync
+    @synchronized(self.partialProcs)
+    {
+        //init process info
+        processInfo = [NSMutableDictionary dictionary];
+        
+        //pad
+        processInfo[@"pid"] = [notification userInfo][@"NSApplicationProcessIdentifier"];
+        
+        //name
+        processInfo[@"name"] = [notification userInfo][@"NSApplicationName"];
+        
+        //app path
+        processInfo[@"appPath"] = [notification userInfo][@"NSApplicationPath"];
+        
+        //try grab app's executable path
+        appBundle = [NSBundle bundleWithPath:processInfo[@"appPath"]];
+        
+        //set path
+        if(nil != appBundle)
+        {
+            //set
+            processInfo[@"path"] = appBundle.executablePath;
+        }
+        
+        //when first one
+        // ->create dictionary and add pid
+        if(nil == [self.partialProcs objectForKey:processInfo[@"pid"]])
+        {
+            //init dictionary
+            self.partialProcs[processInfo[@"pid"]] = [NSMutableDictionary dictionary];
+            
+            //add timestamp
+            self.partialProcs[processInfo[@"pid"]][@"timestamp"] = [NSDate date];
+            
+            //init array for partial proc group
+            self.partialProcs[processInfo[@"pid"]][@"procGroup"] = [NSMutableArray array];
+        }
+        
+        //add proc info into group
+        [self.partialProcs[processInfo[@"pid"]][@"procGroup"] addObject:processInfo];
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"app callback, added partial proc (%@)", self.partialProcs[processInfo[@"pid"]]]);
+        
+    }//sync
+    
+    return;
 }
 
 //thread function
@@ -272,6 +459,9 @@ bail:
     //amount currently processed
     int processedLength = -1;
     
+    //full path (for fork())
+    NSString* fullPath = nil;
+    
     //process dictionary
     NSMutableDictionary* processInfo = nil;
     
@@ -285,7 +475,7 @@ bail:
     if(auditFile == NULL)
     {
         //err msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to open audit pipe (%s)", AUDIT_PIPE]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to open audit pipe (%s)", AUDIT_PIPE]);
         
         //bail
         goto bail;
@@ -448,8 +638,7 @@ bail:
                 {
                     //save path
                     // ->but only for exec* events
-                    if( (AUE_EXECVE == [processInfo[@"type"] unsignedShortValue]) ||
-                        (AUE_EXEC == [processInfo[@"type"] unsignedShortValue]) )
+                    if(AUE_EXECVE == [processInfo[@"type"] unsignedShortValue])
                     {
                         //save path
                         processInfo[@"path"] = [NSString stringWithUTF8String:tokenStruct.tt.path.path];
@@ -467,8 +656,7 @@ bail:
                 case AUT_SUBJECT64_EX:
                 {
                     //for execves save pid/uid
-                    if( (AUE_EXECVE == [processInfo[@"type"] unsignedShortValue]) ||
-                        (AUE_EXEC == [processInfo[@"type"] unsignedShortValue]) )
+                    if(AUE_EXECVE == [processInfo[@"type"] unsignedShortValue])
                     {
                         //save pid
                         processInfo[@"pid"] = [NSNumber numberWithUnsignedInteger:tokenStruct.tt.subj32.pid];
@@ -481,7 +669,7 @@ bail:
                 }
                     
                 //args
-                // ->for fork, save child pid
+                // ->for fork, save child pid & try get path
                 case AUT_ARG32:
                 case AUT_ARG64:
                 {
@@ -503,7 +691,13 @@ bail:
                         }
                         
                         //try get path
-                        // ->TODO: use util method?
+                        // ->fork only gives us a pid
+                        fullPath = getFullPath(processInfo[@"pid"], processInfo[@"name"], NO);
+                        if(nil != fullPath)
+                        {
+                            //save
+                            processInfo[@"path"] = fullPath;
+                        }
                     }
                     
                     break;
@@ -534,18 +728,67 @@ bail:
                         //dbg msg
                         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process 'event' (from audit pipe): %@", processInfo]);
                         
+                        //exec & fork can go into main partial process list since they have pids
+                        if(AUE_POSIX_SPAWN != [processInfo[@"type"] unsignedShortValue])
+                        {
+                            //sanity check
+                            // ->only processes w/ a pid
+                            if(nil != processInfo[@"pid"])
+                            {
+                                //sync
+                                @synchronized(self.partialProcs)
+                                {
+                                    //when first one
+                                    // ->create dictionary and add pid
+                                    if(nil == [self.partialProcs objectForKey:processInfo[@"pid"]])
+                                    {
+                                        //init dictionary
+                                        self.partialProcs[processInfo[@"pid"]] = [NSMutableDictionary dictionary];
+                                        
+                                        //add timestamp
+                                        self.partialProcs[processInfo[@"pid"]][@"timestamp"] = [NSDate date];
+                                        
+                                        //init array for partial proc group
+                                        self.partialProcs[processInfo[@"pid"]][@"procGroup"] = [NSMutableArray array];
+                                    }
+        
+                                    //add proc info into group
+                                    [self.partialProcs[processInfo[@"pid"]][@"procGroup"] addObject:processInfo];
+                                    
+                                    
+                                    //dbg msg
+                                    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"audit pipe, added partial proc (%@)", self.partialProcs[processInfo[@"pid"]]]);
+                                
+                                }//sync
                         
-                        //TODO: insert into process combiner...
+                            }//has pid
+                            
+                        }//exec & fork
                         
-                    }
+                        //spawn
+                        // ->add to path
+                        @synchronized(self.partialProcPaths)
+                        {
+                            //sanity check
+                            // ->only add processes w/ path
+                            if(nil != processInfo[@"path"])
+                            {
+                                //add
+                                self.partialProcPaths[processInfo[@"path"]] = [NSDate date];
+                            }
+                            
+                        }//sync
+                        
+                    }//handle record (of type we care about)
                     
                     //reset
                     processInfo = nil;
                     
                     break;
-                }
                     
+                }//AUT_TRAILER
                     
+
                 default:
                     ;
                     
@@ -576,7 +819,6 @@ bail:
             //subtract lenght of current token
             recordBalance -= tokenStruct.len;
         }
-        
     }
     
 //bail
@@ -606,11 +848,9 @@ bail:
     //flag
     BOOL shouldProcess =  NO;
     
-    //check
-    if( (eventType == AUE_EXECVE) ||
-        (eventType == AUE_FORK) ||
-        (eventType == AUE_EXEC) ||
-        (eventType == AUE_MAC_EXECVE) ||
+    //check type; fork/exec/spawn
+    if( (eventType == AUE_FORK) ||
+        (eventType == AUE_EXECVE) ||
         (eventType == AUE_POSIX_SPAWN) )
     {
         //set flag
@@ -652,6 +892,9 @@ bail:
     // ->can use full dtrace probe
     if(YES != self.isRootless)
     {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"using pre-rootless dtrace");
+        
         //compile the pre-rootless dtrace probe
         dtraceProgram = dtrace_program_strcompile(self.dtraceHandle, dtraceProbePreRootless, DTRACE_PROBESPEC_NAME, 0, 0, NULL);
         if(NULL == dtraceProgram)
@@ -667,6 +910,13 @@ bail:
     // ->have to use neutered dtrace probe...
     else
     {
+        
+        //TODO: re-enable
+        /*
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, @"using pre-rootless dtrace");
+         
         //compile the rootless dtrace probe
         dtraceProgram = dtrace_program_strcompile(self.dtraceHandle, dtraceProbeRootless, DTRACE_PROBESPEC_NAME, 0, 0, NULL);
         if(NULL == dtraceProgram)
@@ -677,6 +927,10 @@ bail:
             //bail
             goto bail;
         }
+        */
+        
+        //TODO: REMOVE!!
+        goto bail;
     }
     
     //install the probe
@@ -907,44 +1161,41 @@ bail:
                         //dbg msg
                         //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"DTRACE: inserting process into process list: %@", processInfo]);
                         
-                        
-                        //get full path
+                        //try full path
                         // ->then, update path in info dictionary
-                        fullPath = getFullPath(processInfo[@"pid"], processInfo[@"name"]);
+                        fullPath = getFullPath(processInfo[@"pid"], processInfo[@"name"], NO);
                         if(nil != fullPath)
                         {
-                            //dbg msg
-                            //logMsg(LOG_ERR, [NSString stringWithFormat:@"updating short path (%@) with long path (%@)", processInfo[@"path"], fullPath]);
-                            
                             //save
                             processInfo[@"path"] = fullPath;
                         }
                     }
                     
-                    //handle (possibly) new process object creation
-                    // ->sync'd, since this can happen in from various places/callbacks
-                    @synchronized(self.processList)
+                    //add to partial process list
+                    // ->process combiner thread will pick up and process
+                   
+                    //sync
+                    @synchronized(self.partialProcs)
                     {
-                        //create new process
-                        // ->but only if its new
-                        if(nil == [processList objectForKey:processInfo[@"pid"]])
+                        //when first one
+                        // ->create dictionary and add pid
+                        if(nil == [self.partialProcs objectForKey:processInfo[@"pid"]])
                         {
-                            //create process object
-                            Process * process = [[Process alloc] initWithPid:[processInfo[@"pid"] intValue] infoDictionary:processInfo];
+                            //init dictionary
+                            self.partialProcs[processInfo[@"pid"]] = [NSMutableDictionary dictionary];
                             
-                            //dbg msg
-                            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"DTRACE: inserting process into process list: %@", processInfo]);
+                            //add timestamp
+                            self.partialProcs[processInfo[@"pid"]][@"timestamp"] = [NSDate date];
                             
-                            //trim list if needed
-                            if(self.processList.count >= PROCESS_LIST_MAX_SIZE)
-                            {
-                                //toss first (oldest) item
-                                [self.processList removeObjectForKey:[self.processList keyAtIndex:0]];
-                            }
-                            
-                            //insert process at end
-                            [self.processList insertObject:process forKey:processInfo[@"pid"] atIndex:self.processList.count];
+                            //init array for partial proc group
+                            self.partialProcs[processInfo[@"pid"]][@"procGroup"] = [NSMutableArray array];
                         }
+                        
+                        //add proc info into group
+                        [self.partialProcs[processInfo[@"pid"]][@"procGroup"] addObject:processInfo];
+                        
+                        //dbg msg
+                        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"dtrace, added partial proc (%@)", self.partialProcs[processInfo[@"pid"]]]);
                         
                     }//sync
                     

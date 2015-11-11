@@ -519,6 +519,7 @@ bail:
     // ->handle logic where downloaded app was moved to /Application before executing
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
     {
+        //TODO: THIS!!! or just check app's path...is it running from /applications?
         //detect 'moved manually into /Applications' by seeing if there are no other components
         // ->and file is owned by current user (not root, which installers sets)
         

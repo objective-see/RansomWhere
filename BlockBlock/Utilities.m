@@ -153,7 +153,7 @@ id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait)
 
 //given a pid and process name, try to find full path
 // ->first tries proc_pidpath(), then 'which'
-NSString* getFullPath(NSNumber* processID, NSString* processName)
+NSString* getFullPath(NSNumber* processID, NSString* processName, BOOL tryWhich)
 {
     //full path
     NSString* fullPath = nil;
