@@ -39,7 +39,7 @@
 }
 
 
-//install!
+//install
 -(BOOL)install
 {
     //return/status var
@@ -151,7 +151,26 @@
             goto bail;
         }
     }
+    
+    //if kext already/still exists
+    // ->cuz previous installer logic decided not to uninstall it (same version/other users)
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:kextPath()])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"kext not found, installing....");
         
+        //install kext
+        // ->copy kext (bundle) to /Library/Extensions and set permissions
+        if(YES != [self installKext])
+        {
+            //err msg
+            logMsg(LOG_ERR, @"ERROR: failed to install kext");
+            
+            //bail
+            goto bail;
+        }
+    }
+    
     //dbg msg
     logMsg(LOG_DEBUG, @"installed launch daemon component");
     
@@ -285,9 +304,6 @@ bail:
     
     //update first arg (path to binary) to location of installed app
     launchItemPlist[@"ProgramArguments"][0] = [NSString pathWithComponents:@[APPLICATION_PATH, BINARY_SUB_PATH]];
-    
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current user: %@", getCurrentConsoleUser()]);
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current ~: %@", [@"~" stringByExpandingTildeInPath]]);
     
     //always install for self
     //[self.installedLaunchAgents addObject:launchAgentPlist(NSHomeDirectory())];
@@ -441,6 +457,42 @@ bail:
     return bRet;
 }
 
+//install kext
+// ->copy kext (bundle) to /Library/Extensions and set permissions
+-(BOOL)installKext
+{
+    //return/status var
+    BOOL bRet = NO;
+    
+    //error
+    NSError* error = nil;
+    
+    //move kext into /Libary/Extensions
+    // ->orginally stored in applications /Resource bundle
+    if(YES != [[NSFileManager defaultManager] copyItemAtPath:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:KEXT_NAME] toPath:kextPath() error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to kext into /Library/Extensions (%@)", error]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied kext to %@", kextPath()]);
+    
+    //always set group/owner to root/wheel
+    setFileOwner(kextPath(), @0, @0, YES);
+    
+    //no errors
+    bRet = YES;
+    
+//bail
+bail:
+    
+    return bRet;
+}
+
 //load the template launch item plist
 -(NSMutableDictionary*)loadLaunchItemPlist
 {
@@ -507,6 +559,13 @@ bail:
         installedState = INSTALL_STATE_PARTIAL;
     }
     
+    //check for app
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
+    {
+        //set flag
+        installedState = INSTALL_STATE_PARTIAL;
+    }
+    
     //check for current user's launch agent
     // ->this implies a full install
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist(currentUserDirectory)])
@@ -515,6 +574,7 @@ bail:
         installedState = INSTALL_STATE_FULL;
     }
     
+    /*
     //check for app
     // ->handle logic where downloaded app was moved to /Application before executing
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
@@ -526,7 +586,7 @@ bail:
         //set flag
         installedState = INSTALL_STATE_PARTIAL;
     }
-    
+    */
     
     return installedState;
 }

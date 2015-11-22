@@ -32,6 +32,7 @@
 @synthesize reportedWatchEvents;
 @synthesize infoWindowController;
 @synthesize errorWindowController;
+@synthesize prefsWindowController;
 @synthesize rememberedWatchEvents;
 
 //for testing
@@ -40,6 +41,8 @@
 
 //TODO: dtrace perf issue :/
 //TODO: sandbox'd login items
+
+//TODO: signature status in alert! (signed, etc)
 
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
@@ -262,6 +265,19 @@
             //init dictionary for orginal file contents
             orginals = [NSMutableDictionary dictionary];
             
+            //load kext
+            if(YES != [self.controlObj startKext])
+            {
+                //err msg
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"applicationDidFinishLaunching: ERROR: failed to start %@", kextPath()]);
+                
+                //error, so exit
+                shouldExit = YES;
+                
+                //bail
+                goto bail;
+            }
+            
             //and run daemon logic
             // ->shouldn't error, and if it does, not much we can do
             [self startBlockBlocking_Daemon];
@@ -278,13 +294,43 @@
             //dbg msg
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: starting BLOCKBLOCK (agent)");
             
-            //after a minute
-            //->check for updates in background
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+            //alloc/init prefs
+            prefsWindowController = [[PrefsWindowController alloc] initWithWindowNibName:@"PrefsWindow"];
+            
+            //register defaults
+            [self.prefsWindowController registerDefaults];
+            
+            //load prefs
+            [self.prefsWindowController loadPreferences];
+
+            //check for updates if user has not disabled that feature
+            //TODO: test!!
+            if(YES != self.prefsWindowController.disableUpdateCheck)
             {
-               //check
-               [self checkForUpdate];
-            });
+                //after a minute
+                //->check for updates in background
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+                {
+                   //check
+                   [self checkForUpdate];
+                    
+                });
+            }
+            
+            //when logging is enabled
+            // ->open/create log file
+            if(YES == self.prefsWindowController.enableLogging)
+            {
+                //init
+                if(YES != initLogging())
+                {
+                    //err msg
+                    logMsg(LOG_ERR, @"failed to init logging");
+                }
+                
+                //log a msg
+                log2File(@"BlockBlock Agent initializing...");
+            }
             
             //and run
             // ->shouldn't error
@@ -440,6 +486,7 @@ bail:
     processMonitor = [[ProcessMonitor alloc] init];
     
     //start monitoring processes
+    // ->loads kext and record process creation events
     [processMonitor monitor];
     
     //start file watching

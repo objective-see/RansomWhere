@@ -565,12 +565,12 @@ bail:
         
     }//got pid from path
     
-    //couldn't get path (process likely already exited)
+    //couldn't get path (process likely already exit'ed)
     // ->try lookup from process list (contains process objects from dtrace, etc)
     else
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to get path from pid %d...will lookup", fsEvent->pid]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to get path from pid %d...will lookup from process monitor", fsEvent->pid]);
         
         //try get process for one of the process monitor
         // ->do in loop since they might be buffering/processing

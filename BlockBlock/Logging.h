@@ -11,15 +11,17 @@
 
 #import <syslog.h>
 
-//init logging
-// ->opens file for errors
-//BOOL initLogging();
-
 //log a msg to syslog
 // ->also disk, if error
 void logMsg(int level, NSString* msg);
 
-//log msg to disk
-//void writeToFile(NSString* logMsg);
+//prep/open log file
+BOOL initLogging();
+
+//de-init logging
+void deinitLogging();
+
+//log to file
+void log2File(NSString* msg);
 
 #endif /* defined(__BlockBlock__Logging__) */

@@ -15,7 +15,8 @@
 
 
 /* manually:
- 
+ sudo kextunload -b com.objective-see.kext.BlockBlock
+ sudo rm -rf /Library/Extensions/BlockBlock.kext
  sudo launchctl unload /Library/LaunchDaemons/com.objectiveSee.blockblock.plist
  sudo rm -rf /Library/LaunchDaemons/com.objectiveSee.blockblock.plist
  launchctl unload ~/Library/LaunchAgents/com.objectiveSee.blockblock.plist
@@ -46,8 +47,12 @@
 //uninstall
 -(BOOL)uninstall
 {
-    //return/status var
+    //return var
     BOOL bRet = NO;
+    
+    //status var
+    // ->since want to try all uninstall steps, but record if any fail
+    BOOL bAnyErrors = NO;
     
     //error
     NSError* error = nil;
@@ -110,13 +115,41 @@
         //dbg msg
         logMsg(LOG_DEBUG, @"performing FULL uninstall");
         
-        //if launch daemon's plist is present
+        //when kext is present
+        // ->stop, then delete it
+        if(YES == [[NSFileManager defaultManager] fileExistsAtPath:kextPath()])
+        {
+            //uninstall
+            if(YES != [self uninstallKext])
+            {
+                //set flag
+                bAnyErrors = YES;
+                
+                //err msg
+                logMsg(LOG_ERR, @"ERROR: failed to uninstall kext");
+                
+                //don't bail
+                // ->might as well keep on uninstalling other components
+            }
+            
+            //just logic for dbg msg
+            else
+            {
+                //dbg msg
+                logMsg(LOG_DEBUG, @"fully uninstalled kext");
+            }
+        }
+        
+        //when launch daemon's plist is present
         // ->stop, then delete it
         if(YES == [[NSFileManager defaultManager] fileExistsAtPath:launchDaemonPlist()])
         {
             //uninstall launch daemon
             if(YES != [self uninstallLaunchDaemon])
             {
+                //set flag
+                bAnyErrors = YES;
+                
                 //err msg
                 logMsg(LOG_ERR, @"ERROR: failed to uninstall launch daemon");
                 
@@ -127,7 +160,6 @@
             //just logic for dbg msg
             else
             {
-                
                 //dbg msg
                 logMsg(LOG_DEBUG, @"fully uninstalled launch daemon");
             }
@@ -137,6 +169,9 @@
         // ->uninstall all launch agents
         if(YES != [self uninstallLaunchAgent:installedUsers])
         {
+            //set flag
+            bAnyErrors = YES;
+            
             //err msg
             logMsg(LOG_ERR, @"ERROR: failed to uninstall launch agent(s)");
             
@@ -154,6 +189,9 @@
             //delete it
             if(YES != [[NSFileManager defaultManager] removeItemAtPath:APPLICATION_PATH error:&error])
             {
+                //set flag
+                bAnyErrors = YES;
+                
                 //err msg
                 logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete application (%@)", error]);
                 
@@ -184,6 +222,9 @@
             //uninstall launch agent
             if(YES != [self uninstallLaunchAgent:@[currentUserDirectory]])
             {
+                //set flag
+                bAnyErrors = YES;
+                
                 //err msg
                 logMsg(LOG_ERR, @"ERROR: failed to uninstall launch agent");
                 
@@ -194,16 +235,20 @@
             //just logic for dbg msg
             else
             {
-                
                 //dbg msg
                 logMsg(LOG_DEBUG, @"fully uninstalled launch agent");
             }
         }
+        
+    }//partial uninstall
+    
+    //only success when there were no errors
+    if(YES != bAnyErrors)
+    {
+        //happy
+        bRet = YES;
     }
 
-    //no errors
-    bRet = YES;
-    
 //bail
 bail:
     
@@ -260,7 +305,6 @@ bail:
     return bRet;
 }
 
-
 //stop and remove launch agent
 -(BOOL)uninstallLaunchAgent:(NSArray*)installedUsers;
 {
@@ -304,7 +348,6 @@ bail:
         
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted launch agent's plist (%@)", launchAgentPlist(user)]);
-        
     }
     
     //no errors
@@ -314,6 +357,59 @@ bail:
 //bail
 bail:
 
+    return bRet;
+}
+
+//unload and remove kext
+-(BOOL)uninstallKext
+{
+    //return/status var
+    BOOL bRet = NO;
+    
+    //error
+    NSError* error = nil;
+    
+    //path to kext
+    NSString* path = nil;
+    
+    //get kext's path
+    path = kextPath();
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"uninstalling kext (%@)", path]);
+    
+    //stop (unload) kext
+    if(YES != [controlObj stopKext])
+    {
+        //err msg
+        logMsg(LOG_ERR, @"ERROR: failed to stop kext");
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"stopped kext");
+    
+    //delete kext
+    if(YES != [[NSFileManager defaultManager] removeItemAtPath:path error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete kext (%@)", error]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"deleted kext");
+    
+    //no errors
+    bRet = YES;
+    
+//bail
+bail:
+    
     return bRet;
 }
 

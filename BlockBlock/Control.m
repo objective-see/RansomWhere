@@ -197,7 +197,6 @@ bail:
     return bRet;
 }
 
-
 //spawns auth'd instance of installer/uninstaller
 // ->then wait till it exits
 -(BOOL)execControlInstance:(NSString*)parameter
@@ -237,57 +236,6 @@ bail:
     
     return bRet;
 }
-
-
-
-/*
-//handle install or uninstall
-// just say if it fails, and suggest running commands manually
--(BOOL)lifeCycle:(NSUInteger)action
-{
-    //return var
-    BOOL bRet = NO;
-    
-    //handle request for install
-    if(ACTION_INSTALL_FLAG == action)
-    {
-        //launch auth'd installer instance
-        // ->will ask for r00t privs, then spawn new instance to install
-        if(YES != [self launchInstallerAndWait])
-        {
-            //err msg
-            logMsg(LOG_ERR, @"ERROR: install logic failed");
-            
-            //bail
-            goto bail;
-        }
-    }
-    
-    //handle request for uninstall
-    else
-    {
-        //invoke uninstall logic
-        // ->already an auth'd uninstaller instance, do can simply uninstall
-        if(YES != [self invokeUninstallLogic])
-        {
-            //err msg
-            logMsg(LOG_ERR, @"ERROR: uninstall logic failed");
-            
-            //bail
-            goto bail;
-        }
-    }
-    
-    //no errors
-    bRet = YES;
-    
-//bail
-bail:
-    
-    return bRet;
-}
- 
-*/
 
 //control a launch item
 // ->either load/unload the launch daemon/agent via '/bin/launchctl'
@@ -425,6 +373,93 @@ bail:
         //restore
         setreuid(currentUID, -1);
     }
+    
+    return bRet;
+}
+
+//start kext
+// ->'kextload' <kext path>
+-(BOOL)startKext
+{
+    //return var
+    BOOL bRet = NO;
+    
+    //status
+    NSUInteger status = -1;
+    
+    //parameter array
+    NSMutableArray* parameters = nil;
+    
+    //init pararm array
+    parameters = [NSMutableArray array];
+    
+    //add kext path as first (and only) arg
+    [parameters addObject:kextPath()];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"starting kext with %@", parameters]);
+
+    //load kext
+    status = execTask(KEXT_LOAD, parameters, YES);
+    if(STATUS_SUCCESS != status)
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"starting kext failed with %lu", (unsigned long)status]);
+        
+        //bail
+        goto bail;
+    }
+
+    //happy
+    bRet = YES;
+
+//bail
+bail:
+
+    return bRet;
+}
+
+//stop kext
+// ->'kextunload' -b <kext path>
+-(BOOL)stopKext
+{
+    //return var
+    BOOL bRet = NO;
+    
+    //status
+    NSUInteger status = -1;
+    
+    //parameter array
+    NSMutableArray* parameters = nil;
+    
+    //init pararm array
+    parameters = [NSMutableArray array];
+    
+    //add -b as first arg
+    [parameters addObject:@"-b"];
+    
+    //add kext bundle id/label as second arg
+    [parameters addObject:KEXT_LABEL];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"stopping kext with %@", parameters]);
+    
+    //load kext
+    status = execTask(KEXT_UNLOAD, parameters, YES);
+    if(STATUS_SUCCESS != status)
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"starting kext failed with %lu", (unsigned long)status]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //happy
+    bRet = YES;
+    
+//bail
+bail:
     
     return bRet;
 }

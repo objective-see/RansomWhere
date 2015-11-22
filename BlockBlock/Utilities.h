@@ -15,6 +15,9 @@ NSString* launchDaemonPlist();
 //return path to launch agent's plist
 NSString* launchAgentPlist(NSString* userHomeDirectory);
 
+//return path to kext
+NSString* kextPath();
+
 //given a path to binary
 // parse it back up to find app's bundle
 NSBundle* findAppBundle(NSString* binaryPath);

@@ -36,6 +36,13 @@ NSString* launchAgentPlist(NSString* userHomeDirectory)
     return [NSString pathWithComponents:@[userHomeDirectory, @"/Library/LaunchAgents", LAUNCH_ITEM_PLIST]];
 }
 
+//return path to kext
+NSString* kextPath()
+{
+    //build and ret
+    return [NSString pathWithComponents:@[@"/Library/Extensions", KEXT_NAME]];
+}
+
 //given a path to binary
 // parse it back up to find app's bundle
 NSBundle* findAppBundle(NSString* binaryPath)
@@ -495,6 +502,11 @@ NSString* getVersion(NSUInteger instance)
     {
         //get info dictionary
         infoDictionary = getAppInfo(APPLICATION_PATH);
+        
+        //TODO: REMOVE
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@", infoDictionary]);
+
     }
     
     //extract version string

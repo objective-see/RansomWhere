@@ -5,81 +5,35 @@
 //  Created by Patrick Wardle on 10/19/14.
 //  Copyright (c) 2015 Objective-See. All rights reserved.
 //
+
+#import "Consts.h"
 #import "Process.h"
 #import "Utilities.h"
 #import "ProcessMonitor.h"
 #import "OrderedDictionary.h"
 #import "Logging.h"
 
+#import <sys/ioctl.h>
+#import <sys/socket.h>
+#import <sys/kern_event.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
-#include <bsm/audit.h>
-#include <bsm/libbsm.h>
-#include <bsm/audit_kevents.h>
-#include <sys/ioctl.h>
-#include <security/audit/audit_ioctl.h>
-
-
-
-static int chew(const dtrace_probedata_t *data, void *arg);
-static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, void *arg);
 
 @implementation ProcessMonitor
 
-
-@synthesize isRootless;
-@synthesize auditThread;
 @synthesize processList;
-@synthesize outputChunk;
-@synthesize dtraceHandle;
-@synthesize partialProcs;
-@synthesize partialProcPaths;
-@synthesize dtraceProducerThread;
-@synthesize dtraceConsumerThread;
-@synthesize processCombinerThread;
-
 
 //init
 -(id)init
 {
-    //OS version info
-    NSDictionary* osVersionInfo = nil;
-    
     //init super
     self = [super init];
     if(nil != self)
     {
         //init process list
         processList = [[OrderedDictionary alloc] init];
-        
-        //nil
-        outputChunk = nil;
-        
-        //get OS version info
-        osVersionInfo = getOSVersion();
-        
-        //set rootless flag
-        // ->OS X 10.11+
-        if([osVersionInfo[@"minorVersion"] intValue] >= 11)
-        {
-            //rootless
-            self.isRootless = YES;
-        }
-        //pre-OS X 10.11
-        // ->non-rootless
-        else
-        {
-            //non-rootless
-            self.isRootless = NO;
-        }
-        
-        //init dictionary of partial procs
-        partialProcs = [NSMutableDictionary dictionary];
-        
-        //init dictionary of partial proc paths
-        partialProcPaths = [NSMutableDictionary dictionary];
-        
     }
     
     return self;
@@ -92,75 +46,9 @@ static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, 
     //return var
     BOOL bRet = NO;
     
-    //init producer thread
-    //self.dtraceProducerThread = [[NSThread alloc] initWithTarget:self selector:@selector(produceOutput:) object:nil];
+    //start thread to get process creation notifications from kext
+    [NSThread detachNewThreadSelector:@selector(recvProcNotifications) toTarget:self withObject:nil];
     
-    //init consumer thread
-    //self.dtraceConsumerThread = [[NSThread alloc] initWithTarget:self selector:@selector(consumeOutput:) object:nil];
-    
-    //init audit thread
-    self.auditThread = [[NSThread alloc] initWithTarget:self selector:@selector(auditProcs:) object:nil];
-    
-    //init process 'combiner' thread
-    self.processCombinerThread = [[NSThread alloc] initWithTarget:self selector:@selector(combineProcs:) object:nil];
-    
-    //kick off thread to combine process objects
-    [self.processCombinerThread start];
-    
-    /*
-    //install dtrace probe
-    if(YES != [self installDtraceProbe])
-    {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: failed into install dtrace probe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"installed dtrace probe");
-    
-    //set dtrace options
-    if(YES != [self setDtraceOptions])
-    {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to set dtrace options");
-        
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"set dtrace options");
-    
-    //create an output pipe
-    // ->allows code to read output from dtrace's probe
-    if(YES != [self initOutputPipe])
-    {
-        //err msg
-        logMsg(LOG_DEBUG, @"ERROR: failed to create output pipe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"created output pipe");
-    
-    //start dtrace producer thread
-    [self.dtraceProducerThread start];
-    
-    //start dtrace consumer thread
-    [self.dtraceConsumerThread start];
-    */
-    
-    //register callback for (just) apps
-    [self enableAppWatch];
-    
-    //kick off thread that monitors audit pipe
-    [self.auditThread start];
-
     //no errors
     bRet = YES;
     
@@ -171,15 +59,36 @@ bail:
 }
 
 //thread function
-// ->combine procs
--(void)combineProcs:(id)threadParam
+// ->recv() process creation notification events
+-(void)recvProcNotifications
 {
-    //partial proc dictionary
-    // timestamp & group
-    NSDictionary* partialProcEntry = nil;
+    //status var
+    int status = -1;
     
-    //partial proc (group)
-    NSArray* partialProcGroup = nil;
+    //system socket
+    int systemSocket = -1;
+    
+    //struct for vendor code
+    // ->set via call to ioctl/SIOCGKEVVENDOR
+    struct kev_vendor_code vendorCode = {0};
+    
+    //struct for kernel request
+    // ->set filtering options
+    struct kev_request kevRequest = {0};
+    
+    //struct for broadcast data from the kext
+    struct kern_event_msg *kernEventMsg = {0};
+    
+    //message from kext
+    // ->size is cumulation of header, struct, and max length of a proc path
+    char kextMsg[KEV_MSG_HEADER_SIZE + sizeof(struct processStartEvent) + PATH_MAX] = {0};
+    
+    //bytes received from system socket
+    ssize_t bytesReceived = -1;
+    
+    //custom struct
+    // ->process data from kext
+    struct processStartEvent* procStartEvent = NULL;
     
     //process info
     NSMutableDictionary* procInfo = nil;
@@ -187,1181 +96,147 @@ bail:
     //process object
     Process* processObj = nil;
     
-    //forever
-    // ->sleep, then combine procs
+    //create system socket
+    systemSocket = socket(PF_SYSTEM, SOCK_RAW, SYSPROTO_EVENT);
+    if(-1 == systemSocket)
+    {
+        //set status var
+        status = errno;
+        
+        //err msg
+        printf("ERROR: socket() failed with %d\n\n", status);
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    printf(" created system socket\n");
+    
+    //set vendor name string
+    strncpy(vendorCode.vendor_string, OBJECTIVE_SEE_VENDOR, KEV_VENDOR_CODE_MAX_STR_LEN);
+    
+    //get vendor name -> vendor code mapping
+    status = ioctl(systemSocket, SIOCGKEVVENDOR, &vendorCode);
+    if(0 != status)
+    {
+        //err msg
+        printf("ERROR: ioctl(...,SIOCGKEVVENDOR,...) failed with %d\n\n", status);
+        
+        //goto bail;
+        goto bail;
+    }
+    
+    //dbg msg
+    printf(" got vendor name code %d, for %s\n", vendorCode.vendor_code, OBJECTIVE_SEE_VENDOR);
+    
+    //init filtering options
+    // ->only interested in objective-see's events
+    kevRequest.vendor_code = vendorCode.vendor_code;
+    
+    //...any class
+    kevRequest.kev_class = KEV_ANY_CLASS;
+    
+    //...any subclass
+    kevRequest.kev_subclass = KEV_ANY_SUBCLASS;
+    
+    //tell kernel what we want to filter on
+    status = ioctl(systemSocket, SIOCSKEVFILT, &kevRequest);
+    if(0 != status)
+    {
+        //err msg
+        printf("ERROR: ioctl(...,SIOCSKEVFILT,...) failed with %d\n\n", status);
+        
+        //goto bail;
+        goto bail;
+    }
+    
+    //dbg msg
+    printf(" set kernel event filtering options\n");
+    
+    //dbg msg
+    //printf(" entering recv() loop\n\n");
+    
+    //foreverz
+    // ->listen/parse process creation events from kext
     while(YES)
     {
-        //nap
-        [NSThread sleepForTimeInterval:2.0];
-        
-        //sync
-        @synchronized(self.partialProcs)
+        //ask the kext for process began events
+        // ->will block until event is ready
+        bytesReceived = recv(systemSocket, kextMsg, sizeof(kextMsg), 0);
+        if(bytesReceived < (KEV_MSG_HEADER_SIZE + sizeof(struct processStartEvent)))
         {
-            //iterate over all partial procs
-            for(NSNumber* key in [self.partialProcs allKeys])
-            {
-                //extract partial proc entry
-                partialProcEntry = self.partialProcs[key];
-                
-                //check timestamp for initial partial process
-                // ->ignore those less than 1 second
-                if(1.5 < [partialProcEntry[@"timeStamp"] timeIntervalSinceDate:[NSDate date]])
-                {
-                    //skip
-                    continue;
-                }
-                
-                //partial proc entry is 'old'
-                // ->extract & process
-                partialProcGroup = partialProcEntry[@"procGroup"];
-                
-                //dbg msg
-                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"partial proc group: %@", partialProcGroup]);
-                
-                //init proc info dictionary
-                procInfo = [NSMutableDictionary dictionary];
-                
-                //save pid
-                procInfo[@"pid"] = key;
-
-                //find/combine required process components
-                // ->uid, ppid, name, & path
-                for(NSString* key in @[@"uid", @"ppid", @"name", @"path", @"appPath"])
-                {
-                    //scan each partial entry for process
-                    for(NSDictionary* procEntry in partialProcGroup)
-                    {
-                        //check for key
-                        if(nil != [procEntry objectForKey:key])
-                        {
-                            //hooray
-                            // ->save it, then go on to next key
-                            procInfo[key] = [procEntry objectForKey:key];
-                            
-                            //next
-                            break;
-                        }
-                        
-                    }//each process entry
-                    
-                }//all keys
-                
-                //when no path was found
-                // ->scan all partial process paths (from audit/spawn())
-                if( (nil == procInfo[@"path"]) &&
-                    (nil != procInfo[@"name"]) )
-                {
-                    //sync
-                    @synchronized(self.partialProcPaths)
-                    {
-                    
-                    //scan all partial paths
-                    for(NSString* path in [self.partialProcPaths allKeys])
-                    {
-                        //check if name's match
-                        // ->already tried to get path via proc_pidPath() so this is last ditch effort
-                        if(YES == [procInfo[@"name"] isEqualToString:[[path lastPathComponent] stringByDeletingPathExtension]])
-                        {
-                            //hooray
-                            // ->match
-                            procInfo[@"path"] = path;
-                            
-                            //don't remove, since might be multiple procs
-                            // ->removal is done after timeout (below)
-                            
-                            //bail
-                            break;
-                        }
-                        
-                    }//scan all partial proc paths
-                        
-                    }//sync
-                
-                }//path not found
-                
-                
-                //TODO: don't need to sync? as only code now inserting procs into self.process list? (in entire proj though?)
-                
-                //create process object
-                processObj = [[Process alloc] initWithPid:[procInfo[@"pid"] intValue] infoDictionary:procInfo];
-                
-                //dbg msg
-                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"inserting completed process obj into process list: %@", procInfo]);
-                
-                //trim list if needed
-                if(self.processList.count >= PROCESS_LIST_MAX_SIZE)
-                {
-                    //toss first (oldest) item
-                    [self.processList removeObjectForKey:[self.processList keyAtIndex:0]];
-                }
-                
-                //TODO ignore if already there!
-                // ->already processed from another (quicker source)
-                
-                //insert process at end
-                [self.processList insertObject:processObj forKey:procInfo[@"pid"] atIndex:self.processList.count];
-                
-                //remove from partial procs
-                [self.partialProcs removeObjectForKey:key];
-                
-            }//all partial procs
-        
-        }//sync
-        
-        //sync
-        @synchronized(self.partialProcPaths)
-        {
-        
-        //remove any old partial paths
-        for(NSString* path in [self.partialProcPaths allKeys])
-        {
-            //check timestamp for entry
-            // ->ignore those less than 3 seconds
-            if(3.0 < [self.partialProcPaths[@"timeStamp"] timeIntervalSinceDate:[NSDate date]])
-            {
-                //skip
-                continue;
-            }
-            
-            //remove entry
-            [self.partialProcPaths removeObjectForKey:path];
-            
-        }//cleanup old partial proc paths
-            
-        }//sync
-        
-    }//forever, loop
-    
-    return;
-}
-
-//watch for apps
-// ->just apps
--(void)enableAppWatch
-{
-    //notification center
-    NSNotificationCenter* notificationCenter = nil;
-    
-    //init notification center
-    notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    
-    //install app launch notification
-    [notificationCenter addObserver:self selector:@selector(appLaunched:)
-                               name:NSWorkspaceDidLaunchApplicationNotification object:nil];
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"enabled app watch");
-    
-    return;
-}
-
-//callback that's automatically invoked whenever an app is launched
-// ->instantiate a process obj and save it
--(void)appLaunched:(NSNotification *)notification
-{
-    //info dictionary
-    NSMutableDictionary* processInfo = nil;
-    
-    //app's bundle
-    NSBundle* appBundle = nil;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"APP STARTED: %@", notification]);
-    
-    //add to partial process list
-    // ->process combiner thread will pick up and process
-    
-    //sync
-    @synchronized(self.partialProcs)
-    {
-        //init process info
-        processInfo = [NSMutableDictionary dictionary];
-        
-        //pad
-        processInfo[@"pid"] = [notification userInfo][@"NSApplicationProcessIdentifier"];
-        
-        //name
-        processInfo[@"name"] = [notification userInfo][@"NSApplicationName"];
-        
-        //app path
-        processInfo[@"appPath"] = [notification userInfo][@"NSApplicationPath"];
-        
-        //try grab app's executable path
-        appBundle = [NSBundle bundleWithPath:processInfo[@"appPath"]];
-        
-        //set path
-        if(nil != appBundle)
-        {
-            //set
-            processInfo[@"path"] = appBundle.executablePath;
-        }
-        
-        //when first one
-        // ->create dictionary and add pid
-        if(nil == [self.partialProcs objectForKey:processInfo[@"pid"]])
-        {
-            //init dictionary
-            self.partialProcs[processInfo[@"pid"]] = [NSMutableDictionary dictionary];
-            
-            //add timestamp
-            self.partialProcs[processInfo[@"pid"]][@"timestamp"] = [NSDate date];
-            
-            //init array for partial proc group
-            self.partialProcs[processInfo[@"pid"]][@"procGroup"] = [NSMutableArray array];
-        }
-        
-        //add proc info into group
-        [self.partialProcs[processInfo[@"pid"]][@"procGroup"] addObject:processInfo];
-        
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"app callback, added partial proc (%@)", self.partialProcs[processInfo[@"pid"]]]);
-        
-    }//sync
-    
-    return;
-}
-
-//thread function
-// ->monitor procs via audit pipe
--(void)auditProcs:(id)threadParam
-{
-    //event mask
-    // ->what event classes to watch for
-    u_int eventClasses = AUDIT_CLASS_PROCESS | AUDIT_CLASS_EXEC;
-    
-    //file pointer to audit pipe
-    FILE* auditFile = NULL;
-    
-    //file descriptor for audit pipe
-    int auditFileDescriptor = -1;
-    
-    //status var
-    int status = -1;
-    
-    //preselect mode
-    int mode = -1;
-    
-    //queue length
-    int maxQueueLength = -1;
-    
-    //record buffer
-    u_char* recordBuffer = NULL;
-    
-    //token struct
-    tokenstr_t tokenStruct = {0};
-    
-    //total length of record
-    int recordLength = -1;
-    
-    //amount of record left to process
-    int recordBalance = -1;
-    
-    //amount currently processed
-    int processedLength = -1;
-    
-    //full path (for fork())
-    NSString* fullPath = nil;
-    
-    //process dictionary
-    NSMutableDictionary* processInfo = nil;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"in audit pipe thread (for process monitoring)");
-    
-    //open audit pipe for reading
-    auditFile = fopen(AUDIT_PIPE, "r");
-
-    //sanity check
-    if(auditFile == NULL)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to open audit pipe (%s)", AUDIT_PIPE]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //grab file descriptor
-    auditFileDescriptor = fileno(auditFile);
-    
-    //init mode
-    mode = AUDITPIPE_PRESELECT_MODE_LOCAL;
-    
-    //set preselect mode
-    status = ioctl(auditFileDescriptor, AUDITPIPE_SET_PRESELECT_MODE, &mode);
-    if(-1 == status)
-    {
-        //err msg
-        logMsg(LOG_DEBUG, @"failed to set preselect mode on audit pipe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //grab max queue length
-    status = ioctl(auditFileDescriptor, AUDITPIPE_GET_QLIMIT_MAX, &maxQueueLength);
-    
-    //sanity check
-    if(-1 == status)
-    {
-        //err msg
-        logMsg(LOG_DEBUG, @"failed to grab max queue length from audit pipe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //set queue length to max
-    status = ioctl(auditFileDescriptor, AUDITPIPE_SET_QLIMIT, &maxQueueLength);
-    
-    //sanity check
-    if(-1 == status)
-    {
-        //err msg
-        logMsg(LOG_DEBUG, @"failed to set set max queue length on audit pipe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //set preselect flags
-    // ->event classes we're interested in
-    status = ioctl(auditFileDescriptor, AUDITPIPE_SET_PRESELECT_FLAGS, &eventClasses);
-    
-    //sanity check
-    if(-1 == status)
-    {
-        //err msg
-        logMsg(LOG_DEBUG, @"failed to set preselect flags on audit pipe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //set non-attributable flags
-    // ->event classes we're interested in
-    status = ioctl(auditFileDescriptor, AUDITPIPE_SET_PRESELECT_NAFLAGS, &eventClasses);
-    
-    //sanity check
-    if(-1 == status)
-    {
-        //err msg
-        logMsg(LOG_DEBUG, @"failed to set preselect na-flags on audit pipe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"entering audit pipe monitoring loop");
-    
-    //forever
-    // ->read/parse audit records
-    while(YES)
-    {
-        //reset process info
-        processInfo = nil;
-        
-        //free prev buffer
-        if(NULL != recordBuffer)
-        {
-            //free
-            free(recordBuffer);
-            
-            //unset
-            recordBuffer = NULL;
-        }
-        
-        //read a single audit record
-        // ->note: buffer is allocated by function, so must be freed when done
-        recordLength = au_read_rec(auditFile, &recordBuffer);
-        
-        //sanity check
-        if(-1 == recordLength)
-        {
-            //continue
+            //error or short read
+            // ->ignore
             continue;
         }
         
-        //init (remaining) balance to record's total length
-        recordBalance = recordLength;
+        //type cast
+        // ->to access kev_event_msg header
+        kernEventMsg = (struct kern_event_msg*)kextMsg;
         
-        //init processed length to start (zer0)
-        processedLength = 0;
-        
-        //parse record
-        // ->read all tokens/process
-        while(0 != recordBalance)
+        //only care about 'process began' events
+        if(PROCESS_BEGAN_EVENT != kernEventMsg->event_code)
         {
-            //extract token
-            // ->and sanity check
-            if(-1 == au_fetch_tok(&tokenStruct, recordBuffer + processedLength, recordBalance))
-            {
-                //error
-                // ->skip record
-                break;
-            }
-            
-            //ignore records that aren't related to process exec'ing/spawning
-            // ->gotta wait till we hit a AUT_HEADER* though, as this has the type
-            if( (nil != processInfo) &&
-                (YES != [self shouldProcessRecord:[processInfo[@"type"] unsignedShortValue]]) )
-            {
-                //bail
-                // ->skips reset of record
-                break;
-            }
-            
-            //process token(s)
-            // ->create record object, etc
-            switch(tokenStruct.id)
-            {
-                //handle start of record
-                // ->check event type, and ignore if not related to process exec/spawning
-                case AUT_HEADER32:
-                case AUT_HEADER32_EX:
-                case AUT_HEADER64:
-                case AUT_HEADER64_EX:
-                {
-                    //create a new process info dictionary
-                    processInfo = [NSMutableDictionary dictionary];
-                    
-                    //save type
-                    processInfo[@"type"] = [NSNumber numberWithUnsignedShort:tokenStruct.tt.hdr32.e_type];
-                    
-                    break;
-                }
-                    
-                //paths
-                // ->for execve events, this is process path
-                case AUT_PATH:
-                {
-                    //save path
-                    // ->but only for exec* events
-                    if(AUE_EXECVE == [processInfo[@"type"] unsignedShortValue])
-                    {
-                        //save path
-                        processInfo[@"path"] = [NSString stringWithUTF8String:tokenStruct.tt.path.path];
-                    }
-                    
-                    break;
-                }
-                    
-                //subject
-                // ->extract/save pid, uid, etc
-                //   all these cases can be treated as subj32!
-                case AUT_SUBJECT32:
-                case AUT_SUBJECT32_EX:
-                case AUT_SUBJECT64:
-                case AUT_SUBJECT64_EX:
-                {
-                    //for execves save pid/uid
-                    if(AUE_EXECVE == [processInfo[@"type"] unsignedShortValue])
-                    {
-                        //save pid
-                        processInfo[@"pid"] = [NSNumber numberWithUnsignedInteger:tokenStruct.tt.subj32.pid];
-                        
-                        //save uid
-                        processInfo[@"pid"] = [NSNumber numberWithUnsignedInteger:tokenStruct.tt.subj32.euid];
-                    }
-                    
-                    break;
-                }
-                    
-                //args
-                // ->for fork, save child pid & try get path
-                case AUT_ARG32:
-                case AUT_ARG64:
-                {
-                    //for fork
-                    // ->extract/save pid
-                    if(AUE_FORK == [processInfo[@"type"] unsignedShortValue])
-                    {
-                        //32bit
-                        if(AUT_ARG32 == tokenStruct.id)
-                        {
-                            //save
-                            processInfo[@"pid"] = [NSNumber numberWithUnsignedInteger:tokenStruct.tt.arg32.val];
-                        }
-                        //64bit
-                        else
-                        {
-                            //save
-                            processInfo[@"pid"] = [NSNumber numberWithUnsignedInteger:(pid_t)tokenStruct.tt.arg64.val];
-                        }
-                        
-                        //try get path
-                        // ->fork only gives us a pid
-                        fullPath = getFullPath(processInfo[@"pid"], processInfo[@"name"], NO);
-                        if(nil != fullPath)
-                        {
-                            //save
-                            processInfo[@"path"] = fullPath;
-                        }
-                    }
-                    
-                    break;
-                }
-                    
-                //exec args
-                // ->posix_spawn,
-                case AUT_EXEC_ARGS:
-                {
-                    //posix_spawn
-                    if(AUE_POSIX_SPAWN == [processInfo[@"type"] unsignedShortValue])
-                    {
-                        //save path
-                        processInfo[@"path"] = [NSString stringWithUTF8String:tokenStruct.tt.execarg.text[0]];
-                    }
-                    
-                    break;
-                }
-                    
-                //record trailer
-                // ->end/save, etc
-                case AUT_TRAILER:
-                {
-                    //end
-                    if( (nil != processInfo) &&
-                        (YES == [self shouldProcessRecord:[processInfo[@"type"] unsignedShortValue]]) )
-                    {
-                        //dbg msg
-                        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process 'event' (from audit pipe): %@", processInfo]);
-                        
-                        //exec & fork can go into main partial process list since they have pids
-                        if(AUE_POSIX_SPAWN != [processInfo[@"type"] unsignedShortValue])
-                        {
-                            //sanity check
-                            // ->only processes w/ a pid
-                            if(nil != processInfo[@"pid"])
-                            {
-                                //sync
-                                @synchronized(self.partialProcs)
-                                {
-                                    //when first one
-                                    // ->create dictionary and add pid
-                                    if(nil == [self.partialProcs objectForKey:processInfo[@"pid"]])
-                                    {
-                                        //init dictionary
-                                        self.partialProcs[processInfo[@"pid"]] = [NSMutableDictionary dictionary];
-                                        
-                                        //add timestamp
-                                        self.partialProcs[processInfo[@"pid"]][@"timestamp"] = [NSDate date];
-                                        
-                                        //init array for partial proc group
-                                        self.partialProcs[processInfo[@"pid"]][@"procGroup"] = [NSMutableArray array];
-                                    }
-        
-                                    //add proc info into group
-                                    [self.partialProcs[processInfo[@"pid"]][@"procGroup"] addObject:processInfo];
-                                    
-                                    
-                                    //dbg msg
-                                    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"audit pipe, added partial proc (%@)", self.partialProcs[processInfo[@"pid"]]]);
-                                
-                                }//sync
-                        
-                            }//has pid
-                            
-                        }//exec & fork
-                        
-                        //spawn
-                        // ->add to path
-                        @synchronized(self.partialProcPaths)
-                        {
-                            //sanity check
-                            // ->only add processes w/ path
-                            if(nil != processInfo[@"path"])
-                            {
-                                //add
-                                self.partialProcPaths[processInfo[@"path"]] = [NSDate date];
-                            }
-                            
-                        }//sync
-                        
-                    }//handle record (of type we care about)
-                    
-                    //reset
-                    processInfo = nil;
-                    
-                    break;
-                    
-                }//AUT_TRAILER
-                    
-
-                default:
-                    ;
-                    
-            }//process token
-            
-            
-            /*
-             
-             printf("EVENT: %d\n", processRecord.type);
-             
-             // Print the long form of the token as a string
-             fprintf(stdout, "event: ");
-             au_print_tok(stdout, &token, ",", 1, AU_OFLAG_XML);
-             fprintf(stdout, "\n");
-             
-             au_print_tok_xml(stdout, &token, ",", 1, 0);
-             fprintf(stdout, "\n");
-             
-             fprintf(stdout, "flags: ");
-             au_print_flags_tok(stdout, &token, ",", AU_OFLAG_XML);
-             fprintf(stdout, "\n\n");
-             
-             */
-            
-            //add length of current token
-            processedLength += tokenStruct.len;
-            
-            //subtract lenght of current token
-            recordBalance -= tokenStruct.len;
+            //skip
+            continue;
         }
-    }
+        
+        //typecast custom data
+        // ->begins right after header
+        procStartEvent = (struct processStartEvent*)&kernEventMsg->event_data[0];
+        
+        //dbg msg(s)
+        //printf("  process: %s \n", procStartEvent->path);
+        //printf("  pid: %d ppid: %d uid: %d\n\n", procStartEvent->pid, procStartEvent->ppid, procStartEvent->uid);
+    
+        //init proc info dictionary
+        procInfo = [NSMutableDictionary dictionary];
+        
+        //save pid
+        procInfo[@"pid"] = [NSNumber numberWithInt:procStartEvent->pid];
+        
+        //save uid
+        procInfo[@"uid"] = [NSNumber numberWithInt:procStartEvent->uid];
+        
+        //save ppid
+        procInfo[@"ppid"] = [NSNumber numberWithInt:procStartEvent->ppid];
+        
+        //save path
+        procInfo[@"path"] = [NSString stringWithUTF8String:procStartEvent->path];
+        
+        //create process object
+        processObj = [[Process alloc] initWithPid:procStartEvent->pid infoDictionary:procInfo];
+    
+        //sync
+        @synchronized(self.processList)
+        {
+            //trim list if needed
+            if(self.processList.count >= PROCESS_LIST_MAX_SIZE)
+            {
+                //toss first (oldest) item
+                [self.processList removeObjectForKey:[self.processList keyAtIndex:0]];
+            }
+        
+            //insert process at end
+            [self.processList insertObject:processObj forKey:procInfo[@"pid"] atIndex:self.processList.count];
+        
+        }//sync
+        
+    }//while(YES)
     
 //bail
 bail:
     
-    //free buffer
-    if(NULL != recordBuffer)
-    {
-        //free
-        free(recordBuffer);
-    }
-    
-    //close audit pipe
-    if(NULL != auditFile)
+    //close socket
+    if(-1 != systemSocket)
     {
         //close
-        fclose(auditFile);
+        close(systemSocket);
     }
-    
+
     return;
+
 }
-
-//check if event is one we care about
-// ->i.e. one that deals with process exec/spawning
--(BOOL)shouldProcessRecord:(u_int16_t)eventType
-{
-    //flag
-    BOOL shouldProcess =  NO;
-    
-    //check type; fork/exec/spawn
-    if( (eventType == AUE_FORK) ||
-        (eventType == AUE_EXECVE) ||
-        (eventType == AUE_POSIX_SPAWN) )
-    {
-        //set flag
-        shouldProcess = YES;
-    }
-    
-    return shouldProcess;
-}
-
-
-//install the dtrace probe
-// ->open dtrace, compile probe, install it
--(BOOL)installDtraceProbe
-{
-    //return var
-    BOOL bRet = NO;
-    
-    //dtrace error msg
-    int dtraceError = 0;
-    
-    //dtrace program
-    dtrace_prog_t *dtraceProgram = NULL;
-    
-    //dtrace program info
-    dtrace_proginfo_t dtraceProgramInfo = {0};
-    
-    //open dtrace handle
-    self.dtraceHandle = dtrace_open(DTRACE_VERSION, 0, &dtraceError);
-    if(NULL == self.dtraceHandle)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to get handle to dtrace (%s)", dtrace_errmsg(NULL, dtraceError)]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //pre-rootless OSs
-    // ->can use full dtrace probe
-    if(YES != self.isRootless)
-    {
-        //dbg msg
-        logMsg(LOG_DEBUG, @"using pre-rootless dtrace");
-        
-        //compile the pre-rootless dtrace probe
-        dtraceProgram = dtrace_program_strcompile(self.dtraceHandle, dtraceProbePreRootless, DTRACE_PROBESPEC_NAME, 0, 0, NULL);
-        if(NULL == dtraceProgram)
-        {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to compile pre-rootless dtrace probe (%s)", dtrace_errmsg(NULL, dtraceError)]);
-            
-            //bail
-            goto bail;
-        }
-    }
-    //rootless OSs
-    // ->have to use neutered dtrace probe...
-    else
-    {
-        
-        //TODO: re-enable
-        /*
-        
-        //dbg msg
-        logMsg(LOG_DEBUG, @"using pre-rootless dtrace");
-         
-        //compile the rootless dtrace probe
-        dtraceProgram = dtrace_program_strcompile(self.dtraceHandle, dtraceProbeRootless, DTRACE_PROBESPEC_NAME, 0, 0, NULL);
-        if(NULL == dtraceProgram)
-        {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to compile rootless dtrace probe (%s)", dtrace_errmsg(NULL, dtraceError)]);
-            
-            //bail
-            goto bail;
-        }
-        */
-        
-        //TODO: REMOVE!!
-        goto bail;
-    }
-    
-    //install the probe
-    if(-1 == dtrace_program_exec(self.dtraceHandle, dtraceProgram, &dtraceProgramInfo))
-    {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: install dtrace probe");
-        
-        //bail
-        goto bail;
-    }
-    
-    //no errors
-    bRet = YES;
-    
-//bail
-bail:
-    
-    return bRet;
-}
-
-//set options for dtrace
--(BOOL)setDtraceOptions
-{
-    //return var
-    BOOL bRet  = NO;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"setting dtrace options");
-    
-    //set string (output) size
-    // ->note: BUFFER_SIZE: 512
-    if(-1 == dtrace_setopt(self.dtraceHandle, "strsize", "512"))
-    {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to set 'strsize'");
-        
-        //bail
-        goto bail;
-    }
-    
-    //set buffer size
-    if(-1 == dtrace_setopt(self.dtraceHandle, "bufsize", "4m"))
-    {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to set 'bufsize'");
-        
-        //bail
-        goto bail;
-    }
-    
-    //set quite
-    if(-1 == dtrace_setopt(self.dtraceHandle, "quiet", "true"))
-    {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to set 'quiet'");
-        
-        //bail
-        goto bail;
-    }
-    
-    //no errors
-    bRet = YES;
-    
-//bail
-bail:
-    
-    return bRet;
-}
-
-//create output pipe
--(BOOL)initOutputPipe
-{
-    //return var
-    BOOL bRet = NO;
-    
-    //flags
-    long flags = 0;
-
-    //make em a pipe
-    pipe(self->outputPipe);
-
-    //get current flags
-    flags = fcntl(self->outputPipe[0], F_GETFL);
-    
-    //update flags
-    // ->non-blocking
-    flags |= O_NONBLOCK;
-    
-    //update with new flags
-    // ->makes pipe non-blocking
-    if(-1 == fcntl(self->outputPipe[0], F_SETFL, flags))
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to make pipe non-blocking, (%d)", errno]);
-        
-        //bail
-        goto bail;
-    }
-
-    //no errors
-    bRet = YES;
-
-//bail
-bail:
-
-    return bRet;
-}
-
-//read output from dtrace pipe
-// ->parse and save
--(void)consumeOutput:(id)threadParam
-{
-    //input buffer
-    char output[BUFFER_SIZE+1] = {0};
-    
-    //bytes read
-    size_t bytesRead = 0;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"process consumer thread, off and running");
-    
-    //tokenized output
-    NSMutableArray* tokenizedOuput = nil;
-    
-    //process info dictionary
-    NSMutableDictionary* processInfo = nil;
-
-    //full path
-    // ->needed as sometimes dtrace just reports 'tail', 'sed' etc
-    NSString* fullPath = nil;
-    
-    //read/parse foreverz
-    while(true)
-    {
-        //pool
-        @autoreleasepool {
-            
-        //reset buffer
-        memset(output, 0x0, BUFFER_SIZE);
-        
-        //read bytes from pipe
-        // ->this is dtrace's output
-        switch(bytesRead = read(self->outputPipe[0], output, BUFFER_SIZE))
-        {
-            //error or simply no data
-            // (since pipe is non-blocking
-            case -1:
-            {
-                //handle no data case
-                // ->just sleep, then try again
-                if(errno == EAGAIN)
-                {
-                    //sleep
-                    sleep(PSLEEP_TIME);
-                    
-                    //bail
-                    break;
-                }
-                //'real' error
-                else
-                {
-                    //err msg
-                    logMsg(LOG_ERR, [NSString stringWithFormat:@"read() failed with %d", errno]);
-                    
-                    //bail
-                    goto cleanup;
-                }
-            }
-                
-            //pipe closed
-            // TODO: use this to cause thead to bail? (e.g. when disabling blockblock)
-            case 0:
-            {
-                //err msg
-                logMsg(LOG_ERR, @"ERROR: pipe was closed...");
-                
-                //bail
-                goto cleanup;
-            }
-                
-            //got data
-            // ->parse it
-            default:
-            {
-                //split output on '###'
-                tokenizedOuput = [self parseOutput:[NSMutableString stringWithUTF8String:output]];
-                
-                //parse output line-by-line
-                // ->extract components and then place in dictionary
-                for(NSString* item in tokenizedOuput)
-                {
-                    //convert from JSON string to dictionary
-                    processInfo = [NSJSONSerialization JSONObjectWithData:[item dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:NULL];
-                    
-                    //sanity check
-                    // ->make sure data was parsed ok
-                    if(nil == processInfo)
-                    {
-                        //error, just skip
-                        continue;
-                    }
-                    
-                    //dbg msg
-                    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"item: %@", item]);
-                    
-                    //sanity check output dictionary
-                    // ->regardless of OS, should contains pid, name, etc
-                    if( (nil == processInfo[@"pid"]) ||
-                        (nil == processInfo[@"uid"]) ||
-                        (nil == processInfo[@"name"]) ||
-                        (nil == processInfo[@"ppid"]) )
-                    {
-                        //err msg
-                        logMsg(LOG_ERR, [NSString stringWithFormat:@"process dictionary appears incomplete: %@", processInfo]);
-                        
-                        //error, just skip
-                        continue;
-                    }
-                    
-                    //TODO: do process sync here, before finding path....
-
-                    //dtrace sometimes just reports a short name, or on rootless OSs, this is all we've got
-                    // ->try to find full path
-                    if( (nil == [processInfo objectForKey:@"path"]) ||
-                        (YES == [processInfo[@"name"] isEqualToString:processInfo[@"path"]]))
-                    {
-                        //dbg msg
-                        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"DTRACE: inserting process into process list: %@", processInfo]);
-                        
-                        //try full path
-                        // ->then, update path in info dictionary
-                        fullPath = getFullPath(processInfo[@"pid"], processInfo[@"name"], NO);
-                        if(nil != fullPath)
-                        {
-                            //save
-                            processInfo[@"path"] = fullPath;
-                        }
-                    }
-                    
-                    //add to partial process list
-                    // ->process combiner thread will pick up and process
-                   
-                    //sync
-                    @synchronized(self.partialProcs)
-                    {
-                        //when first one
-                        // ->create dictionary and add pid
-                        if(nil == [self.partialProcs objectForKey:processInfo[@"pid"]])
-                        {
-                            //init dictionary
-                            self.partialProcs[processInfo[@"pid"]] = [NSMutableDictionary dictionary];
-                            
-                            //add timestamp
-                            self.partialProcs[processInfo[@"pid"]][@"timestamp"] = [NSDate date];
-                            
-                            //init array for partial proc group
-                            self.partialProcs[processInfo[@"pid"]][@"procGroup"] = [NSMutableArray array];
-                        }
-                        
-                        //add proc info into group
-                        [self.partialProcs[processInfo[@"pid"]][@"procGroup"] addObject:processInfo];
-                        
-                        //dbg msg
-                        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"dtrace, added partial proc (%@)", self.partialProcs[processInfo[@"pid"]]]);
-                        
-                    }//sync
-                    
-                }//parse each line
-                
-            }//default case; have date
-                
-        }//switch
-            
-        }//pool
-        
-    }//while(true)
-  
-//cleanup
-cleanup:
-    
-    fprintf(stderr, "end of l00p\n");
-    
-    return;
-}
-
-//parse dtrace's output
-// ->split on '###' and handle partial chunks
--(NSMutableArray*)parseOutput:(NSMutableString*)output
-{
-    //array of tokenized output
-    // ->each member is JSON (pid, name, path)
-    NSMutableArray* tokenizedOuput = nil;
-    
-    //strip off the first '###'
-    if(YES == [output hasPrefix:@OUTPUT_TOKENIZER])
-    {
-        //remove '###'
-        [output deleteCharactersInRange:NSMakeRange(0, @OUTPUT_TOKENIZER.length)];
-    }
-    
-    //split the output!
-    tokenizedOuput = [NSMutableArray arrayWithArray:[output componentsSeparatedByString:@OUTPUT_TOKENIZER]];
-    
-    //check if there was a previous chunk
-    // ->if so, append first object to chunk...this should complete the chunk!
-    if(nil != self.outputChunk)
-    {
-        //append
-        self.outputChunk = [NSMutableString stringWithString:[outputChunk stringByAppendingString:tokenizedOuput.firstObject]];
-        
-        //remove the first (partial) chunk
-        // ->if it wasn't completed here - not sure it ever will
-        [tokenizedOuput removeObjectAtIndex:0x0];
-        
-        //check if chunk is now complete
-        // ->ends with '}'
-        if(YES == [self.outputChunk hasSuffix:@"}"])
-        {
-            //insert (add) it into start of tokenized array
-            [tokenizedOuput insertObject:self.outputChunk atIndex:0];
-        }
-        
-        //either way, nil out the partial chunk
-        // ->if it wasn't completed by now - not sure it ever will
-        self.outputChunk = nil;
-    }
-    
-    //if the last object is a partial chunk
-    // ->save it, hopefully next time will complete the check
-    if(YES != [[tokenizedOuput lastObject] hasSuffix:@"}"])
-    {
-        //save partial chunk
-        self.outputChunk = [tokenizedOuput lastObject];
-        
-        //remove it from tokenized output
-        [tokenizedOuput removeLastObject];
-    }
-    
-    return tokenizedOuput;
-}
-
-
-//thread function
-// ->produce dtrace output
--(void)produceOutput:(id)threadParam
-{
-    //file handle
-    FILE *outputPipeHandle = NULL;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process monitor producer thread: running"]);
-    
-    //get file handle to output pipe
-    outputPipeHandle = fdopen(self->outputPipe[1], "a");
-    if(NULL == outputPipeHandle)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"fdopen() failed with %d", errno]);
-        
-        //bail
-        goto cleanup;
-    }
-    
-    //dtrace go!
-    if(0 != dtrace_go(self.dtraceHandle))
-    {
-        //err msg
-        logMsg(LOG_ERR, @"dtrace_go() failed");
-        
-        //bail
-        goto cleanup;
-    }
-    
-    //forever
-    // ->do dtrace work
-    do
-    {
-        //pool
-        @autoreleasepool {
-            
-        //nap
-        dtrace_sleep(self.dtraceHandle);
-        
-        //work (ignoring result)
-        // ->will produce output to stdout, that is consumed by another thread/logic
-        dtrace_work(self.dtraceHandle, outputPipeHandle, chew, chewrec, NULL);
-        
-        //flush it
-        fflush(outputPipeHandle);
-    
-        }//pool
-    
-    } while(TRUE);
-   
-//cleanup
-cleanup:
-    
-    ;
-    
-    return;
-    
-}
-
-//TODO: shutdown function
-// dtrace_close(g_dtp);
-// close threads, etc
-// close pipes~
-
 
 @end
-
-static int chew(const dtrace_probedata_t *data, void *arg)
-{
-    return DTRACE_CONSUME_THIS;
-}
-
-static int chewrec(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, void *arg)
-{
-    if(rec == NULL)
-    {
-        return DTRACE_CONSUME_NEXT;
-    }
-    if (rec->dtrd_action == DTRACEACT_EXIT)
-    {
-        return DTRACE_CONSUME_NEXT;
-    }
-    
-    if(rec->dtrd_action == DTRACEACT_PRINTF)
-    {
-        return DTRACE_CONSUME_THIS;
-    }
-    return DTRACE_CONSUME_THIS;
-}

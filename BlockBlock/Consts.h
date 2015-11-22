@@ -27,6 +27,18 @@
 //user's defaults
 #define NSUSER_DEFAULTS @"Library/Preferences/com.objectivesee.BlockBlock.plist"
 
+//kext bundle name
+#define KEXT_NAME @"BlockBlock.kext"
+
+//kext label
+#define KEXT_LABEL @"com.objective-see.kext.BlockBlock"
+
+//path to kextload
+#define KEXT_LOAD @"/sbin/kextload"
+
+//path to kextunload
+#define KEXT_UNLOAD @"/sbin/kextunload"
+
 //path to launchctl
 #define LAUNCHCTL @"/bin/launchctl"
 
@@ -215,5 +227,30 @@
 // ->for long paths...
 #define ELLIPIS @"..."
 
+//vendor id string
+#define OBJECTIVE_SEE_VENDOR "com.objective-see"
+
+//process started
+#define PROCESS_BEGAN_EVENT	0x1
+
+//max number of items in process list
+#define PROCESS_LIST_MAX_SIZE 64
+
+//disabled state
+#define STATE_DISABLED 0
+
+//enabled state
+#define STATE_ENABLED 1
+
+//prefs
+// ->enable logging
+#define PREF_ENABLE_LOGGING @"enableLogging"
+
+//prefs
+// ->disable update check
+#define PREF_DISABLE_UPDATE_CHECK @"disableUpdateCheck"
+
+//log file name
+#define LOG_FILE_NAME @"BlockBlock.log"
 
 #endif

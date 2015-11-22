@@ -707,6 +707,8 @@ bail:
             //dbg msg
             logMsg(LOG_DEBUG, @"blocking event!");
             
+            //TODO: log this!
+            
             //invoke plugin's block method
             // ->send error msg if blocking fails
             if(YES != [reportedWatchEvent.plugin block:reportedWatchEvent])

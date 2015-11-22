@@ -8,11 +8,11 @@
 #import <Cocoa/Cocoa.h>
 
 #import "Control.h"
-//#import "Watcher.h"
 #import "StatusBarMenu.h"
 #import "InterProcComms.h"
 #import "InfoWindowController.h"
 #import "ErrorWindowController.h"
+#import "PrefsWindowController.h"
 #import "ConfigureWindowController.h"
 
 @class ProcessMonitor;
@@ -45,6 +45,9 @@
 
 //for testing
 //@property(nonatomic, retain)AlertWindowController* alertWindowController;
+
+//preferences window controller
+@property(nonatomic, retain)PrefsWindowController* prefsWindowController;
 
 //error window
 @property(nonatomic, retain) ErrorWindowController* errorWindowController;

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		7D0215131BF1D27D0005CF0F /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D0215121BF1D27D0005CF0F /* libbsm.tbd */; };
+		7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */; };
+		7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */; };
+		7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F2C1C018DA600A9CCE4 /* settings.png */; };
 		CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CD06BD211A6C5D7C00DE285A /* LoginItem.m */; };
 		CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */; };
 		CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */; };
@@ -78,6 +81,10 @@
 
 /* Begin PBXFileReference section */
 		7D0215121BF1D27D0005CF0F /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
+		7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PrefsWindow.xib; path = BlockBlock/ui/PrefsWindow.xib; sourceTree = SOURCE_ROOT; };
+		7D774F271C017C9000A9CCE4 /* PrefsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrefsWindowController.h; path = BlockBlock/PrefsWindowController.h; sourceTree = "<group>"; };
+		7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PrefsWindowController.m; path = BlockBlock/PrefsWindowController.m; sourceTree = "<group>"; };
+		7D774F2C1C018DA600A9CCE4 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = BlockBlock/images/settings.png; sourceTree = "<group>"; };
 		CD06BD201A6C5D7C00DE285A /* LoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginItem.h; path = BlockBlock/plugins/LoginItem.h; sourceTree = "<group>"; };
 		CD06BD211A6C5D7C00DE285A /* LoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginItem.m; path = BlockBlock/plugins/LoginItem.m; sourceTree = "<group>"; };
 		CD3CE6871A22C53400B4F940 /* ConfigureWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigureWindowController.h; path = BlockBlock/ui/ConfigureWindowController.h; sourceTree = "<group>"; };
@@ -215,6 +222,7 @@
 		CD7C872019D4428100EC7F0A /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */,
 				CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */,
 				CD855A801A773EA700A13C5C /* AlertWindowController.xib */,
 				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
@@ -244,6 +252,8 @@
 		CD7F087F19AE6DCA00FF00FC = {
 			isa = PBXGroup;
 			children = (
+				7D774F271C017C9000A9CCE4 /* PrefsWindowController.h */,
+				7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */,
 				CD6974F81B013AB600CE819B /* ParentsWindowController.h */,
 				CD6974F91B013AB600CE819B /* ParentsWindowController.m */,
 				CDE36CCB1ADAEDE500371F4E /* Exception.h */,
@@ -363,6 +373,7 @@
 		CD8381371A7DAA0F00AC0D96 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7D774F2C1C018DA600A9CCE4 /* settings.png */,
 				CD9282DE1B0133B8007A5E03 /* parentsIcon.png */,
 				CD9282DF1B0133B8007A5E03 /* parentsIconBG.png */,
 				CD9282E01B0133B8007A5E03 /* parentsIconOver.png */,
@@ -429,6 +440,7 @@
 				CD7F088419AE6DCA00FF00FC /* Sources */,
 				CD7F088519AE6DCA00FF00FC /* Frameworks */,
 				CD7F088619AE6DCA00FF00FC /* Resources */,
+				7D774F241C015DBD00A9CCE4 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -474,6 +486,7 @@
 				CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */,
 				CD7C871F19D43F9C00EC7F0A /* MainMenu.xib in Resources */,
 				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
+				7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */,
 				CD9282E11B0133B8007A5E03 /* parentsIcon.png in Resources */,
 				CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */,
 				CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */,
@@ -495,6 +508,7 @@
 				CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */,
 				CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */,
 				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
+				7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */,
 				CD9282E31B0133B8007A5E03 /* parentsIconOver.png in Resources */,
 				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
 				CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */,
@@ -506,6 +520,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7D774F241C015DBD00A9CCE4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		CD7F088419AE6DCA00FF00FC /* Sources */ = {
@@ -534,6 +564,7 @@
 				CD5C998919D6810C0015232A /* WatchEvent.m in Sources */,
 				CD5C999519D8B84B0015232A /* AlertViewBottom.m in Sources */,
 				CDACB9271A2EF3330088CC30 /* InterProcComms.m in Sources */,
+				7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */,
 				CDD738BF1A5F7D0500B825BA /* StatusBarPopoverController.m in Sources */,
 				CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */,
 				CD7C871519D43EAD00EC7F0A /* AppDelegate.m in Sources */,

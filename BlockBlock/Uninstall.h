@@ -13,9 +13,13 @@
 
 @interface Uninstall : NSObject
 {
-    /* IVARS */
-    Control* controlObj;
+   
 }
+
+/* PROPERTIES */
+
+@property (nonatomic, retain) Control* controlObj;
+
 
 /* METHODS */
 -(BOOL)uninstall;
@@ -26,9 +30,8 @@
 //stop and remove launch daemon
 -(BOOL)uninstallLaunchDaemon;
 
-
-
-@property (nonatomic, retain) Control* controlObj;
+//unload and remove kext
+-(BOOL)uninstallKext;
 
 @end
 

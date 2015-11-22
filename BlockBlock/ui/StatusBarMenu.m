@@ -24,6 +24,7 @@
 @synthesize viewController;
 @synthesize infoWindowController;
 
+
 //configure
 // ->set initial state, etc
 -(void)configure
@@ -266,7 +267,34 @@
     }
     
     return;
+}
+//handler for 'preferences' menu item
+// ->show window that has selectabel preferences
+-(IBAction)preferencesHandler:(id)sender
+{
+    //controller for preferences window
+    PrefsWindowController* prefsWindowController = nil;
     
+    //dbg msg
+    logMsg(LOG_DEBUG, @"displaying preferences window");
+    
+    //grab controller
+    prefsWindowController = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).prefsWindowController;
+    
+    //show pref window
+    //TODO: is nil ok?
+    [prefsWindowController showWindow:nil];
+    
+    //invoke function in background that will make window modal
+    // ->waits until window is non-nil
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        //make modal
+        makeModal(prefsWindowController);
+        
+    });
+    
+    return;
 }
 
 //menu handler that's automatically invoked when user clicks 'about'

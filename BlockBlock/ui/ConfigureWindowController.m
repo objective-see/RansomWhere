@@ -68,7 +68,6 @@
             //set
             self.buttonTitle = ACTION_INSTALL;
             
-
             break;
             
         //uninstall
@@ -97,7 +96,7 @@
         //check
         // ->returns action
         detailedStatus = [self shouldCustomizeInstallUI];
-        
+    
         //customize futher
         if(nil != detailedStatus)
         {
@@ -213,8 +212,6 @@
         if( (YES == [installedVersion isEqualToString:currentVersion]) &&
             (INSTALL_STATE_FULL == [installObj installState]) )
         {
-            
-            
             //installed already (and same version!)
             detailedAction = ACTION_REINSTALL;
         }
@@ -248,7 +245,6 @@ bail:
     
     return;
 }
-
 
 //button handler for action (install/uninstall)
 -(IBAction)handleActionClick:(id)sender

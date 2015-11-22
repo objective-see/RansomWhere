@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9059"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="StatusBarMenu">
@@ -32,6 +31,13 @@
                         <action selector="uninstallHandler:" target="-2" id="FmQ-cT-9rb"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Preferences" id="uLg-V0-Six">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="preferencesHandler:" target="-2" id="qTx-rc-p13"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="AvM-lr-WzH"/>
                 <menuItem title="About BlockBlock" id="rwM-Hc-f8w">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

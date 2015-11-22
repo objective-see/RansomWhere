@@ -12,17 +12,13 @@
 
 @interface Install : NSObject
 {
-    /* IVARS */
-        
-    //list of installed launch agents
-    // ->during upgrade, want to upgrade all
-    NSMutableArray* installedLaunchAgents;
     
 }
 
+/* PROPERTIES */
 
-//status
-//@property int installerStatus;
+//list of installed launch agents
+// ->during upgrade, want to upgrade all
 @property NSMutableArray* installedLaunchAgents;
 
 //flag indicating core (daemon) should be started
@@ -44,6 +40,10 @@
 
 //install launch daemon
 -(BOOL)installLaunchDaemon;
+
+//install kext
+// ->copy kext (bundle) to /Library/Extensions and set permissions
+-(BOOL)installKext;
 
 //check if install is to a newer version
 -(BOOL)isUpgrade;

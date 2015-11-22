@@ -8,7 +8,7 @@
 
 #import "Control.h"
 #import "InterProcComms.h"
-
+#import "PrefsWindowController.h"
 #import "StatusBarCustomView.h"
 #import "InfoWindowController.h"
 #import "StatusBarPopoverController.h"
@@ -40,9 +40,6 @@
 //flag indicating popover was closed
 @property BOOL wasClosed;
 
-//IPC obj
-//@property (nonatomic, retain)InterProcComms* interProcComms;
-
 //Control obj
 @property (nonatomic, retain)Control* controlObj;
 
@@ -68,6 +65,7 @@
 @property (weak) IBOutlet NSMenuItem *menuItemStatus;
 
 /* METHODS */
+
 //configure
 // ->set initial state, etc
 -(void)configure;
@@ -82,5 +80,9 @@
 
 //init the dropdown menu
 -(void)initMenu;
+
+//handler for 'preferences' menu item
+// ->show window that has selectabel preferences
+-(void)preferencesHandler:(id)sender;
 
 @end
