@@ -184,7 +184,8 @@
 -(void)disable
 {
     //dbg msg
-    logMsg(LOG_DEBUG, @"disable: disabling");
+    // ->and log to file (if logging is enabled)
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'disable'");
     
     //tell IPC object ui is disabled
     // ->allows it to ignore alerts from daemon (core)
@@ -204,12 +205,13 @@
 }
 
 
-//
-// ->enable block block
+//invoked by the status bar menu to re-enable BlockBlock
+// ->basically just send msg via IPC to let it know we are again interested in alerts
 -(void)enable
 {
     //dbg msg
-    logMsg(LOG_DEBUG, @"(re)enabling BLOCKBLOCK");
+    // ->and log to file (if logging is enabled)
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'enable'");
     
     //tell IPC object ui is enabled
     // ->allows it to listen/show alerts from daemon (core)

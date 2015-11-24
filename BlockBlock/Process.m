@@ -52,13 +52,6 @@
         //init parent id
         self.ppid = -1;
         
-        //process name
-        if(nil != infoDictionary[@"name"])
-        {
-            //save name
-            self.name = infoDictionary[@"name"];
-        }
-        
         //process uid
         if(nil != infoDictionary[@"uid"])
         {
@@ -73,15 +66,6 @@
             self.path = infoDictionary[@"path"];
         }
         
-        //process bundle
-        // ->direct load via app path
-        if(nil != infoDictionary[@"appPath"])
-        {
-            //load app bundle
-            // ->path will be set for 'apps'
-            self.bundle = [NSBundle bundleWithPath:infoDictionary[@"appPath"]];
-        }
-        
         //parent id
         if(nil != infoDictionary[@"ppid"])
         {
@@ -91,27 +75,26 @@
 
         //process bundle
         // ->indirect load via binary path
-        if( (nil == self.bundle) &&
-            (nil != self.path) )
+        if(nil != self.path)
         {
             //try to get app's bundle from binary path
             // ->of course, will only succeed for apps
             self.bundle = findAppBundle(self.path);
         }
     
-        //name still blank?
-        // ->try to determine it
+        //get a meaningful name
+        // ->via non-nil bundles, path, etc.
         if(nil == self.name)
         {
             //resolve name
             [self determineName];
         }
         
-        //path still blank?
-        // ->try to determine it
+        //when path still blank
+        // ->try to determine it via non-nil bundles, name (via 'which'), etc
         if(nil == self.path)
         {
-            //resolve name
+            //resolve path
             [self determinePath];
         }
         

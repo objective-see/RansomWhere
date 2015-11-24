@@ -515,7 +515,8 @@ bail:
     NSDictionary* actionInfo = nil;
     
     //dbg msg
-    logMsg(LOG_DEBUG, @"user clicked: 'block'");
+    // ->and to file (if logging is enabled)
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'block'");
     
     //init dictionary w/ action info
     actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:BLOCK_WATCH_EVENT], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state]};
@@ -538,7 +539,8 @@ bail:
     NSDictionary* actionInfo = nil;
     
     //dbg msg
-    logMsg(LOG_DEBUG, @"user clicked: 'allow'");
+    // ->and to file (if logging is enabled)
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'allow'");
     
     //init dictionary w/ action info
     actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state]};

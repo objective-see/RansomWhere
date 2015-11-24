@@ -12,8 +12,6 @@
 #import <Foundation/Foundation.h>
 #import <Security/AuthSession.h>
 
-
-
 @interface WatchEvent : NSObject
 {
     //path
@@ -66,9 +64,10 @@
 // ->need this for matching 'remembered' items
 @property (nonatomic, retain)NSString* itemBinary;
 
-
-
+//process
 @property (nonatomic, retain)Process* process;
+
+//plugin
 @property (nonatomic, retain)PluginBase* plugin;
 
 //uuid

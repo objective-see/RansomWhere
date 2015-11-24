@@ -435,6 +435,10 @@ bail:
         //configure alert window with data from daemon
         [alertWindowController configure:notification.userInfo];
         
+        //dbg msg
+        // ->and log to file (if logging is enabled)
+        logMsg(LOG_DEBUG|LOG_TO_FILE, [NSString stringWithFormat:@"%@ %@ (%@ -> %@)", alertWindowController.processPath.stringValue, alertWindowController.alertMsg.stringValue, alertWindowController.itemFile.stringValue, alertWindowController.itemBinary.stringValue]);
+
         //show (now configured), alert
         [alertWindowController showWindow:self];
     }
@@ -705,9 +709,7 @@ bail:
         if(BLOCK_WATCH_EVENT == [alertSelection[@"action"] integerValue])
         {
             //dbg msg
-            logMsg(LOG_DEBUG, @"blocking event!");
-            
-            //TODO: log this!
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"blocking %@'s attempt to create %@", reportedWatchEvent.process.path, reportedWatchEvent.path]);
             
             //invoke plugin's block method
             // ->send error msg if blocking fails
@@ -742,10 +744,11 @@ bail:
                 [self sendErrorToAgent:errorInfo];
             }
             //success
+            // ->for msg/logging logic only
             else
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, @"successfully blocked ");
+                logMsg(LOG_DEBUG, @"successfully blocked");
             }
             
             //indicate it was blocked
@@ -756,7 +759,7 @@ bail:
         else if(ALLOW_WATCH_EVENT == [alertSelection[@"action"] integerValue])
         {
             //dbg msg
-            logMsg(LOG_DEBUG, @"allowing event");
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"allowing %@'s attempt to create %@", reportedWatchEvent.process.path, reportedWatchEvent.path]);
             
             //invoke plugin's block method
             [reportedWatchEvent.plugin allow:reportedWatchEvent];

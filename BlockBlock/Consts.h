@@ -253,4 +253,7 @@
 //log file name
 #define LOG_FILE_NAME @"BlockBlock.log"
 
+//log to file flag
+#define LOG_TO_FILE 0x10
+
 #endif

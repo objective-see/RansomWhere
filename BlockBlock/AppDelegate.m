@@ -327,11 +327,12 @@
                     //err msg
                     logMsg(LOG_ERR, @"failed to init logging");
                 }
-                
-                //log a msg
-                log2File(@"BlockBlock Agent initializing...");
             }
             
+            //dbg log
+            // ->and to file (if logging is enabled)
+            logMsg(LOG_DEBUG|LOG_TO_FILE, @"BlockBlock Agent initializing...");
+
             //and run
             // ->shouldn't error
             [self startBlockBlocking_Agent];

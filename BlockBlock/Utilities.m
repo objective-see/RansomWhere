@@ -502,11 +502,6 @@ NSString* getVersion(NSUInteger instance)
     {
         //get info dictionary
         infoDictionary = getAppInfo(APPLICATION_PATH);
-        
-        //TODO: REMOVE
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@", infoDictionary]);
-
     }
     
     //extract version string

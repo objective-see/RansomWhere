@@ -17,8 +17,18 @@ NSFileHandle* logFileHandle = nil;
 // ->default to syslog, and if an err msg, to disk
 void logMsg(int level, NSString* msg)
 {
+    //flag for logging
+    BOOL shouldLog = NO;
+    
     //log prefix
     NSMutableString* logPrefix = nil;
+    
+    //first grab logging flag
+    shouldLog = (LOG_TO_FILE == (level & LOG_TO_FILE));
+    
+    //then remove it
+    // ->make sure syslog is happy
+    level &= ~LOG_TO_FILE;
     
     //alloc/init
     // ->always start w/ 'BLOCKBLOCK' + pid
@@ -35,7 +45,7 @@ void logMsg(int level, NSString* msg)
     #ifdef DEBUG
     
     //in debug mode promote debug msgs to LOG_NOTICE
-    // ->OS X only shows LOG_NOTICE and above~
+    // ->OS X only shows LOG_NOTICE and above
     if(LOG_DEBUG == level)
     {
         //promote
@@ -47,19 +57,24 @@ void logMsg(int level, NSString* msg)
     //log to syslog
     syslog(level, "%s: %s", [logPrefix UTF8String], [msg UTF8String]);
     
+    //when a message is to be logged to file
+    // ->log it, when logging is enabled
+    if(YES == shouldLog)
+    {
+        //but only when logging is enable
+        if(nil != logFileHandle)
+        {
+            //log
+            log2File(msg);
+        }
+    }
+    
     return;
 }
 
 //log to file
 void log2File(NSString* msg)
 {
-    //sanity chec
-    if(nil == logFileHandle)
-    {
-        //skip
-        goto bail;
-    }
-    
     //append timestamp
     // ->write msg out
     [logFileHandle writeData:[[NSString stringWithFormat:@"%@: %@\n", [NSDate date], msg] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -74,8 +89,9 @@ bail:
 //de-init logging
 void deinitLogging()
 {
-    //log a msg
-    log2File(@"logging ending");
+    //dbg msg
+    // ->and to file
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"logging ending");
     
     //close file handle
     [logFileHandle closeFile];
@@ -137,8 +153,9 @@ BOOL initLogging()
     //seek to end
     [logFileHandle seekToEndOfFile];
     
-    //log a msg
-    log2File(@"logging intialized");
+    //dbg msg
+    // ->and to file
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"logging intialized");
     
     //happy
     bRet = YES;
