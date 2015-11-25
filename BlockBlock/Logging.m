@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
-
 #import "Logging.h"
+#import "Utilities.h"
 #import "Consts.h"
 
 //global log file handle
@@ -72,17 +72,39 @@ void logMsg(int level, NSString* msg)
     return;
 }
 
-//log to file
-void log2File(NSString* msg)
+//get path to log file
+NSString* logFilePath()
 {
-    //append timestamp
-    // ->write msg out
-    [logFileHandle writeData:[[NSString stringWithFormat:@"%@: %@\n", [NSDate date], msg] dataUsingEncoding:NSUTF8StringEncoding]];
+    //path to log directory
+    NSString* logDirectory = nil;
+    
+    //path to log file
+    NSString* logFile = nil;
+    
+    //get log file directory
+    logDirectory = supportDirectory();
+    if(nil == logDirectory)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //build path
+    logFile = [logDirectory stringByAppendingPathComponent:LOG_FILE_NAME];
     
 //bail
 bail:
     
+    return logFile;
+}
 
+//log to file
+void log2File(NSString* msg)
+{
+    //append timestamp
+    // ->write msg out to disk
+    [logFileHandle writeData:[[NSString stringWithFormat:@"%@: %@\n", [NSDate date], msg] dataUsingEncoding:NSUTF8StringEncoding]];
+    
     return;
 }
 
@@ -108,47 +130,55 @@ BOOL initLogging()
     //ret var
     BOOL bRet = NO;
     
-    //app document directory
-    NSString* appDocDirectory = nil;
-    
     //log file path
-    NSString* logFilePath = nil;
+    NSString* logPath = nil;
     
-    //get app's doc directory
-    appDocDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
-    if(nil == appDocDirectory)
+    //create log directory if needed
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:supportDirectory()])
+    {
+        //create it
+        if(YES != [[NSFileManager defaultManager] createDirectoryAtPath:supportDirectory() withIntermediateDirectories:YES attributes:nil error:NULL])
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to create directory (%@) for log file", supportDirectory()]);
+            
+            //bail
+            goto bail;
+        }
+    }
+    
+    //get path to log file
+    logPath = logFilePath();
+    if(nil == logPath)
     {
         //err msg
-        logMsg(LOG_ERR, @"failed to find application's document directory");
+        logMsg(LOG_ERR, @"failed to build path for log file");
         
         //bail
         goto bail;
     }
     
-    //build path to log file
-    logFilePath = [appDocDirectory stringByAppendingPathComponent:LOG_FILE_NAME];
-    
     //first time
     // ->create
-    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:logFilePath])
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:logPath])
     {
         //create
-        [[NSFileManager defaultManager] createFileAtPath:logFilePath contents:nil attributes:nil];
+        [[NSFileManager defaultManager] createFileAtPath:logPath contents:nil attributes:nil];
     }
     
     //get file handle
-    logFileHandle = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
+    logFileHandle = [NSFileHandle fileHandleForWritingAtPath:logPath];
     if(nil == logFileHandle)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to get log file handle to %@", logFilePath]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to get log file handle to %@", logPath]);
         
         //bail
         goto bail;
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"opened log file; %@", logFilePath]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"opened log file; %@", logPath]);
     
     //seek to end
     [logFileHandle seekToEndOfFile];

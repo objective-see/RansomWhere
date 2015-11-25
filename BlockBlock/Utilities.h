@@ -18,6 +18,10 @@ NSString* launchAgentPlist(NSString* userHomeDirectory);
 //return path to kext
 NSString* kextPath();
 
+//return path to app support directory
+// ->~/Library/Application Support/<app bundle id>
+NSString* supportDirectory();
+
 //given a path to binary
 // parse it back up to find app's bundle
 NSBundle* findAppBundle(NSString* binaryPath);

@@ -257,6 +257,10 @@
 // ->spawn UI instance of self to kick off uninstaller logic
 -(void)uninstallHandler:(id)sender
 {
+    //dbg mgs
+    // ->and log to file (if logging is enabled)
+    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'uninstall'");
+    
     //dbg msg
     logMsg(LOG_DEBUG, @"exec'ing UI instance of uninstaller");
     

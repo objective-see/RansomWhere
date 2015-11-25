@@ -18,6 +18,9 @@ void logMsg(int level, NSString* msg);
 //prep/open log file
 BOOL initLogging();
 
+//get path to log file
+NSString* logFilePath();
+
 //de-init logging
 void deinitLogging();
 

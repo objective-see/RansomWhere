@@ -43,6 +43,34 @@ NSString* kextPath()
     return [NSString pathWithComponents:@[@"/Library/Extensions", KEXT_NAME]];
 }
 
+//return path to bb's support directory
+// ->~/Library/Application Support/<app bundle id>
+NSString* supportDirectory()
+{
+    //path to log directory
+    NSString* supportDirectory = nil;
+    
+    //system application support directory
+    NSString* appSupportDirectory = nil;
+    
+    //grab application support directory
+    appSupportDirectory = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) firstObject];
+    if(nil == appSupportDirectory)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //build path
+    supportDirectory = [appSupportDirectory stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
+    
+//bail
+bail:
+    
+    return supportDirectory;
+}
+
+
 //given a path to binary
 // parse it back up to find app's bundle
 NSBundle* findAppBundle(NSString* binaryPath)

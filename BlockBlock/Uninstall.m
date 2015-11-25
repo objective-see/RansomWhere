@@ -180,8 +180,9 @@
         }
         
         //if app binary is present
-        // ->just delete it
-        if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
+        // ->just delete it, unless its the instance that's running!
+        if( (YES != [[[NSBundle mainBundle] bundlePath] isEqualToString:APPLICATION_PATH]) &&
+            (YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH]))
         {
             //dbg msg
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found: %@", APPLICATION_PATH]);
@@ -241,6 +242,37 @@
         }
         
     }//partial uninstall
+    
+    //always delete app support directory
+    // ->for now just has log file
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:supportDirectory()])
+    {
+        //delete it
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:supportDirectory() error:nil])
+        {
+            //set flag
+            bAnyErrors = YES;
+            
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to remove app support (logging) directory, %@", supportDirectory()]);
+            
+            //don't bail
+            // ->might as well keep on uninstalling other components
+        }
+        //just logic for dbg msg
+        else
+        {
+            //dbg msg
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"removed app's support directory, %@", supportDirectory()]);
+        }
+    }
+    
+    //always delete app preferences
+    // ->note: removePersistentDomainForName doesn't seem to work anymore (and discussed on stackoverflow), and if re-installed, they come back!?
+    [[NSUserDefaults standardUserDefaults] setPersistentDomain:[NSDictionary dictionary] forName:[[NSBundle mainBundle] bundleIdentifier]];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"removed app's preferences");
     
     //only success when there were no errors
     if(YES != bAnyErrors)
