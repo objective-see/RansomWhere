@@ -459,6 +459,11 @@
 			attributes = {
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = Synack;
+				TargetAttributes = {
+					CD7F088719AE6DCA00FF00FC = {
+						DevelopmentTeam = VBG97UB4TA;
+					};
+				};
 			};
 			buildConfigurationList = CD7F088319AE6DCA00FF00FC /* Build configuration list for PBXProject "BlockBlock" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -695,6 +700,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
@@ -709,6 +715,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";

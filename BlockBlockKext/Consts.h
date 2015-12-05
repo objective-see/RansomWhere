@@ -22,5 +22,8 @@
 # define DEBUG_PRINT(x) do {} while (0)
 #endif
 
+//max data size
+#define MAX_MSG_SIZE 200
+
 
 #endif /* Consts_h */

@@ -506,6 +506,47 @@ bail:
     return userInfo;
 }
 
+//determine if there is a new version
+// -1, YES or NO
+NSInteger isNewVersion(NSMutableString* versionString)
+{
+    //flag
+    NSInteger newVersionExists = -1;
+    
+    //installed version
+    NSString* installedVersion = nil;
+    
+    //latest version
+    NSString* latestVersion = nil;
+    
+    //get installed version
+    installedVersion = getAppVersion();
+    
+    //get latest version
+    // ->will query internet (bb's website)
+    latestVersion = getLatestVersion();
+    if(nil == latestVersion)
+    {
+        //set error msg
+        [versionString setString:@"failed to get latest version"];
+        
+        //bail
+        goto bail;
+    }
+    
+    //save version
+    [versionString setString:latestVersion];
+    
+    //set version flag
+    // ->YES/NO
+    newVersionExists = (NSOrderedAscending == [installedVersion compare:latestVersion options:NSNumericSearch]);
+    
+//bail
+bail:
+    
+    return newVersionExists;
+}
+
 
 //get version
 // ->either of self, or installed
@@ -542,6 +583,51 @@ NSString* getVersion(NSUInteger instance)
     
     return currentVersion;
 }
+
+//query interwebz to get latest version
+NSString* getLatestVersion()
+{
+    //version data
+    NSData* versionData = nil;
+    
+    //version dictionary
+    NSDictionary* versionDictionary = nil;
+    
+    //latest version
+    NSString* latestVersion = nil;
+    
+    //get version from remote URL
+    versionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSION_URL]];
+    
+    //sanity check
+    if(nil == versionData)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //convert JSON to dictionary
+    versionDictionary = [NSJSONSerialization JSONObjectWithData:versionData options:0 error:nil];
+    
+    //sanity check
+    if(nil == versionDictionary)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //extract latest version
+    latestVersion = versionDictionary[@"latestVersion"];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"latest version: %@", latestVersion]);
+    
+//bail
+bail:
+    
+    return latestVersion;
+}
+
 
 
 //check if process is alive
@@ -962,22 +1048,47 @@ BOOL isDaemonInstance()
     return isDaemon;
 }
 
+//TODO: if we only support yosemite+, can just call API, with no version checks!
 //determine menu mode
 // ->only in Yosemite!
 BOOL isMenuDark()
 {
+    //flag indicating Yosemite+
+    // ->static, so 'saved'
+    static int isYosemite = -1;
+    
     //flag
     BOOL isDark = NO;
     
     //OS version info
     NSDictionary* osVersionInfo = nil;
     
-    //get OS version info
-    osVersionInfo = getOSVersion();
+    //get version number
+    // ->only once
+    if(-1 == isYosemite)
+    {
+        //get OS version info
+        osVersionInfo = getOSVersion();
+        
+        //gotta be OS X 10.10 to check for dark menu
+        // note: can use 'containsString' API since code will only execute on Yosemite+
+        if([osVersionInfo[@"minorVersion"] intValue] >= 10)
+        {
+            //set flag
+            isYosemite = YES;
+        }
+        //otherwise
+        // ->pre-yosemite, so unset flag
+        else
+        {
+            //unset
+            isYosemite = NO;
+        }
+    }
     
     //gotta be OS X 10.10 to check for dark menu
     // note: can use 'containsString' API since code will only execute on Yosemite+
-    if([osVersionInfo[@"minorVersion"] intValue] >= 10)
+    if(YES == isYosemite)
     {
         //set flag
         isDark = [[[NSAppearance currentAppearance] name] containsString:NSAppearanceNameVibrantDark];

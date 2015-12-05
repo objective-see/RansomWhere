@@ -27,6 +27,11 @@
 //button title
 @property(nonatomic, retain)NSString* actionButtonTitle;
 
+//overlay view
+@property (weak) IBOutlet NSView *overlayView;
+
+//spinner
+@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 
 /* METHODS */
 

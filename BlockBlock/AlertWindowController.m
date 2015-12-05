@@ -6,18 +6,18 @@
 //  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
-#import "AlertWindowController.h"
+#import "Consts.h"
+#import "Logging.h"
 #import "AlertView.h"
+#import "Utilities.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
-#import "Logging.h"
-#import "Consts.h"
-#import "Utilities.h"
+#import "AlertWindowController.h"
 
 
-#import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
+#import <QuartzCore/QuartzCore.h>
 
 
 @interface AlertWindowController ()
@@ -49,6 +49,9 @@
 {
     //super
     [super windowDidLoad];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process heirarchy: %@", self.processHierarchy]);
     
     //tracking area for buttons
     NSTrackingArea* trackingArea = nil;
@@ -141,8 +144,6 @@
             continue;
         }
         
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking for %@ in object", key]);
-        
         //get instance variable by name
         instanceVariable = class_getInstanceVariable([self class], [[NSString stringWithFormat:@"_%s", [key UTF8String]] UTF8String]);
         
@@ -182,7 +183,7 @@
     
     //make sure text's fits
     // ->some might be multiple lines...
-    [self adjust2Fit];
+    //[self adjust2Fit];
     
     //center alert
     [[self window] center];

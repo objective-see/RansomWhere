@@ -255,25 +255,30 @@
     // ->need name/path
     parentProcessObj = [((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList objectForKey:[NSNumber numberWithInt:parentID]];
     
-    //extract ppid/name from process obj
+    //extract name from process obj
     if(nil != parentProcessObj)
     {
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got parent process from list: %@", parentProcessObj]);
-        
-        //name
-        parentProcess[@"name"] = parentProcessObj.name;
-        
+        //save name
+        if( (nil != parentProcessObj.name) &&
+            (0 != parentProcessObj.name.length) )
+        {
+            //name
+            parentProcess[@"name"] = parentProcessObj.name;
+        }
+        //not known
+        // ->just set to 'unknown'
+        else
+        {
+            //dunno
+            parentProcess[@"name"]  = @"unknown";
+        }
     }
     //look it up manually
     else
     {
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"didn't find %d, looking up manually", processID]);
-        
         //get path from pid
         if(0 != proc_pidpath(parentID, parentPath, PROC_PIDPATHINFO_MAXSIZE))
         {
-            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"pidPath %s", parentPath]);
-            
             //save name
             // ->since 'proc_pidpath()' returns full path strip to get name
             parentProcess[@"name"] = [[NSString stringWithUTF8String:parentPath] lastPathComponent];
@@ -285,7 +290,7 @@
             // ->just set it to 'kernel_task'
             if(0 == parentID)
             {
-                //dunno
+                //k-task
                 parentProcess[@"name"]  = @"kernel_task";
             }
             //couldn't find
@@ -305,7 +310,8 @@ bail:
     return parentProcess;
 }
 
-                            
+//build an array of processes ancestry
+// ->start with process and go 'back' till initial ancestor (likely kernel_task or launchd)
 -(NSMutableArray*)buildProcessHierarchy
 {
     //process hierarchy
@@ -317,15 +323,32 @@ bail:
     //current process id
     pid_t processID = -1;
     
+    //current process name
+    NSString* processName = nil;
+    
     //alloc list for process hierarchy
     processHierarchy = [NSMutableArray array];
     
-    //start with leaf process
+    //start with current process
+    // ->pid
     processID = self.process.pid;
     
-    //add current (leaf) process
-    // ->always at front
-    [processHierarchy insertObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:self.process.pid], @"pid", self.process.name, @"name", nil] atIndex:0];
+    //start with current process
+    // ->name
+    processName = self.process.name;
+    
+    //sanity check
+    // ->when current process doesn't have a name, init to 'unknown'
+    if( (nil == processName) ||
+        (0 == processName.length) )
+    {
+        //dunno
+        processName = @"unknown";
+    }
+    
+    //add current process (leaf)
+    // ->other processes (parents) are added at front...
+    [processHierarchy addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:self.process.pid], @"pid", processName, @"name", nil]];
   
     //add until we get to to root (kernel_task)
     // ->or error out
@@ -337,21 +360,24 @@ bail:
         //bail if parent process is nil
         // ->or if process pid matches parent
         if( (nil == parentProcessInfo) ||
+            (0 == parentProcessInfo.count) ||
             (processID == [parentProcessInfo[@"pid"] intValue]) )
         {
             //bail
             break;
         }
         
-        //add info
+        //add parent process
         // ->always at front
         [processHierarchy insertObject:parentProcessInfo atIndex:0];
         
-        //get parent's process id
+        //now
+        // ->get parent's process id as current pid
         processID = [parentProcessInfo[@"pid"] intValue];
     }
     
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"FINAL processHierarchy %@", processHierarchy]);
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"processHierarchy %@", processHierarchy]);
     
     //add the index value to each process in the hierarchy
     // ->used to populate outline/table
@@ -363,7 +389,6 @@ bail:
     
     return processHierarchy;
 }
-
 
 //check if something is nil
 // ->if so, return a default ('unknown') value

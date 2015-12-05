@@ -236,15 +236,13 @@
 //max number of items in process list
 #define PROCESS_LIST_MAX_SIZE 64
 
-//disabled state
-#define STATE_DISABLED 0
-
-//enabled state
-#define STATE_ENABLED 1
-
 //prefs
 // ->enable logging
 #define PREF_ENABLE_LOGGING @"enableLogging"
+
+//prefs
+// ->run in passive mode
+#define PREF_PASSIVE_MODE @"passiveMode"
 
 //prefs
 // ->disable update check

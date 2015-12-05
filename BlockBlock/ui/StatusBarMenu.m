@@ -288,8 +288,7 @@
     prefsWindowController = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).prefsWindowController;
     
     //show pref window
-    //TODO: is nil ok?
-    [prefsWindowController showWindow:nil];
+    [prefsWindowController showWindow:sender];
     
     //invoke function in background that will make window modal
     // ->waits until window is non-nil

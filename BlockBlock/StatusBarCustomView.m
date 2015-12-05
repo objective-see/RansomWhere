@@ -78,9 +78,10 @@
     return;
 }
 
-- (void)mouseDown:(NSEvent *)theEvent
+-(void)mouseDown:(NSEvent *)theEvent
 {
-    //logMsg(LOG_DEBUG, @"MOUSE DOWN EVENT");
+    //dbg msg
+    logMsg(LOG_DEBUG, @"MOUSE DOWN EVENT");
     
     //update
     [self setNeedsDisplay:YES];
@@ -90,8 +91,5 @@
     //update
     [self setNeedsDisplay:YES];
 }
-
-
-
 
 @end

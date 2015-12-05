@@ -59,6 +59,12 @@ NSMutableArray* getUsers();
 //get curent version
 NSString* getVersion(NSUInteger instance);
 
+//query interwebz to get latest version
+NSString* getLatestVersion();
+
+//determine if there is a new version
+NSInteger isNewVersion(NSMutableString* errMsg);
+
 //check if process is alive
 BOOL isProcessAlive(pid_t processID);
 

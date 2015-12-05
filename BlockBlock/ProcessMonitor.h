@@ -14,8 +14,9 @@
 struct processStartEvent
 {
     //process pid
+    // ->id's all chunks
     pid_t pid;
-    
+
     //process uid
     uid_t uid;
     
@@ -26,6 +27,8 @@ struct processStartEvent
     char path[0];
 };
 
+
+
 @interface ProcessMonitor : NSObject
 {
     
@@ -33,7 +36,8 @@ struct processStartEvent
 
 /* PROPERTIES */
 
-@property (nonatomic, retain)OrderedDictionary* processList;
+@property(nonatomic, retain)OrderedDictionary* processList;
+@property(nonatomic, retain)NSMutableDictionary* partialProcessEvents;
 
 
 /* METHODS */

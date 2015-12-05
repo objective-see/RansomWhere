@@ -407,7 +407,7 @@ bail:
         //extract watch event uuid (from daemon)
         watchEventUUID = notification.userInfo[KEY_WATCH_EVENT_UUID];
         
-        //make sure its not nil
+        //make sure it's not nil
         // ->since passing it back, and can't have nil in a dictioanary
         if(nil == watchEventUUID)
         {
@@ -418,10 +418,21 @@ bail:
         //send off to daemon
         // ->for now, just say it was allowed
         [self sendActionToDaemon:@{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT]}];
-         
     }
     
-    //UI is enabled
+    //handle case where passive mode is enabled
+    // ->just log
+    else if(YES == ((AppDelegate*)[[NSApplication sharedApplication] delegate]).prefsWindowController.passiveMode)
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"passive mode enable, so not showing alert");
+        
+        //dbg msg
+        // ->and log to file (if logging is enabled)
+        logMsg(LOG_DEBUG|LOG_TO_FILE, [NSString stringWithFormat:@"%@ %@ (%@ -> %@)", notification.userInfo[@"processPath"], notification.userInfo[@"alertMsg"],notification.userInfo[@"itemFile"], notification.userInfo[@"itemBinary"]]);
+    }
+    
+    //UI is enabled, and passive move is not enabled
     // ->show alert, which will provide buttons to user
     //   on click, will send action back to daemon
     else
@@ -429,16 +440,16 @@ bail:
         //dbg msg
         logMsg(LOG_DEBUG, @"showing alert to user");
         
+        //dbg msg
+        // ->and log to file (if logging is enabled)
+        logMsg(LOG_DEBUG|LOG_TO_FILE, [NSString stringWithFormat:@"%@ %@ (%@ -> %@)", notification.userInfo[@"processPath"], notification.userInfo[@"alertMsg"],notification.userInfo[@"itemFile"], notification.userInfo[@"itemBinary"]]);
+
         //alloc/init
         alertWindowController = [[AlertWindowController alloc] initWithWindowNibName:@"AlertWindowController"];
         
         //configure alert window with data from daemon
         [alertWindowController configure:notification.userInfo];
-        
-        //dbg msg
-        // ->and log to file (if logging is enabled)
-        logMsg(LOG_DEBUG|LOG_TO_FILE, [NSString stringWithFormat:@"%@ %@ (%@ -> %@)", alertWindowController.processPath.stringValue, alertWindowController.alertMsg.stringValue, alertWindowController.itemFile.stringValue, alertWindowController.itemBinary.stringValue]);
-
+    
         //show (now configured), alert
         [alertWindowController showWindow:self];
     }

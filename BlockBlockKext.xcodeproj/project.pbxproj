@@ -1,0 +1,284 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7D774F1F1C01389100A9CCE4 /* BlockBlockKext.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D774F1D1C01389100A9CCE4 /* BlockBlockKext.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7D20D68D1BFDAA7D00FD6ECF /* BlockBlock.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlockBlock.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D774F1D1C01389100A9CCE4 /* BlockBlockKext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BlockBlockKext.c; path = BlockBlockKext/BlockBlockKext.c; sourceTree = SOURCE_ROOT; };
+		7D774F1E1C01389100A9CCE4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BlockBlockKext/Info.plist; sourceTree = SOURCE_ROOT; };
+		7DC6C0F01C042BC70014090A /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Consts.h; path = BlockBlockKext/Consts.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7D20D6891BFDAA7D00FD6ECF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7D20D6831BFDAA7D00FD6ECF = {
+			isa = PBXGroup;
+			children = (
+				7D20D68F1BFDAA7D00FD6ECF /* BlockBlockKext */,
+				7D20D68E1BFDAA7D00FD6ECF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7D20D68E1BFDAA7D00FD6ECF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7D20D68D1BFDAA7D00FD6ECF /* BlockBlock.kext */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7D20D68F1BFDAA7D00FD6ECF /* BlockBlockKext */ = {
+			isa = PBXGroup;
+			children = (
+				7DC6C0F01C042BC70014090A /* Consts.h */,
+				7D774F1D1C01389100A9CCE4 /* BlockBlockKext.c */,
+				7D774F1E1C01389100A9CCE4 /* Info.plist */,
+			);
+			name = BlockBlockKext;
+			path = BlockBlockKext2;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		7D20D68A1BFDAA7D00FD6ECF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		7D20D68C1BFDAA7D00FD6ECF /* BlockBlockKext */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7D20D6951BFDAA7D00FD6ECF /* Build configuration list for PBXNativeTarget "BlockBlockKext" */;
+			buildPhases = (
+				7D20D6881BFDAA7D00FD6ECF /* Sources */,
+				7D20D6891BFDAA7D00FD6ECF /* Frameworks */,
+				7D20D68A1BFDAA7D00FD6ECF /* Headers */,
+				7D20D68B1BFDAA7D00FD6ECF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BlockBlockKext;
+			productName = BlockBlockKext2;
+			productReference = 7D20D68D1BFDAA7D00FD6ECF /* BlockBlock.kext */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7D20D6841BFDAA7D00FD6ECF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = "Objective-See";
+				TargetAttributes = {
+					7D20D68C1BFDAA7D00FD6ECF = {
+						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = VBG97UB4TA;
+					};
+				};
+			};
+			buildConfigurationList = 7D20D6871BFDAA7D00FD6ECF /* Build configuration list for PBXProject "BlockBlockKext" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7D20D6831BFDAA7D00FD6ECF;
+			productRefGroup = 7D20D68E1BFDAA7D00FD6ECF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7D20D68C1BFDAA7D00FD6ECF /* BlockBlockKext */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7D20D68B1BFDAA7D00FD6ECF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7D20D6881BFDAA7D00FD6ECF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D774F1F1C01389100A9CCE4 /* BlockBlockKext.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7D20D6931BFDAA7D00FD6ECF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MODULE_START = "";
+				MODULE_STOP = "";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		7D20D6941BFDAA7D00FD6ECF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MODULE_START = "";
+				MODULE_STOP = "";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7D20D6961BFDAA7D00FD6ECF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				INFOPLIST_FILE = BlockBlockKext/Info.plist;
+				MODULE_NAME = "com.objective-see.BlockBlockKext";
+				MODULE_START = start;
+				MODULE_STOP = stop;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.kext.BlockBlock";
+				PRODUCT_NAME = BlockBlock;
+				PROVISIONING_PROFILE = "";
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Debug;
+		};
+		7D20D6971BFDAA7D00FD6ECF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				INFOPLIST_FILE = BlockBlockKext/Info.plist;
+				MODULE_NAME = "com.objective-see.BlockBlockKext";
+				MODULE_START = start;
+				MODULE_STOP = stop;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.kext.BlockBlock";
+				PRODUCT_NAME = BlockBlock;
+				PROVISIONING_PROFILE = "";
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7D20D6871BFDAA7D00FD6ECF /* Build configuration list for PBXProject "BlockBlockKext" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D20D6931BFDAA7D00FD6ECF /* Debug */,
+				7D20D6941BFDAA7D00FD6ECF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7D20D6951BFDAA7D00FD6ECF /* Build configuration list for PBXNativeTarget "BlockBlockKext" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D20D6961BFDAA7D00FD6ECF /* Debug */,
+				7D20D6971BFDAA7D00FD6ECF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7D20D6841BFDAA7D00FD6ECF /* Project object */;
+}

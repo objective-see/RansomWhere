@@ -105,4 +105,8 @@
 //initialize status menu bar
 -(void)loadStatusBar;
 
+//AGENT METHOD
+// ->check for update
+-(void)checkForUpdate;
+
 @end

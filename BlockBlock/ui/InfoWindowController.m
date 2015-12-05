@@ -18,9 +18,11 @@
 
 
 @synthesize infoLabel;
+@synthesize overlayView;
 @synthesize actionButton;
 @synthesize infoLabelString;
 @synthesize actionButtonTitle;
+@synthesize progressIndicator;
 
 
 //automatically called when nib is loaded
@@ -29,6 +31,8 @@
 {
     //center
     [self.window center];
+    
+    return;
 }
 
 //automatically invoked when window is loaded
@@ -57,6 +61,7 @@
 }
 
 //save the main label's & button title's text
+// ->invoked before window is loaded (and thus buttons, etc are nil)
 -(void)configure:(NSString*)label buttonTitle:(NSString*)buttonTitle
 {
     //save label's string
@@ -68,17 +73,132 @@
     return;
 }
 
+//invoked when user clicks 'check for updates' button
+// ->invoke method on app delegate that checks/displays result
+-(IBAction)updateBtnHandler:(id)sender
+{
+    //version string
+    NSMutableString* versionString = nil;
+    
+    //version flag
+    NSInteger versionFlag = -1;
+    
+    //alloc string
+    versionString = [NSMutableString string];
+    
+    //pre-req
+    [self.overlayView setWantsLayer:YES];
+    
+    //set overlay's view color to black
+    self.overlayView.layer.backgroundColor = [NSColor whiteColor].CGColor;
+    
+    //make it semi-transparent
+    self.overlayView.alphaValue = 0.75;
+    
+    //show it
+    self.overlayView.hidden = NO;
+    
+    //disable 'update' check button
+    ((NSButton*)sender).enabled = NO;
+    
+    //disable close button
+    self.actionButton.enabled = NO;
+    
+    //remove detailed textz
+    self.infoLabel.stringValue = @"";
+    
+    //show spinner
+    self.progressIndicator.hidden = NO;
+    
+    //animate it
+    [self.progressIndicator startAnimation:nil];
+    
+    //get version flag
+    versionFlag = isNewVersion(versionString);
+    
+    //delay so UI shows spinner, etc
+    // ->then process version logic
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+    {
+        //run on main thread for UI updates, etc
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            
+        //hide spinner
+        self.progressIndicator.hidden = YES;
+        
+        //hide overlay
+        self.overlayView.hidden = YES;
+        
+        //take action based on version
+        // ->show error, new version msg, etc
+        switch(versionFlag)
+        {
+            //error
+            // ->show err msg
+            case -1:
+                
+                //red for error
+                self.infoLabel.textColor = [NSColor redColor];
+                
+                //set label
+                self.infoLabel.stringValue = @"error, update check failed :(";
+                
+                //set button title
+                self.actionButton.title = @"close";
+                
+                break;
+                
+            //new version
+            case YES:
+                
+                //set label
+                self.infoLabel.stringValue = [NSString stringWithFormat:@"a new version (%@) is available", versionString];
+                
+                //set button title
+                self.actionButton.title = @"update";
+                
+                break;
+                
+            //no new version
+            case NO:
+                
+                //set label
+                self.infoLabel.stringValue = [NSString stringWithFormat:@"your version, (%@), is current", versionString];
+                
+                //set button title
+                self.actionButton.title = @"close";
+                
+                break;
+                
+            default:
+                
+                break;
+        }
+            
+        //always enable action button
+        self.actionButton.enabled = YES;
+        
+        }); //dispatch on main thread
+        
+    }); //dispatch for delay
+    
+    return;
+}
+
 //invoked when user clicks button
 // ->trigger action such as opening product website, updating, etc
 -(IBAction)buttonHandler:(id)sender
 {
-    //for now, all actions just open blockblock's webpage
+    //handle 'update' / 'more info', etc
+    // ->open BB's webpage
+    if(YES != [((NSButton*)sender).title isEqualToString:@"close"])
+    {
+        //open URL
+        // ->invokes user's default browser
+        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:PRODUCT_URL]];
+    }
     
-    //open URL
-    // ->invokes user's default browser
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:PRODUCT_URL]];
-    
-    //then close window
+    //always close window
     [[self window] close];
         
     return;

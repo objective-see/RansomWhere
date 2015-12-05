@@ -39,9 +39,7 @@
 //@synthesize alertWindowController;
 
 
-//TODO: dtrace perf issue :/
 //TODO: sandbox'd login items
-
 //TODO: signature status in alert! (signed, etc)
 
 //automatically invoked when app is loaded
@@ -303,7 +301,8 @@
             //load prefs
             [self.prefsWindowController loadPreferences];
 
-            //check for updates if user has not disabled that feature
+            //check for updates
+            // ->but only when user has not disabled that feature
             //TODO: test!!
             if(YES != self.prefsWindowController.disableUpdateCheck)
             {
@@ -311,9 +310,8 @@
                 //->check for updates in background
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
                 {
-                   //check
-                   [self checkForUpdate];
-                    
+                    //check
+                    [self checkForUpdate];
                 });
             }
             
@@ -514,57 +512,18 @@ bail:
 }
 
 //AGENT METHOD
-//check for update
+// ->check for update
 -(void)checkForUpdate
 {
-    //installed version
-    NSString* installedVersion = nil;
+    //version string
+    NSMutableString* versionString = nil;
     
-    //version data
-    NSData* versionData = nil;
-    
-    //version dictionary
-    NSDictionary* versionDictionary = nil;
-    
-    //latest version
-    NSString* latestVersion = nil;
-    
-    //get installed version
-    installedVersion = getAppVersion();
-    
-    //get version from remote URL
-    versionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSION_URL]];
-    
-    //sanity check
-    if(nil == versionData)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //convert JSON to dictionary
-    versionDictionary = [NSJSONSerialization JSONObjectWithData:versionData options:0 error:nil];
-    
-    //sanity check
-    if(nil == versionDictionary)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //extract latest version
-    latestVersion = versionDictionary[@"latestVersion"];
-    
-    //sanity check
-    if(nil == latestVersion)
-    {
-        //bail
-        goto bail;
-    }
+    //alloc string
+    versionString = [NSMutableString string];
     
     //check if available version is newer
     // ->show update window
-    if(NSOrderedAscending == [installedVersion compare:latestVersion options:NSNumericSearch])
+    if(YES == isNewVersion(versionString))
     {
         //new version!
         // ->show update popup on main thread
@@ -574,7 +533,7 @@ bail:
             infoWindowController = [[InfoWindowController alloc] initWithWindowNibName:@"InfoWindow"];
             
             //configure
-            [self.infoWindowController configure:[NSString stringWithFormat:@"a new version (%@) is available", latestVersion] buttonTitle:@"update"];
+            [self.infoWindowController configure:[NSString stringWithFormat:@"a new version (%@) is available", versionString] buttonTitle:@"update"];
             
             //center window
             [[self.infoWindowController window] center];
