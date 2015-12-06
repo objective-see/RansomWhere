@@ -180,9 +180,8 @@
         }
         
         //if app binary is present
-        // ->just delete it, unless its the instance that's running!
-        if( (YES != [[[NSBundle mainBundle] bundlePath] isEqualToString:APPLICATION_PATH]) &&
-            (YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH]))
+        // ->just delete it
+        if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
         {
             //dbg msg
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found: %@", APPLICATION_PATH]);

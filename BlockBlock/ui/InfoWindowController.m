@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Objective-See, LLC. All rights reserved.
 //
 
-
 #import "Consts.h"
 #import "Logging.h"
 #import "Utilities.h"
@@ -16,9 +15,9 @@
 
 @implementation InfoWindowController
 
-
 @synthesize infoLabel;
 @synthesize overlayView;
+@synthesize firstButton;
 @synthesize actionButton;
 @synthesize infoLabelString;
 @synthesize actionButtonTitle;
@@ -50,6 +49,14 @@
     
     //set button text
     self.actionButton.title = self.actionButtonTitle;
+
+    //hide first button when action is 'update'
+    // ->don't need update check button ;)
+    if(YES == [self.actionButton.title isEqualToString:@"update"])
+    {
+        //hide
+        self.firstButton.hidden = YES;
+    }
     
     //make it key window
     [self.window makeKeyAndOrderFront:self];
@@ -81,7 +88,7 @@
     NSMutableString* versionString = nil;
     
     //version flag
-    NSInteger versionFlag = -1;
+    __block NSInteger versionFlag = -1;
     
     //alloc string
     versionString = [NSMutableString string];
@@ -113,9 +120,15 @@
     //animate it
     [self.progressIndicator startAnimation:nil];
     
-    //get version flag
-    versionFlag = isNewVersion(versionString);
-    
+    //run version check on BG thread
+    // ->don't want to block UI thread
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        
+        //get version flag
+        versionFlag = isNewVersion(versionString);
+        
+    });
+
     //delay so UI shows spinner, etc
     // ->then process version logic
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
@@ -152,7 +165,7 @@
             case YES:
                 
                 //set label
-                self.infoLabel.stringValue = [NSString stringWithFormat:@"a new version (%@) is available", versionString];
+                self.infoLabel.stringValue = [NSString stringWithFormat:@"a new version (%@) is available!", versionString];
                 
                 //set button title
                 self.actionButton.title = @"update";

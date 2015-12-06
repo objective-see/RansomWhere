@@ -1048,7 +1048,6 @@ BOOL isDaemonInstance()
     return isDaemon;
 }
 
-//TODO: if we only support yosemite+, can just call API, with no version checks!
 //determine menu mode
 // ->only in Yosemite!
 BOOL isMenuDark()

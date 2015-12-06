@@ -8,6 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="InfoWindowController">
             <connections>
                 <outlet property="actionButton" destination="tDD-5C-L8e" id="VA6-H5-ZZO"/>
+                <outlet property="firstButton" destination="Igd-bt-R7A" id="ocU-Rd-7oX"/>
                 <outlet property="infoLabel" destination="OSm-xS-Dmd" id="Ffv-9q-5a6"/>
                 <outlet property="overlayView" destination="afp-ji-No6" id="qDV-BW-3l3"/>
                 <outlet property="progressIndicator" destination="1oq-WT-B5T" id="f6G-ch-c3m"/>

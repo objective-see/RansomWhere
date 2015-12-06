@@ -310,6 +310,9 @@
                 //->check for updates in background
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
                 {
+                    //dbg msg
+                    logMsg(LOG_DEBUG, @"checking for update");
+                    
                     //check
                     [self checkForUpdate];
                 });
@@ -525,6 +528,9 @@ bail:
     // ->show update window
     if(YES == isNewVersion(versionString))
     {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"a new version (%@) is available", versionString]);
+        
         //new version!
         // ->show update popup on main thread
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -533,7 +539,7 @@ bail:
             infoWindowController = [[InfoWindowController alloc] initWithWindowNibName:@"InfoWindow"];
             
             //configure
-            [self.infoWindowController configure:[NSString stringWithFormat:@"a new version (%@) is available", versionString] buttonTitle:@"update"];
+            [self.infoWindowController configure:[NSString stringWithFormat:@"a new version (%@) is available!", versionString] buttonTitle:@"update"];
             
             //center window
             [[self.infoWindowController window] center];
@@ -543,9 +549,14 @@ bail:
             
         });
     }
-    
-//bail
-bail:
+
+    //no new version
+    // ->just (debug) log msg
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"no updates available");
+    }
     
     return;
 }

@@ -16,22 +16,25 @@
 /* PROPERTIES */
 
 //version label/string
-@property (weak) IBOutlet NSTextField *infoLabel;
+@property(weak)IBOutlet NSTextField *infoLabel;
 
 //action button
-@property (weak) IBOutlet NSButton *actionButton;
+@property(weak)IBOutlet NSButton *actionButton;
 
 //label string
 @property(nonatomic, retain)NSString* infoLabelString;
+
+//first button ('update check')
+@property(weak)IBOutlet NSView *firstButton;
 
 //button title
 @property(nonatomic, retain)NSString* actionButtonTitle;
 
 //overlay view
-@property (weak) IBOutlet NSView *overlayView;
+@property(weak)IBOutlet NSView *overlayView;
 
 //spinner
-@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
+@property(weak)IBOutlet NSProgressIndicator *progressIndicator;
 
 /* METHODS */
 
