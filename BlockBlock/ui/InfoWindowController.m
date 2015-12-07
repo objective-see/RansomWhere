@@ -120,19 +120,13 @@
     //animate it
     [self.progressIndicator startAnimation:nil];
     
-    //run version check on BG thread
-    // ->don't want to block UI thread
-    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        
+    //delay so UI shows spinner, etc
+    // ->then process version logic
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+    {
         //get version flag
         versionFlag = isNewVersion(versionString);
         
-    });
-
-    //delay so UI shows spinner, etc
-    // ->then process version logic
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
-    {
         //run on main thread for UI updates, etc
         dispatch_sync(dispatch_get_main_queue(), ^{
             
@@ -176,7 +170,8 @@
             case NO:
                 
                 //set label
-                self.infoLabel.stringValue = [NSString stringWithFormat:@"your version, (%@), is current", versionString];
+                // ->versions should be the same, but we'll use getAppVersion() (since beta's might be newer than what's live)
+                self.infoLabel.stringValue = [NSString stringWithFormat:@"your version, (%@), is current", getAppVersion()];
                 
                 //set button title
                 self.actionButton.title = @"close";

@@ -25,7 +25,9 @@
 
 @implementation InterProcComms
 
+@synthesize alertWindows;
 @synthesize registeredAgents;
+@synthesize alertWindowController;
 @synthesize errorWindowController;
 
 -(id)init
@@ -40,6 +42,9 @@
         
         //alloc dictionary for registered agents
         registeredAgents = [NSMutableDictionary dictionary];
+        
+        //alert windows
+        alertWindows = [NSMutableSet set];
     }
     
     return self;
@@ -219,14 +224,26 @@
 //AGENT METHOD
 //notify background (daemon) instance what user selected
 // ->notification will contain dictionary w/ watch event UUID and action (block | allow | disabled)
--(void)sendActionToDaemon:(NSDictionary*)actionInfo
+-(void)sendActionToDaemon:(NSMutableDictionary*)actionInfo
 {
-    //user selection
-    //NSDictionary* userSelection = nil;
+    //first remove alert window for array
+    // ->this is how we can have multiple windows, without memory issues
+    @synchronized(self.alertWindows)
+    {
+        //TODO: remove
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"alert windows: %@/%@", self.alertWindows, actionInfo[KEY_ALERT_WINDOW]]);
+        
+        //remove
+        [self.alertWindows removeObject:actionInfo[KEY_ALERT_WINDOW]];
+    }
     
-    //init dictionary
-    // ->contains watch event UUID and action (block | allow)
-    //userSelection = @{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:action]};
+    //remove 'alert window' from dictionary
+    // ->don't need it anymore, plus can't pass pointers/objects anyways
+    if(nil != actionInfo[KEY_ALERT_WINDOW])
+    {
+        //remove
+        [actionInfo removeObjectForKey:KEY_ALERT_WINDOW];
+    }
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to daemon", actionInfo]);
@@ -292,7 +309,6 @@
         // ->just use active user as session
         else if( (PLUGIN_TYPE_LOGIN_ITEM != watchEvent.plugin.type) ||
                  (0 == targetUID) )
-    
         {
             //get active user
             activeUser = getCurrentConsoleUser();
@@ -361,7 +377,6 @@ bail:
     return;
 }
 
-
 //AGENT METHOD
 //display alert in UI
 // ->invoked from daemon to/on UI (agent)
@@ -373,9 +388,8 @@ bail:
     //target session uid
     uid_t targetUID = -1;
     
-    //alert window controller
-    // ->used to show alert window to user
-    AlertWindowController* alertWindowController = nil;
+    //alert window
+    AlertWindowController* alertWindow = nil;
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got request from daemon to show alert (ui) :%d/%@", getpid(), getCurrentConsoleUser()]);
@@ -444,14 +458,21 @@ bail:
         // ->and log to file (if logging is enabled)
         logMsg(LOG_DEBUG|LOG_TO_FILE, [NSString stringWithFormat:@"%@ %@ (%@ -> %@)", notification.userInfo[@"processPath"], notification.userInfo[@"alertMsg"],notification.userInfo[@"itemFile"], notification.userInfo[@"itemBinary"]]);
 
-        //alloc/init
-        alertWindowController = [[AlertWindowController alloc] initWithWindowNibName:@"AlertWindowController"];
+        //alloc
+        alertWindow = [[AlertWindowController alloc] initWithWindowNibName:@"AlertWindowController"];
         
         //configure alert window with data from daemon
-        [alertWindowController configure:notification.userInfo];
+        [alertWindow configure:notification.userInfo];
     
         //show (now configured), alert
-        [alertWindowController showWindow:self];
+        [alertWindow showWindow:self];
+        
+        //sync to save
+        @synchronized(self.alertWindows)
+        {
+            //save
+            [self.alertWindows addObject:alertWindow];
+        }
     }
     
 //bail

@@ -16,19 +16,13 @@
 @interface AlertWindowController : NSWindowController <NSWindowDelegate>
 {
 
-    //iVars
 }
 
 @property (nonatomic, strong) NSWindowController *windowController;
 
-//menu (in status bar)
 
 //top/main view
 @property (weak) IBOutlet AlertView *mainView;
-
-//pointer to self
-// ->ensure that memory isn't prematurely released
-@property (strong, nonatomic)AlertWindowController* instance;
 
 //top
 // ->alert msg
@@ -125,16 +119,6 @@
 
 //configure the alert with the info from the daemon
 -(void)configure:(NSDictionary*)alertInfo;
-
-//increase size of element
--(void)increaseElementHeight:(NSControl*)element height:(float)height;
-
-//shift an element
--(void)shiftElementVertically:(NSControl*)element shift:(float)shift;
-
-//find the max width available in the text field
-// ->takes into account font, and word-wrapping breaks!
--(float)findMaxWidth:(NSTextField*)textField;
 
 //when user clicks 'allow'
 -(IBAction)allow:(id)sender;

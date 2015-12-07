@@ -179,14 +179,8 @@ bail:
 // ->basically expands all '~'s into valid (registered) users
 -(void)updateWatchedPaths:(NSMutableDictionary*)registeredAgents
 {
-    //updated mappings
-    NSMutableDictionary* updatedPluginMappings = nil;
-    
     //expanded path
     NSString* expandedPath = nil;
-    
-    //alloc
-    updatedPluginMappings = [NSMutableDictionary dictionary];
     
     //dbg msg
     logMsg(LOG_DEBUG, @"updating watch paths");
@@ -235,7 +229,6 @@ bail:
                     pluginMappings[expandedPath] = plugin;
                 }
             }
-            
             
             //just save mapping
             // ->key is path, value is plugin
@@ -600,6 +593,9 @@ bail:
         // ->just create a process object with only a pid/ppid :/
         if(nil == watchEvent.process)
         {
+            //dbg msg
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find process (%d) in %@", fsEvent->pid, [processList description]]);
+            
             //create process object
             watchEvent.process = [[Process alloc] initWithPid:fsEvent->pid infoDictionary:@{@"ppid": [NSNumber numberWithInt:parentID]}];
         }

@@ -951,9 +951,6 @@ NSString* stringByTruncatingString(NSTextField* textField, float width)
     //trucated string (with ellipis)
     NSMutableString *truncatedString = nil;
     
-    //attributed string
-    //NSAttributedString* attributedString = nil;
-    
     //offset of last '/'
     NSRange lastSlash = {};
     

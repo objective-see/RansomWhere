@@ -134,9 +134,6 @@
 // ->handle extra logic to turn on logging as well
 -(IBAction)togglePassiveMode:(id)sender
 {
-    //TODO: remove
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@" passive mode: %d / logging: %d", ((NSButton*)sender).state, self.enableLoggingBtn.state]);
-    
     //passive mode enabled
     // ->ensure logging is enabled as well
     if(NSOnState == ((NSButton*)sender).state)
@@ -145,7 +142,7 @@
         // ->enable, then disable button
         if(NSOnState != self.enableLoggingBtn.state)
         {
-            //TODO: remove
+            //dbg msg
             logMsg(LOG_DEBUG, @"selecting logging, then disabling");
             
             //select logging
@@ -166,7 +163,7 @@
         //deselect logging when it was enabled because of passive mode enablement
         if(YES == self.loggingViaPassive)
         {
-            //TODO: remove
+            //dbg msg
             logMsg(LOG_DEBUG, @"unselecting logging");
             
             //unselect logging (as well)
@@ -176,7 +173,7 @@
             self.loggingViaPassive = NO;
         }
         
-        //TODO: remove
+        //dbg msg
         logMsg(LOG_DEBUG, @"enabling logging button");
 
         //always enable logging button

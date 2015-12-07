@@ -295,14 +295,12 @@ bail:
         
         //close
         [self.window close];
-
     }
 
 //bail
 bail:
     
     return;
-
 }
 
 //button handler that's automatically invoked when user clicks '?' button (on an error)

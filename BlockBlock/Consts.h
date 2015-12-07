@@ -168,6 +168,9 @@
 //watch event uuid
 #define KEY_WATCH_EVENT_UUID @"watchEventUUID"
 
+//alert window
+#define KEY_ALERT_WINDOW @"alertWindow"
+
 //action
 #define KEY_ACTION @"action"
 

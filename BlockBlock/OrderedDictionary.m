@@ -63,6 +63,12 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
 	return self;
 }
 
+//description
+-(NSString*)description
+{
+    return dictionary.description;
+}
+
 - (id)copy
 {
 	return [self mutableCopy];

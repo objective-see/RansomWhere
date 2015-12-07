@@ -189,6 +189,7 @@
             //delete it
             if(YES != [[NSFileManager defaultManager] removeItemAtPath:APPLICATION_PATH error:&error])
             {
+                //TODO: use!!!!
                 //set flag
                 bAnyErrors = YES;
                 

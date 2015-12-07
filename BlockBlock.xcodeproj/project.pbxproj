@@ -539,7 +539,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/";
+			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n#cp -R -f /Users/patrickw/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext /Users/patrickw/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

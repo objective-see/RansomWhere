@@ -23,7 +23,13 @@
 @property NSUInteger uiState;
 
 //list of registered UI agents
-@property (nonatomic, retain)NSMutableDictionary* registeredAgents;
+@property(nonatomic, retain)NSMutableDictionary* registeredAgents;
+
+//set for alert windows
+@property(nonatomic, retain)NSMutableSet* alertWindows;
+
+//alert window
+@property(nonatomic, retain)AlertWindowController* alertWindowController;
 
 //error popup
 @property(nonatomic, retain)ErrorWindowController* errorWindowController;
@@ -69,7 +75,7 @@
 //AGENT METHOD
 //notify background (daemon) instance what user selected
 // ->sends info such as watch event UUID, action (block | allow | disabled), and optionally 'remember' state
--(void)sendActionToDaemon:(NSDictionary*)actionInfo;
+-(void)sendActionToDaemon:(NSMutableDictionary*)actionInfo;
 
 //AGENT METHOD
 //allow a agent (might be multiple in diff user sessions) to register w/ the daemon
