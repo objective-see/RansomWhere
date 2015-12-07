@@ -100,16 +100,16 @@
 @property (nonatomic, retain)NSNumber* pluginType;
 
 //parents window controller
-@property (strong) IBOutlet ParentsWindowController *ancestryViewController;
+@property (weak) IBOutlet ParentsWindowController *ancestryViewController;
 
 //ancestry outline view
 @property (weak) IBOutlet NSOutlineView *ancestryOutline;
 
 //ancestry view
-@property (strong) IBOutlet NSView *ancestorView;
+@property (weak) IBOutlet NSView *ancestorView;
 
 //ancestory popover
-@property (strong) IBOutlet NSPopover *popover;
+@property (weak) IBOutlet NSPopover *popover;
 
 //instance of single text cell (row)
 @property (weak) IBOutlet NSTextFieldCell *ancestorTextCell;
@@ -120,10 +120,11 @@
 //configure the alert with the info from the daemon
 -(void)configure:(NSDictionary*)alertInfo;
 
-//when user clicks 'allow'
--(IBAction)allow:(id)sender;
+//when user clicks 'block/allow'
+// ->send msg to daemon, and close window
+-(IBAction)doAction:(id)sender;
 
-//when user clicks 'deny'
--(IBAction)deny:(id)sender;
+//logic to close/remove popup from view
+-(void)deInitPopup;
 
 @end

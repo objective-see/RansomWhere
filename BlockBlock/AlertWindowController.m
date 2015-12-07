@@ -212,48 +212,50 @@
     return;
 }
 
-//automatically invoked when user clicks 'deny'
+//automatically invoked when user clicks 'block' or 'allow'
 // invokes 'sendActionToDaemon' so that notification will be sent/handled
--(void)deny:(id)sender
+-(void)doAction:(id)sender
 {
     //action info
     NSDictionary* actionInfo = nil;
     
-    //dbg msg
-    // ->and to file (if logging is enabled)
-    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'block'");
+    //action
+    // ->block or allow
+    NSInteger action = 0;
     
-    //init dictionary w/ action info
-    actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:BLOCK_WATCH_EVENT], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state], KEY_ALERT_WINDOW:self};
-    
-    //send notification to daemon
-    // ->block it!
-    [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendActionToDaemon:[actionInfo mutableCopy]];
-    
-    //close window
-    [self close];
-    
-    return;
-}
-
-//automatically invoked when user clicks 'allow'
-// invokes 'sendActionToDaemon' so that notification will be sent/handled
--(void)allow:(id)sender
-{
-    //action info
-    NSDictionary* actionInfo = nil;
+    //set action
+    // ->allow
+    if(sender == self.allowButton)
+    {
+        //allow
+        action = ALLOW_WATCH_EVENT;
+    }
+    //set action
+    // ->block
+    else
+    {
+        //allow
+        action = BLOCK_WATCH_EVENT;
+    }
     
     //dbg msg
     // ->and to file (if logging is enabled)
-    logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'allow'");
+    logMsg(LOG_DEBUG|LOG_TO_FILE, [NSString stringWithFormat:@"user clicked: %@", ((NSButton*)sender).title]);
     
     //init dictionary w/ action info
-    actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state], KEY_ALERT_WINDOW:self};
+    actionInfo = @{KEY_WATCH_EVENT_UUID:self.watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:action], KEY_REMEMBER:[NSNumber numberWithInteger:self.rememberButton.state], KEY_ALERT_WINDOW:self};
     
     //send notification to daemon
-    // ->allow it!
+    // ->will ignore or block it :)
     [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendActionToDaemon:[actionInfo mutableCopy]];
-
+    
+    //take care of popup
+    if(NSOnState == self.parentsButton.state)
+    {
+        //remove/close
+        [self deInitPopup];
+    }
+    
     //close window
     [self close];
     
@@ -270,13 +272,6 @@
     //reset button's image to original (visual) state
     [self.parentsButton setImage:[NSImage imageNamed:@"parentsIcon"]];
     
-    //always make sure popover is closed
-    if(NSOnState == self.parentsButton.state)
-    {
-        //close
-        [self.popover close];
-    }
-
     return;
 }
 
@@ -381,6 +376,22 @@
     //set new frame
     self.ancestorView.frame = popoverFrame;
     
+    return;
+}
+
+//logic to close/remove popup from view
+// ->needed, otherwise random memory issues occur :/
+-(void)deInitPopup
+{
+    //close
+    [self.popover close];
+        
+    //remove view
+    [self.ancestorView removeFromSuperview];
+    
+    //set to nil
+    self.popover = nil;
+
     return;
 }
 
