@@ -38,9 +38,10 @@
 //for testing
 //@synthesize alertWindowController;
 
-
 //TODO: sandbox'd login items
 //TODO: signature status in alert! (signed, etc)
+//TODO: GDC proc monitoring?
+
 
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
@@ -64,7 +65,6 @@
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"applicationDidFinishLaunching: loaded in process %d as %d\n", getpid(), geteuid()]);
-    
     
     /* BEGIN: FOR TESTING ALERT WINDOW */
     /*
@@ -303,7 +303,6 @@
 
             //check for updates
             // ->but only when user has not disabled that feature
-            //TODO: test!!
             if(YES != self.prefsWindowController.disableUpdateCheck)
             {
                 //after a minute

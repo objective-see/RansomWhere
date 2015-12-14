@@ -31,8 +31,10 @@
 //alert window
 @property(nonatomic, retain)AlertWindowController* alertWindowController;
 
-//error popup
-@property(nonatomic, retain)ErrorWindowController* errorWindowController;
+//error windows
+// ->might be several at once, so save each into array
+//   see: http://stackoverflow.com/questions/11677043/nswindowcontrollers-window-released-immediately
+@property(nonatomic, retain)NSMutableArray* errorWindows;
 
 
 /* METHODS */

@@ -444,12 +444,12 @@ bail:
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"stopping kext with %@", parameters]);
     
-    //load kext
+    //unload kext
     status = execTask(KEXT_UNLOAD, parameters, YES);
     if(STATUS_SUCCESS != status)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"starting kext failed with %lu", (unsigned long)status]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"stopping kext failed with %lu", (unsigned long)status]);
         
         //bail
         goto bail;

@@ -28,7 +28,7 @@
 @synthesize plugin;
 @synthesize process;
 @synthesize timestamp;
-@synthesize itemBinary;
+@synthesize itemObject;
 @synthesize wasBlocked;
 @synthesize reportedUID;
 @synthesize shouldRemember;
@@ -96,7 +96,6 @@
 
 //determines if a new watch event matches a prev. 'remembered' event
 // ->checks path and item
-//   TODO: cron jobs don't have an item binary? or wait, maybe that's what's overloaded to hold ext?
 -(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent
 {
     //dbg msg
@@ -114,11 +113,11 @@
     }
     
     //check 2:
-    // ->different startup item binary
-    if(YES != [self.itemBinary isEqualToString: rememberedEvent.itemBinary])
+    // ->different startup item binary/cmd
+    if(YES != [self.itemObject isEqualToString: rememberedEvent.itemObject])
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemBinary, rememberedEvent.itemBinary]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemObject, rememberedEvent.itemObject]);
         
         //nope!
         return NO;
@@ -172,10 +171,10 @@
     
     //set binary (path) of startup item
     // ->when already set, can just use that
-    if(nil != self.itemBinary)
+    if(nil != self.itemObject)
     {
         //set
-        alertInfo[@"itemBinary"] = self.itemBinary;
+        alertInfo[@"itemBinary"] = self.itemObject;
     }
     //when still nil
     // ->lookup
@@ -414,7 +413,7 @@ bail:
 
 //for pretty print
 -(NSString *)description {
-    return [NSString stringWithFormat: @"process=%@, item file path=%@, flags=%lx, timestamp=%@, item binary=%@", self.process, self.path, (unsigned long)self.flags, self.timestamp, self.itemBinary];
+    return [NSString stringWithFormat: @"process=%@, item file path=%@, flags=%lx, timestamp=%@, item binary=%@", self.process, self.path, (unsigned long)self.flags, self.timestamp, self.itemObject];
 }
 
 

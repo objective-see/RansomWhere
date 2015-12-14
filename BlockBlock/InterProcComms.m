@@ -26,10 +26,12 @@
 @implementation InterProcComms
 
 @synthesize alertWindows;
+@synthesize errorWindows;
 @synthesize registeredAgents;
 @synthesize alertWindowController;
-@synthesize errorWindowController;
 
+//init method
+// ->all some arrays, sets, etc
 -(id)init
 {
     //init super
@@ -45,6 +47,9 @@
         
         //alert windows
         alertWindows = [NSMutableSet set];
+        
+        //error windows
+        errorWindows = [NSMutableArray array];
     }
     
     return self;
@@ -228,23 +233,20 @@
 {
     //first remove alert window for array
     // ->this is how we can have multiple windows, without memory issues
-    @synchronized(self.alertWindows)
-    {
-        //TODO: remove
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"alert windows: %@/%@", self.alertWindows, actionInfo[KEY_ALERT_WINDOW]]);
-        
-        //remove
-        [self.alertWindows removeObject:actionInfo[KEY_ALERT_WINDOW]];
-    }
-    
-    //remove 'alert window' from dictionary
-    // ->don't need it anymore, plus can't pass pointers/objects anyways
     if(nil != actionInfo[KEY_ALERT_WINDOW])
     {
-        //remove
+        //sync
+        @synchronized(self.alertWindows)
+        {
+            //remove
+            [self.alertWindows removeObject:actionInfo[KEY_ALERT_WINDOW]];
+        }
+        
+        //remove 'alert window' from dictionary
+        // ->don't need it anymore, plus can't pass pointers/objects via 'DO' anyways
         [actionInfo removeObjectForKey:KEY_ALERT_WINDOW];
     }
-    
+
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to daemon", actionInfo]);
     
@@ -431,7 +433,7 @@ bail:
         
         //send off to daemon
         // ->for now, just say it was allowed
-        [self sendActionToDaemon:@{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT]}];
+        [self sendActionToDaemon:[@{KEY_WATCH_EVENT_UUID:watchEventUUID, KEY_ACTION:[NSNumber numberWithInteger:ALLOW_WATCH_EVENT]} mutableCopy]];
     }
     
     //handle case where passive mode is enabled
@@ -485,6 +487,9 @@ bail:
 // ->display an error popup
 -(void)displayErrorViaIPC:(NSNotification *)notification
 {
+    //error window controller
+    ErrorWindowController* errorWindowController = nil;
+    
     //user info dictionary
     NSDictionary* userInfo = nil;
     
@@ -493,6 +498,24 @@ bail:
     
     //extract user info
     userInfo = notification.userInfo;
+    
+    //sync to clear out any closed/handled error windows
+    @synchronized(self.errorWindows)
+    {
+        //remove any that aren't visible
+        for(int i = (int)self.errorWindows.count-1; i >= 0; i--)
+        {
+            //grab window controller
+            errorWindowController = self.errorWindows[i];
+            
+            //remove those that are not (still) visible
+            if(YES != [errorWindowController.window isVisible])
+            {
+                //remove
+                [self.errorWindows removeObjectAtIndex:i];
+            }
+        }
+    }//sync
     
     //sanity check
     // ->make sure received dictionary is valid
@@ -522,8 +545,15 @@ bail:
         goto bail;
     }
     
-    //alloc error window
+    //alloc new error window controller
     errorWindowController = [[ErrorWindowController alloc] initWithWindowNibName:@"ErrorWindowController"];
+    
+    //sync to save
+    @synchronized(self.errorWindows)
+    {
+        //save it
+        [self.errorWindows addObject:errorWindowController];
+    }
     
     //main thread
     // ->just show UI alert
@@ -531,10 +561,10 @@ bail:
     {
         //display it
         // ->call this first to so that outlets are connected (not nil)
-        [self.errorWindowController display];
+        [errorWindowController display];
         
         //configure it
-        [self.errorWindowController configure:userInfo];
+        [errorWindowController configure:userInfo];
     }
     //background thread
     // ->have to show it on main thread
@@ -546,15 +576,13 @@ bail:
             
             //display it
             // ->call this first to so that outlets are connected (not nil)
-            [self.errorWindowController display];
+            [errorWindowController display];
             
             //configure it
-            [self.errorWindowController configure:userInfo];
+            [errorWindowController configure:userInfo];
             
         });
     }
-    
-    
     
 //bail
 bail:
@@ -574,6 +602,9 @@ bail:
     
     //error info
     NSMutableDictionary* errorInfo = nil;
+    
+    //error window controller
+    ErrorWindowController* errorWindowController = nil;
     
     //grab script info
     actionInfo = notification.userInfo;
@@ -625,6 +656,24 @@ bail:
                 //err msg
                 logMsg(LOG_ERR, @"failed to delete login item");
                 
+                //sync to clear out any closed/handled error windows
+                @synchronized(self.errorWindows)
+                {
+                    //remove any that aren't visible
+                    for(int i = (int)self.errorWindows.count-1; i >= 0; i--)
+                    {
+                        //grab window controller
+                        errorWindowController = self.errorWindows[i];
+                        
+                        //remove those that are not (still) visible
+                        if(YES != [errorWindowController.window isVisible])
+                        {
+                            //remove
+                            [self.errorWindows removeObjectAtIndex:i];
+                        }
+                    }
+                }//sync
+
                 //alloc error info
                 errorInfo = [NSMutableDictionary dictionary];
              
@@ -640,12 +689,19 @@ bail:
                 //alloc error window
                 errorWindowController = [[ErrorWindowController alloc] initWithWindowNibName:@"ErrorWindowController"];
                 
+                //sync to save
+                @synchronized(self.errorWindows)
+                {
+                    //save it
+                    [self.errorWindows addObject:errorWindowController];
+                }
+                
                 //display it
                 // ->call this first to so that outlets are connected (not nil)
-                [self.errorWindowController display];
+                [errorWindowController display];
                 
                 //configure it
-                [self.errorWindowController configure:errorInfo];
+                [errorWindowController configure:errorInfo];
                 
                 //bail
                 goto bail;

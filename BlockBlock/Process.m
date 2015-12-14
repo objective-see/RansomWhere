@@ -28,9 +28,6 @@
 @synthesize ppid;
 @synthesize bundle;
 
-//TODO: add logic for name & bundle lookup
-// ->now always nil! (since coming from KEXT)
-
 //init w/ a pid
 // note: icons are dynamically determined only when process is shown in alert
 -(id)initWithPid:(pid_t)processID infoDictionary:(NSDictionary*)infoDictionary

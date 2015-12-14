@@ -178,6 +178,12 @@
             //don't bail
             // ->might as well keep on uninstalling other components
         }
+        //just logic for dbg msg
+        else
+        {
+            //dbg msg
+            logMsg(LOG_DEBUG, @"fully uninstalled launch agent");
+        }
         
         //if app binary is present
         // ->just delete it
@@ -189,15 +195,14 @@
             //delete it
             if(YES != [[NSFileManager defaultManager] removeItemAtPath:APPLICATION_PATH error:&error])
             {
-                //TODO: use!!!!
                 //set flag
                 bAnyErrors = YES;
                 
                 //err msg
                 logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete application (%@)", error]);
                 
-                //bail
-                goto bail;
+                //don't bail
+                // ->might as well keep on uninstalling other components
             }
             
             //dbg msg
@@ -274,15 +279,15 @@
     //dbg msg
     logMsg(LOG_DEBUG, @"removed app's preferences");
     
+//bail
+bail:
+    
     //only success when there were no errors
     if(YES != bAnyErrors)
     {
         //happy
         bRet = YES;
     }
-
-//bail
-bail:
     
     return bRet;
 }

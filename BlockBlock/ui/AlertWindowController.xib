@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -44,7 +44,6 @@
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Bac-hQ-LrL">
                         <rect key="frame" x="117" y="271" width="420" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="procces name" id="fTo-9i-H1N">
                             <font key="font" size="17" name="Menlo-Bold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -54,7 +53,6 @@
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="wUf-2S-N1r">
                         <rect key="frame" x="8" y="257" width="100" height="100"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="yg3-qL-WdG"/>
                     </imageView>
                     <customView id="nAw-rO-OXn" customClass="AlertViewBottom">
@@ -64,7 +62,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" id="uyT-k8-mEe">
                                 <rect key="frame" x="131" y="85" width="491" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" sendsActionOnEndEditing="YES" title="path to startup item" id="aLU-sr-aCI">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -74,7 +71,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="DQU-JZ-8Wy">
                                 <rect key="frame" x="18" y="140" width="97" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="process path:" id="wuO-8w-Jln">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" white="0.33000000000000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -84,7 +80,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" id="31G-Q6-fmN">
                                 <rect key="frame" x="131" y="123" width="491" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" truncatesLastVisibleLine="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="/path/of/process" id="D8k-7y-vrx">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -94,7 +89,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Lfg-tW-69F">
                                 <rect key="frame" x="18" y="180" width="604" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="process name" id="Vu7-2E-Xr0">
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -104,7 +98,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="oUf-HD-yMl">
                                 <rect key="frame" x="18" y="160" width="86" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="process id: " id="UZS-kV-q5a">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" white="0.33000000000000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -114,7 +107,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="cxO-xk-kK9">
                                 <rect key="frame" x="131" y="160" width="491" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="&lt;pid&gt;" id="8me-qj-Ti6">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -124,7 +116,6 @@
                             <button verticalHuggingPriority="750" id="M7j-S9-XG1">
                                 <rect key="frame" x="426" y="13" width="82" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <buttonCell key="cell" type="push" title="Block" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Kj-r6-qBl">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -136,7 +127,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="y5t-XB-pFv">
                                 <rect key="frame" x="19" y="65" width="112" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="startup binary:" id="f41-Ac-sVb">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" white="0.33000000000000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -146,7 +136,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Dwm-eP-K6C">
                                 <rect key="frame" x="19" y="85" width="97" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="startup file:" id="3NX-tS-Lhy">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" white="0.33000000000000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -156,7 +145,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="454-RV-c8m">
                                 <rect key="frame" x="19" y="105" width="489" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="startup item name" id="jl0-JB-5Xi">
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -166,7 +154,6 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" id="kMW-GJ-kvr">
                                 <rect key="frame" x="131" y="48" width="491" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <textFieldCell key="cell" truncatesLastVisibleLine="YES" allowsUndo="NO" title="path to startup item's binary" id="VXW-LW-EyP">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -176,7 +163,6 @@
                             <button verticalHuggingPriority="750" id="uQN-Qh-YaV">
                                 <rect key="frame" x="544" y="13" width="82" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <buttonCell key="cell" type="push" title="Allow" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wDa-Rh-mcM">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -188,19 +174,16 @@
                             <button id="Iv6-wW-pKy">
                                 <rect key="frame" x="334" y="21" width="85" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <animations/>
                                 <buttonCell key="cell" type="check" title="remember" bezelStyle="regularSquare" imagePosition="left" alignment="center" inset="2" id="WB8-CB-M8N">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                 </buttonCell>
                             </button>
                         </subviews>
-                        <animations/>
                     </customView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="2Bn-dp-flW">
                         <rect key="frame" x="117" y="244" width="360" height="30"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="alert msg" id="cVb-ha-4gh">
                             <font key="font" size="14" name="Menlo-Bold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -213,16 +196,13 @@
                         <view key="contentView" id="Sbs-k9-6GS">
                             <rect key="frame" x="1" y="1" width="638" height="0.0"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <animations/>
                         </view>
-                        <animations/>
                         <color key="borderColor" red="0.44666150090000001" green="0.82829483699999995" blue="0.46594502310000002" alpha="1" colorSpace="calibratedRGB"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Udl-dj-WGZ">
                         <rect key="frame" x="603" y="245" width="57" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="ancestry" id="Sfj-l4-El1">
                             <font key="font" size="11" name="Menlo-Regular"/>
                             <color key="textColor" white="0.52269995629370625" alpha="1" colorSpace="calibratedWhite"/>
@@ -232,7 +212,6 @@
                     <button tag="1002" id="ROX-Ie-W4k">
                         <rect key="frame" x="613" y="262" width="29" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="parentsIcon" imagePosition="only" alignment="center" alternateImage="parentsIconBG" imageScaling="proportionallyDown" inset="2" id="wo1-dL-YPZ">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -242,7 +221,6 @@
                         </connections>
                     </button>
                 </subviews>
-                <animations/>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
@@ -274,7 +252,6 @@
                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="18" indentationPerLevel="16" outlineTableColumn="SZa-YU-u66" id="tjO-ag-O49">
                                 <rect key="frame" x="0.0" y="0.0" width="480" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <animations/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -299,23 +276,18 @@
                                 </connections>
                             </outlineView>
                         </subviews>
-                        <animations/>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
-                    <animations/>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="0vF-fy-kNf">
                         <rect key="frame" x="1" y="119" width="223" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <animations/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="9n5-Bm-Wyt">
                         <rect key="frame" x="224" y="17" width="15" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <animations/>
                     </scroller>
                 </scrollView>
             </subviews>
-            <animations/>
             <point key="canvasLocation" x="330.5" y="457.5"/>
         </view>
         <customObject id="j1T-Qz-N5N" customClass="ParentsWindowController"/>

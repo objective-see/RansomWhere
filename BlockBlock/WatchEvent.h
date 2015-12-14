@@ -60,9 +60,9 @@
 @property (nonatomic, retain)NSString* path;
 @property (nonatomic, retain)NSString* match;
 
-//item binary
+//item binary or command
 // ->need this for matching 'remembered' items
-@property (nonatomic, retain)NSString* itemBinary;
+@property (nonatomic, retain)NSString* itemObject;
 
 //process
 @property (nonatomic, retain)Process* process;

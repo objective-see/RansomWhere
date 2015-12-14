@@ -404,7 +404,7 @@ bail:
                 
                 //save item's binary
                 // ->needed to match 'remembered' items
-                watchEvent.itemBinary = [watchEvent.plugin startupItemBinary:watchEvent];
+                watchEvent.itemObject = [watchEvent.plugin startupItemBinary:watchEvent];
                 
                 //allow the plugin to closely examine the event
                 // ->it will know more about the details so can determine if it should be ignored

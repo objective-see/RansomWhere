@@ -111,8 +111,7 @@
             
             //set the command in the watch event
             // ->done here since we just parsed all the cron jobs etc.
-            //TODO: rename itemBinary? maybe itemObject (binary, cron job, cmd, etc)
-            watchEvent.itemBinary = newCronJob;
+            watchEvent.itemObject = newCronJob;
         }
         /*
         else
@@ -280,21 +279,21 @@
     
     //find cron job that is to be blocked
     // ->reported crob job in 'itemBinary' of watch event
-    index = [cronJobs indexOfObject:watchEvent.itemBinary];
+    index = [cronJobs indexOfObject:watchEvent.itemObject];
     
     //sanity check
     // ->make sure item was found
     if(NSNotFound == index)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: could not find %@ in %@", watchEvent.itemBinary, watchEvent.path]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: could not find %@ in %@", watchEvent.itemObject, watchEvent.path]);
         
         //bail
         goto bail;
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, found %@ at index %lu", watchEvent.itemBinary, (unsigned long)index]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, found %@ at index %lu", watchEvent.itemObject, (unsigned long)index]);
     
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, before %@", [cronJobs componentsJoinedByString:@"\n"]]);
     
@@ -329,6 +328,6 @@ bail:
 // ->just return command (binary doesn't make sense for cron jobs) that was prev. stored in watchEvent
 -(NSString*)startupItemBinary:(WatchEvent*)watchEvent
 {
-    return watchEvent.itemBinary;
+    return watchEvent.itemObject;
 }
 @end

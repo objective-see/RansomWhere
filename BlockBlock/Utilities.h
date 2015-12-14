@@ -91,10 +91,6 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
 //set permissions for file
 //void setFilePermissions(NSString* file, int permissions);
 
-//if string is too long to fit into a the (2-lines) text field
-// ->truncate and insert ellipises before /file
-NSString* stringByTruncatingString(NSTextField* textField, float width);
-
 //determine if instance is daemon (background) instance
 BOOL isDaemonInstance();
 

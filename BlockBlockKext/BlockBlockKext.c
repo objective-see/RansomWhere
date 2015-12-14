@@ -131,9 +131,6 @@ static int processExec(kauth_cred_t credential, void* idata, kauth_action_t acti
     // ->termination; end of string
     while(0x0 != *chunkPointer)
     {
-        //dbg msg
-        //printf("BLOCKBLOCK KEXT: chunk pointer (path): %s\n", chunkPointer);
-        
         //add current offset of path
         kEventMsg.dv[3].data_ptr = chunkPointer;
         
@@ -141,9 +138,6 @@ static int processExec(kauth_cred_t credential, void* idata, kauth_action_t acti
         // ->either string length (with NULL)
         //   or max size - pid, etc and extra for NULL!
         kEventMsg.dv[3].data_length = min((u_int)strlen(chunkPointer)+1, (MAX_MSG_SIZE - nonPathSize - 1));
-        
-        //dbg msg
-        //printf("BLOCKBLOCK KEXT: chunk path length: %d\n", kEventMsg.dv[3].data_length);
         
         //broadcast msg to user-mode
         status = kev_msg_post(&kEventMsg);

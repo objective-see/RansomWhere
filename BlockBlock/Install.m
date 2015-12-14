@@ -23,7 +23,6 @@
 @synthesize shouldStartDaemon;
 @synthesize installedLaunchAgents;
 
-
 //init
 -(id)init
 {
@@ -205,8 +204,7 @@ bail:
             bUpgrade = YES;
         }
     }
-    
-    
+
     return bUpgrade;
 }
 

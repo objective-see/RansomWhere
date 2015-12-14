@@ -133,7 +133,6 @@
     return;
 }
 
-
 //automatically invoked when window is closing
 // ->tell OS that we are done with window so it can (now) be freed
 -(void)windowWillClose:(NSNotification *)notification
