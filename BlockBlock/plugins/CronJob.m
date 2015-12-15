@@ -295,11 +295,13 @@
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, found %@ at index %lu", watchEvent.itemObject, (unsigned long)index]);
     
+    //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, before %@", [cronJobs componentsJoinedByString:@"\n"]]);
     
     //remove unwanted cron job
     [cronJobs removeObjectAtIndex:index];
     
+    //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, after; %@", [cronJobs componentsJoinedByString:@"\n"]]);
     
     //update file

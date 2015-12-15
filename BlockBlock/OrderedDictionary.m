@@ -23,44 +23,24 @@
 
 #import "OrderedDictionary.h"
 
-NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
-{
-	NSString *objectString;
-	if ([object isKindOfClass:[NSString class]])
-	{
-		objectString = (NSString *)object;
-	}
-	else if ([object respondsToSelector:@selector(descriptionWithLocale:indent:)])
-	{
-		objectString = [(NSDictionary *)object descriptionWithLocale:locale indent:indent];
-	}
-	else if ([object respondsToSelector:@selector(descriptionWithLocale:)])
-	{
-		objectString = [(NSSet *)object descriptionWithLocale:locale];
-	}
-	else
-	{
-		objectString = [object description];
-	}
-	return objectString;
-}
-
 @implementation OrderedDictionary
 
 -(id)init
 {
-	return [self initWithCapacity:0];
+    self = [super init];
+    if (self != nil)
+    {
+        dictionary = [NSMutableDictionary dictionary];
+        array = [NSMutableArray array];
+    }
+    return self;
+    
 }
 
-- (id)initWithCapacity:(NSUInteger)capacity
+//copy
+-(id)copy
 {
-	self = [super init];
-	if (self != nil)
-	{
-		dictionary = [[NSMutableDictionary alloc] initWithCapacity:capacity];
-		array = [[NSMutableArray alloc] initWithCapacity:capacity];
-	}
-	return self;
+    return [self mutableCopy];
 }
 
 //description
@@ -69,104 +49,62 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
     return dictionary.description;
 }
 
-- (id)copy
-{
-	return [self mutableCopy];
-}
-
-- (void)setObject:(id)anObject forKey:(id)aKey
-{
-	if (![dictionary objectForKey:aKey])
-	{
-		[array addObject:aKey];
-	}
-	[dictionary setObject:anObject forKey:aKey];
-}
-
-- (void)removeObjectForKey:(id)aKey
+//remove
+-(void)removeObjectForKey:(id)aKey
 {
 	[dictionary removeObjectForKey:aKey];
 	[array removeObject:aKey];
 }
 
-- (NSUInteger)count
+//count
+-(NSUInteger)count
 {
 	return [dictionary count];
 }
 
-- (id)objectForKey:(id)aKey
+//object for key
+-(id)objectForKey:(id)aKey
 {
 	return [dictionary objectForKey:aKey];
 }
 
-
-//insert obj
-// ->added sanity/error checking
-- (void)insertObject:(id)anObject forKey:(id)aKey atIndex:(NSUInteger)anIndex
-{
-	if ([dictionary objectForKey:aKey])
-	{
-        //remove old
-		[self removeObjectForKey:aKey];
-	}
-    
-    //sanity check
-    // ->make sure index is valid
-    if(anIndex > array.count)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //special case
-    // ->add at end
-    if(anIndex == array.count)
-    {
-        //add
-        [array addObject:aKey];
-    }
-    //just insert at index
-    else
-    {
-        //insert
-        [array insertObject:aKey atIndex:anIndex];
-    }
-    
-    //set in dictionary too
-	[dictionary setObject:anObject forKey:aKey];
-
-//bail
-bail:
-    
-    return;
-    
-}
-
-- (id)keyAtIndex:(NSUInteger)anIndex
+//key at index
+-(id)keyAtIndex:(NSUInteger)anIndex
 {
 	return [array objectAtIndex:anIndex];
 }
 
-- (NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)level
+//add an object
+// ->either (but only) start or end
+-(void)addObject:(id)anObject forKey:(id)aKey atStart:(BOOL)atStart
 {
-	NSMutableString *indentString = [NSMutableString string];
-	NSUInteger i, count = level;
-	for (i = 0; i < count; i++)
-	{
-		[indentString appendFormat:@"    "];
-	}
-	
-	NSMutableString *description = [NSMutableString string];
-	[description appendFormat:@"%@{\n", indentString];
-	for (NSObject *key in self)
-	{
-		[description appendFormat:@"%@    %@ = %@;\n",
-			indentString,
-			DescriptionForObject(key, locale, level),
-			DescriptionForObject([self objectForKey:key], locale, level)];
-	}
-	[description appendFormat:@"%@}\n", indentString];
-	return description;
+    //if object already exists
+    // ->remove from both dictionary *and* array
+    if(nil != [dictionary objectForKey:aKey])
+    {
+        //remove
+        [self removeObjectForKey:aKey];
+    }
+    
+    //at start?
+    // ->insert into beginning of array
+    if(YES == atStart)
+    {
+        //insert
+        [array insertObject:aKey atIndex:0];
+    }
+    //otherwise at end
+    // ->just add into array
+    else
+    {
+        //add
+        [array addObject:aKey];
+    }
+    
+    //add to dictionary
+    [dictionary setObject:anObject forKey:aKey];
+    
+    return;
 }
 
 @end

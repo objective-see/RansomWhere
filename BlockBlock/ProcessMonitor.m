@@ -285,7 +285,7 @@ bail:
                 }
                 
                 //insert process at end
-                [self.processList insertObject:processObj forKey:procInfo[@"pid"] atIndex:self.processList.count];
+                [self.processList addObject:processObj forKey:procInfo[@"pid"] atStart:NO];
                 
             }//sync
             

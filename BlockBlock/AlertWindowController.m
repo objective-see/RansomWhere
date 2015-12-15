@@ -327,12 +327,12 @@
     //extra rows
     NSUInteger extraRows = 0;
     
-    //when heirarchy is less than 5
+    //when hierarchy is less than 5
     // ->set three extra rows
     if(self.ancestryViewController.processHierarchy.count < 5)
     {
-        //3 extra
-        extraRows = 3;
+        //5 total
+        extraRows = 5 - self.ancestryViewController.processHierarchy.count;
     }
     
     //calc total window height
@@ -372,6 +372,10 @@
     
     //set width
     popoverFrame.size.width = maxRowWidth;
+    
+    //set new frame for scroll view
+    //self.ancestryOutline.frame = popoverFrame;
+    //TODO: set size of scroll view!!!!!
     
     //set new frame
     self.ancestorView.frame = popoverFrame;

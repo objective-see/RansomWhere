@@ -29,7 +29,10 @@
 	NSMutableArray *array;
 }
 
-- (void)insertObject:(id)anObject forKey:(id)aKey atIndex:(NSUInteger)anIndex;
+//add an object
+// ->either (but only) start/end
+-(void)addObject:(id)anObject forKey:(id)aKey atStart:(BOOL)atStart;
+
 - (id)keyAtIndex:(NSUInteger)anIndex;
 
 

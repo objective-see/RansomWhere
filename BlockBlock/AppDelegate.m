@@ -40,7 +40,11 @@
 
 //TODO: sandbox'd login items
 //TODO: signature status in alert! (signed, etc)
-//TODO: GDC proc monitoring?
+//TODO: GDC proc monitoring? (for forks/execs)
+
+//TODO: process ancestry window is a little foo'barrd
+
+//TODO: better process name lookup: http://lists.apple.com/archives/darwin-kernel/2006/Oct/msg00165.html (GetProcessForPID - do in UI session though!)
 
 
 //automatically invoked when app is loaded
