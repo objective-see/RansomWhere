@@ -327,17 +327,17 @@
     //extra rows
     NSUInteger extraRows = 0;
     
-    //when hierarchy is less than 5
-    // ->set three extra rows
-    if(self.ancestryViewController.processHierarchy.count < 5)
+    //when hierarchy is less than 4
+    // ->set (some) extra rows
+    if(self.ancestryViewController.processHierarchy.count < 4)
     {
         //5 total
-        extraRows = 5 - self.ancestryViewController.processHierarchy.count;
+        extraRows = 4 - self.ancestryViewController.processHierarchy.count;
     }
     
     //calc total window height
     // ->number of rows + extra rows, * height
-    popoverHeight = (self.ancestryViewController.processHierarchy.count + 1 + extraRows) * [self.ancestryOutline rowHeight];
+    popoverHeight = (self.ancestryViewController.processHierarchy.count + extraRows + 2) * [self.ancestryOutline rowHeight];
    
     //get window's frame
     popoverFrame = self.ancestorView.frame;
@@ -365,17 +365,14 @@
     }
     
     //add some padding
-    maxRowWidth += 30;
+    // ->scroll bar, etc
+    maxRowWidth += 50;
 
     //set height
     popoverFrame.size.height = popoverHeight;
     
     //set width
     popoverFrame.size.width = maxRowWidth;
-    
-    //set new frame for scroll view
-    //self.ancestryOutline.frame = popoverFrame;
-    //TODO: set size of scroll view!!!!!
     
     //set new frame
     self.ancestorView.frame = popoverFrame;
