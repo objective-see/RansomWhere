@@ -92,7 +92,7 @@
 		7D20D6841BFDAA7D00FD6ECF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0710;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Objective-See";
 				TargetAttributes = {
 					7D20D68C1BFDAA7D00FD6ECF = {
@@ -228,6 +228,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = BlockBlockKext/Info.plist;
 				MODULE_NAME = "com.objective-see.BlockBlockKext";
 				MODULE_START = start;
@@ -245,6 +246,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = BlockBlockKext/Info.plist;
 				MODULE_NAME = "com.objective-see.BlockBlockKext";
 				MODULE_START = start;
