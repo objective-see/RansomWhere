@@ -4,15 +4,15 @@
 
 /** Popover UI delegate */
 
-@protocol StatusBarPopoverDelegate <NSObject>
+//@protocol StatusBarPopoverDelegate <NSObject>
 
--(void)didClickButton;
+//-(void)didClickButton;
 
-@end
+//@end
 
 @interface StatusBarPopoverController : NSViewController
 
-@property (weak) id<StatusBarPopoverDelegate> delegate;     /** interactions delegate */
-@property (retain, nonatomic)NSPopover *popover;                               /** default popover */
+//@property (weak) id<StatusBarPopoverDelegate> delegate;     /** interactions delegate */
+//@property (retain, nonatomic)NSPopover *popover;                               /** default popover */
 
 @end

@@ -968,6 +968,7 @@ BOOL isDaemonInstance()
     return isDaemon;
 }
 
+/*
 //determine menu mode
 // ->only in Yosemite!
 BOOL isMenuDark()
@@ -1015,6 +1016,8 @@ BOOL isMenuDark()
     
     return isDark;
 }
+ 
+*/
 
 //wait until a window is non nil
 // ->then make it modal

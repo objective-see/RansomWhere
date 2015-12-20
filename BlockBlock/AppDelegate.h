@@ -50,7 +50,7 @@
 @property(nonatomic, retain)PrefsWindowController* prefsWindowController;
 
 //error window
-@property(nonatomic, retain) ErrorWindowController* errorWindowController;
+@property(nonatomic, retain)ErrorWindowController* errorWindowController;
 
 //info window
 @property(nonatomic, retain)InfoWindowController* infoWindowController;
@@ -62,7 +62,7 @@
 @property (nonatomic, retain)InterProcComms* interProcComms;
 
 //status bar menu
-@property(strong, nonatomic)StatusBarMenu* statusBarMenuController;
+@property(nonatomic, retain)StatusBarMenu* statusBarMenuController;
 
 //watcher instance
 @property (strong, nonatomic)Watcher* watcher;

@@ -1,6 +1,6 @@
 //
 //  PrefsWindowController.m
-//  KnockKnock
+//  BlockBlock
 //
 //  Created by Patrick Wardle on 2/6/15.
 //  Copyright (c) 2015 Objective-See, LLC. All rights reserved.
@@ -87,7 +87,8 @@
 -(void)registerDefaults
 {
     //set defaults
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{PREF_ENABLE_LOGGING:@NO, PREF_PASSIVE_MODE:@NO, PREF_DISABLE_UPDATE_CHECK:@NO}];
+    // ->all no (off), except 'show popover' (for first run)
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{PREF_SHOW_POPOVER:@YES, PREF_ENABLE_LOGGING:@NO, PREF_PASSIVE_MODE:@NO, PREF_DISABLE_UPDATE_CHECK:@NO}];
     
     return;
 }
@@ -103,29 +104,42 @@
     
     //load prefs
     // ->won't be any until user sets some...
-    if(nil != defaults)
+    if(nil == defaults)
     {
-        //load 'enable logging'
-        if(nil != [defaults objectForKey:PREF_ENABLE_LOGGING])
-        {
-            //save
-            self.enableLogging = [defaults boolForKey:PREF_ENABLE_LOGGING];
-        }
-        
-        //load 'run in passive mode'
-        if(nil != [defaults objectForKey:PREF_PASSIVE_MODE])
-        {
-            //save
-            self.passiveMode = [defaults boolForKey:PREF_PASSIVE_MODE];
-        }
-        
-        //load 'disable update checks'
-        if(nil != [defaults objectForKey:PREF_DISABLE_UPDATE_CHECK])
-        {
-            //save
-            self.disableUpdateCheck = [defaults boolForKey:PREF_DISABLE_UPDATE_CHECK];
-        }
+        //bail
+        goto bail;
     }
+    
+    //load 'show popover'
+    if(nil != [defaults objectForKey:PREF_SHOW_POPOVER])
+    {
+        //save
+        self.showPopup = [defaults boolForKey:PREF_SHOW_POPOVER];
+    }
+    
+    //load 'enable logging'
+    if(nil != [defaults objectForKey:PREF_ENABLE_LOGGING])
+    {
+        //save
+        self.enableLogging = [defaults boolForKey:PREF_ENABLE_LOGGING];
+    }
+    
+    //load 'run in passive mode'
+    if(nil != [defaults objectForKey:PREF_PASSIVE_MODE])
+    {
+        //save
+        self.passiveMode = [defaults boolForKey:PREF_PASSIVE_MODE];
+    }
+    
+    //load 'disable update checks'
+    if(nil != [defaults objectForKey:PREF_DISABLE_UPDATE_CHECK])
+    {
+        //save
+        self.disableUpdateCheck = [defaults boolForKey:PREF_DISABLE_UPDATE_CHECK];
+    }
+    
+//bail
+bail:
     
     return;
 }
@@ -217,6 +231,32 @@
     //make un-modal
     [[NSApplication sharedApplication] stopModal];
     
+    return;
+}
+
+//set (single) pref
+// ->for now, just 'show popover' (as this is set externally)
+-(void)setPref:(NSString*)key value:(BOOL)value
+{
+    //user defaults
+    NSUserDefaults* defaults = nil;
+    
+    //init
+    defaults = [NSUserDefaults standardUserDefaults];
+
+    //'show popover'
+    if(YES == [key isEqualToString:PREF_SHOW_POPOVER])
+    {
+        //update iVar
+        self.showPopup = value;
+        
+        //save pref
+        [defaults setBool:self.showPopup forKey:PREF_SHOW_POPOVER];
+    }
+
+    //flush/save
+    [defaults synchronize];
+
     return;
 }
 

@@ -418,7 +418,7 @@ bail:
     if(UI_STATUS_DISABLED == self.uiState)
     {
         //dbg msg
-        logMsg(LOG_DEBUG, @"UI is disabled, so not showing alert");
+        logMsg(LOG_DEBUG|LOG_TO_FILE, @"UI is disabled, so not showing alert");
         
         //extract watch event uuid (from daemon)
         watchEventUUID = notification.userInfo[KEY_WATCH_EVENT_UUID];

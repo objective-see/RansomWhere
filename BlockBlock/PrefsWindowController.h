@@ -25,6 +25,9 @@
 //button for ok/close
 @property (weak) IBOutlet NSButton *okButton;
 
+//show popup
+@property BOOL showPopup;
+
 //logging flag
 @property BOOL enableLogging;
 
@@ -50,6 +53,9 @@
 // ->handle extra logic to turn on logging as well
 -(IBAction)togglePassiveMode:(id)sender;
 
+//set (single) pref
+-(void)setPref:(NSString*)key value:(BOOL)value;
+
 //save prefs
 // ->persist them to disk
 -(void)savePrefs;
@@ -57,6 +63,5 @@
 //'OK' button handler
 // ->save prefs and close window
 -(IBAction)closeWindow:(id)sender;
-
 
 @end

@@ -94,9 +94,6 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
 //determine if instance is daemon (background) instance
 BOOL isDaemonInstance();
 
-//determine menu mode
-BOOL isMenuDark();
-
 //wait until a window is non nil
 // ->then make it modal
 void makeModal(NSWindowController* windowController);

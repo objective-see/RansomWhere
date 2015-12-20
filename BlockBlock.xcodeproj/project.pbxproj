@@ -61,13 +61,11 @@
 		CDCA50091A3187D20086B4D3 /* Control.m in Sources */ = {isa = PBXBuildFile; fileRef = CDCA50081A3187D20086B4D3 /* Control.m */; };
 		CDCA50851A47DA700086B4D3 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = CDCA50831A47DA700086B4D3 /* Logging.m */; };
 		CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD5681E1A5E37770094BC3A /* Launchd.m */; };
-		CDD738BD1A5F7D0500B825BA /* StatusBarCustomView.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD738B81A5F7D0500B825BA /* StatusBarCustomView.m */; };
 		CDD738BF1A5F7D0500B825BA /* StatusBarPopoverController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */; };
 		CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C41A5F7FE800B825BA /* MainMenu.xib */; };
 		CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C71A5F7FE800B825BA /* Credits.rtf */; };
 		CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C91A5F7FE800B825BA /* InfoPlist.strings */; };
 		CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */ = {isa = PBXBuildFile; fileRef = CDD738D41A5F7FE800B825BA /* launchAgent.plist */; };
-		CDD7390C1A5FABB800B825BA /* NSWindow+BugFix.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */; };
 		CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */; };
 		CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */; };
 		CDE36C921AD3B67B00371F4E /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C911AD3B67B00371F4E /* icon.png */; };
@@ -76,7 +74,6 @@
 		CDE36C991AD500EE00371F4E /* bbText.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C981AD500EE00371F4E /* bbText.png */; };
 		CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = CDE36CCC1ADAEDE500371F4E /* Exception.m */; };
 		CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */; };
-		CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -168,16 +165,12 @@
 		CDCA50841A47DA700086B4D3 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = BlockBlock/Logging.h; sourceTree = "<group>"; };
 		CDD5681D1A5E37770094BC3A /* Launchd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Launchd.h; path = BlockBlock/plugins/Launchd.h; sourceTree = "<group>"; };
 		CDD5681E1A5E37770094BC3A /* Launchd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Launchd.m; path = BlockBlock/plugins/Launchd.m; sourceTree = "<group>"; };
-		CDD738B71A5F7D0500B825BA /* StatusBarCustomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarCustomView.h; path = BlockBlock/StatusBarCustomView.h; sourceTree = "<group>"; };
-		CDD738B81A5F7D0500B825BA /* StatusBarCustomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarCustomView.m; path = BlockBlock/StatusBarCustomView.m; sourceTree = "<group>"; };
 		CDD738BA1A5F7D0500B825BA /* StatusBarPopoverController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarPopoverController.h; path = BlockBlock/StatusBarPopoverController.h; sourceTree = "<group>"; };
 		CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarPopoverController.m; path = BlockBlock/StatusBarPopoverController.m; sourceTree = "<group>"; };
 		CDD738C51A5F7FE800B825BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
 		CDD738C81A5F7FE800B825BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
 		CDD738CA1A5F7FE800B825BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
 		CDD738D41A5F7FE800B825BA /* launchAgent.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = launchAgent.plist; path = BlockBlock/launchAgent.plist; sourceTree = "<group>"; };
-		CDD7390A1A5FABB800B825BA /* NSWindow+BugFix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSWindow+BugFix.h"; path = "BlockBlock/NSWindow+BugFix.h"; sourceTree = "<group>"; };
-		CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+BugFix.m"; path = "BlockBlock/NSWindow+BugFix.m"; sourceTree = "<group>"; };
 		CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ConfigureWindowController.xib; path = BlockBlock/ui/ConfigureWindowController.xib; sourceTree = SOURCE_ROOT; };
 		CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarPopover.xib; path = BlockBlock/ui/StatusBarPopover.xib; sourceTree = SOURCE_ROOT; };
 		CDE36C911AD3B67B00371F4E /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = BlockBlock/images/icon/icon.png; sourceTree = "<group>"; };
@@ -189,7 +182,6 @@
 		CDE36CCC1ADAEDE500371F4E /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = BlockBlock/Exception.m; sourceTree = "<group>"; };
 		CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarMenu.h; path = BlockBlock/ui/StatusBarMenu.h; sourceTree = "<group>"; };
 		CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarMenu.m; path = BlockBlock/ui/StatusBarMenu.m; sourceTree = "<group>"; };
-		CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarMenu.xib; path = BlockBlock/ui/StatusBarMenu.xib; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,7 +220,6 @@
 				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
 				CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */,
 				CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */,
-				CDF8B0AF1A5A38D7000D8AD3 /* StatusBarMenu.xib */,
 				CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */,
 			);
 			name = ui;
@@ -259,11 +250,7 @@
 				CDE36CCB1ADAEDE500371F4E /* Exception.h */,
 				CDE36CCC1ADAEDE500371F4E /* Exception.m */,
 				CD8381371A7DAA0F00AC0D96 /* images */,
-				CDD7390A1A5FABB800B825BA /* NSWindow+BugFix.h */,
-				CDD7390B1A5FABB800B825BA /* NSWindow+BugFix.m */,
 				CDD738D41A5F7FE800B825BA /* launchAgent.plist */,
-				CDD738B71A5F7D0500B825BA /* StatusBarCustomView.h */,
-				CDD738B81A5F7D0500B825BA /* StatusBarCustomView.m */,
 				CDD738BA1A5F7D0500B825BA /* StatusBarPopoverController.h */,
 				CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */,
 				CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */,
@@ -518,7 +505,6 @@
 				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
 				CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */,
 				CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */,
-				CDF8B0B01A5A38D7000D8AD3 /* StatusBarMenu.xib in Resources */,
 				CD7620A61AF3629400CFCB68 /* statusOFFWhite@2x.png in Resources */,
 				CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */,
 			);
@@ -550,7 +536,6 @@
 			files = (
 				CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */,
 				CD6BBBF31B52204F00506D0D /* CronJob.m in Sources */,
-				CDD738BD1A5F7D0500B825BA /* StatusBarCustomView.m in Sources */,
 				CDB4D9E519FCD9410069BE62 /* Process.m in Sources */,
 				CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */,
 				CD7C874C19D50F3B00EC7F0A /* Kext.m in Sources */,
@@ -564,7 +549,6 @@
 				CDE36C971AD4FEFB00371F4E /* InfoWindowController.m in Sources */,
 				CD6974FB1B013AB600CE819B /* ParentsWindowController.m in Sources */,
 				CD5C998F19D73C380015232A /* AlertView.m in Sources */,
-				CDD7390C1A5FABB800B825BA /* NSWindow+BugFix.m in Sources */,
 				CD3CE6951A23010B00B4F940 /* Uninstall.m in Sources */,
 				CD7C874119D4C58700EC7F0A /* AlertWindowController.m in Sources */,
 				CD5C998919D6810C0015232A /* WatchEvent.m in Sources */,

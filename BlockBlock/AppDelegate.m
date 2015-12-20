@@ -34,17 +34,18 @@
 @synthesize errorWindowController;
 @synthesize prefsWindowController;
 @synthesize rememberedWatchEvents;
+@synthesize statusBarMenuController;
 
 //for testing
 //@synthesize alertWindowController;
 
 //TODO: sandbox'd login items
 //TODO: signature status in alert! (signed, etc)
-//TODO: GDC proc monitoring? (for forks/execs)
 
-//TODO: process ancestry window is a little foo'barrd
 
 //TODO: better process name lookup: http://lists.apple.com/archives/darwin-kernel/2006/Oct/msg00165.html (GetProcessForPID - do in UI session though!)
+
+//TODO: menu click!! not registered after waking up?
 
 
 //automatically invoked when app is loaded
@@ -229,15 +230,12 @@
             //dbg msg
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: started BLOCKBLOCK");
             
-            //since the launch agent sends a mouse click to the icon in the status bar
-            // ->sleep a bit, so that can succeed (will keep the UI from saying install is done/the mouse click going to another process/icon)
-            [NSThread sleepForTimeInterval:1.5f];
-            
             //no errors
             exitStatus = STATUS_SUCCESS;
             
         }//install
         
+        //TODO: do this in main!!!!!! not here (UI issues, err msgs in log)
         //DAEMON
         // ->check for root, then invoke function to exec daemon logic
         else if(YES == [arguments[1] isEqualToString:ACTION_RUN_DAEMON])
@@ -347,6 +345,7 @@
         }//agent
         
         //UNINSTALL (UI)
+        // ->just show 'uninstall BlockBlock' window
         else if(YES == [arguments[1] isEqualToString:ACTION_UNINSTALL_UI])
         {
             //don't exit
@@ -401,7 +400,6 @@
 
             //bail
             goto bail;
-            
         }
         
     }//2 args
@@ -644,18 +642,19 @@ bail:
 //initialize status menu bar
 -(void)loadStatusBar
 {
-    //contents of launch agent's plist
-    // ->determines if popup should be shown
-    NSMutableDictionary* plistContents = nil;
-    
     //alloc/load nib
-    self.statusBarMenuController = [[StatusBarMenu alloc] initWithWindowNibName:@"StatusBarMenu"];
+    statusBarMenuController = [[StatusBarMenu alloc] init];
+
+    //init menu
+    [self.statusBarMenuController setupStatusItem];
     
     //ensure outlet connections are made (e.g. not NULL)
-    [self.statusBarMenuController showWindow:self];
+    //[self.statusBarMenuController showWindow:self];
     
     //configure
-    [self.statusBarMenuController configure];
+    //[self.statusBarMenuController configure];
+    
+    /*
     
     //get contents of 'Info.plist'
     plistContents = [NSMutableDictionary dictionaryWithContentsOfFile:launchAgentPlist(NSHomeDirectory())];
@@ -701,6 +700,8 @@ bail:
         [self.statusBarMenuController initMenu];
     }
     
+     
+    */
     return;
 }
 

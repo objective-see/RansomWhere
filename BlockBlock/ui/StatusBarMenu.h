@@ -8,81 +8,59 @@
 
 #import "Control.h"
 #import "InterProcComms.h"
-#import "PrefsWindowController.h"
-#import "StatusBarCustomView.h"
 #import "InfoWindowController.h"
+#import "PrefsWindowController.h"
 #import "StatusBarPopoverController.h"
+//TODO: copy right!
 
 #import <Cocoa/Cocoa.h>
 
-
-@interface StatusBarMenu : NSWindowController <NSMenuDelegate, NSPopoverDelegate, StatusBarPopoverDelegate, StatusBarCustomViewDelegate>
+@interface StatusBarMenu : NSObject <NSPopoverDelegate>
 {
-    //IPC object
-    //InterProcComms* interProcComms;
-    
-    //Control object
-    Control* controlObj;
 
 }
 
-- (void)didClickButton;
+//status item
+@property (nonatomic, strong, readwrite) NSStatusItem *statusItem;
 
-//popover stuffz
-@property StatusBarPopoverController *viewController;     /** popover content view controller */
-@property StatusBarCustomView *menulet;                      /** menu bar icon view */
-@property (getter = isActive) BOOL active;          /** menu bar active */
-@property (getter= isDisabled) BOOL disabled;
+//popover
+@property (retain, nonatomic)NSPopover *popover;
 
-//flag indicating popover should be opened
-@property BOOL shouldOpen;
+//enabled flag
+@property BOOL isEnabled;
 
-//flag indicating popover was closed
-@property BOOL wasClosed;
-
-//Control obj
-@property (nonatomic, retain)Control* controlObj;
-
-
--(IBAction)toggle:(id)sender;
--(IBAction)uninstallHandler:(id)sender;
--(IBAction)about:(id)sender;
-
+//pre-Yosemite flag
+@property BOOL preYosemite;
 
 //about window controller
 @property(nonatomic, retain)InfoWindowController* infoWindowController;
 
-//(top) status bar item
-@property (strong, nonatomic)NSStatusItem* statusBarItem;
-
-//menu (in status bar)
-@property (strong) IBOutlet NSMenu *statusMenu;
-
-@property (weak) IBOutlet NSMenuItem *status;
-
-//status
-// ->second menu item
-@property (weak) IBOutlet NSMenuItem *menuItemStatus;
-
 /* METHODS */
 
-//configure
-// ->set initial state, etc
--(void)configure;
+//setup status item
+// ->init button, show popover, etc
+-(void)setupStatusItem;
 
-//automatically show the popover
-// ->do this via mouse click (otherwise have issues...)
--(void)showPopover;
+//create/update status item menu
+-(void)updateStatusItemMenu;
 
-//hide the popover
-// ->if its already hidden, nothing is done...
--(void)hidePopover;
+//init a menu item
+-(NSMenuItem*)initializeMenuItem:(NSString*)title action:(SEL)action;
 
-//init the dropdown menu
--(void)initMenu;
+//menu handler for 'enable'/'disable'
+// ->toggle blockblock & update menu
+-(void)toggle:(id)sender;
 
-//handler for 'preferences' menu item
-// ->show window that has selectabel preferences
--(void)preferencesHandler:(id)sender;
+//menu handler for 'uninstall'
+// ->kick off uninstall
+-(void)uninstall:(id)sender;
+
+//menu handler for 'perferences'
+// ->show preferences window
+-(void)preferences:(id)sender;
+
+//menu handler for 'about'
+// ->show about window
+-(void)about:(id)sender;
 
 @end

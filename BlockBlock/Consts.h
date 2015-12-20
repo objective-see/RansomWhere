@@ -21,9 +21,6 @@
 //wait interval
 #define WAIT_INTERVAL 0.1f
 
-//first time key
-#define IS_FIRST_RUN @"firstTime"
-
 //user's defaults
 #define NSUSER_DEFAULTS @"Library/Preferences/com.objectivesee.BlockBlock.plist"
 
@@ -226,6 +223,7 @@
 //cron jobs
 #define PLUGIN_TYPE_CRON_JOB 4
 
+//TODO: remove!?
 //ellipis
 // ->for long paths...
 #define ELLIPIS @"..."
@@ -238,6 +236,10 @@
 
 //max number of items in process list
 #define PROCESS_LIST_MAX_SIZE 64
+
+//prefs
+// ->first time
+#define PREF_SHOW_POPOVER @"showPopover"
 
 //prefs
 // ->enable logging

@@ -215,6 +215,10 @@ bail:
         goto bail;
     }
     
+    //while still in user's session
+    // ->reset all prefs
+    [[NSUserDefaults standardUserDefaults] setPersistentDomain:[NSDictionary dictionary] forName:[[NSBundle mainBundle] bundleIdentifier]];
+    
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"auth'd %@ (%d) spawned OK, will wait...", parameter, self.authPID]);
     
@@ -227,7 +231,7 @@ bail:
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"auth'd %@ exited OK", parameter]);
-    
+
     //no errors
     bRet = YES;
     

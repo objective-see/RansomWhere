@@ -390,7 +390,7 @@ bail:
         resultMsgColor = [NSColor redColor];
         
         //show 'get more info' button
-        // -> don't have to worry about (re)hiding since the only option is to close the app
+        // ->don't have to worry about (re)hiding since the only option is to close the app
         [self.moreInfoButton setHidden:NO];
         
         //set return var/flag

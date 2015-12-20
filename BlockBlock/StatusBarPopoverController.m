@@ -1,39 +1,19 @@
+//TODO: label/copyright!
 
-
+#import "AppDelegate.h"
 #import "StatusBarPopoverController.h"
-#import "StatusBarCustomView.h"
 
-@interface StatusBarPopoverController ()
-@end
 
 @implementation StatusBarPopoverController
 
--(id)init
+//'close' button handler
+// ->simply close popover
+-(IBAction)interactionHandler:(NSControl *)sender
 {
-    //load from nib
-    self = [super initWithNibName:@"StatusBarPopover" bundle:nil];
-    if(self != nil)
-    {
-        //alloc popover
-        self.popover = [[NSPopover alloc] init];
-        
-        //set mode
-        self.popover.behavior = NSPopoverBehaviorApplicationDefined;
-        
-        //set view controller (to self)
-        self.popover.contentViewController = self;
-    }
-
-    return self;
+    //close
+    [[[self view] window] close];
+    
+    return;
 }
-
-//'close' button click handler
-- (IBAction)interactionHandler:(NSControl *)sender
-{
-    //send to delegate
-    // ->can close the popover
-    [self.delegate didClickButton];
-}
-
 
 @end

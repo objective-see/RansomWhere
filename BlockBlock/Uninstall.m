@@ -7,11 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+
 #import "Consts.h"
-#import "Utilities.h"
 #import "Install.h"
-#import "Uninstall.h"
 #import "Logging.h"
+#import "Utilities.h"
+#import "Uninstall.h"
+#import "AppDelegate.h"
+
 
 
 /* manually:
@@ -271,11 +274,7 @@
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"removed app's support directory, %@", supportDirectory()]);
         }
     }
-    
-    //always delete app preferences
-    // ->note: removePersistentDomainForName doesn't seem to work anymore (and discussed on stackoverflow), and if re-installed, they come back!?
-    [[NSUserDefaults standardUserDefaults] setPersistentDomain:[NSDictionary dictionary] forName:[[NSBundle mainBundle] bundleIdentifier]];
-    
+
     //dbg msg
     logMsg(LOG_DEBUG, @"removed app's preferences");
     

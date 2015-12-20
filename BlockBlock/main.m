@@ -43,6 +43,9 @@ int main(int argc, const char * argv[])
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"arg[%d]: %s", i, argv[i]]);
     }
     
+    //TODO: don't call for daeomon you fools!
+    //NSApplicationMain
+    
     //rest of logic is performed in app delegate
     // ->method, applicationDidFinishLaunching:
     return NSApplicationMain(argc, argv);
