@@ -13,7 +13,6 @@
 #import "Logging.h"
 #import "Utilities.h"
 #import "Uninstall.h"
-#import "AppDelegate.h"
 
 
 
@@ -274,9 +273,6 @@
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"removed app's support directory, %@", supportDirectory()]);
         }
     }
-
-    //dbg msg
-    logMsg(LOG_DEBUG, @"removed app's preferences");
     
 //bail
 bail:

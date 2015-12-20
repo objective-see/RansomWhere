@@ -8,9 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 #import "Consts.h"
 #import "Logging.h"
+#import "Utilities.h"
 
 int main(int argc, const char * argv[])
 {
@@ -35,6 +35,10 @@ int main(int argc, const char * argv[])
     
     //dbg msg
     logMsg(LOG_DEBUG, @"launched, in main()");
+
+    
+    //debug mode logic
+    #ifdef DEBUG
     
     //log args
     for(int i = 0; i < argc; i++)
@@ -43,8 +47,32 @@ int main(int argc, const char * argv[])
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"arg[%d]: %s", i, argv[i]]);
     }
     
-    //TODO: don't call for daeomon you fools!
-    //NSApplicationMain
+    #endif
+    
+    //for daemon
+    // ->wait until there is user/login to prevent error msgs in syslog
+    if( (0x2 == argc) &&
+        (0 == strcmp(argv[1], ACTION_RUN_DAEMON.UTF8String)) )
+    {
+        //wait till user logs in
+        // ->otherwise bad things happen when trying to connect to the window server/status bar
+        do
+        {
+            //wait till a user is logged in
+            if(nil != getCurrentConsoleUser())
+            {
+                //yay
+                break;
+            }
+            
+            //nap
+            [NSThread sleepForTimeInterval:1.0f];
+            
+        } while(YES);
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, @"daemon continuing, as user logged in/UI session ok!");
+    }
     
     //rest of logic is performed in app delegate
     // ->method, applicationDidFinishLaunching:

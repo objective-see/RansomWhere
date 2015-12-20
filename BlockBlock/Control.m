@@ -220,6 +220,9 @@ bail:
     [[NSUserDefaults standardUserDefaults] setPersistentDomain:[NSDictionary dictionary] forName:[[NSBundle mainBundle] bundleIdentifier]];
     
     //dbg msg
+    logMsg(LOG_DEBUG, @"removed app/user's preferences");
+    
+    //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"auth'd %@ (%d) spawned OK, will wait...", parameter, self.authPID]);
     
     //wait till (auth'd) installer complete

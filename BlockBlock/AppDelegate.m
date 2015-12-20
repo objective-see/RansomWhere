@@ -45,9 +45,6 @@
 
 //TODO: better process name lookup: http://lists.apple.com/archives/darwin-kernel/2006/Oct/msg00165.html (GetProcessForPID - do in UI session though!)
 
-//TODO: menu click!! not registered after waking up?
-
-
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -235,7 +232,6 @@
             
         }//install
         
-        //TODO: do this in main!!!!!! not here (UI issues, err msgs in log)
         //DAEMON
         // ->check for root, then invoke function to exec daemon logic
         else if(YES == [arguments[1] isEqualToString:ACTION_RUN_DAEMON])
