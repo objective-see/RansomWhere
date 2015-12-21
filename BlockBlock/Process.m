@@ -120,7 +120,7 @@
         self.name = [self.bundle infoDictionary][@"CFBundleName"];
     }
     
-    //no bundle/that fail
+    //no bundle/that failed
     // ->try from path, by grabbing last component
     if( (nil == self.name) &&
         (nil != self.path) )

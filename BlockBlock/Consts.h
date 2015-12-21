@@ -223,11 +223,6 @@
 //cron jobs
 #define PLUGIN_TYPE_CRON_JOB 4
 
-//TODO: remove!?
-//ellipis
-// ->for long paths...
-#define ELLIPIS @"..."
-
 //vendor id string
 #define OBJECTIVE_SEE_VENDOR "com.objective-see"
 

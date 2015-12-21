@@ -6,14 +6,14 @@
 //  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
+#import <Cocoa/Cocoa.h>
+
 #import "Control.h"
 #import "InterProcComms.h"
 #import "InfoWindowController.h"
 #import "PrefsWindowController.h"
 #import "StatusBarPopoverController.h"
-//TODO: copy right!
 
-#import <Cocoa/Cocoa.h>
 
 @interface StatusBarMenu : NSObject <NSPopoverDelegate>
 {

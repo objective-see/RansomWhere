@@ -61,7 +61,7 @@ int main(int argc, const char * argv[])
             //wait till a user is logged in
             if(nil != getCurrentConsoleUser())
             {
-                //yay
+                //got user
                 break;
             }
             

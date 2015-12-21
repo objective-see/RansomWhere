@@ -1,18 +1,12 @@
-
+//
+//  StatusBarPopoverController.f
+//  BlockBlock
+//
+//  Created by Patrick Wardle on 12/19/15.
+//  Copyright (c) 2015 Objective-See. All rights reserved.
 
 #import <Cocoa/Cocoa.h>
 
-/** Popover UI delegate */
-
-//@protocol StatusBarPopoverDelegate <NSObject>
-
-//-(void)didClickButton;
-
-//@end
-
 @interface StatusBarPopoverController : NSViewController
-
-//@property (weak) id<StatusBarPopoverDelegate> delegate;     /** interactions delegate */
-//@property (retain, nonatomic)NSPopover *popover;                               /** default popover */
 
 @end

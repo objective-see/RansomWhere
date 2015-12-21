@@ -42,9 +42,6 @@
 //TODO: sandbox'd login items
 //TODO: signature status in alert! (signed, etc)
 
-
-//TODO: better process name lookup: http://lists.apple.com/archives/darwin-kernel/2006/Oct/msg00165.html (GetProcessForPID - do in UI session though!)
-
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification

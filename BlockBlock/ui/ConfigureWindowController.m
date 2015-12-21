@@ -275,15 +275,13 @@ bail:
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing BlockBlock", button]);
         
-        //invoke install logic
-        if(YES != [self lifeCycleEvent:self.action])
-        {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to %@", self.buttonTitle]);
-        }
-        
-        //ok to re-enable 'x' button
-        [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:YES];
+        //invoke logic to install/uninstall
+        // ->do in background so UI doesn't block
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+        ^{
+            //install/uninstall
+            [self lifeCycleEvent:self.action];
+        });
     }
     
     //handle 'close'
@@ -320,29 +318,65 @@ bail:
     return;
 }
 
-//call into Control obj to perform install | uninstall
--(BOOL)lifeCycleEvent:(NSUInteger)event
+//perform install | uninstall via Control obj
+// ->invoked on background thread so that UI doesn't block
+-(void)lifeCycleEvent:(NSUInteger)event
 {
-    //return var
-    BOOL bRet = NO;
+    //status var
+    BOOL status = NO;
     
     //control object
     Control* controlObj;
     
-    //status msg frame
-    CGRect statusMsgFrame = {0};
-
-    //result msg
-    NSString* resultMsg = nil;
-    
-    //msg font
-    NSColor* resultMsgColor = nil;
-    
     //dbg msg
-    logMsg(LOG_DEBUG, @"handling life cycle event");
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"handling life cycle event, %lu", (unsigned long)event]);
     
     //alloc control object
     controlObj = [[Control alloc] init];
+    
+    //begin event
+    // ->updates ui on main thread
+    dispatch_sync(dispatch_get_main_queue(),
+    ^{
+        //complete
+        [self beginEvent];
+    });
+    
+    //perform action (install | uninstall)
+    // ->perform background actions
+    if(YES == [controlObj execControlInstance:self.buttonTitle])
+    {
+        //set flag
+        status = YES;
+    }
+    
+    //error occurred
+    else
+    {
+        //err msg
+        logMsg(LOG_ERR, @"ERROR: failed to perform life cycle event");
+        
+        //set flag
+        status = NO;
+    }
+    
+    //complet event
+    // ->updates ui on main thread
+    dispatch_async(dispatch_get_main_queue(),
+    ^{
+        //complete
+        [self completeEvent:status];
+    });
+    
+    return;
+}
+
+//begin event
+// ->basically just update UI
+-(void)beginEvent
+{
+    //status msg frame
+    CGRect statusMsgFrame = {0};
     
     //grab exiting frame
     statusMsgFrame = self.statusMsg.frame;
@@ -375,14 +409,35 @@ bail:
     //nap, briefly
     // ->allows update to status to be displayed before auth popup
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.5, NO);
+    
+    return;
+}
 
-    //perform action (install | uninstall)
-    // ->perform background actions
-    if(YES != [controlObj execControlInstance:self.buttonTitle])
+//complete event
+// ->update UI after background event has finished
+-(void)completeEvent:(BOOL)success
+{
+    //status msg frame
+    CGRect statusMsgFrame = {0};
+    
+    //result msg
+    NSString* resultMsg = nil;
+    
+    //msg font
+    NSColor* resultMsgColor = nil;
+    
+    //success
+    if(YES == success)
     {
-        //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to perform life cycle event");
+        //set result msg
+        resultMsg = [NSString stringWithFormat:@"BlockBlock %@ed", self.buttonTitle];
         
+        //set font to black
+        resultMsgColor = [NSColor blackColor];
+    }
+    //failure
+    else
+    {
         //set result msg
         resultMsg = [[NSString stringWithFormat:@"error: %@ failed", self.buttonTitle] lowercaseString];
         
@@ -392,23 +447,6 @@ bail:
         //show 'get more info' button
         // ->don't have to worry about (re)hiding since the only option is to close the app
         [self.moreInfoButton setHidden:NO];
-        
-        //set return var/flag
-        bRet = NO;
-    }
-    
-    //no errors
-    // ->action completed OK
-    else
-    {
-        //set result msg
-        resultMsg = [NSString stringWithFormat:@"BlockBlock %@ed", self.buttonTitle];
-        
-        //set font to black
-        resultMsgColor = [NSColor blackColor];
-        
-        //set return var/flag
-        bRet = YES;
     }
     
     //stop/hide spinner
@@ -441,6 +479,9 @@ bail:
     //enable
     self.actionButton.enabled = YES;
     
+    //ok to re-enable 'x' button
+    [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:YES];
+    
     //make it active
     [self.window makeFirstResponder:self.actionButton];
     
@@ -450,7 +491,7 @@ bail:
     //(re)make window front
     [NSApp activateIgnoringOtherApps:YES];
     
-    return bRet;    
+    return;
 }
 
 //automatically invoked when window is closing
