@@ -6,17 +6,14 @@
 //  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
-
 #import <Foundation/Foundation.h>
 #import <OpenDirectory/OpenDirectory.h>
 
-
 #import "Consts.h"
 #import "Install.h"
+#import "Logging.h"
 #import "Utilities.h"
 #import "Uninstall.h"
-#import "Logging.h"
-
 
 @implementation Install
 
@@ -90,13 +87,25 @@
     }
     
     //nothing installed
-    // ->just dbg msg
+    // ->just print dbg msg
     else
     {
+        //dbg msg
         logMsg(LOG_DEBUG, @"not installed (so no need to uninstall anything)");
     }
     
-    //if its already there
+    //first check for '/sbin/kextload'
+    // ->sometimes boxes don't have this, which will be a problem
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:KEXT_LOAD])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"kext loader (%@) not found", KEXT_LOAD]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //if app is already in /Applications
     // ->its cuz previous installer logic decided not to uninstall it, so no need to move
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
     {
@@ -149,6 +158,9 @@
             //bail
             goto bail;
         }
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, @"installed launch deamon");
     }
     
     //if kext already/still exists
@@ -168,10 +180,10 @@
             //bail
             goto bail;
         }
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, @"installed kext");
     }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"installed launch daemon component");
     
     //no errors
     bRet = YES;
@@ -470,7 +482,7 @@ bail:
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:KEXT_NAME] toPath:kextPath() error:&error])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to kext into /Library/Extensions (%@)", error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to copy kext into /Library/Extensions (%@)", error]);
         
         //bail
         goto bail;
@@ -571,20 +583,6 @@ bail:
         //set flag
         installedState = INSTALL_STATE_FULL;
     }
-    
-    /*
-    //check for app
-    // ->handle logic where downloaded app was moved to /Application before executing
-    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:APPLICATION_PATH])
-    {
-        //TODO: THIS!!! or just check app's path...is it running from /applications?
-        //detect 'moved manually into /Applications' by seeing if there are no other components
-        // ->and file is owned by current user (not root, which installers sets)
-        
-        //set flag
-        installedState = INSTALL_STATE_PARTIAL;
-    }
-    */
     
     return installedState;
 }

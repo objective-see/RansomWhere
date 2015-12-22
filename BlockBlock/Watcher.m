@@ -143,10 +143,10 @@ bail:
         for(NSString* path in plugin.watchPaths)
         {
             //skip '~' path
-            if(NSNotFound != [path rangeOfString:@"~/"].location)
+            if(NSNotFound != [path rangeOfString:@"~"].location)
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"skipping plugin path: %@", path]);
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"skipping plugin path: %@ - will be expanded shortly", path]);
                 
                 //skip
                 continue;
@@ -208,7 +208,7 @@ bail:
                     expandedPath = [path stringByReplacingOccurrencesOfString:@"~" withString:registeredAgents[key][KEY_USER_HOME_DIR]];
                     
                     //save
-                    pluginMappings[expandedPath] = plugin;
+                    self.pluginMappings[expandedPath] = plugin;
                 }
             }
             
@@ -217,7 +217,7 @@ bail:
             else if(YES == [path hasSuffix:@"~"])
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path: %@", path]);
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path wiht ~ at end: %@", path]);
                 
                 //expand all
                 for(NSNumber* key in registeredAgents)
@@ -226,7 +226,7 @@ bail:
                     expandedPath = [path stringByReplacingCharactersInRange:NSMakeRange(path.length-1, 1) withString:registeredAgents[key][KEY_USER_NAME]];
                     
                     //save
-                    pluginMappings[expandedPath] = plugin;
+                    self.pluginMappings[expandedPath] = plugin;
                 }
             }
             
@@ -235,7 +235,7 @@ bail:
             else
             {
                 //save
-                pluginMappings[path] = plugin;
+                self.pluginMappings[path] = plugin;
             }
         }
     }
@@ -354,7 +354,6 @@ bail:
         //pool
         @autoreleasepool
         {
-
             
         //offset into buffer
         int bufferOffset = 0;

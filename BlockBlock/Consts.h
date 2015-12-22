@@ -223,6 +223,9 @@
 //cron jobs
 #define PLUGIN_TYPE_CRON_JOB 4
 
+//app login item
+#define PLUGIN_TYPE_APP_LOGIN_ITEM 5
+
 //vendor id string
 #define OBJECTIVE_SEE_VENDOR "com.objective-see"
 

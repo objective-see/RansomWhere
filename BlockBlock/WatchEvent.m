@@ -81,13 +81,11 @@
         //nope!
         return NO;
     }
-
     
     //case 4:
     // ->watch items paths aren't related means unrelated watch events
     // TODO: use 'in directory' code - google this!
     // check both paths to make sure a isn't in b and b isn't in a
-    
     
     
     //events appear to be related

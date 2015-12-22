@@ -64,5 +64,19 @@
 		<key>ignoreKids</key>
 		<true/>
 	</dict>
+	<dict>
+		<key>description</key>
+		<string>App Login Items</string>
+		<key>paths</key>
+		<array>
+			<string>/Applications</string>
+		</array>
+		<key>class</key>
+		<string>AppLoginItem</string>
+		<key>alert</key>
+		<string>created an application helper login item</string>
+		<key>ignoreKids</key>
+		<false/>
+	</dict>
 </array>
 </plist>

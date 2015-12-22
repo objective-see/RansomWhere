@@ -240,7 +240,7 @@
             if(0 != geteuid())
             {
                 //err msg
-                logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: r00t is required for block blocking (daemon)");
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching, r00t is required for block blocking (daemon)");
                 
                 //error, so exit
                 shouldExit = YES;
@@ -262,7 +262,7 @@
             if(YES != [self.controlObj startKext])
             {
                 //err msg
-                logMsg(LOG_ERR, [NSString stringWithFormat:@"applicationDidFinishLaunching: ERROR: failed to start %@", kextPath()]);
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"applicationDidFinishLaunching, failed to start %@", kextPath()]);
                 
                 //error, so exit
                 shouldExit = YES;

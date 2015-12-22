@@ -277,6 +277,8 @@ NSUInteger execTask(NSString* path, NSArray* arguments, BOOL waitUntilExit)
     {
         //error
         logMsg(LOG_ERR, [NSString stringWithFormat:@"cannot exec NSTask since %@ was not found", path]);
+        
+        //bail
         goto bail;
     }
     
