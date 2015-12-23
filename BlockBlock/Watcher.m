@@ -327,7 +327,7 @@ bail:
     
     //set depth
     // ->bumped this since events were being dropped
-    clonedArgs.event_queue_depth = 512;
+    clonedArgs.event_queue_depth = 10000;
     
     //set list
     clonedArgs.event_list = events;
@@ -401,16 +401,16 @@ bail:
                 // ->make a copy since matchedPath var is re-used
                 watchEvent.match = [NSString stringWithString:matchedPath];
                 
-                //save item's binary
-                // ->needed to match 'remembered' items
-                watchEvent.itemObject = [watchEvent.plugin startupItemBinary:watchEvent];
-                
                 //allow the plugin to closely examine the event
                 // ->it will know more about the details so can determine if it should be ignored
                 if(YES != [handlerPlugin shouldIgnore:watchEvent])
                 {
                     //dbg msg
                     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"NON-ignored watch event: %@", watchEvent]);
+                    
+                    //now, save item's binary
+                    // ->needed to match 'remembered' items
+                    watchEvent.itemObject = [watchEvent.plugin startupItemBinary:watchEvent];
                     
                     //add to global queue
                     // ->this will trigger alert, and handling of event, etc
@@ -610,7 +610,6 @@ bail:
     NSString* path = nil;
     
     struct kfs_event_a *fse = (struct kfs_event_a *)(unsigned char*)((unsigned char*)ptrBuffer + *ptrCurrentOffset);
-    
     
     struct kfs_event_arg *fse_arg;
     

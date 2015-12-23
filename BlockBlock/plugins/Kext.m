@@ -159,7 +159,7 @@ bail:
 }
 
 //get the name of the kext
-// note: manually load/parse Info.plist (instead of using bundle) since it might not be on disk yet...
+// ->try load bundle in a loop (as it might not exist yet), then extract name
 -(NSString*)startupItemName:(WatchEvent*)watchEvent
 {
     //name of kext
@@ -214,7 +214,7 @@ bail:
 }
 
 //get the binary of the kext
-// ->parse
+// ->try load bundle in a loop (as it might not exist yet), then extract binary
 -(NSString*)startupItemBinary:(WatchEvent*)watchEvent
 {
     //name of kext

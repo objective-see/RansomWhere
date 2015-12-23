@@ -206,8 +206,8 @@ bail:
         procStartEvent = (struct processStartEvent*)&kernEventMsg->event_data[0];
         
         //dbg msg(s)
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"  path (in this chunk): %s \n", procStartEvent->path]);
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"  pid: %d ppid: %d uid: %d\n\n", procStartEvent->pid, procStartEvent->ppid, procStartEvent->uid]);
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"  path (in this chunk): %s \n", procStartEvent->path]);
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"  pid: %d ppid: %d uid: %d\n\n", procStartEvent->pid, procStartEvent->ppid, procStartEvent->uid]);
     
         //init proc info dictionary
         procInfo = [NSMutableDictionary dictionary];
@@ -268,7 +268,7 @@ bail:
             }
             
             //dbg msg
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new process: %@", procInfo[@"path"]]);
+            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new process: %@", procInfo[@"path"]]);
             
             //now, create process object
             processObj = [[Process alloc] initWithPid:procStartEvent->pid infoDictionary:procInfo];

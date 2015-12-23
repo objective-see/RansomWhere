@@ -18,6 +18,8 @@
 
 @implementation AppLoginItem
 
+@synthesize matchPredicate;
+
 //init
 -(id)initWithParams:(NSDictionary*)watchItemInfo
 {
@@ -30,6 +32,9 @@
         
         //set type
         self.type = PLUGIN_TYPE_APP_LOGIN_ITEM;
+        
+        //init match predicate
+        self.matchPredicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", APP_LOGIN_ITEM_REGEX];
     }
 
     return self;
@@ -43,255 +48,90 @@
     // ->default to ignore
     BOOL shouldIgnore = YES;
     
-    //TODO: should be directory!!!
+    //directory flag
+    BOOL isDirectory = NO;
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is a app helper login item", watchEvent.path]);
     
-    
-    
-    /*
-    
-    //original cron jobs
-    NSArray* originalCronJobs = nil;
-    
-    //possibly new cron jobs
-    NSArray* newCronJobs = nil;
-    
-    //new cron job
-    NSString* newCronJob = nil;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOB %@ flag: %lu' set", watchEvent.path, (unsigned long)watchEvent.flags]);
-    
-    //create/modification/rename of file
-    // ->note: OS does a rename
-    if( (FSE_CREATE_FILE == watchEvent.flags) ||
-        (FSE_RENAME == watchEvent.flags) ||
-        (FSE_CONTENT_MODIFIED == watchEvent.flags) )
+    //ignore anything that's not a directory
+    // ->since app helper login items are bundles (directories)
+    if( (YES != [[NSFileManager defaultManager] fileExistsAtPath:watchEvent.path isDirectory:&isDirectory]) ||
+        (YES != isDirectory) )
+    {
+        //bail
+        goto bail;
+    }
+
+    //skip things that don't look like an app login item
+    // ->'/Applications/*/Contents/Library/LoginItems/*.app'
+    if(YES != [self.matchPredicate evaluateWithObject:watchEvent.path])
     {
         //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE/FSE_RENAME/FSE_CONTENT_MODIFIED (%lu)' set (not maybe ignoring)", watchEvent.path, (unsigned long)watchEvent.flags]);
-        
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current cron jobs: %@", [((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals objectForKey:watchEvent.path]]);
-        
-        //grab original crob jobs
-        // ->parse into array
-        originalCronJobs = [self parseCronJobs:[((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals objectForKey:watchEvent.path] includeComments:NO];
-        
-        //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"original jobs: %@", originalCronJobs]);
-        
-        //load new cron jobs
-        // ->parse into array
-        newCronJobs = [self parseCronJobs: [NSData dataWithContentsOfFile:watchEvent.path] includeComments:NO];
-        
-        //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new jobs: %@", newCronJobs]);
-        
-        //find new job
-        newCronJob = [self findNewJob:originalCronJobs newJobs:newCronJobs];
-        
-        //new cron job?
-        if(nil != newCronJob)
-        {
-            //dbg msg
-            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is a new cron job so NOT ignoring....", newCronJob]);
-            
-            //don't ignore
-            shouldIgnore = NO;
-            
-            //set the command in the watch event
-            // ->done here since we just parsed all the cron jobs etc.
-            watchEvent.itemObject = newCronJob;
-        }
-     
-        else
-        {
-            logMsg(LOG_DEBUG, @"no new cron job so NOT ignoring....");
-        }
-    
-    }
-    
-    //dbg
-    else
-    {
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%lu is a flag the %@ plugin doesn't care about....", (unsigned long)watchEvent.flags, NSStringFromClass([self class])]);
-    }
-    */
-
-
-
-    return shouldIgnore;
-}
-
-//invoked when user clicks 'allow'
-// ->just update originals
--(void)allow:(WatchEvent *)watchEvent
-{
-    //just update originals
-    [self updateOriginals:watchEvent.path];
-    
-    return;
-}
-
-//update original cron jobs for user
--(void)newAgent:(NSDictionary*)newUser
-{
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, handling new agent %@/%@", newUser, self.watchPaths]);
-    
-    //iterate over plugin's watch paths
-    // ->any that are user specific (~) save original cron jobs for new user
-    for(NSString* watchPath in self.watchPaths)
-    {
-        //save user specific (~) originals
-        if(YES == [watchPath hasSuffix:@"~"])
-        {
-            //dbg msg
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, saving orginals for %@", watchPath]);
-            
-            //matched
-            // ->save orginals
-            [self updateOriginals:[watchPath stringByReplacingCharactersInRange:NSMakeRange(watchPath.length-1, 1) withString:newUser[KEY_USER_NAME]]];
-        }
-    }
-    
-    return;
-}
-
-//update originals
-// ->ensures there is always the latest version of the ok/approved cron jobs saved
--(void)updateOriginals:(NSString*)path
-{
-    //user's cron jobs
-    NSData* cronJobs = nil;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updating orginals of user's cron jobs at: %@", path]);
-    
-    //load login items
-    cronJobs = [NSData dataWithContentsOfFile:path];
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"user's originals: %@", [[NSString alloc] initWithData:cronJobs encoding:NSUTF8StringEncoding]]);
-
-    //save em
-    if(nil != cronJobs)
-    {
-        //load into originals
-        [((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals setObject:cronJobs forKey:path];
-    }
-
-    return;
-}
-
-//parse cron jobs
-// ->but each into an array
--(NSMutableArray*)parseCronJobs:(NSData*)fileData includeComments:(BOOL)includeComments
-{
-    //parsed jobs
-    NSMutableArray* cronJobs = nil;
-    
-    //lines
-    NSArray* lines = nil;
-    
-    //alloc
-    cronJobs = [NSMutableArray array];
-    
-    //convert data to string
-    // ->and then split into lines
-    lines = [[[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    
-    //add all jobs
-    // ->ignore any lines that begin w/ '#'
-    for(NSString* line in lines)
-    {
-        //skip comments?
-        if( (YES != includeComments) &&
-            (YES == [line hasPrefix:@"#"]))
-        {
-            //skip
-            continue;
-        }
-        
-        //save job
-        [cronJobs addObject:line];
-    }
-    
-    return cronJobs;
-}
-
-//subtract original crob jobs from current
--(NSString*)findNewJob:(NSArray*)originalCronJobs newJobs:(NSArray*)newCronJobs
-{
-    //new job
-    NSString* newJob = nil;
-    
-    //new jobs
-    NSArray* relativeComplement = nil;
-    
-    //filter
-    // ->returns all new jobs (that didn't exist before)
-    relativeComplement = [newCronJobs filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF IN %@", originalCronJobs]];
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new jobs: %@", relativeComplement]);
-    
-    //grab first new one
-    //TODO: handle multiple cron jobs?
-    newJob = [relativeComplement firstObject];
-    
-    return newJob;
-}
-
-//invoked when user clicks 'block'
-// ->remove cron job from cron job file
--(BOOL)block:(WatchEvent*)watchEvent;
-{
-    //return var
-    BOOL wasBlocked = NO;
-    
-    //existing cron jobs
-    // ->will contain the one that should be blocked
-    NSMutableArray* cronJobs = nil;
-    
-    //index of cron job to be blocked
-    NSUInteger index = NSNotFound;
-    
-    //get cron jobs
-    cronJobs = [self parseCronJobs: [NSData dataWithContentsOfFile:watchEvent.path] includeComments:YES];
-    
-    //find cron job that is to be blocked
-    // ->reported crob job in 'itemBinary' of watch event
-    index = [cronJobs indexOfObject:watchEvent.itemObject];
-    
-    //sanity check
-    // ->make sure item was found
-    if(NSNotFound == index)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: could not find %@ in %@", watchEvent.itemObject, watchEvent.path]);
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is not a regex match, so ignoring", watchEvent.path]);
         
         //bail
         goto bail;
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, found %@ at index %lu", watchEvent.itemObject, (unsigned long)index]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ matches regex, so not ignoring", watchEvent.path]);
+    
+    //set flag
+    shouldIgnore = NO;
+    
+//bail
+bail:
+
+    return shouldIgnore;
+}
+
+//invoked when user clicks 'block'
+// ->just delete login item app bundle
+-(BOOL)block:(WatchEvent*)watchEvent;
+{
+    //return var
+    BOOL wasBlocked = NO;
+    
+    //error
+    NSError* error = nil;
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, before %@", [cronJobs componentsJoinedByString:@"\n"]]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
     
-    //remove unwanted cron job
-    [cronJobs removeObjectAtIndex:index];
+    //delete login item app
+    if(YES != [[NSFileManager defaultManager] removeItemAtPath:watchEvent.path error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete %@ (%@)", watchEvent.path, error]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //TODO: FIX!!! this logic is wrong -gotta look up from proc list (see loginItem.m)
+    
+    //kill the persistent process
+    if(0 != watchEvent.process.pid)
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"killing %@ (pid: %d)", watchEvent.path, watchEvent.process.pid]);
+        if(0 != kill(watchEvent.process.pid, SIGKILL))
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to kill login item %@ (pid: %d)", watchEvent.path, watchEvent.process.pid]);
+        }
+    }
+    //pid not found
+    // ->just log msg about this (might not have been started yet, etc)
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find pid for %@", watchEvent.path]);
+    }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, after; %@", [cronJobs componentsJoinedByString:@"\n"]]);
-    
-    //update file
-    [[cronJobs componentsJoinedByString:@"\n"] writeToFile:watchEvent.path atomically:YES];
+    logMsg(LOG_DEBUG, @"application login item was blocked!");
     
     //happy
     wasBlocked = YES;
@@ -299,23 +139,139 @@
 //bail
 bail:
     
-    //always update originals
-    [self updateOriginals:watchEvent.path];
-    
     return wasBlocked;
 }
 
-//invoked to get name of item
-// ->since it's a command, just return a hard-coded category name
+//get the name of the app login item
+// ->try load bundle in a loop (as it might not exist yet), then extract name
 -(NSString*)startupItemName:(WatchEvent*)watchEvent
 {
-    return @"crob job";
+    //name of app login item
+    NSString* name = nil;
+    
+    //max wait time
+    // ->1 second
+    float maxWait = 1.0f;
+    
+    //bundle
+    NSBundle* bundle = nil;
+    
+    //current wait time
+    float currentWait = 0.0f;
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting app login item name for %@", watchEvent.path]);
+    
+    //try to get name of kext
+    // ->might have to try several time since Info.plist may not exist right away...
+    do
+    {
+        //nap (.1 seconds)
+        [NSThread sleepForTimeInterval:WAIT_INTERVAL];
+        
+        //load bundle
+        // ->and see if name is available
+        bundle = [NSBundle bundleWithPath:watchEvent.path];
+        if( (nil != bundle) &&
+            (nil != bundle.infoDictionary[@"CFBundleName"]) )
+        {
+            //save it
+            name = bundle.infoDictionary[@"CFBundleName"];
+            
+            //got name, so bail
+            break;
+        }
+        
+        //inc
+        currentWait += WAIT_INTERVAL;
+        
+    //while timeout isn't hit
+    } while(currentWait < maxWait);
+    
+    //sanity check
+    if(nil == name)
+    {
+        //dbg err msg
+        logMsg(LOG_DEBUG, @"failed to find name for app login item");
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat: @"extracted name: %@", name]);
+    
+//bail
+bail:
+    
+    return name;
 }
 
-//invoked to get binary of item
-// ->just return command (binary doesn't make sense for cron jobs) that was prev. stored in watchEvent
+//get the binary of the login item
+// ->try load bundle in a loop (as it might not exist yet), then extract binary
 -(NSString*)startupItemBinary:(WatchEvent*)watchEvent
 {
-    return watchEvent.itemObject;
+    //name of kext
+    NSString* binary = nil;
+    
+    //max wait time
+    // ->1 second
+    float maxWait = 1.0f;
+    
+    //bundle
+    NSBundle* bundle = nil;
+    
+    //current wait time
+    float currentWait = 0.0f;
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting app login item binary for %@", watchEvent.path]);
+    
+    //try to get name of kext
+    // ->might have to try several time since bundle may not exist right away...
+    do
+    {
+        //nap
+        [NSThread sleepForTimeInterval:WAIT_INTERVAL];
+        
+        //load bundle
+        // ->and see if name is available
+        bundle = [NSBundle bundleWithPath:watchEvent.path];
+        
+        //extract kext name
+        if( (nil != bundle) &&
+            (nil != bundle.executablePath) )
+        {
+            //save it
+            binary = bundle.executablePath;
+            
+            //got it, so bail
+            break;
+        }
+        
+        //inc
+        currentWait += WAIT_INTERVAL;
+        
+        //while timeout isn't hit
+    } while(currentWait < maxWait);
+    
+    //sanity check
+    if(nil == binary)
+    {
+        //dbg err msg
+        logMsg(LOG_DEBUG, @"failed to find binary for app login item");
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted name: %@", binary]);
+    
+//bail
+bail:
+    
+    return binary;
 }
+
 @end

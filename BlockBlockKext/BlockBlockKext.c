@@ -245,7 +245,7 @@ static int processExec(kauth_cred_t credential, void* idata, kauth_action_t acti
     ppid = proc_ppid(proc);
     
     //dbg msg
-    DEBUG_PRINT(("BLOCKBLOCK KEXT: new process: %s %d/%d/%d\n", path, pid, ppid, uid));
+    //DEBUG_PRINT(("BLOCKBLOCK KEXT: new process: %s %d/%d/%d\n", path, pid, ppid, uid));
     
     //calc non-path size
     // ->pid, uid, and ppid

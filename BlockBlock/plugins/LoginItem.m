@@ -465,6 +465,8 @@ bail:
     //grab global process list
     processList = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList;
 
+    //TODO: start from end!?!? to find most recent proc that matches?
+    
     //always sync
     // ->try to find matching process
     @synchronized(processList)

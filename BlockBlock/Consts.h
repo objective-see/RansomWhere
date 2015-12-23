@@ -226,6 +226,9 @@
 //app login item
 #define PLUGIN_TYPE_APP_LOGIN_ITEM 5
 
+//regex for app login items
+#define APP_LOGIN_ITEM_REGEX @"\\/Applications\\/.*.app\\/Contents\\/Library\\/LoginItems\\/.*.app"
+
 //vendor id string
 #define OBJECTIVE_SEE_VENDOR "com.objective-see"
 

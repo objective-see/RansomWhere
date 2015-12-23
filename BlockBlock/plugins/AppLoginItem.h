@@ -16,6 +16,8 @@
 
 /* PROPERTIES */
 
+//match predicate
+@property (nonatomic, retain)NSPredicate* matchPredicate;
 
 
 /* METHODS */
