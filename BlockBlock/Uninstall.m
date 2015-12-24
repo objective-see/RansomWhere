@@ -24,8 +24,8 @@
  launchctl unload ~/Library/LaunchAgents/com.objectiveSee.blockblock.plist
  rm -rf ~/Library/LaunchAgents/com.objectiveSee.blockblock.plist
  sudo rm -rf /Applications/BlockBlock.app
+ rm -rf ~/Library/Application Support/com.objectiveSee.BlockBlock
  sudo killall BlockBlock
- 
  */
 
 
@@ -33,6 +33,7 @@
 
 @synthesize controlObj;
 
+//init
 -(id)init
 {
     //init super
@@ -385,7 +386,6 @@ bail:
     //no errors
     bRet = YES;
     
-
 //bail
 bail:
 

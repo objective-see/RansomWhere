@@ -22,7 +22,7 @@
 #define WAIT_INTERVAL 0.1f
 
 //user's defaults
-#define NSUSER_DEFAULTS @"Library/Preferences/com.objectivesee.BlockBlock.plist"
+#define NSUSER_DEFAULTS @"Library/Preferences/com.objectiveSee.BlockBlock.plist"
 
 //kext bundle name
 #define KEXT_NAME @"BlockBlock.kext"

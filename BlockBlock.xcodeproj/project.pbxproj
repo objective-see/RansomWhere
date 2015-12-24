@@ -695,7 +695,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
 				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.objectivesee.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = BlockBlock;
 				WRAPPER_EXTENSION = app;
 			};
@@ -710,7 +710,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
 				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.objectivesee.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = BlockBlock;
 				WRAPPER_EXTENSION = app;
 			};
