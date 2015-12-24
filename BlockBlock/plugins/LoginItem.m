@@ -402,12 +402,6 @@ bail:
     //error
     NSError* error = nil;
     
-    //global process list
-    OrderedDictionary* processList = nil;
-    
-    //process
-    Process* process = nil;
-    
     //pid
     pid_t loginItemPID = 0;
     
@@ -462,36 +456,9 @@ bail:
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", loginItemPath]);
     }
     
-    //grab global process list
-    processList = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList;
-
-    //TODO: start from end!?!? to find most recent proc that matches?
+    //get most recent process that matches path
+    loginItemPID = mostRecentProc(((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList, loginItemPath);
     
-    //always sync
-    // ->try to find matching process
-    @synchronized(processList)
-    {
-        //iterate over all processes
-        // ->find pid of process that matches login item's path
-        for(NSString* processID in processList)
-        {
-            //extract process
-            process = processList[processID];
-            
-            //check for match
-            if( (YES == [process.path isEqualToString:loginItemPath]) ||
-                (YES == [[process.bundle bundlePath] isEqualToString:loginItemPath]) )
-            {
-                //get pid
-                loginItemPID = process.pid;
-                
-                //bail
-                break;
-            }
-        }
-        
-    }//sync
-
     //kill the persistent process
     if(0 != loginItemPID)
     {

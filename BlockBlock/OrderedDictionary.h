@@ -33,7 +33,11 @@
 // ->either (but only) start/end
 -(void)addObject:(id)anObject forKey:(id)aKey atStart:(BOOL)atStart;
 
-- (id)keyAtIndex:(NSUInteger)anIndex;
+//key at index
+-(id)keyAtIndex:(NSUInteger)anIndex;
+
+//reverse key enumerator
+-(NSEnumerator *)reverseKeyEnumerator;
 
 
 @end

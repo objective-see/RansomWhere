@@ -7,19 +7,18 @@
 //
 
 #import "Consts.h"
+#import "Logging.h"
 #import "Process.h"
 #import "Utilities.h"
 #import "ProcessMonitor.h"
 #import "OrderedDictionary.h"
-#import "Logging.h"
 
+#import <stdio.h>
+#import <stdlib.h>
+#import <arpa/inet.h>
 #import <sys/ioctl.h>
 #import <sys/socket.h>
 #import <sys/kern_event.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
 
 @implementation ProcessMonitor
 

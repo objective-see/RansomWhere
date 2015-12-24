@@ -62,6 +62,14 @@
         //bail
         goto bail;
     }
+    
+    //ignore things that aren't creation/rename events
+    if( (FSE_CREATE_DIR != watchEvent.flags) &&
+        (FSE_RENAME != watchEvent.flags) )
+    {
+        //bail
+        goto bail;
+    }
 
     //skip things that don't look like an app login item
     // ->'/Applications/*/Contents/Library/LoginItems/*.app'
@@ -96,6 +104,9 @@ bail:
     //error
     NSError* error = nil;
     
+    //pid
+    pid_t loginItemPID = 0;
+    
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
     
@@ -109,17 +120,18 @@ bail:
         goto bail;
     }
     
-    //TODO: FIX!!! this logic is wrong -gotta look up from proc list (see loginItem.m)
+    //get most recent process that matches path
+    loginItemPID = mostRecentProc(((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList, watchEvent.path);
     
     //kill the persistent process
-    if(0 != watchEvent.process.pid)
+    if(0 != loginItemPID)
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"killing %@ (pid: %d)", watchEvent.path, watchEvent.process.pid]);
-        if(0 != kill(watchEvent.process.pid, SIGKILL))
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"killing %@ (pid: %d)", watchEvent.path, loginItemPID]);
+        if(0 != kill(loginItemPID, SIGKILL))
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to kill login item %@ (pid: %d)", watchEvent.path, watchEvent.process.pid]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to kill login item %@ (pid: %d)", watchEvent.path, loginItemPID]);
         }
     }
     //pid not found

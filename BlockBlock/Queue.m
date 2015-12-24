@@ -9,6 +9,7 @@
 #import "Queue.h"
 #import "Consts.h"
 #import "Logging.h"
+#import "Process.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
@@ -130,7 +131,7 @@
             if(YES == previousWatchEvent.wasBlocked)
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, @"automatically blocking related/remembered event");
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"automatically blocking related/remembered event: %@ %@ (%@ -> %@)", currentWatchEvent.process.path, currentWatchEvent.plugin.alertMsg, currentWatchEvent.path, currentWatchEvent.itemObject]);
             
                 //automatically block it
                 // ->plugins will be same

@@ -9,6 +9,8 @@
 #ifndef __BlockBlock__Utilities__
 #define __BlockBlock__Utilities__
 
+#import "OrderedDictionary.h"
+
 //return path to launch daemon's plist
 NSString* launchDaemonPlist();
 
@@ -87,6 +89,10 @@ pid_t getParentID(int pid);
 
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive);
+
+//given a list of process and a path
+// ->find most recent process that matches
+pid_t mostRecentProc(OrderedDictionary* processList, NSString* path);
 
 //set permissions for file
 //void setFilePermissions(NSString* file, int permissions);

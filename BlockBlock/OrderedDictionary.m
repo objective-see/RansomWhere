@@ -68,6 +68,12 @@
 	return [dictionary objectForKey:aKey];
 }
 
+//reverse key enumerator
+-(NSEnumerator *)reverseKeyEnumerator
+{
+    return [array reverseObjectEnumerator];
+}
+
 //key at index
 -(id)keyAtIndex:(NSUInteger)anIndex
 {

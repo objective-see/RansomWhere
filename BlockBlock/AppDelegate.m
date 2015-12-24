@@ -39,12 +39,7 @@
 //for testing
 //@synthesize alertWindowController;
 
-//TODO: sandbox'd login items
 //TODO: signature status in alert! (signed, etc)
-
-//TODO: test login items (since changed pid stuff)
-//TODO: test rememberd items, since moved logic down!
-
 
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take

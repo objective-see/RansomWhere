@@ -8,18 +8,15 @@
 
 #import "Consts.h"
 #import "Logging.h"
+#import "Process.h"
 #import "Utilities.h"
-
 
 #import <libproc.h>
 #import <sys/sysctl.h>
 #import <OpenDirectory/OpenDirectory.h>
-#import <SystemConfiguration/SystemConfiguration.h>
-
-
 #import <CoreFoundation/CoreFoundation.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 #import <ApplicationServices/ApplicationServices.h>
-
 
 //return path to launch daemon's plist
 NSString* launchDaemonPlist()
@@ -493,7 +490,6 @@ NSDictionary* getCurrentConsoleUser()
         userInfo[@"homeDirectory"] = userHomeDirectory;
     }
     
-    
 //bail
 bail:
     
@@ -777,6 +773,44 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
 bail:
     
     return bRet;
+}
+
+//given a list of process and a path
+// ->find most recent process that matches
+pid_t mostRecentProc(OrderedDictionary* processList, NSString* path)
+{
+    //pid
+    pid_t pID = 0;
+    
+    //process
+    Process* process = nil;
+
+    //sync
+    @synchronized(processList)
+    {
+        
+    //iterate over all processes backwards
+    // ->find pid of process (of must recent process) that matches path
+    for(NSString* processID in [processList reverseKeyEnumerator])
+    {
+        //extract process
+        process = processList[processID];
+        
+        //check for match
+        if( (YES == [process.path isEqualToString:path]) ||
+            (YES ==  [[process.bundle bundlePath] isEqualToString:path]) )
+        {
+            //save pid
+            pID = process.pid;
+            
+            //bail
+            break;
+        }
+    }
+        
+    }//sync
+
+    return pID;
 }
 
 /*

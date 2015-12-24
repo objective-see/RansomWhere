@@ -36,7 +36,10 @@ struct processStartEvent
 
 /* PROPERTIES */
 
+//process list
 @property(nonatomic, retain)OrderedDictionary* processList;
+
+//dictionary of partial events
 @property(nonatomic, retain)NSMutableDictionary* partialProcessEvents;
 
 
