@@ -28,7 +28,7 @@
 #define KEXT_NAME @"BlockBlock.kext"
 
 //kext label
-#define KEXT_LABEL @"com.objective-see.kext.BlockBlock"
+#define KEXT_LABEL @"com.objectiveSee.kext.BlockBlock"
 
 //path to kextload
 #define KEXT_LOAD @"/sbin/kextload"
@@ -230,7 +230,7 @@
 #define APP_LOGIN_ITEM_REGEX @"\\/Applications\\/.*.app\\/Contents\\/Library\\/LoginItems\\/.*.app"
 
 //vendor id string
-#define OBJECTIVE_SEE_VENDOR "com.objective-see"
+#define OBJECTIVE_SEE_VENDOR "com.objectiveSee"
 
 //process started
 #define PROCESS_BEGAN_EVENT	0x1

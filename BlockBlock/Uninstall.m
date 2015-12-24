@@ -17,7 +17,7 @@
 
 
 /* manually:
- sudo kextunload -b com.objective-see.kext.BlockBlock
+ sudo kextunload -b com.objectiveSee.kext.BlockBlock
  sudo rm -rf /Library/Extensions/BlockBlock.kext
  sudo launchctl unload /Library/LaunchDaemons/com.objectiveSee.blockblock.plist
  sudo rm -rf /Library/LaunchDaemons/com.objectiveSee.blockblock.plist

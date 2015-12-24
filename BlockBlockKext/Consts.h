@@ -10,7 +10,7 @@
 #define Consts_h
 
 //vendor id string
-#define OBJECTIVE_SEE_VENDOR "com.objective-see"
+#define OBJECTIVE_SEE_VENDOR "com.objectiveSee"
 
 //process started
 #define PROCESS_BEGAN_EVENT	0x1
