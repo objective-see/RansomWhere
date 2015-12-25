@@ -416,12 +416,15 @@ bail:
         //err msg
         logMsg(LOG_ERR, @"ERROR: failed to stop kext");
         
-        //bail
-        goto bail;
+        //don't bail since still want to to try delete...
     }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"stopped kext");
+    //stopped ok
+    // ->just dbg msg
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"stopped kext");
+    }
     
     //delete kext
     if(YES != [[NSFileManager defaultManager] removeItemAtPath:path error:&error])
