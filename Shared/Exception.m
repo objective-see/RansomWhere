@@ -10,7 +10,10 @@
 #import "Logging.h"
 #import "Exception.h"
 #import "Utilities.h"
-#import "AppDelegate.h"
+
+#ifdef IS_APP
+ #import "AppDelegate.h"
+#endif
 
 //global
 // ->only report an fatal exception once
@@ -45,9 +48,6 @@ void installExceptionHandlers()
 // will be invoked for Obj-C exceptions
 void exceptionHandler(NSException *exception)
 {
-    //error info dictionary
-    NSMutableDictionary* errorInfo = nil;
-
     //error msg
     NSString* errorMessage = nil;
     
@@ -55,12 +55,9 @@ void exceptionHandler(NSException *exception)
     if(YES == wasReported)
     {
         //bail
-        goto bail;
+        return;
     }
     
-    //alloc
-    errorInfo = [NSMutableDictionary dictionary];
-        
     //err msg
     logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: OS version: %@ /App version: %@", [[NSProcessInfo processInfo] operatingSystemVersionString], getAppVersion()]);
 
@@ -72,6 +69,18 @@ void exceptionHandler(NSException *exception)
     
     //err msg
     logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", [[NSThread callStackSymbols] description]]);
+    
+    //set flag
+    wasReported = YES;
+    
+    //start app-specific code
+    #ifdef IS_APP
+    
+    //error info dictionary
+    NSMutableDictionary* errorInfo = nil;
+
+    //alloc
+    errorInfo = [NSMutableDictionary dictionary];
     
     //add main error msg
     errorInfo[KEY_ERROR_MSG] = @"ERROR: unrecoverable fault";
@@ -89,11 +98,8 @@ void exceptionHandler(NSException *exception)
     //display error msg
     [((AppDelegate*)[[NSApplication sharedApplication] delegate]) displayErrorWindow:errorInfo];
     
-    //set flag
-    wasReported = YES;
-    
     //need to sleep, otherwise returning from this function will cause OS to kill agent
-    //   instead, we want error popup to be displayed (which will exit agent when closed)
+    //  ->instead, we want error popup to be displayed (which will exit agent when closed)
     if(YES != [NSThread isMainThread])
     {
         //nap
@@ -103,9 +109,9 @@ void exceptionHandler(NSException *exception)
             [NSThread sleepForTimeInterval:1.0f];
         }
     }
-
-//bail
-bail:
+    
+    //end app-specific code
+    #endif
     
 	return;
 }
@@ -114,9 +120,6 @@ bail:
 // will be invoked for BSD/*nix signals
 void signalHandler(int signal, siginfo_t *info, void *context)
 {
-    //error info dictionary
-    NSMutableDictionary* errorInfo = nil;
-
     //error msg
     NSString* errorMessage = nil;
     
@@ -127,11 +130,8 @@ void signalHandler(int signal, siginfo_t *info, void *context)
     if(YES == wasReported)
     {
         //bail
-        goto bail;
+        return;
     }
-    
-    //alloc
-    errorInfo = [NSMutableDictionary dictionary];
     
     //err msg
     logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: OS version: %@ /App version: %@", [[NSProcessInfo processInfo] operatingSystemVersionString], getAppVersion()]);
@@ -149,6 +149,18 @@ void signalHandler(int signal, siginfo_t *info, void *context)
     //err msg
     logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", [[NSThread callStackSymbols] description]]);
     
+    //set flag
+    wasReported = YES;
+    
+    //start app-specific code
+    #ifdef IS_APP
+    
+    //error info dictionary
+    NSMutableDictionary* errorInfo = nil;
+    
+    //alloc
+    errorInfo = [NSMutableDictionary dictionary];
+    
     //add main error msg
     errorInfo[KEY_ERROR_MSG] = @"ERROR: unrecoverable fault";
     
@@ -165,12 +177,8 @@ void signalHandler(int signal, siginfo_t *info, void *context)
     //display error msg
     [((AppDelegate*)[[NSApplication sharedApplication] delegate]) displayErrorWindow:errorInfo];
     
-    //set flag
-    wasReported = YES;
-    
-    
-//bail
-bail:
+    //end app-specific code
+    #endif
     
     return;
 }

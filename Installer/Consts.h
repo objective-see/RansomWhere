@@ -56,7 +56,6 @@
 //action to kick off UI installer
 #define ACTION_UNINSTALL_UI @"Uninstall_UI"
 
-
 //button title
 // ->Close
 #define ACTION_CLOSE @"Close"

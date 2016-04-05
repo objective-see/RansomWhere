@@ -14,22 +14,31 @@
 #import "Consts.h"
 #import "Logging.h"
 #import "Process.h"
+#import "Exception.h"
 #import "Utilities.h"
 #import "ProcessMonitor.h"
-#import "FileSystemMonitor.h"
+#import "FSMonitor.h"
 #import "3rdParty/ent/ent.h"
 
 
 //sudo chown -R root:wheel  /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
 //sudo chmod 4755 /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
 
-//global process list
+//global list of installed apps
+NSMutableSet* installedApps = nil;
+
+//global list of running processes
 NSMutableDictionary* processList = nil;
 
+//global list of user approved binaries
+NSMutableSet* userApprovedBins = nil;
+
 //TODO: don't need entropy? (pi is enough?)
-//TODO: make 'save'd' files persistent!
-//TODO: allow all existing installed apps?
 //TODO: don't need pid?
+
+//TODO: allow apps from app store
+//      see: https://github.com/ole/NSBundle-OBCodeSigningInfo/blob/master/NSBundle%2BOBCodeSigningInfo.m & https://github.com/rmaddy/VerifyStoreReceiptiOS
+//      though looks like not trivial to do...
 
 //main interface
 // ->init some procs, kick off file-system watcher, then just runloop()
@@ -55,17 +64,33 @@ int main(int argc, const char * argv[])
         //dbg msg
         logMsg(LOG_DEBUG, @"daemon instance");
         
+        //first thing...
+        // ->install exception handlers
+        installExceptionHandlers();
+        
         //priority++
         setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
         
         //io policy++
         setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_IMPORTANT);
         
+        //install shutdown handler
+        initShutdownHandler();
+        
+        //load list of apps installed installed at baseline
+        // ->first time; generate them (this might take a while)
+        initInstalledApps();
+        
+        //init list of user approved binaries
+        // ->loads from disk, into global variable
+        initApprovedBins();
+        
         //init proc list
+        // ->loads from disk into global variable
         initProcessList();
         
         //start file system monitoring
-        [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FileSystemMonitor alloc] init] withObject:nil];
+        [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FSMonitor alloc] init] withObject:nil];
         
         //dbg msg
         logMsg(LOG_DEBUG, @"started file system monitor");
@@ -83,6 +108,193 @@ bail:
     
     return 0;
 }
+
+//install handler for shutdown
+// ->i.e: want to catch SIGTERM
+void initShutdownHandler()
+{
+    //action
+    struct sigaction action = {0};
+    
+    //clear
+    memset(&action, 0, sizeof(struct sigaction));
+    
+    //set handler
+    action.sa_handler = shutdownHandler;
+    
+    //install
+    sigaction(SIGTERM, &action, NULL);
+    
+    return;
+}
+
+//shutdown handler
+// ->write out approved apps
+void shutdownHandler(int signum)
+{
+    //file for user approved bins
+    NSString* approvedBinsFile = nil;
+    
+    //init path for where to save user approved binaries
+    approvedBinsFile = [[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:USER_APPROVED_BINARIES];
+    
+    //save to disk
+    if(YES != writeSetToFile(userApprovedBins, approvedBinsFile))
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save enumerated apps to %@", approvedBinsFile]);
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saved list of installed apps to %@", approvedBinsFile]);
+    
+    return;
+}
+
+//load list of apps installed installed at baseline
+// ->first time; generate them (this might take a while)
+void initInstalledApps()
+{
+    //path to prev. saved list of installed apps
+    NSString* installedAppsFile = nil;
+    
+    //enumerated apps
+    // ->array of detailed app dictionaries
+    NSMutableArray* enumeratedApps = nil;
+    
+    //app bundle path
+    NSString* appBundlePath = nil;
+    
+    //app bundle
+    NSBundle* appBundle = nil;
+    
+    //app path
+    NSString* appPath = nil;
+    
+    //alloc global set for installed apps
+    installedApps = [NSMutableSet set];
+    
+    //init path to save list of installed apps
+    installedAppsFile = [[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:INSTALLED_APPS];
+    
+    //enumerate apps if necessary
+    // ->note: this is will be slow!
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
+    {
+        //enumerate
+        enumeratedApps = enumerateInstalledApps();
+        if(nil == enumeratedApps)
+        {
+            //bail
+            goto bail;
+        }
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, @"enumerated all installed applications");
+        
+        //process all enumerated apps
+        // ->extract app path and load bundle to get full path
+        for(NSDictionary* enumeratedApp in enumeratedApps)
+        {
+            //grab path to app's bundle
+            appBundlePath = [enumeratedApp objectForKey:@"path"];
+            if(nil == appBundlePath)
+            {
+                //skip
+                continue;
+            }
+            
+            //load app bundle
+            appBundle = [NSBundle bundleWithPath:appBundlePath];
+            if(nil == appBundle)
+            {
+                //skip
+                continue;
+            }
+            
+            //grab full path to app's binary
+            appPath = appBundle.executablePath;
+            if(nil == appPath)
+            {
+                //skip
+                continue;
+            }
+            
+            //save
+            [installedApps addObject:appPath];
+        }
+       
+        //save to disk
+        if(YES != writeSetToFile(installedApps, installedAppsFile))
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save enumerated apps to %@", installedAppsFile]);
+        }
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saved list of installed apps to %@", installedAppsFile]);
+    }
+    
+    //already enumerated
+    // ->load them from disk into memory
+    else
+    {
+        //load
+        installedApps = readSetFromFile(installedAppsFile);
+        if(nil == installedApps)
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to loaded enumerated apps from %@", installedAppsFile]);
+        }
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded list of installed apps from %@", installedAppsFile]);
+    }
+    
+//bail
+bail:
+    
+    return;
+}
+
+//init list of user approved binaries
+// ->loads from disk, into global variable
+void initApprovedBins()
+{
+    //file for user approved bins
+    NSString* approvedBinsFile = nil;
+    
+    //alloc global set
+    userApprovedBins = [NSMutableSet set];
+    
+    //init path for where to save user approved binaries
+    approvedBinsFile = [[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:USER_APPROVED_BINARIES];
+    
+    //bail if file doesn't exist yet
+    // ->for example, first time daemon is run
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:approvedBinsFile])
+    {
+        //bail
+        goto bail;
+    }
+    
+    //load from disk
+    userApprovedBins = readSetFromFile(approvedBinsFile);
+    if(nil == userApprovedBins)
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to loaded user approved binaries from %@", approvedBinsFile]);
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded list of user approved binaries from %@", approvedBinsFile]);
+        
+//bail
+bail:
+    
+    return;
+}
+
 
 //init process list
 // ->make process objects of all currently running processes

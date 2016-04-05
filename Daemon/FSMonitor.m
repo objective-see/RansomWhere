@@ -12,7 +12,7 @@
 #import "Logging.h"
 #import "Process.h"
 #import "Utilities.h"
-#import "FileSystemMonitor.h"
+#import "FSMonitor.h"
 
 #import <Foundation/Foundation.h>
 
@@ -20,9 +20,11 @@
 //directories to watch
 NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
 
-@implementation FileSystemMonitor
+@implementation FSMonitor
 
 @synthesize eventQueue;
+@synthesize windowRegex;
+@synthesize pidPathMappings;
 @synthesize watchDirectories;
 
 //init function
@@ -39,6 +41,13 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
         
         //alloc/init event queue
         eventQueue = [[Queue alloc] init];
+        
+        //alloc/init pid -> path mappings
+        pidPathMappings = [NSMutableDictionary dictionary];
+        
+        //init regex
+        // ->want to ignore window_xx.data files
+        windowRegex = [NSRegularExpression regularExpressionWithPattern:WINDOW_DATA_REGEX options:NSRegularExpressionCaseInsensitive error:nil];
         
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watching %@, for encrypted files", self.watchDirectories]);
@@ -210,15 +219,6 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
             
             //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
             
-            //check process
-            // ->make new process object if needed
-            process = [self checkProcess:fse->pid];
-            if(nil == process)
-            {
-                //skip
-                continue;
-            }
-        
             //skip any non-watched paths
             if(YES != [self isWatched:path])
             {
@@ -226,8 +226,18 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
                 continue;
             }
             
+            //check process
+            // ->make new process object if needed
+            process = [self getProcessObj:fse->pid];
+            if(nil == process)
+            {
+                //skip
+                continue;
+            }
 
-            //TODO: add path
+            
+
+            //TODO: rename args, etc?
             //create event object
             event = [[Event alloc] initWithParams:path fsEvent:fse procPath:process.path];
             if(nil == event)
@@ -267,20 +277,40 @@ bail:
 
 //check process
 // ->makes new process obj if needed
--(Process*)checkProcess:(pid_t)pid
+-(Process*)getProcessObj:(pid_t)pid
 {
     //process object
     Process* process = nil;
     
+    //pid->path mapping dictionary
+    NSMutableDictionary* pidProcMapping = nil;
+    
     //process path
     NSString* processPath = nil;
     
-    //get path from pid
-    processPath = getProcessPath(pid);
-    if(nil == processPath)
+    //check if there is a valid ('cached') pid->path mapping
+    // ->will be for recent existing procs (for now, 60 seconds)
+    pidProcMapping = [self.pidPathMappings objectForKey:[NSNumber numberWithUnsignedInt:pid]];
+    if( (nil != pidProcMapping) &&
+        ([pidProcMapping[@"timestamp"] timeIntervalSinceNow] < 60) )
     {
-        //ignore
-        goto bail;
+        //extract path
+        processPath = pidProcMapping[@"path"];
+    }
+    //otherwise, new process, or time interval too long
+    // ->lookup process path & save it into pid->path mapping
+    else
+    {
+        //get path from pid
+        processPath = getProcessPath(pid);
+        if(nil == processPath)
+        {
+            //ignore
+            goto bail;
+        }
+        
+        //save ('cache') pid->path mapping
+        [self.pidPathMappings setObject:@{@"timestamp": [NSDate date], @"path": processPath} forKey:[NSNumber numberWithUnsignedInt:pid]];
     }
     
     //see if there's an existing process
@@ -290,7 +320,10 @@ bail:
         //all set
         goto bail;
     }
-
+    
+    
+    /*
+    
     //new process
     // ->suspend it so have time to create process object
     if(-1 == kill(pid, SIGSTOP))
@@ -300,6 +333,7 @@ bail:
         
         //don't bail though
     }
+    */
     
     //create process object and add it to global list
     process = [[Process alloc] initWithPid:pid infoDictionary:nil];
@@ -313,6 +347,7 @@ bail:
         }
     }
     
+    /*
     //resume process
     if(-1 == kill(pid, SIGCONT))
     {
@@ -321,6 +356,11 @@ bail:
         
         //don't bail though
     }
+    */
+        
+    
+    
+    //}//new process or timeout
     
 //bail
 bail:
@@ -334,7 +374,22 @@ bail:
     //flag
     BOOL watched = NO;
     
-    //check all watch paths
+    //file component
+    NSString* fileComponent = nil;
+    
+    //init file component
+    fileComponent = [path lastPathComponent];
+    
+    //TODO: fix! should match something like: 'window_1.data'
+    //ignore any 'window_<digits>.data' files
+    if(nil != [self.windowRegex firstMatchInString:fileComponent options:0 range:NSMakeRange(0, fileComponent.length)])
+    {
+        //matched
+        // ->so bail
+        goto bail;
+    }
+    
+    //then check all watch paths
     for(NSString* watchDirectory in self.watchDirectories)
     {
         //check if path is being watched

@@ -13,7 +13,7 @@
 
 @class WatchEvent;
 
-@interface FileSystemMonitor : NSObject
+@interface FSMonitor : NSObject
 {
     //iVARS
     
@@ -21,7 +21,7 @@
     FSEventStreamRef streamRef;
 }
 
-//METHODS
+/* METHODS */
 
 //monitor file-system events
 -(void)monitor;
@@ -35,7 +35,14 @@
 //watched directories
 @property (nonatomic, retain)NSMutableSet* watchDirectories;
 
+//regex for 'window_<digits>.data' files
+@property (nonatomic, retain)NSRegularExpression *windowRegex;
+
 //file-system event queue
 @property (nonatomic, retain)Queue* eventQueue;
+
+//pid -> path mappings
+// ->timestamp ensures its still timely, cuz at this point can't detect when procs exit, so this is kinda of a hack...
+@property (nonatomic, retain)NSMutableDictionary* pidPathMappings;
 
 @end

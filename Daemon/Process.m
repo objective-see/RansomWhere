@@ -8,7 +8,7 @@
 
 #import "Consts.h"
 #import "Process.h"
-#import "FileSystemMonitor.h"
+#import "FSMonitor.h"
 #import "Logging.h"
 #import "Utilities.h"
 #import "ProcessMonitor.h"

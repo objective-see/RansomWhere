@@ -87,6 +87,98 @@ bail:
     return processes;
 }
 
+//generate list of all installed applications
+NSMutableArray* enumerateInstalledApps()
+{
+    //installed apps
+    NSMutableArray* installedApplications = nil;
+    
+    //output from system profiler task
+    NSData* taskOutput = nil;
+    
+    //serialized task output
+    NSArray* serializedOutput = nil;
+    
+    //alloc array for installed apps
+    installedApplications = [NSMutableArray array];
+    
+    //exec system profiler
+    taskOutput = execTask(SYSTEM_PROFILER, @[@"SPApplicationsDataType", @"-xml",  @"-detailLevel", @"mini"]);
+    if(nil == taskOutput)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //serialize output to array
+    serializedOutput = [NSPropertyListSerialization propertyListWithData:taskOutput options:kNilOptions format:NULL error:NULL];
+    if(nil == serializedOutput)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //wrap to parse
+    // ->grab list of installed apps from '_items' key
+    @try
+    {
+        //save
+        installedApplications = serializedOutput[0][@"_items"];
+    }
+    @catch(NSException *exception)
+    {
+        //err msg
+        logMsg(LOG_ERR, @"failed to extract installed items from serialized application list");
+        
+        //bail
+        goto bail;
+    }
+    
+//bail
+bail:
+    
+    return installedApplications;
+}
+
+//write an NSSet to file
+BOOL writeSetToFile(NSSet* set, NSString* file)
+{
+    //flag
+    BOOL wasWritten = NO;
+    
+    //convert to array
+    // ->then write that to file
+    wasWritten = [set.allObjects writeToFile:file atomically:NO];
+    
+    return wasWritten;
+}
+
+//read an NSSet from file
+NSMutableSet* readSetFromFile(NSString* file)
+{
+    //array
+    NSArray* fileContents = nil;
+    
+    //set
+    NSMutableSet* set = nil;
+    
+    //load as array
+    fileContents = [NSArray arrayWithContentsOfFile:file];
+    if(nil == fileContents)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //convert to set
+    set = [NSMutableSet setWithArray:fileContents];
+    
+//bail
+bail:
+    
+    return set;
+}
+
 //get process's path
 NSString* getProcessPath(pid_t pid)
 {

@@ -7,3 +7,6 @@
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
+
+//specific app
+#define IS_APP 1

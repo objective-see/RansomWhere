@@ -22,9 +22,6 @@
 //condition for queue's status
 @property (nonatomic, retain)NSCondition* queueCondition;
 
-//processes explicity allowed by the user
-@property (nonatomic, retain)NSMutableDictionary* allowedProcs;
-
 //processes explicity disallowed by the user
 @property (nonatomic, retain)NSMutableDictionary* disallowedProcs;
 

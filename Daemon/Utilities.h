@@ -54,14 +54,17 @@ NSString* which(NSString* processName);
 //given a pid and process name, try to find full path
 NSString* getFullPath(NSNumber* processID, NSString* processName, BOOL tryWhich);
 
-//start an NSTask
-//NSUInteger execTask(NSString* path, NSArray* arguments, BOOL waitUntilExit);
+//exec a process and grab it's output
+NSData* execTask(NSString* binaryPath, NSArray* arguments);
 
 //bring an app to foreground (to get an icon in the dock) or background
 void transformProcess(ProcessApplicationTransformState location);
 
 //get info about current logged in/active user
 NSDictionary* getCurrentConsoleUser();
+
+//generate list of all installed applications
+NSMutableArray* enumerateInstalledApps();
 
 //get all users
 NSMutableArray* getUsers();
@@ -109,6 +112,12 @@ NSString* getProcessPath(pid_t pid);
 
 //determine if a file is signed by Apple proper
 BOOL isAppleBinary(NSString* path);
+
+//write an NSSet to file
+BOOL writeSetToFile(NSSet* set, NSString* file);
+
+//read an NSSet from file
+NSMutableSet* readSetFromFile(NSString* file);
 
 
 #endif /* defined(__BlockBlock__Utilities__) */

@@ -12,5 +12,7 @@
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
+	<key>EnableTransactions</key>
+	<true/>
 </dict>
 </plist>

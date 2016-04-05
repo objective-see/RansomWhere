@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD90BCC1CB38B66001D68BB /* Exception.m */; };
 		7DF707E71CAD10ED00FF79D8 /* com.objective-see.ransomwhere.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7DF707E61CAD108B00FF79D8 /* com.objective-see.ransomwhere.plist */; };
 		7DF707EA1CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707E91CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m */; };
 		7DF707F21CAE5B1A00FF79D8 /* chisq.c in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707EC1CAE5B1A00FF79D8 /* chisq.c */; };
@@ -17,7 +18,7 @@
 		7DF708021CAE5B7500FF79D8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707FA1CAE5B7500FF79D8 /* main.m */; };
 		7DF708031CAE5B7500FF79D8 /* Queue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707FC1CAE5B7500FF79D8 /* Queue.m */; };
 		7DF708041CAE5B7500FF79D8 /* Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707FE1CAE5B7500FF79D8 /* Utilities.m */; };
-		7DF708051CAE5B7500FF79D8 /* FileSystemMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708001CAE5B7500FF79D8 /* FileSystemMonitor.m */; };
+		7DF708051CAE5B7500FF79D8 /* FSMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708001CAE5B7500FF79D8 /* FSMonitor.m */; };
 		7DF708151CB094AC00FF79D8 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708111CB094AC00FF79D8 /* Logging.m */; };
 		7DF7081B1CB0BBE700FF79D8 /* Process.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708171CB0BBE700FF79D8 /* Process.m */; };
 		7DF7081E1CB0CD8800FF79D8 /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DF7081D1CB0CD8800FF79D8 /* libbsm.tbd */; };
@@ -37,6 +38,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7DD90BCC1CB38B66001D68BB /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = Shared/Exception.m; sourceTree = "<group>"; };
+		7DD90BCD1CB38B66001D68BB /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = Shared/Exception.h; sourceTree = "<group>"; };
 		7DF707E61CAD108B00FF79D8 /* com.objective-see.ransomwhere.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "com.objective-see.ransomwhere.plist"; sourceTree = "<group>"; };
 		7DF707E81CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+QueueAdditions.h"; path = "Daemon/3rdParty/NSMutableArray+QueueAdditions.h"; sourceTree = "<group>"; };
 		7DF707E91CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+QueueAdditions.m"; path = "Daemon/3rdParty/NSMutableArray+QueueAdditions.m"; sourceTree = "<group>"; };
@@ -55,8 +58,8 @@
 		7DF707FC1CAE5B7500FF79D8 /* Queue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Queue.m; path = Daemon/Queue.m; sourceTree = "<group>"; };
 		7DF707FD1CAE5B7500FF79D8 /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utilities.h; path = Daemon/Utilities.h; sourceTree = "<group>"; };
 		7DF707FE1CAE5B7500FF79D8 /* Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utilities.m; path = Daemon/Utilities.m; sourceTree = "<group>"; };
-		7DF707FF1CAE5B7500FF79D8 /* FileSystemMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileSystemMonitor.h; path = Daemon/FileSystemMonitor.h; sourceTree = "<group>"; };
-		7DF708001CAE5B7500FF79D8 /* FileSystemMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileSystemMonitor.m; path = Daemon/FileSystemMonitor.m; sourceTree = "<group>"; };
+		7DF707FF1CAE5B7500FF79D8 /* FSMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSMonitor.h; path = Daemon/FSMonitor.h; sourceTree = "<group>"; };
+		7DF708001CAE5B7500FF79D8 /* FSMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSMonitor.m; path = Daemon/FSMonitor.m; sourceTree = "<group>"; };
 		7DF708061CAE5EA700FF79D8 /* ent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ent.h; path = Daemon/3rdParty/ent/ent.h; sourceTree = "<group>"; };
 		7DF708111CB094AC00FF79D8 /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logging.m; path = Shared/Logging.m; sourceTree = "<group>"; };
 		7DF708121CB094AC00FF79D8 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = Shared/Logging.h; sourceTree = "<group>"; };
@@ -113,6 +116,8 @@
 		7DF708101CB094A100FF79D8 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				7DD90BCC1CB38B66001D68BB /* Exception.m */,
+				7DD90BCD1CB38B66001D68BB /* Exception.h */,
 				7DF708111CB094AC00FF79D8 /* Logging.m */,
 				7DF708121CB094AC00FF79D8 /* Logging.h */,
 			);
@@ -131,14 +136,14 @@
 				7DF707F71CAE5B7500FF79D8 /* Event.h */,
 				7DF707F81CAE5B7500FF79D8 /* Event.m */,
 				7DF707F91CAE5B7500FF79D8 /* fsEvents.h */,
-				7DF707FA1CAE5B7500FF79D8 /* main.m */,
 				7DF7081F1CB0E62000FF79D8 /* main.h */,
+				7DF707FA1CAE5B7500FF79D8 /* main.m */,
 				7DF707FB1CAE5B7500FF79D8 /* Queue.h */,
 				7DF707FC1CAE5B7500FF79D8 /* Queue.m */,
 				7DF707FD1CAE5B7500FF79D8 /* Utilities.h */,
 				7DF707FE1CAE5B7500FF79D8 /* Utilities.m */,
-				7DF707FF1CAE5B7500FF79D8 /* FileSystemMonitor.h */,
-				7DF708001CAE5B7500FF79D8 /* FileSystemMonitor.m */,
+				7DF707FF1CAE5B7500FF79D8 /* FSMonitor.h */,
+				7DF708001CAE5B7500FF79D8 /* FSMonitor.m */,
 				7DF707E51CAD107D00FF79D8 /* Supporting Files */,
 				7DE29CDF1CAA11B100DFA6A6 /* 3rdParty */,
 				CDBC2B451C9EEF5300853C8A /* Products */,
@@ -217,10 +222,11 @@
 				7DF707F21CAE5B1A00FF79D8 /* chisq.c in Sources */,
 				7DF708031CAE5B7500FF79D8 /* Queue.m in Sources */,
 				7DF707F31CAE5B1A00FF79D8 /* ent.m in Sources */,
-				7DF708051CAE5B7500FF79D8 /* FileSystemMonitor.m in Sources */,
+				7DF708051CAE5B7500FF79D8 /* FSMonitor.m in Sources */,
 				7DF708021CAE5B7500FF79D8 /* main.m in Sources */,
 				7DF708041CAE5B7500FF79D8 /* Utilities.m in Sources */,
 				7DF707F41CAE5B1A00FF79D8 /* iso8859.c in Sources */,
+				7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
