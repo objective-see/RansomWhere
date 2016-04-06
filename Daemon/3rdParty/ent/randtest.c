@@ -65,6 +65,8 @@ void rt_init(int binmode)
     totalc = 0;
 }
 
+//TODO: always called with 0x1, so can unroll some stuff here!?
+
 /*  RT_ADD  --	Add one or more bytes to accumulation.	*/
 void rt_add(void *buf, int bufl)
 {

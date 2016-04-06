@@ -17,8 +17,11 @@
 #import "Logging.h"
 #import "Utilities.h"
 
+//#import <AppKit/AppKit.h>
+
 @implementation Queue
 
+@synthesize icon;
 @synthesize eventQueue;
 @synthesize queueCondition;
 @synthesize disallowedProcs;
@@ -37,11 +40,11 @@
         //init empty condition
         queueCondition = [[NSCondition alloc] init];
  
-        //alloc for 'user-allowed' processes
-        //allowedProcs = [NSMutableDictionary dictionary];
-        
         //alloc for 'user-disallowed' processes
         disallowedProcs = [NSMutableDictionary dictionary];
+        
+        //init path to icon
+        icon = [NSURL URLWithString:[[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:ALERT_ICON]];
         
         //spin up thread to watch/process queue
         [NSThread detachNewThreadSelector:@selector(dequeue:) toTarget:self withObject:nil];
@@ -201,7 +204,8 @@
     //dbg msg
     logMsg(LOG_DEBUG, @"3) is from non-disallowed process");
     
-    //ignore files under 1KB
+    //ignore files under 1014
+    // ->entropy calculations don't do well on smaller files
     if([[[NSFileManager defaultManager] attributesOfItemAtPath:event.filePath error:nil] fileSize] < 1024)
     {
         //dbg msg
@@ -214,6 +218,22 @@
     //dbg msg
     logMsg(LOG_DEBUG, @"4) is large enough");
     
+    /* THIS IS TOO SLOW :( do be manaul checks in 'is encrypted' via first xxx bytes!
+    //ignore image files as they can look 'encrypted'
+    // ->NSImage's 'initWithContentsOfFile' method will nicely fail if file isn't an image :)
+    if(nil != [[NSImage alloc] initWithContentsOfFile:event.filePath])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"ignoring: is an image");
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"5) is not an image");
+    */
+   
     //skip any non-encrypted files
     if(YES != isEncrypted(event.filePath))
     {
@@ -225,7 +245,7 @@
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, @"5) is encrypted");
+    logMsg(LOG_DEBUG, @"6) is encrypted");
     
     //TODO: call determineFileType to make sure its 'data'
     // ->jpg, etc?
@@ -286,8 +306,6 @@ bail:
 // ->block until response, which is returned from this method
 -(CFOptionFlags)alertUser:(Event*)event
 {
-    //title
-    
     //user's response
     CFOptionFlags response = 0;
     
@@ -305,7 +323,7 @@ bail:
     
     //show alert
     // ->will block until user iteraction, then response saved in 'response' variable
-    CFUserNotificationDisplayAlert(0.0f, kCFUserNotificationStopAlertLevel, NULL, NULL, NULL, title, body, (__bridge CFStringRef)@"Terminate", (__bridge CFStringRef)@"Allow", NULL, &response);
+    CFUserNotificationDisplayAlert(0.0f, kCFUserNotificationStopAlertLevel, (CFURLRef)self.icon, NULL, NULL, title, body, (__bridge CFStringRef)@"Terminate", (__bridge CFStringRef)@"Allow", NULL, &response);
     
 //bail
 bail:

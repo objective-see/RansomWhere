@@ -134,7 +134,7 @@
     if(YES == self.shouldExit)
     {
         //dbg msg
-        logMsg(LOG_ERR, @"exiting application");
+        logMsg(LOG_DEBUG, @"exiting application");
         
         //exit
         [NSApp terminate:self];

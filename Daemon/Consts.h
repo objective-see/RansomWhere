@@ -30,7 +30,17 @@
 //user approved binaries
 #define USER_APPROVED_BINARIES @"approvedBinaries.plist"
 
+//icon for user alert
+#define ALERT_ICON @"icon.png"
+
 //window data regex
-#define WINDOW_DATA_REGEX @"\\^window_\\d\\+\\.data"
+//  ^window_ : must start w/ 'window_
+//  \d+ : then match any # of digits
+//  .data$ : end in .data
+#define WINDOW_DATA_REGEX @"^window_\\d+.data$"
+
+//header size
+// ->just # of bytes to grab from start of file for image detections, etc
+#define HEADER_SIZE 0x10
 
 #endif /* Consts_h */

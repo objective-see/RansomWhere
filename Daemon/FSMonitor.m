@@ -235,8 +235,6 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
                 continue;
             }
 
-            
-
             //TODO: rename args, etc?
             //create event object
             event = [[Event alloc] initWithParams:path fsEvent:fse procPath:process.path];
@@ -380,7 +378,6 @@ bail:
     //init file component
     fileComponent = [path lastPathComponent];
     
-    //TODO: fix! should match something like: 'window_1.data'
     //ignore any 'window_<digits>.data' files
     if(nil != [self.windowRegex firstMatchInString:fileComponent options:0 range:NSMakeRange(0, fileComponent.length)])
     {

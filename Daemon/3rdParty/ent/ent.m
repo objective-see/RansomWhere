@@ -29,6 +29,7 @@
 #include <math.h>
 #include <unistd.h>
 
+#include "Consts.h"
 #include "iso8859.h"
 #include "randtest.h"
 
@@ -109,30 +110,10 @@ NSMutableDictionary* testFile(NSString* file)
     //add each byte
     for(NSUInteger index = 0; index < length; index++)
     {
+        //add
         rt_add((void*)&fileBytes[index], 1);
     }
 
-    /*
-    //open file for binary reading
-    fp = fopen(fileName, "rb");
-    if(NULL == fp)
-    {
-        //err msg
-        
-        //bail
-        goto bail;
-    }
-    
-	//process each byte in file
-	while((oc = fgetc(fp)) != EOF)
-    {
-        //add
-        rt_add(&oc, 1);
-	}
-    
-    */
-    
-    
 	//complete calculations
 	rt_end(&ent, &chisq, &montepi);
     
@@ -145,25 +126,20 @@ NSMutableDictionary* testFile(NSString* file)
     //save monto carlo pi error
     results[@"montecarlo"] = [NSNumber numberWithDouble:100.0 * (fabs(PI - montepi) / PI)];
     
-	printf("\nEntropy = %f bits per bytes\n", ent);
-    printf("Chi square distribution is %1.2f\n", chisq);
-    printf("Monte Carlo value for Pi is %1.9f (error %1.2f percent)\n\n", montepi, 100.0 * (fabs(PI - montepi) / PI));
+    //save bytes at start of file
+    if(length > HEADER_SIZE)
+    {
+        //save
+        results[@"header"] = [NSData dataWithBytes:fileBytes length:HEADER_SIZE];
+    }
+    
+	//printf("\nEntropy = %f bits per bytes\n", ent);
+    //printf("Chi square distribution is %1.2f\n", chisq);
+    //printf("Monte Carlo value for Pi is %1.9f (error %1.2f percent)\n\n", montepi, 100.0 * (fabs(PI - montepi) / PI));
 
    
 //bail
 bail:
     
-    /*
-    //close file
-    if(NULL != fp)
-    {
-        //close
-        fclose(fp);
-        
-        //unset
-        fp = NULL;
-    }
-    */
-
 	return results;
 }

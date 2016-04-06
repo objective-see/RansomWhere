@@ -69,6 +69,14 @@
     // ->'/Library/LauchDaemons' + daemon plist
     paths[DAEMON_DEST_PLIST_KEY] = [@"/Library/LaunchDaemons" stringByAppendingPathComponent:DAEMON_PLIST];
     
+    //set daemon icon src path
+    // ->orginally stored in installer app's /Resource bundle
+    paths[DAEMON_SRC_ICON_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:ICON_NAME];
+    
+    //set daemon icon dest path
+    // ->'/Library/RansomWhere/' + icon name
+    paths[DAEMON_DEST_ICON_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:ICON_NAME];
+    
     return paths;
 }
 
@@ -188,6 +196,28 @@ bail:
         goto bail;
     }
     
+    //move icon for user alert into persistent location
+    // ->'/Library/RansomWhere/' + icon name
+    if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_ICON_KEY] toPath:daemonInfo[DAEMON_DEST_ICON_KEY] error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy user alert icon into %@ (%@)", daemonInfo[DAEMON_DEST_ICON_KEY], error]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //set group/owner to root/wheel
+    if(YES != setFileOwner(daemonInfo[DAEMON_DEST_ICON_KEY], @0, @0, YES))
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon %@ to be owned by root", daemonInfo[DAEMON_DEST_ICON_KEY]]);
+        
+        //bail
+        goto bail;
+    }
+
+
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_PATH_KEY], daemonInfo[DAEMON_DEST_PATH_KEY]]);
 

@@ -913,8 +913,6 @@ NSData* execTask(NSString* binaryPath, NSArray* arguments)
     //grab any left over data
     [output appendData:[readHandle readDataToEndOfFile]];
     
-    //syslog(LOG_ERR, "OBJECTIVE-SEE: results here: %s", [[output description] UTF8String]);
-    
 //bail
 bail:
     
@@ -989,6 +987,14 @@ BOOL isEncrypted(NSString* path)
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"encryption results for %@: %@", path, results]);
     
+    //ignore image files
+    // ->looks for well known headers at start of file
+    if(YES == isAnImage(results[@"header"]))
+    {
+        //ignore
+        goto bail;
+    }
+    
     //encrypted files have super high entropy
     // ->so ignore files that have 'low' entropy
     if([results[@"entropy"] doubleValue] < 7.95)
@@ -1021,6 +1027,35 @@ BOOL isEncrypted(NSString* path)
 bail:
 
     return encrypted;
+}
+
+//examines header for image signatures (e.g. 'GIF87a')
+BOOL isAnImage(NSData* header)
+{
+    //flag
+    // ->default to 'YES' for speed
+    BOOL isImage = YES;
+    
+    //header bytes
+    const char* headerBytes = NULL;
+    
+    //extract header bytes
+    headerBytes = header.bytes;
+    
+    //gif ('GIF8')
+    // ->do 'GIF87a' and 'GIF89a' in single compar
+    if(0x38464947 == *(unsigned int*)headerBytes)
+    {
+        //goto bail
+        goto bail;
+    }
+    
+    //TODO: test/add more!
+    
+//bail
+bail:
+    
+    return isImage;
 }
 
 

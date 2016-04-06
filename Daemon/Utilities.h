@@ -119,5 +119,8 @@ BOOL writeSetToFile(NSSet* set, NSString* file);
 //read an NSSet from file
 NSMutableSet* readSetFromFile(NSString* file);
 
+//examines header for image signatures (e.g. 'GIF87a')
+BOOL isAnImage(NSData* header);
+
 
 #endif /* defined(__BlockBlock__Utilities__) */
