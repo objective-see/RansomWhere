@@ -103,7 +103,7 @@
 -(IBAction)cancel:(id)sender
 {
     //dbg msg
-    logMsg(LOG_DEBUG, @"handling 'cancel' button click, exiting application");
+    logMsg(LOG_DEBUG, @"handling 'cancel'/'close' button click, exiting application");
     
     //close
     [self.window close];

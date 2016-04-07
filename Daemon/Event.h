@@ -9,6 +9,8 @@
 #import "fsEvents.h"
 #import <Foundation/Foundation.h>
 
+@class Binary;
+
 @interface Event : NSObject
 {
     
@@ -25,12 +27,15 @@
 //process id
 @property (nonatomic, retain)NSNumber* processID;
 
+//binary object
+@property (nonatomic, retain)Binary* binary;
+
 //process path
-@property (nonatomic, retain)NSString* processPath;
+//@property (nonatomic, retain)NSString* processPath;
 
 /* PROPERTIES */
 
 //init
--(id)initWithParams:(NSString*)path fsEvent:(kfs_event_a *)fsEvent procPath:(NSString*)procPath;;
+-(id)initWithParams:(NSString*)path binary:(Binary*)bin fsEvent:(kfs_event_a *)fsEvent;
 
 @end

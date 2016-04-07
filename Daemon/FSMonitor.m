@@ -10,7 +10,7 @@
 #import "Event.h"
 #import "Consts.h"
 #import "Logging.h"
-#import "Process.h"
+#import "Binary.h"
 #import "Utilities.h"
 #import "FSMonitor.h"
 
@@ -50,7 +50,9 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
         windowRegex = [NSRegularExpression regularExpressionWithPattern:WINDOW_DATA_REGEX options:NSRegularExpressionCaseInsensitive error:nil];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watching %@, for encrypted files", self.watchDirectories]);
+        #endif
         
     }
     
@@ -126,8 +128,8 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
     //event object
     Event* event = nil;
     
-    //process object
-    Process* process = nil;
+    //binary object
+    Binary* binary = nil;
     
     //matched path
     NSMutableString* matchedPath = nil;
@@ -228,8 +230,8 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
             
             //check process
             // ->make new process object if needed
-            process = [self getProcessObj:fse->pid];
-            if(nil == process)
+            binary = [self getBinaryObject:fse->pid];
+            if(nil == binary)
             {
                 //skip
                 continue;
@@ -237,7 +239,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
 
             //TODO: rename args, etc?
             //create event object
-            event = [[Event alloc] initWithParams:path fsEvent:fse procPath:process.path];
+            event = [[Event alloc] initWithParams:path binary:binary fsEvent:fse];
             if(nil == event)
             {
                 //skip
@@ -273,12 +275,12 @@ bail:
     return;
 }
 
-//check process
-// ->makes new process obj if needed
--(Process*)getProcessObj:(pid_t)pid
+//try find existing binary obj
+// ->makes new one if that's needed
+-(Binary*)getBinaryObject:(pid_t)pid
 {
-    //process object
-    Process* process = nil;
+    //binary object
+    Binary* binary = nil;
     
     //pid->path mapping dictionary
     NSMutableDictionary* pidProcMapping = nil;
@@ -295,7 +297,7 @@ bail:
         //extract path
         processPath = pidProcMapping[@"path"];
     }
-    //otherwise, new process, or time interval too long
+    //otherwise, new binary, or time interval too long
     // ->lookup process path & save it into pid->path mapping
     else
     {
@@ -311,16 +313,17 @@ bail:
         [self.pidPathMappings setObject:@{@"timestamp": [NSDate date], @"path": processPath} forKey:[NSNumber numberWithUnsignedInt:pid]];
     }
     
-    //see if there's an existing process
-    process = processList[processPath];
-    if(nil != process)
+    //see if there's an existing process object
+    // ->if so, all set, so can bail to return to caller
+    binary = binaryList[processPath];
+    if(nil != binary)
     {
         //all set
         goto bail;
     }
     
     
-    /*
+    /* TODO: this is really nice to have - so re-enable if possible!!
     
     //new process
     // ->suspend it so have time to create process object
@@ -333,17 +336,16 @@ bail:
     }
     */
     
-    //create process object and add it to global list
-    process = [[Process alloc] initWithPid:pid infoDictionary:nil];
-    if(nil != process)
+    //create binary object
+    binary = [[Binary alloc] init:processPath attributes:nil];
+    
+    //sync to add
+    @synchronized(binaryList)
     {
-        //sync to add
-        @synchronized(processList)
-        {
-            //add
-            processList[process.path] = process;
-        }
+        //add
+        binaryList[binary.path] = binary;
     }
+    
     
     /*
     //resume process
@@ -363,7 +365,7 @@ bail:
 //bail
 bail:
     
-    return process;
+    return binary;
 }
 
 //determine if a path is, or is under a watched path
@@ -471,14 +473,11 @@ bail:
             if( (FSE_RENAME == fse->type) &&
                 (FSE_ARG_STRING == *argType) )
             {
-                //dbg msg
-                //logMsg(LOG_DEBUG, @"RENAME/FSE_ARG_STRING");
-                
                 //save as path
                 path = [NSString stringWithUTF8String:(const char*)(ptrBuffer + *ptrCurrentOffset + 4)];
             }
                
-            
+            //advance
             arg_len = (4 + *argLen);
         }
         

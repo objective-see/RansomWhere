@@ -9,6 +9,9 @@
 #ifndef Consts_h
 #define Consts_h
 
+//reset flag
+#define RESET_FLAG "-reset"
+
 //path to fsevents devices
 #define DEVICE_FSEVENTS "/dev/fsevents"
 
@@ -32,6 +35,9 @@
 
 //icon for user alert
 #define ALERT_ICON @"icon.png"
+
+//daemon destination folder
+#define DAEMON_DEST_FOLDER @"/Library/RansomWhere"
 
 //window data regex
 //  ^window_ : must start w/ 'window_

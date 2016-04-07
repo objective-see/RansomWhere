@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Process : NSObject
+@interface Binary : NSObject
 {
 
 }
@@ -18,22 +18,28 @@
 //process id
 //@property (nonatomic, retain)NSNumber* pid;
 
-//process path
+//binary path
 @property (nonatomic, retain)NSString* path;
 
-//process name
+//binary name
 @property (nonatomic, retain)NSString* name;
 
-//process bundle
+//binary bundle
 // ->only for apps
-@property (nonatomic, retain)NSBundle* bundle;
+//@property (nonatomic, retain)NSBundle* bundle;
 
 //flag indicating binary belongs to Apple OS
 @property BOOL isApple;
 
+//flag indicating binary was present at baseline
+@property BOOL isBaseline;
+
+//flag indicating binary was approved
+@property BOOL isApproved;
+
 /* METHODS */
 
-//init function
--(id)initWithPid:(pid_t)processID infoDictionary:(NSDictionary*)infoDictionary;
+//init w/ an info dictionary
+-(id)init:(NSString*)path attributes:(NSDictionary*)attributes;
 
 @end

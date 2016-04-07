@@ -29,9 +29,6 @@
 // ->shown in alert to user
 @property (nonatomic, retain)NSURL* icon;
 
-//path to user approved files
-@property (nonatomic, retain)NSString* approvedBinsFile;
-
 
 /* METHODS */
 

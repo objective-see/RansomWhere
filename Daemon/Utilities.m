@@ -140,45 +140,6 @@ bail:
     return installedApplications;
 }
 
-//write an NSSet to file
-BOOL writeSetToFile(NSSet* set, NSString* file)
-{
-    //flag
-    BOOL wasWritten = NO;
-    
-    //convert to array
-    // ->then write that to file
-    wasWritten = [set.allObjects writeToFile:file atomically:NO];
-    
-    return wasWritten;
-}
-
-//read an NSSet from file
-NSMutableSet* readSetFromFile(NSString* file)
-{
-    //array
-    NSArray* fileContents = nil;
-    
-    //set
-    NSMutableSet* set = nil;
-    
-    //load as array
-    fileContents = [NSArray arrayWithContentsOfFile:file];
-    if(nil == fileContents)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //convert to set
-    set = [NSMutableSet setWithArray:fileContents];
-    
-//bail
-bail:
-    
-    return set;
-}
-
 //get process's path
 NSString* getProcessPath(pid_t pid)
 {
@@ -985,7 +946,9 @@ BOOL isEncrypted(NSString* path)
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"encryption results for %@: %@", path, results]);
+    #endif
     
     //ignore image files
     // ->looks for well known headers at start of file

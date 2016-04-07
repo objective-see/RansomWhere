@@ -7,45 +7,31 @@
 //
 
 #import "Event.h"
+#import "Binary.h"
 #import "Utilities.h"
 
 @implementation Event
 
 @synthesize flags;
+@synthesize binary;
 @synthesize filePath;
 @synthesize processID;
-@synthesize processPath;
 
 //init
--(id)initWithParams:(NSString*)path fsEvent:(kfs_event_a *)fsEvent procPath:(NSString*)procPath;
+-(id)initWithParams:(NSString*)path binary:(Binary*)bin fsEvent:(kfs_event_a *)fsEvent
 {
     //init super
     self = [super init];
     if(nil != self)
     {
-        self.processPath = procPath;
-        
-        /*
-        //first try get process path
-        // ->might error if proc exit'd, which won't (generally) happen w/ ransomware
-        self.processPath = getProcessPath(fsEvent->pid);
-        if( (nil == processPath) ||
-            (0 == processPath.length) )
-        {
-            //unset
-            // ->indicate errors
-            self = nil;
-            
-            //error
-            goto bail;
-        }
-        */
-        
         //save flags
         self.flags = [NSNumber numberWithUnsignedShort:fsEvent->type];
         
         //save file path
         self.filePath = path;
+        
+        //save binary
+        self.binary = bin;
         
         //save process id
         self.processID = [NSNumber numberWithUnsignedInt:fsEvent->pid];
@@ -60,7 +46,7 @@ bail:
 //description
 -(NSString*)description
 {
-    return [NSString stringWithFormat:@"%@ -> %@", self.processID, self.filePath];
+    return [NSString stringWithFormat:@"(%@) %@ -> %@", self.processID, self.binary.path, self.filePath];
 }
 
 

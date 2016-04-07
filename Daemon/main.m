@@ -13,7 +13,7 @@
 #import "Queue.h"
 #import "Consts.h"
 #import "Logging.h"
-#import "Process.h"
+#import "Binary.h"
 #import "Exception.h"
 #import "Utilities.h"
 #import "ProcessMonitor.h"
@@ -24,14 +24,10 @@
 //sudo chown -R root:wheel  /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
 //sudo chmod 4755 /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
 
-//global list of installed apps
-NSMutableSet* installedApps = nil;
 
-//global list of running processes
-NSMutableDictionary* processList = nil;
-
-//global list of user approved binaries
-NSMutableSet* userApprovedBins = nil;
+//global list of binary objects
+// ->running/installed/user approved apps
+NSMutableDictionary* binaryList = nil;
 
 //TODO: don't need entropy? (pi is enough?)
 //TODO: don't need pid?
@@ -50,23 +46,39 @@ int main(int argc, const char * argv[])
         //isEncrypted([NSString stringWithUTF8String:argv[1]]);
         //return 0;
         
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"daemon instance");
+        #endif
+        
         //sanity check
         // ->gotta be r00t
         if(0 != geteuid())
         {
             //err msg
-            logMsg(LOG_ERR, @"must run as r00t");
+            // ->syslog() & printf() since likely run from cmdline for this to happen?
+            logMsg(LOG_ERR, @"must be run as r00t");
+            printf("\nRANSOMWHERE ERROR: must be run as r00t\n\n");
             
             //bail
             goto bail;
         }
         
-        //dbg msg
-        logMsg(LOG_DEBUG, @"daemon instance");
-        
         //first thing...
         // ->install exception handlers
         installExceptionHandlers();
+        
+        //handle '-reset'
+        // ->delete list of installed/approved apps, etc
+        if( (2 == argc) &&
+            (0 == strcmp(argv[1], RESET_FLAG)) )
+        {
+            //do it
+            reset();
+            
+            //all pau
+            goto bail;
+        }
         
         //priority++
         setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
@@ -74,17 +86,18 @@ int main(int argc, const char * argv[])
         //io policy++
         setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_IMPORTANT);
         
-        //load list of apps installed installed at baseline
-        // ->first time; generate them (this might take a while)
-        initInstalledApps();
+        //alloc global dictionary for binary list
+        binaryList = [NSMutableDictionary dictionary];
         
-        //init list of user approved binaries
-        // ->loads from disk, into global variable
-        initApprovedBins();
+        //create binary objects for all baselined app
+        // ->first time; generate list from OS (this might take a while)
+        processBaselinedApps();
         
-        //init proc list
-        // ->enumerates running processes to generate process objs
-        initProcessList();
+        //create binary objects for all (persistent) user-approved binaries
+        processApprovedBins();
+        
+        //create binary objects for all currently running processes
+        processRunningProcs();
         
         //msg
         // ->always print
@@ -92,9 +105,6 @@ int main(int argc, const char * argv[])
         
         //start file system monitoring
         [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FSMonitor alloc] init] withObject:nil];
-        
-        //dbg msg
-        logMsg(LOG_DEBUG, @"started file system monitor");
         
         //run
         CFRunLoopRun();
@@ -104,16 +114,83 @@ int main(int argc, const char * argv[])
 bail:
     
     //dbg msg
-    // ->shouldn't exit unless manually unloaded, etc
+    // ->shouldn't exit unless manually unloaded, reset mode, etc
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"exiting");
+    #endif
     
     return 0;
 }
 
-//load list of apps installed installed at baseline
-// ->first time; generate them (this might take a while)
-void initInstalledApps()
+//delete list of installed/approved apps, etc
+void reset()
 {
+    //error
+    NSError* error = nil;
+    
+    //status var
+    // ->since want to keep trying
+    BOOL bAnyErrors = NO;
+    
+    //path to prev. saved list of installed apps
+    NSString* installedAppsFile = nil;
+    
+    //file for user approved bins
+    NSString* approvedBinsFile = nil;
+    
+    //init path to save list of installed apps
+    installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
+    
+    //when found
+    // ->delete list of installed apps
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
+    {
+        //delete
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:installedAppsFile error:&error])
+        {
+            //set flag
+            bAnyErrors = YES;
+            
+            //err msg
+            printf("ERROR: failed to list of installed apps %s (%s)", installedAppsFile.UTF8String, error.description.UTF8String);
+        }
+    }
+    
+    //init path for where to save user approved binaries
+    approvedBinsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_BINARIES];
+    
+    //when found
+    // ->delete list of 'user approved' apps
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:approvedBinsFile])
+    {
+        //delete
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:approvedBinsFile error:&error])
+        {
+            //set flag
+            bAnyErrors = YES;
+            
+            //err msg
+            printf("ERROR: failed to list of approvedBinsFile apps %s (%s)\n", approvedBinsFile.UTF8String, error.description.UTF8String);
+        }
+    }
+    
+    //all good?
+    if(YES != bAnyErrors)
+    {
+        //dbg msg
+        printf("\nRANDSOMWHERE: reset\n\t      removed list of installed and all 'user approved' binaries\n\n");
+    }
+
+    return;
+}
+
+//load list of apps installed at time of baseline
+// ->first time; generate them (this might take a while)
+void processBaselinedApps()
+{
+    //list of installed apps
+    NSMutableArray* installedApps = nil;
+
     //path to prev. saved list of installed apps
     NSString* installedAppsFile = nil;
     
@@ -130,11 +207,14 @@ void initInstalledApps()
     //app path
     NSString* appPath = nil;
     
-    //alloc global set for installed apps
-    installedApps = [NSMutableSet set];
+    //binary object
+    Binary* binary = nil;
+    
+    //alloc set for installed apps
+    installedApps = [NSMutableArray array];
     
     //init path to save list of installed apps
-    installedAppsFile = [[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:INSTALLED_APPS];
+    installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
     
     //enumerate apps if necessary
     // ->note: this is will be slow!
@@ -149,7 +229,9 @@ void initInstalledApps()
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"enumerated all installed applications");
+        #endif
         
         //process all enumerated apps
         // ->extract app path and load bundle to get full path
@@ -184,14 +266,16 @@ void initInstalledApps()
         }
        
         //save to disk
-        if(YES != writeSetToFile(installedApps, installedAppsFile))
+        if(YES != [installedApps writeToFile:installedAppsFile atomically:NO])
         {
             //err msg
             logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save installed apps to %@", installedAppsFile]);
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saved list of installed apps to %@", installedAppsFile]);
+        #endif
     }
     
     //already enumerated
@@ -199,7 +283,7 @@ void initInstalledApps()
     else
     {
         //load
-        installedApps = readSetFromFile(installedAppsFile);
+        installedApps = [NSMutableArray arrayWithContentsOfFile:installedAppsFile];
         if(nil == installedApps)
         {
             //err msg
@@ -207,7 +291,21 @@ void initInstalledApps()
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded list of installed apps from %@", installedAppsFile]);
+        #endif
+    }
+    
+    //iterate overall all installed apps
+    // ->create binary objects for all, passing in 'baselined' flag
+    for(NSString* appPath in installedApps)
+    {
+        //init binary object
+        binary = [[Binary alloc] init:appPath attributes:@{@"baselined":[NSNumber numberWithBool:YES]}];
+        
+        //add to global list
+        // ->path is key; object is value
+        binaryList[binary.path] = binary;
     }
     
 //bail
@@ -216,18 +314,23 @@ bail:
     return;
 }
 
-//init list of user approved binaries
-// ->loads from disk, into global variable
-void initApprovedBins()
+//create binary objects for all (persistent) user-approved binaries
+void processApprovedBins()
 {
     //file for user approved bins
     NSString* approvedBinsFile = nil;
     
-    //alloc global set
-    userApprovedBins = [NSMutableSet set];
+    //array for approved bins
+    NSMutableArray* userApprovedBins = nil;
+    
+    //binary object
+    Binary* binary = nil;
+    
+    //alloc set
+    userApprovedBins = [NSMutableArray array];
     
     //init path for where to save user approved binaries
-    approvedBinsFile = [[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:USER_APPROVED_BINARIES];
+    approvedBinsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_BINARIES];
     
     //bail if file doesn't exist yet
     // ->for example, first time daemon is run
@@ -238,7 +341,7 @@ void initApprovedBins()
     }
     
     //load from disk
-    userApprovedBins = readSetFromFile(approvedBinsFile);
+    userApprovedBins = [NSMutableArray arrayWithContentsOfFile:approvedBinsFile];
     if(nil == userApprovedBins)
     {
         //err msg
@@ -246,39 +349,60 @@ void initApprovedBins()
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded list of user approved binaries from %@", approvedBinsFile]);
+    #endif
+    
+    //iterate overall all approved binaries
+    // ->create binary objects for all, passing in 'approved' flag
+    for(NSString* binaryPath in userApprovedBins)
+    {
+        //init binary object
+        binary = [[Binary alloc] init:binaryPath attributes:@{@"approved":[NSNumber numberWithBool:YES]}];
         
+        //add to global list
+        // ->path is key; object is value
+        binaryList[binary.path] = binary;
+    }
+    
 //bail
 bail:
     
     return;
 }
 
-
-//init process list
-// ->make process objects of all currently running processes
-void initProcessList()
+//create binary objects for all currently running processes
+void processRunningProcs()
 {
-    //process object
-    Process* process = nil;
+    //process path
+    NSString* processPath = nil;
     
-    //alloc global dictionary for process list
-    processList = [NSMutableDictionary dictionary];
+    //binary object
+    Binary* binary = nil;
     
     //iterate over all running processes
     // ->create process obj & save into global list
     for(NSNumber* processID in enumerateProcesses())
     {
-        //create new process obj
-        process = [[Process alloc] initWithPid:processID.unsignedIntValue infoDictionary:nil];
-        if(nil == process)
+        //get process path from pid
+        processPath = getProcessPath(processID.unsignedIntValue);
+        if(nil == processPath)
         {
             //skip
             continue;
         }
         
-        //add to path:proc
-        processList[process.path] = process;
+        //init binary object
+        binary = [[Binary alloc] init:processPath attributes:nil];
+        if(nil == binary)
+        {
+            //skip
+            continue;
+        }
+        
+        //add to global list
+        // ->path is key; object is value
+        binaryList[binary.path] = binary;
     }
     
     return;

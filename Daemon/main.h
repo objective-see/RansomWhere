@@ -13,34 +13,26 @@
 
 /* GLOBALS */
 
-//global list of installed apps
-extern NSMutableSet* installedApps;
-
-//global process list
-extern NSMutableDictionary* processList;
-
-//global list of user approved binaries
-extern NSMutableSet* userApprovedBins;
+//global list of binary objects
+extern NSMutableDictionary* binaryList;
 
 /* FUNCTIONS */
 
-//shutdown handler
-void shutdownHandler(int signum);
+//delete list of installed/approved apps, etc
+void reset();
 
-//init list of user approved binaries
-// ->loads from disk, into global variable
-void initApprovedBins();
+//create binary objects for all baselined app
+// ->first time; generate list from OS (this might take a while)
+void processBaselinedApps();
 
-//init list of user approved binaries
-// ->loads from disk, into global variable
-void initApprovedBins();
+//create binary objects for all (persistent) user-approved binaries
+void processApprovedBins();
 
 //load list of installed apps
 // ->first time; generate them (this might take a while)
 void initInstalledApps();
 
-//init process list
-// ->make process objects of all currently running processes
-void initProcessList();
+//create binary objects for all currently running processes
+void processRunningProcs();
 
 #endif /* main_h */
