@@ -74,9 +74,6 @@ int main(int argc, const char * argv[])
         //io policy++
         setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_IMPORTANT);
         
-        //install shutdown handler
-        initShutdownHandler();
-        
         //load list of apps installed installed at baseline
         // ->first time; generate them (this might take a while)
         initInstalledApps();
@@ -86,8 +83,12 @@ int main(int argc, const char * argv[])
         initApprovedBins();
         
         //init proc list
-        // ->loads from disk into global variable
+        // ->enumerates running processes to generate process objs
         initProcessList();
+        
+        //msg
+        // ->always print
+        syslog(LOG_ERR, "OBJECTIVE-SEE RANSOMWHERE: completed initializations; monitoring engaged!\n");
         
         //start file system monitoring
         [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FSMonitor alloc] init] withObject:nil];
@@ -107,48 +108,6 @@ bail:
     logMsg(LOG_DEBUG, @"exiting");
     
     return 0;
-}
-
-//install handler for shutdown
-// ->i.e: want to catch SIGTERM
-void initShutdownHandler()
-{
-    //action
-    struct sigaction action = {0};
-    
-    //clear
-    memset(&action, 0, sizeof(struct sigaction));
-    
-    //set handler
-    action.sa_handler = shutdownHandler;
-    
-    //install
-    sigaction(SIGTERM, &action, NULL);
-    
-    return;
-}
-
-//shutdown handler
-// ->write out approved apps
-void shutdownHandler(int signum)
-{
-    //file for user approved bins
-    NSString* approvedBinsFile = nil;
-    
-    //init path for where to save user approved binaries
-    approvedBinsFile = [[NSProcessInfo.processInfo.arguments[0] stringByDeletingLastPathComponent] stringByAppendingPathComponent:USER_APPROVED_BINARIES];
-    
-    //save to disk
-    if(YES != writeSetToFile(userApprovedBins, approvedBinsFile))
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save enumerated apps to %@", approvedBinsFile]);
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saved list of installed apps to %@", approvedBinsFile]);
-    
-    return;
 }
 
 //load list of apps installed installed at baseline
@@ -228,7 +187,7 @@ void initInstalledApps()
         if(YES != writeSetToFile(installedApps, installedAppsFile))
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save enumerated apps to %@", installedAppsFile]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save installed apps to %@", installedAppsFile]);
         }
         
         //dbg msg
@@ -244,7 +203,7 @@ void initInstalledApps()
         if(nil == installedApps)
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to loaded enumerated apps from %@", installedAppsFile]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to load installed apps from %@", installedAppsFile]);
         }
         
         //dbg msg

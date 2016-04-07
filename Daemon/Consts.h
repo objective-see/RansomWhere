@@ -43,4 +43,21 @@
 // ->just # of bytes to grab from start of file for image detections, etc
 #define HEADER_SIZE 0x10
 
+//gif ('GIF8')
+// ->note: covers 'GIF87a' and 'GIF89a'
+#define MAGIC_GIF 0x38464947
+
+//png ('.PNG')
+#define MAGIC_PNG 0x474E5089
+
+//icns ('icns')
+#define MAGIC_ICNS 0x736E6369
+
+//jpg
+#define MAGIC_JPG  0xE0FFD8FF
+
+//tiff
+#define MAGIC_TIFF 0x2A004D4D
+
+
 #endif /* Consts_h */

@@ -989,7 +989,8 @@ BOOL isEncrypted(NSString* path)
     
     //ignore image files
     // ->looks for well known headers at start of file
-    if(YES == isAnImage(results[@"header"]))
+    if( (nil != results[@"header"]) &&
+        (YES == isAnImage(results[@"header"])) )
     {
         //ignore
         goto bail;
@@ -1030,34 +1031,37 @@ bail:
 }
 
 //examines header for image signatures (e.g. 'GIF87a')
+// ->see: https://en.wikipedia.org/wiki/List_of_file_signatures for image signatures
 BOOL isAnImage(NSData* header)
 {
     //flag
-    // ->default to 'YES' for speed
-    BOOL isImage = YES;
+    BOOL isImage = NO;
     
-    //header bytes
-    const char* headerBytes = NULL;
+    //header bytes as 4byte int
+    unsigned int magic = 0;
     
-    //extract header bytes
-    headerBytes = header.bytes;
+    //init with first 4 bytes of header
+    magic = *(unsigned int*)header.bytes;
     
-    //gif ('GIF8')
-    // ->do 'GIF87a' and 'GIF89a' in single compar
-    if(0x38464947 == *(unsigned int*)headerBytes)
+    //check for magic (4-byte) header values
+    if( (MAGIC_PNG == magic) ||
+        (MAGIC_JPG == magic) ||
+        (MAGIC_GIF == magic) ||
+        (MAGIC_ICNS == magic) ||
+        (MAGIC_TIFF == magic) )
     {
-        //goto bail
+        //set flag
+        isImage = YES;
+        
+        //bail
         goto bail;
     }
-    
-    //TODO: test/add more!
     
 //bail
 bail:
     
     return isImage;
 }
-
 
 
 

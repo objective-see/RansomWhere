@@ -420,9 +420,6 @@ bail:
     //handle dropped events
     if(fse->type == FSE_EVENTS_DROPPED)
     {
-        //TODO: remove
-        logMsg(LOG_ERR, @"dropping events");
-        
         //advance to next
         *ptrCurrentOffset += sizeof(kfs_event_a) + sizeof(fse->type);
         

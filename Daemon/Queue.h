@@ -25,9 +25,12 @@
 //processes explicity disallowed by the user
 @property (nonatomic, retain)NSMutableDictionary* disallowedProcs;
 
-//path to our icon
+//path to icon
 // ->shown in alert to user
 @property (nonatomic, retain)NSURL* icon;
+
+//path to user approved files
+@property (nonatomic, retain)NSString* approvedBinsFile;
 
 
 /* METHODS */

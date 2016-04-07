@@ -24,10 +24,6 @@ extern NSMutableSet* userApprovedBins;
 
 /* FUNCTIONS */
 
-//install handler for shutdown
-// ->i.e: want to catch SIGTERM
-void initShutdownHandler();
-
 //shutdown handler
 void shutdownHandler(int signum);
 

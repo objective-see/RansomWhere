@@ -28,17 +28,10 @@
     return;
 }
 
-//TODO: remove title (if not using!)
 //configure window/buttons
 // ->also brings window to front
 -(void)configure:(NSString*)title action:(NSUInteger)requestedAction
 {
-    //save window title
-    //self.windowTitle = title;
-    
-    //save action
-    //self.action = requestedAction;
-    
     //set window title
     [self window].title = title;
     
@@ -72,6 +65,7 @@
             break;
             
         default:
+            
             break;
    
     }//switch
