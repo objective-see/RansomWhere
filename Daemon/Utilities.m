@@ -22,6 +22,12 @@
 //success
 #define STATUS_SUCCESS 0
 
+//get version of self
+NSString* getDaemonVersion()
+{
+    return DAEMON_VERSION;
+}
+
 //enumerate all running processes
 NSMutableArray* enumerateProcesses()
 {
@@ -88,6 +94,7 @@ bail:
 }
 
 //generate list of all installed applications
+// ->done via system_profiler, w/ 'SPApplicationsDataType' flag
 NSMutableArray* enumerateInstalledApps()
 {
     //installed apps
@@ -402,7 +409,6 @@ bail:
         //free
         CFRelease(staticCode);
     }
-    
     
     return isApple;
 }
@@ -800,18 +806,8 @@ NSDictionary* getOSVersion()
 //bail
 bail:
     
-    return osVersionInfo;
-    
+    return osVersionInfo;    
 }
-
-//get app's version
-// ->extracted from Info.plist
-NSString* getAppVersion()
-{
-    //read and return 'CFBundleVersion' from bundle
-    return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-}
-
 
 //exec a process and grab it's output
 NSData* execTask(NSString* binaryPath, NSArray* arguments)
@@ -879,7 +875,6 @@ bail:
     
     return output;
 }
-
 
 //set file type
 // ->invokes 'file' cmd, the parses out result

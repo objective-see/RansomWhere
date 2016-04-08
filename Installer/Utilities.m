@@ -66,8 +66,8 @@ bail:
 }
 
 //get version
-//TODO: add self or installed (uninstall, want to grab version from installed da kine!!)
-NSString* getVersion()
+// ->either self, or installed version
+NSString* getVersion(int instanceFlag)
 {
     //version
     NSString* currentVersion = nil;

@@ -41,20 +41,22 @@
         //bail
         goto bail;
     }
+    //TODO: remove titles?
+    // ...or at least update when buttons change or let's disable the buttons!
     
     //already installed?
     // ->display uninstall window
     if(YES == [configureObj isInstalled])
     {
         //show window
-        [self displayConfigureWindow:[NSString stringWithFormat:@"Uninstall v. %@", getVersion()] action:ACTION_UNINSTALL_FLAG];
+        [self displayConfigureWindow:@"Uninstall" action:ACTION_UNINSTALL_FLAG];
     }
     //not installed
     // ->display install window
     else
     {
         //show window
-        [self displayConfigureWindow:[NSString stringWithFormat:@"Install v. %@", getVersion()] action:ACTION_INSTALL_FLAG];
+        [self displayConfigureWindow:[NSString stringWithFormat:@"Install v. %@", getAppVersion()] action:ACTION_INSTALL_FLAG];
     }
     
 //bail

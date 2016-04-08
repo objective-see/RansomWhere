@@ -64,16 +64,14 @@ void transformProcess(ProcessApplicationTransformState location);
 NSDictionary* getCurrentConsoleUser();
 
 //generate list of all installed applications
+// ->done via system_profiler, w/ 'SPApplicationsDataType' flag
 NSMutableArray* enumerateInstalledApps();
 
 //get all users
 NSMutableArray* getUsers();
 
-//get curent version
-NSString* getVersion(NSUInteger instance);
-
-//query interwebz to get latest version
-NSString* getLatestVersion();
+//get version of self
+NSString* getDaemonVersion();
 
 //determine if there is a new version
 NSInteger isNewVersion(NSMutableString* errMsg);
@@ -91,10 +89,6 @@ NSDictionary* getOSVersion();
 //get path to app's (self) 'Info.plist' file
 NSString* infoPlistFile();
 
-//get app's version
-// ->extracted from Info.plist
-NSString* getAppVersion();
-
 //given a pid, get its parent (ppid)
 pid_t getParentID(int pid);
 
@@ -103,9 +97,6 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
 
 //determine if a file is encrypted via entropy
 BOOL isEncrypted(NSString* path);
-
-//set permissions for file
-//void setFilePermissions(NSString* file, int permissions);
 
 //get process's path
 NSString* getProcessPath(pid_t pid);

@@ -30,7 +30,6 @@
 NSMutableDictionary* binaryList = nil;
 
 //TODO: don't need entropy? (pi is enough?)
-//TODO: don't need pid?
 
 //TODO: allow apps from app store
 //      see: https://github.com/ole/NSBundle-OBCodeSigningInfo/blob/master/NSBundle%2BOBCodeSigningInfo.m & https://github.com/rmaddy/VerifyStoreReceiptiOS
@@ -80,24 +79,56 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
+        //alloc global dictionary for binary list
+        binaryList = [NSMutableDictionary dictionary];
+        
+        //init paths
+        // ->this logic will only be needed if daemon is executed from non-standard location
+        if(YES != initPaths())
+        {
+            //err msg
+            logMsg(LOG_ERR, @"failed to initialize paths");
+            
+            //bail
+            goto bail;
+        }
+        
+        //create binary objects for all baselined app
+        // ->first time; generate list from OS (this might take a while)
+        if(YES != processBaselinedApps())
+        {
+            //err msg
+            logMsg(LOG_ERR, @"failed to enumerate/process baselined apps");
+            
+            //bail
+            goto bail;
+        }
+        
+        //create binary objects for all (persistent) user-approved binaries
+        if(YES != processApprovedBins())
+        {
+            //err msg
+            logMsg(LOG_ERR, @"failed to enumerate/process user-approved apps");
+            
+            //bail
+            goto bail;
+        }
+        
+        //create binary objects for all currently running processes
+        if(YES != processRunningProcs())
+        {
+            //err msg
+            logMsg(LOG_ERR, @"failed to enumerate/process running apps");
+            
+            //bail
+            goto bail;
+        }
+        
         //priority++
         setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
         
         //io policy++
         setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_IMPORTANT);
-        
-        //alloc global dictionary for binary list
-        binaryList = [NSMutableDictionary dictionary];
-        
-        //create binary objects for all baselined app
-        // ->first time; generate list from OS (this might take a while)
-        processBaselinedApps();
-        
-        //create binary objects for all (persistent) user-approved binaries
-        processApprovedBins();
-        
-        //create binary objects for all currently running processes
-        processRunningProcs();
         
         //msg
         // ->always print
@@ -123,8 +154,12 @@ bail:
 }
 
 //delete list of installed/approved apps, etc
-void reset()
+// ->note: as invoked via cmdline, use printf()'s for output
+BOOL reset()
 {
+    //flag
+    BOOL fullReset = NO;
+    
     //error
     NSError* error = nil;
     
@@ -177,17 +212,71 @@ void reset()
     //all good?
     if(YES != bAnyErrors)
     {
+        //set flag
+        fullReset = YES;
+        
         //dbg msg
         printf("\nRANDSOMWHERE: reset\n\t      removed list of installed and all 'user approved' binaries\n\n");
     }
 
-    return;
+    return fullReset;
+}
+
+//init paths
+// ->this logic will only be needed if daemon is executed from non-standard location
+BOOL initPaths()
+{
+    //flag
+    BOOL pathsInitd = NO;
+    
+    //error
+    NSError* error = nil;
+    
+    //check if daemon's installation directory needs to be created
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:DAEMON_DEST_FOLDER])
+    {
+        //create it
+        if(YES != [[NSFileManager defaultManager] createDirectoryAtPath:DAEMON_DEST_FOLDER withIntermediateDirectories:YES attributes:nil error:&error])
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to create daemon's directory %@ (%@)", DAEMON_DEST_FOLDER, error]);
+            
+            //bail
+            goto bail;
+        }
+        
+        //set group/owner to root/wheel
+        if(YES != setFileOwner(DAEMON_DEST_FOLDER, @0, @0, YES))
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon's directory %@ to be owned by root", DAEMON_DEST_FOLDER]);
+            
+            //bail
+            goto bail;
+        }
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created %@", DAEMON_DEST_FOLDER]);
+        #endif
+    }
+    
+    //happy
+    pathsInitd = YES;
+    
+//bail
+bail:
+    
+    return pathsInitd;
 }
 
 //load list of apps installed at time of baseline
 // ->first time; generate them (this might take a while)
-void processBaselinedApps()
+BOOL processBaselinedApps()
 {
+    //flag
+    BOOL wereProcessed = NO;
+    
     //list of installed apps
     NSMutableArray* installedApps = nil;
 
@@ -217,13 +306,17 @@ void processBaselinedApps()
     installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
     
     //enumerate apps if necessary
-    // ->note: this is will be slow!
+    // ->done via system_profiler, w/ 'SPApplicationsDataType' flag (slow!)
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
     {
         //enumerate
         enumeratedApps = enumerateInstalledApps();
-        if(nil == enumeratedApps)
+        if( (nil == enumeratedApps) ||
+            (0 == enumeratedApps.count) )
         {
+            //err msg
+            logMsg(LOG_ERR, @"failed to enumerate installed apps");
+            
             //bail
             goto bail;
         }
@@ -235,7 +328,7 @@ void processBaselinedApps()
         
         //process all enumerated apps
         // ->extract app path and load bundle to get full path
-        for(NSDictionary* enumeratedApp in enumeratedApps)
+        for(NSDictionary* enumeratedApp in enumerateInstalledApps())
         {
             //grab path to app's bundle
             appBundlePath = [enumeratedApp objectForKey:@"path"];
@@ -270,6 +363,9 @@ void processBaselinedApps()
         {
             //err msg
             logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save installed apps to %@", installedAppsFile]);
+            
+            //bail
+            goto bail;
         }
         
         //dbg msg
@@ -288,6 +384,9 @@ void processBaselinedApps()
         {
             //err msg
             logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to load installed apps from %@", installedAppsFile]);
+            
+            //bail
+            goto bail;
         }
         
         //dbg msg
@@ -308,15 +407,21 @@ void processBaselinedApps()
         binaryList[binary.path] = binary;
     }
     
+    //happy
+    wereProcessed = YES;
+    
 //bail
 bail:
     
-    return;
+    return wereProcessed;
 }
 
 //create binary objects for all (persistent) user-approved binaries
-void processApprovedBins()
+BOOL processApprovedBins()
 {
+    //flag
+    BOOL wereProcessed = NO;
+    
     //file for user approved bins
     NSString* approvedBinsFile = nil;
     
@@ -336,6 +441,9 @@ void processApprovedBins()
     // ->for example, first time daemon is run
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:approvedBinsFile])
     {
+        //not an error though!
+        wereProcessed = YES;
+        
         //bail
         goto bail;
     }
@@ -346,6 +454,9 @@ void processApprovedBins()
     {
         //err msg
         logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to loaded user approved binaries from %@", approvedBinsFile]);
+        
+        //bail
+        goto bail;
     }
     
     //dbg msg
@@ -365,28 +476,57 @@ void processApprovedBins()
         binaryList[binary.path] = binary;
     }
     
+    //happy
+    wereProcessed = YES;
+    
 //bail
 bail:
     
-    return;
+    return wereProcessed;
 }
 
 //create binary objects for all currently running processes
-void processRunningProcs()
+BOOL processRunningProcs()
 {
+    //flag
+    BOOL wereProcessed = NO;
+    
+    //running processes
+    NSMutableArray* runningProcesses = nil;
+    
     //process path
     NSString* processPath = nil;
     
     //binary object
     Binary* binary = nil;
     
+    //enumerate all running processes
+    runningProcesses = enumerateProcesses();
+    if( (nil == runningProcesses) ||
+        (0 == runningProcesses.count) )
+    {
+        //err msg
+        logMsg(LOG_ERR, @"failed to enumerate running processes");
+        
+        //bail
+        goto bail;
+    }
+    
     //iterate over all running processes
     // ->create process obj & save into global list
-    for(NSNumber* processID in enumerateProcesses())
+    for(NSNumber* processID in runningProcesses)
     {
         //get process path from pid
         processPath = getProcessPath(processID.unsignedIntValue);
         if(nil == processPath)
+        {
+            //skip
+            continue;
+        }
+        
+        //skip existing binary objects
+        // ->since existings ones will be baselined/approved, so don't want to overwrite
+        if(nil != binaryList[processPath])
         {
             //skip
             continue;
@@ -405,5 +545,11 @@ void processRunningProcs()
         binaryList[binary.path] = binary;
     }
     
-    return;
+    //happy
+    wereProcessed = YES;
+    
+//bail
+bail:
+    
+    return wereProcessed;
 }

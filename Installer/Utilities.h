@@ -16,8 +16,9 @@ BOOL isInstalled();
 //start an NSTask
 NSUInteger execTask(NSString* path, NSArray* arguments);
 
-//get current version
-NSString* getVersion();
+//get app's version
+// ->extracted from Info.plist
+NSString* getAppVersion();
 
 //is current OS version supported?
 // ->for now, just OS X 10.11.* (El Capitan)
@@ -27,8 +28,8 @@ BOOL isSupportedOS();
 NSDictionary* getOSVersion();
 
 //get app's version
-// ->extracted from Info.plist
-NSString* getAppVersion();
+// ->either self, or installed version
+NSString* getVersion(int instanceFlag);
 
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive);

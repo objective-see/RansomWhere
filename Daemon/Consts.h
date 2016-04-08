@@ -9,6 +9,9 @@
 #ifndef Consts_h
 #define Consts_h
 
+//version
+#define DAEMON_VERSION @"1.0.0"
+
 //reset flag
 #define RESET_FLAG "-reset"
 

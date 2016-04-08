@@ -23,7 +23,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
 @implementation FSMonitor
 
 @synthesize eventQueue;
-@synthesize windowRegex;
+//@synthesize windowRegex;
 @synthesize pidPathMappings;
 @synthesize watchDirectories;
 
@@ -47,7 +47,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
         
         //init regex
         // ->want to ignore window_xx.data files
-        windowRegex = [NSRegularExpression regularExpressionWithPattern:WINDOW_DATA_REGEX options:NSRegularExpressionCaseInsensitive error:nil];
+        //windowRegex = [NSRegularExpression regularExpressionWithPattern:WINDOW_DATA_REGEX options:NSRegularExpressionCaseInsensitive error:nil];
         
         //dbg msg
         #ifdef DEBUG
@@ -314,19 +314,16 @@ bail:
     }
     
     //see if there's an existing process object
-    // ->if so, all set, so can bail to return to caller
+    // ->if so, all set, so can bail to return binary to caller
     binary = binaryList[processPath];
     if(nil != binary)
     {
         //all set
         goto bail;
     }
-    
-    
-    /* TODO: this is really nice to have - so re-enable if possible!!
-    
+
     //new process
-    // ->suspend it so have time to create process object
+    // ->suspend it so have time to create binary object
     if(-1 == kill(pid, SIGSTOP))
     {
         //err msg
@@ -334,7 +331,6 @@ bail:
         
         //don't bail though
     }
-    */
     
     //create binary object
     binary = [[Binary alloc] init:processPath attributes:nil];
@@ -346,8 +342,6 @@ bail:
         binaryList[binary.path] = binary;
     }
     
-    
-    /*
     //resume process
     if(-1 == kill(pid, SIGCONT))
     {
@@ -356,11 +350,6 @@ bail:
         
         //don't bail though
     }
-    */
-        
-    
-    
-    //}//new process or timeout
     
 //bail
 bail:
@@ -374,6 +363,18 @@ bail:
     //flag
     BOOL watched = NO;
     
+    //TODO: is this slow?
+    //ignore any window_<digits>.data files
+    // ->are encrypted, but don't want to 'watch' them, as they are legit
+    if( (YES == [path containsString:@"/Library/Saved Application State/"]) &&
+        (YES == [path hasPrefix:@".data"]) )
+    {
+        //matched
+        // ->so bail
+        goto bail;
+    }
+    
+    /*
     //file component
     NSString* fileComponent = nil;
     
@@ -387,7 +388,7 @@ bail:
         // ->so bail
         goto bail;
     }
-    
+    */
     //then check all watch paths
     for(NSString* watchDirectory in self.watchDirectories)
     {

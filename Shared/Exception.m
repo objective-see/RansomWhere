@@ -1,6 +1,6 @@
 //
 //  Exception.m
-//  RansomWhere (Installer)
+//  RansomWhere (Installer/Daemon)
 //
 //  Created by Patrick Wardle on 1/2/16.
 //  Copyright (c) 2016 Objective-See. All rights reserved.
@@ -51,6 +51,9 @@ void exceptionHandler(NSException *exception)
     //error msg
     NSString* errorMessage = nil;
     
+    //version
+    NSString* version = nil;
+    
     //ignore if exception was already reported
     if(YES == wasReported)
     {
@@ -58,8 +61,18 @@ void exceptionHandler(NSException *exception)
         return;
     }
     
+    //get app version
+    #ifdef IS_APP
+    version = getAppVersion();
+    
+    //get daemon version
+    #else
+    version = getDaemonVersion();
+    
+    #endif
+    
     //err msg
-    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: OS version: %@ /App version: %@", [[NSProcessInfo processInfo] operatingSystemVersionString], getAppVersion()]);
+    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: OS version: %@ /App version: %@", [[NSProcessInfo processInfo] operatingSystemVersionString], version]);
 
     //create error msg
     errorMessage = [NSString stringWithFormat:@"unhandled obj-c exception caught [name: %@ / reason: %@]", [exception name], [exception reason]];
@@ -120,6 +133,9 @@ void exceptionHandler(NSException *exception)
 // will be invoked for BSD/*nix signals
 void signalHandler(int signal, siginfo_t *info, void *context)
 {
+    //version
+    NSString* version = nil;
+    
     //error msg
     NSString* errorMessage = nil;
     
@@ -133,8 +149,18 @@ void signalHandler(int signal, siginfo_t *info, void *context)
         return;
     }
     
+    //get app version
+    #ifdef IS_APP
+    version = getAppVersion();
+    
+    //get daemon version
+    #else
+    version = getDaemonVersion();
+    
+    #endif
+    
     //err msg
-    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: OS version: %@ /App version: %@", [[NSProcessInfo processInfo] operatingSystemVersionString], getAppVersion()]);
+    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: OS version: %@ /App version: %@", [[NSProcessInfo processInfo] operatingSystemVersionString], version]);
     
     //typecast context
 	uContext = (ucontext_t *)context;

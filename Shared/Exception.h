@@ -1,6 +1,6 @@
 //
 //  Exception.h
-//  RansomWhere (Installer)
+//  RansomWhere (Installer/Daemon)
 //
 //  Created by Patrick Wardle on 1/2/16.
 //  Copyright (c) 2016 Objective-See. All rights reserved.

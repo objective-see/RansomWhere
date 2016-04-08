@@ -19,20 +19,20 @@ extern NSMutableDictionary* binaryList;
 /* FUNCTIONS */
 
 //delete list of installed/approved apps, etc
-void reset();
+BOOL reset();
+
+//init paths
+// ->this logic will only be needed if daemon is executed from non-standard location
+BOOL initPaths();
 
 //create binary objects for all baselined app
 // ->first time; generate list from OS (this might take a while)
-void processBaselinedApps();
+BOOL processBaselinedApps();
 
 //create binary objects for all (persistent) user-approved binaries
-void processApprovedBins();
-
-//load list of installed apps
-// ->first time; generate them (this might take a while)
-void initInstalledApps();
+BOOL processApprovedBins();
 
 //create binary objects for all currently running processes
-void processRunningProcs();
+BOOL processRunningProcs();
 
 #endif /* main_h */
