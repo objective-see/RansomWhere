@@ -23,7 +23,6 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
 @implementation FSMonitor
 
 @synthesize eventQueue;
-//@synthesize windowRegex;
 @synthesize pidPathMappings;
 @synthesize watchDirectories;
 
@@ -44,10 +43,6 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
         
         //alloc/init pid -> path mappings
         pidPathMappings = [NSMutableDictionary dictionary];
-        
-        //init regex
-        // ->want to ignore window_xx.data files
-        //windowRegex = [NSRegularExpression regularExpressionWithPattern:WINDOW_DATA_REGEX options:NSRegularExpressionCaseInsensitive error:nil];
         
         //dbg msg
         #ifdef DEBUG
@@ -332,6 +327,11 @@ bail:
         //don't bail though
     }
     
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"suspended %@, now creating binary object for it", processPath]);
+    #endif
+    
     //create binary object
     binary = [[Binary alloc] init:processPath attributes:nil];
     
@@ -363,32 +363,35 @@ bail:
     //flag
     BOOL watched = NO;
     
-    //TODO: is this slow?
+    //path bytes
+    const char* utf8String = NULL;
+    
+    //init bytes
+    utf8String = path.UTF8String;
+    
+    //dot
+    char* dot = NULL;
+    
+    //slash
+    char* slash = NULL;
+    
     //ignore any window_<digits>.data files
-    // ->are encrypted, but don't want to 'watch' them, as they are legit
-    if( (YES == [path containsString:@"/Library/Saved Application State/"]) &&
-        (YES == [path hasPrefix:@".data"]) )
+    // ->start by seeing if file ends in '.data'
+    dot = strrchr(utf8String, '.');
+    if( (NULL != dot) &&
+        (0 == strcmp(dot, ".data")) )
     {
-        //matched
-        // ->so bail
-        goto bail;
+        //now check if the file name starts with '/window_'
+        slash = strrchr(utf8String, '/');
+        if( (NULL != slash) &&
+            (0 == strncmp(slash, "/window_", strlen("/window_"))) )
+        {
+            //got a window_xxx.data
+            // ->good enough match for now, so ignore
+            goto bail;
+        }
     }
-    
-    /*
-    //file component
-    NSString* fileComponent = nil;
-    
-    //init file component
-    fileComponent = [path lastPathComponent];
-    
-    //ignore any 'window_<digits>.data' files
-    if(nil != [self.windowRegex firstMatchInString:fileComponent options:0 range:NSMakeRange(0, fileComponent.length)])
-    {
-        //matched
-        // ->so bail
-        goto bail;
-    }
-    */
+        
     //then check all watch paths
     for(NSString* watchDirectory in self.watchDirectories)
     {

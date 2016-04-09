@@ -16,20 +16,15 @@
 #import "Binary.h"
 #import "Exception.h"
 #import "Utilities.h"
-#import "ProcessMonitor.h"
 #import "FSMonitor.h"
 #import "3rdParty/ent/ent.h"
-
 
 //sudo chown -R root:wheel  /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
 //sudo chmod 4755 /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
 
-
 //global list of binary objects
 // ->running/installed/user approved apps
 NSMutableDictionary* binaryList = nil;
-
-//TODO: don't need entropy? (pi is enough?)
 
 //TODO: allow apps from app store
 //      see: https://github.com/ole/NSBundle-OBCodeSigningInfo/blob/master/NSBundle%2BOBCodeSigningInfo.m & https://github.com/rmaddy/VerifyStoreReceiptiOS
@@ -123,7 +118,7 @@ int main(int argc, const char * argv[])
             //bail
             goto bail;
         }
-        
+    
         //priority++
         setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
         

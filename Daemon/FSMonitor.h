@@ -35,9 +35,6 @@
 //watched directories
 @property (nonatomic, retain)NSMutableSet* watchDirectories;
 
-//regex for 'window_<digits>.data' files
-//@property (nonatomic, retain)NSRegularExpression* windowRegex;
-
 //file-system event queue
 @property (nonatomic, retain)Queue* eventQueue;
 

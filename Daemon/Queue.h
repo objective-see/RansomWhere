@@ -16,18 +16,21 @@
 
 /* PROPERTIES */
 
+//path to icon
+// ->shown in alert to user
+@property(nonatomic, retain)NSURL* icon;
+
 //event queue
 @property(retain, atomic)NSMutableArray* eventQueue;
 
 //condition for queue's status
-@property (nonatomic, retain)NSCondition* queueCondition;
+@property(nonatomic, retain)NSCondition* queueCondition;
 
 //processes explicity disallowed by the user
-@property (nonatomic, retain)NSMutableDictionary* disallowedProcs;
+@property(nonatomic, retain)NSMutableDictionary* disallowedProcs;
 
-//path to icon
-// ->shown in alert to user
-@property (nonatomic, retain)NSURL* icon;
+//pid -> last encrypted file timestamp
+@property(nonatomic, retain)NSMutableDictionary* lastEncryptedFiles;
 
 
 /* METHODS */

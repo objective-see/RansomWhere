@@ -11,11 +11,6 @@
 #import "FSMonitor.h"
 #import "Logging.h"
 #import "Utilities.h"
-#import "ProcessMonitor.h"
-
-
-#import <libproc.h>
-
 
 @implementation Binary
 

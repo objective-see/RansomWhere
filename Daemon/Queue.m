@@ -23,6 +23,7 @@
 @synthesize eventQueue;
 @synthesize queueCondition;
 @synthesize disallowedProcs;
+@synthesize lastEncryptedFiles;
 
 //init
 // ->alloc & queue thead
@@ -40,6 +41,9 @@
  
         //alloc for 'user-disallowed' processes
         disallowedProcs = [NSMutableDictionary dictionary];
+        
+        //alloc dictionary to pid -> last encrypted file timestamp
+        lastEncryptedFiles = [NSMutableDictionary dictionary];
         
         //init path to icon
         icon = [NSURL URLWithString:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:ALERT_ICON]];
@@ -118,6 +122,9 @@
 {
     //response
     CFOptionFlags response = 0;
+    
+    //last encrypted file
+    NSMutableDictionary* lastEncryptedFile = nil;
     
     //dbg msg
     #ifdef DEBUG
@@ -221,7 +228,6 @@
     logMsg(LOG_DEBUG, @"4) is large enough");
     #endif
     
-    //SKIP _
     
     //SKIP
     // ->any non-encrypted files (also ignores image files)
@@ -236,12 +242,73 @@
         goto bail;
     }
     
+    
     //dbg msg
     #ifdef DEBUG
     logMsg(LOG_DEBUG, @"5) is encrypted");
     #endif
     
+    //grab this processes' last encrypted file
+    lastEncryptedFile = self.lastEncryptedFiles[event.processID];
+    
+    //when its new, add timestamp and file
+    // ->then ignore, cuz want at least 2 encrypted files to trigger)
+    if(nil == lastEncryptedFile)
+    {
+        //add time stamp & path
+        self.lastEncryptedFiles[event.processID] = @{@"timestamp": [NSDate date], @"path":event.filePath};
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"ignoring: first encrypted file for process");
+        #endif
+        
+        //first encrypted file
+        // ->so ignore proc for now
+        goto bail;
+    }
+    //ok, second (or more) encrypted file for process
+    // ->check timestamp & path to make sure its recent enough and a new file
+    else
+    {
+        //ignore when its just the same file
+        // ->and don't update timestamp!
+        if(YES == [lastEncryptedFile[@"path"] isEqualToString:event.filePath])
+        {
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, @"ignoring: (re)encrypting same file");
+            #endif
+            
+            //ignore
+            goto bail;
+        }
+        
+        //check if older than 5 seconds
+        // ->ignore (but still update timestamp)
+        if([lastEncryptedFile[@"timestamp"] timeIntervalSinceNow] > 5)
+        {
+            //update time stamp
+            self.lastEncryptedFiles[event.processID][@"timestamp"] = [NSDate date];
+            
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, @"ignoring: previously encrypted file(s) for process, too long ago");
+            #endif
+            
+            //too old
+            // ->so ignore proc for now
+            goto bail;
+        }
+    }
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"6) was encrypted by process that's quickly encrypting a bunch of files");
+    #endif
+    
     //TODO: is this sync slow?
+    //TODO: also means only 1 suspend at a time
     //sync to alert user
     @synchronized(self)
     {
@@ -317,7 +384,7 @@ bail:
     title = (__bridge CFStringRef)([NSString stringWithFormat:@"RansomWhere: %@ 🔒'd a file", [event.binary.path lastPathComponent]]);
    
     //init body
-    body = (__bridge CFStringRef)([NSString stringWithFormat:@"%@\r\n\r\n🔒'd file: %@", event.binary.path, event.filePath]);
+    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc: %@\r\n\r\nfile: %@", event.binary.path, event.filePath]);
     
     //show alert
     // ->will block until user iteraction, then response saved in 'response' variable
