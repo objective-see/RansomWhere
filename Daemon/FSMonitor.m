@@ -125,15 +125,9 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
     
     //binary object
     Binary* binary = nil;
-    
-    //matched path
-    NSMutableString* matchedPath = nil;
-    
+
     //alloc buffer
     fsEvents = malloc(BUFSIZE);
-    
-    //init matched path
-    matchedPath = [NSMutableString string];
     
     //open the device
     if((fsed = open(DEVICE_FSEVENTS, O_RDONLY)) < 0)

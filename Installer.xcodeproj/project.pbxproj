@@ -55,7 +55,7 @@
 		7DF7080B1CB0942400FF79D8 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = Shared/Logging.h; sourceTree = "<group>"; };
 		7DF7080C1CB0942400FF79D8 /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = Shared/Exception.h; sourceTree = "<group>"; };
 		7DF7080D1CB0942400FF79D8 /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = Shared/Exception.m; sourceTree = "<group>"; };
-		CD7F088819AE6DCA00FF00FC /* Installer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Installer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD7F088819AE6DCA00FF00FC /* RansomWhere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RansomWhere.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		CD7F088E19AE6DCA00FF00FC /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		CD7F089019AE6DCA00FF00FC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -134,7 +134,7 @@
 		CD7F088919AE6DCA00FF00FC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CD7F088819AE6DCA00FF00FC /* Installer.app */,
+				CD7F088819AE6DCA00FF00FC /* RansomWhere.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -178,7 +178,7 @@
 			);
 			name = Installer;
 			productName = Installer;
-			productReference = CD7F088819AE6DCA00FF00FC /* Installer.app */;
+			productReference = CD7F088819AE6DCA00FF00FC /* RansomWhere.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -364,7 +364,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Installer/Installer-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = Installer;
+				PRODUCT_NAME = RansomWhere;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -382,7 +382,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Installer/Installer-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = Installer;
+				PRODUCT_NAME = RansomWhere;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};

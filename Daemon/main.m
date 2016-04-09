@@ -246,8 +246,10 @@ BOOL reset()
         //set flag
         fullReset = YES;
         
-        //dbg msg
-        printf("\nRANDSOMWHERE: reset\n\t      removed list of installed and all 'user approved' binaries\n\n");
+        //dbg msg(s)
+        printf("\nRANDSOMWHERE: reset\n");
+        printf("\t      a) removed list of installed/approved binaries\n");
+        printf("\t      b) stopped, then (re)started the launch daemon\n\n");
     }
 
     return fullReset;
@@ -461,9 +463,6 @@ BOOL processApprovedBins()
     
     //binary object
     Binary* binary = nil;
-    
-    //alloc set
-    userApprovedBins = [NSMutableArray array];
     
     //init path for where to save user approved binaries
     approvedBinsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_BINARIES];
@@ -728,6 +727,17 @@ BOOL initUserName()
     
 //bail
 bail:
+    
+    //release run loop source
+    if(NULL != runloopSource)
+    {
+        //release
+        CFRelease(runloopSource);
+        
+        //reset
+        runloopSource = NULL;
+    }
+    
     
     return wasInitialize;
 }

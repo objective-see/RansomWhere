@@ -19,6 +19,7 @@
 
 @synthesize icon;
 @synthesize eventQueue;
+@synthesize reportedProcs;
 @synthesize queueCondition;
 @synthesize disallowedProcs;
 @synthesize lastEncryptedFiles;
@@ -39,6 +40,9 @@
  
         //alloc for 'user-disallowed' processes
         disallowedProcs = [NSMutableDictionary dictionary];
+        
+        //alloc set for reported proces
+        reportedProcs = [NSMutableSet set];
         
         //alloc dictionary to pid -> last encrypted file timestamp
         lastEncryptedFiles = [NSMutableDictionary dictionary];
@@ -305,49 +309,39 @@
     logMsg(LOG_DEBUG, @"6) was encrypted by process that's quickly encrypting a bunch of files");
     #endif
     
-    //TODO: is this sync slow?
-    //TODO: also means only 1 suspend at a time
-    //sync to alert user
-    @synchronized(self)
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"suspending process and alerting user!");
+    #endif
+    
+    //suspend process
+    // ->terminated, or resumed depending on user's response
+    if(-1 == kill(event.processID.intValue, SIGSTOP))
     {
-        //check again to ignore events that were prev alerted & disallowed by user!
-        if(YES == [self.disallowedProcs[event.processID] isEqualToString:event.binary.path])
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to suspend %@ (%@), with %d", event.processID, event.binary.path, errno]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //sycn & report
+    @synchronized(self.reportedProcs)
+    {
+        //ignore already reported procs
+        if(YES == [self.reportedProcs containsObject:event.processID])
         {
             //dbg msg
             #ifdef DEBUG
-            logMsg(LOG_DEBUG, @"ignoring: is disallowed (now) process");
+            logMsg(LOG_DEBUG, @"ignoring process that was already reported");
             #endif
             
             //bail
             goto bail;
         }
         
-        //check again to ignore events that were prev alerted & allowed by user
-        if(YES == event.binary.isApproved)
-        {
-            //dbg msg
-            #ifdef DEBUG
-            logMsg(LOG_DEBUG, @"ignoring: is allowed (now) process");
-            #endif
-            
-            //bail
-            goto bail;
-        }
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"suspending process and alerting user!");
-        #endif
-        
-        //suspend process
-        if(-1 == kill(event.processID.intValue, SIGSTOP))
-        {
-            //failed to suspend process
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to suspend %@ (%@), with %d", event.processID, event.binary.path, errno]);
-            
-            //bail
-            goto bail;
-        }
+        //add it as (about to) report
+        [self.reportedProcs addObject:event.processID];
         
         //alert user
         // ->note: will block until user responsed
@@ -357,8 +351,8 @@
         // ->either resume or terminate process
         [self processResponse:event response:response];
         
-    }//sync
-    
+    } //sync
+
 //bail
 bail:
     
@@ -382,7 +376,7 @@ bail:
     title = (__bridge CFStringRef)([NSString stringWithFormat:@"%@ is 🔒'ing files!", [event.binary.path lastPathComponent]]);
    
     //init body
-    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc: %@ (%d)\r\nfiles:  %@\r\n        %@...", event.binary.path, event.processID.unsignedIntValue, prevEncryptedFile, event.filePath]);
+    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc: %@ (%d)\r\nfiles:  %@\r\n         %@...", event.binary.path, event.processID.unsignedIntValue, prevEncryptedFile, event.filePath]);
     
     //show alert
     // ->will block until user iteraction, then response saved in 'response' variable
