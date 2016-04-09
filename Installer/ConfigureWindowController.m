@@ -156,7 +156,7 @@
         [self.statusMsg setNeedsDisplay:YES];
         
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing RansomWhere", buttonTitle]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing RansomWhere?", buttonTitle]);
         
         //invoke logic to install/uninstall
         // ->do in background so UI doesn't block
@@ -309,7 +309,7 @@ bail:
     if(YES == success)
     {
         //set result msg
-        resultMsg = [NSString stringWithFormat:@"Ransomwhere %@ed", self.actionButton.title];
+        resultMsg = [NSString stringWithFormat:@"RansomWhere? %@ed", self.actionButton.title];
         
         //set font to black
         resultMsgColor = [NSColor blackColor];
@@ -349,15 +349,15 @@ bail:
     //set status msg
     [self.statusMsg setStringValue:resultMsg];
     
-    //toggle action button
-    // ->install, change to 'uninstall'
+    //in debug mode
+    // ->toggle action button; install, change to 'uninstall'
+    #ifdef DEBUG
     if(YES == [self.actionButton.title isEqualToString:ACTION_INSTALL])
     {
         //toggle
         self.actionButton.title = ACTION_UNINSTALL;
     }
-    //toggle action button
-    // ->uninstall, change to 'install'
+    //toggle action button; uninstall, change to 'install'
     else
     {
         //toggle
@@ -366,6 +366,7 @@ bail:
     
     //enable action button
     self.actionButton.enabled = YES;
+    #endif
     
     //change cancel button to 'close'
     self.cancelButton.title = ACTION_CLOSE;

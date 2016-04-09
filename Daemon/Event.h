@@ -1,9 +1,9 @@
 //
 //  Event.h
-//  RansomWhere
+//  RansomWhere (Daemon)
 //
 //  Created by Patrick Wardle on 3/28/16.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import "fsEvents.h"
@@ -30,12 +30,11 @@
 //binary object
 @property (nonatomic, retain)Binary* binary;
 
-//process path
-//@property (nonatomic, retain)NSString* processPath;
 
-/* PROPERTIES */
+
+/* METHODS */
 
 //init
--(id)initWithParams:(NSString*)path binary:(Binary*)bin fsEvent:(kfs_event_a *)fsEvent;
+-(id)init:(NSString*)path binary:(Binary*)bin fsEvent:(kfs_event_a *)fsEvent;
 
 @end

@@ -3,7 +3,7 @@
 //  Daemon
 //
 //  Created by Patrick Wardle on 3/31/16.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #ifndef ent_h

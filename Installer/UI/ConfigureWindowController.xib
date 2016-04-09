@@ -65,7 +65,7 @@ Gw
                         </connections>
                     </button>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="K52-9g-sjn">
-                        <rect key="frame" x="130" y="109" width="243" height="67"/>
+                        <rect key="frame" x="138" y="109" width="243" height="67"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ransomwhere" id="WRg-I2-vkK"/>
                     </imageView>
                     <button hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QWu-qZ-Za2">
@@ -88,6 +88,6 @@ Gw
     </objects>
     <resources>
         <image name="icon" width="256" height="256"/>
-        <image name="ransomwhere" width="800" height="84"/>
+        <image name="ransomwhere" width="578" height="102"/>
     </resources>
 </document>

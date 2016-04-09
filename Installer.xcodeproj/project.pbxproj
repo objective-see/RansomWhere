@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DCF017E1CB996E70051C574 /* alertIcon.png */; };
 		7DE29CFC1CABB59600DFA6A6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */; };
 		7DE29CFD1CABB59600DFA6A6 /* Base.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29CE71CABB59600DFA6A6 /* Base.lproj */; };
 		7DE29CFE1CABB59600DFA6A6 /* Configure.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE29CE91CABB59600DFA6A6 /* Configure.m */; };
@@ -27,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7DCF017E1CB996E70051C574 /* alertIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = alertIcon.png; path = Installer/images/alertIcon.png; sourceTree = "<group>"; };
 		7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Installer/AppDelegate.h; sourceTree = "<group>"; };
 		7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Installer/AppDelegate.m; sourceTree = "<group>"; };
 		7DE29CE71CABB59600DFA6A6 /* Base.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Base.lproj; path = Installer/Base.lproj; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 		7DE29D1E1CAD0BD300DFA6A6 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7DCF017E1CB996E70051C574 /* alertIcon.png */,
 				7DE29D1A1CAD0BBD00DFA6A6 /* icon.png */,
 				7DE29D1B1CAD0BBD00DFA6A6 /* ransomwhere.png */,
 			);
@@ -217,6 +220,7 @@
 			files = (
 				7DE29D141CABB67A00DFA6A6 /* ErrorWindowController.xib in Resources */,
 				7DE29D1C1CAD0BBD00DFA6A6 /* icon.png in Resources */,
+				7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */,
 				7DE29CFD1CABB59600DFA6A6 /* Base.lproj in Resources */,
 				7DE29D161CABB72200DFA6A6 /* ConfigureWindowController.xib in Resources */,
 				7DE29D041CABB59600DFA6A6 /* Images.xcassets in Resources */,

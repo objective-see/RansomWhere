@@ -89,7 +89,7 @@ BOOL spawnAsRoot(char* path2Self)
     if(errAuthorizationSuccess != osStatus)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE RANSOMWHERE ERROR: AuthorizationCreate() failed with %d", osStatus]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"AuthorizationCreate() failed with %d", osStatus]);
         
         //bail
         goto bail;
@@ -106,7 +106,7 @@ BOOL spawnAsRoot(char* path2Self)
     if(errAuthorizationSuccess != osStatus)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE RANSOMWHERE ERROR: AuthorizationExecuteWithPrivileges() failed with %d", osStatus]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"AuthorizationExecuteWithPrivileges() failed with %d", osStatus]);
         
         //bail
         goto bail;

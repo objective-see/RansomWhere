@@ -3,7 +3,7 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 9/25/14.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import "main.h"
@@ -16,8 +16,8 @@
 
 #import <Foundation/Foundation.h>
 
-//TODO: make dynamic?
 //directories to watch
+// ->for now, anything under a user directory...
 NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
 
 @implementation FSMonitor
@@ -231,10 +231,17 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
                 //skip
                 continue;
             }
+            
+            //don't process if there is no logged in user
+            // ->could have this check earlier, but want binary objects to be gen'd
+            if(NULL == consoleUserName)
+            {
+                //skip
+                continue;
+            }
 
-            //TODO: rename args, etc?
             //create event object
-            event = [[Event alloc] initWithParams:path binary:binary fsEvent:fse];
+            event = [[Event alloc] init:path binary:binary fsEvent:fse];
             if(nil == event)
             {
                 //skip
@@ -412,16 +419,26 @@ bail:
     return watched;
 }
 
-//TODO: comment code
 //skip over args to get to next event file-system struct
 -(NSString*)advance2Next:(unsigned char*)ptrBuffer currentOffsetPtr:(int*)ptrCurrentOffset
 {
     //path
     NSString* path = nil;
     
-    struct kfs_event_a *fse = (struct kfs_event_a *)(unsigned char*)((unsigned char*)ptrBuffer + *ptrCurrentOffset);
+    //event
+    struct kfs_event_a *fse = NULL;
     
-    struct kfs_event_arg *fse_arg;
+    //args
+    struct kfs_event_arg *fse_arg = NULL;
+    
+    //arg type
+    unsigned short *argType = NULL;
+    
+    //arg length
+    unsigned short *argLen = NULL;
+    
+    //init event
+    fse = (struct kfs_event_a *)(unsigned char*)((unsigned char*)ptrBuffer + *ptrCurrentOffset);
     
     //handle dropped events
     if(fse->type == FSE_EVENTS_DROPPED)
@@ -433,8 +450,10 @@ bail:
         goto bail;
     }
     
+    //init pointer
     *ptrCurrentOffset += sizeof(struct kfs_event_a);
     
+    //init args
     fse_arg = (struct kfs_event_arg *)&ptrBuffer[*ptrCurrentOffset];
     
     //save path
@@ -443,8 +462,11 @@ bail:
     //skip over path
     *ptrCurrentOffset += sizeof(kfs_event_arg) + fse_arg->pathlen ;
     
-    unsigned short *argType = (unsigned short *)(unsigned char*)((unsigned char*)ptrBuffer + *ptrCurrentOffset);
-    unsigned short *argLen   = (unsigned short *) (ptrBuffer + *ptrCurrentOffset + 2);
+    //init arg type
+    argType = (unsigned short *)(unsigned char*)((unsigned char*)ptrBuffer + *ptrCurrentOffset);
+    
+    //init arg length
+    argLen  = (unsigned short *)(ptrBuffer + *ptrCurrentOffset + 2);
     
     int arg_len = 0;
     if(*argType ==  FSE_ARG_DONE)

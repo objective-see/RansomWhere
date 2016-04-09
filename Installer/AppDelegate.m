@@ -41,8 +41,6 @@
         //bail
         goto bail;
     }
-    //TODO: remove titles?
-    // ...or at least update when buttons change or let's disable the buttons!
     
     //already installed?
     // ->display uninstall window
@@ -56,7 +54,7 @@
     else
     {
         //show window
-        [self displayConfigureWindow:[NSString stringWithFormat:@"Install v. %@", getAppVersion()] action:ACTION_INSTALL_FLAG];
+        [self displayConfigureWindow:[NSString stringWithFormat:@"Install v%@", getAppVersion()] action:ACTION_INSTALL_FLAG];
     }
     
 //bail

@@ -3,7 +3,7 @@
 //  BlockBlock
 //
 //  Created by Patrick Wardle on 9/26/14.
-//  Copyright (c) 2015 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

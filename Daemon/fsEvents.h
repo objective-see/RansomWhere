@@ -1,9 +1,9 @@
 //
 //  fsEvents.h
-//  RansomWhere
+//  RansomWhere (Daemon)
 //
 //  Created by Patrick Wardle on 9/26/14.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #ifndef BlockBlock_fsEvents_h

@@ -3,7 +3,7 @@
 //  Daemon
 //
 //  Created by Patrick Wardle on 4/2/16.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #ifndef main_h
@@ -12,6 +12,9 @@
 #import <Foundation/Foundation.h>
 
 /* GLOBALS */
+
+//global current user
+extern CFStringRef consoleUserName;
 
 //global list of binary objects
 extern NSMutableDictionary* binaryList;
@@ -34,5 +37,9 @@ BOOL processApprovedBins();
 
 //create binary objects for all currently running processes
 BOOL processRunningProcs();
+
+//get current user
+// ->then, setup callback for changes
+BOOL initUserName();
 
 #endif /* main_h */

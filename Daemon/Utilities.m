@@ -3,7 +3,7 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 10/31/14.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import "Consts.h"
@@ -338,6 +338,37 @@ NSMutableArray* getUsers()
     
     return users;
 }
+
+//load or unload the launch daemon via '/bin/launchctl'
+void controlLaunchItem(NSUInteger action, NSString* plist)
+{
+    //action string
+    // ->passed to launchctl
+    NSString* actionString = nil;
+    
+    //set action string: load
+    if(DAEMON_LOAD == action)
+    {
+        //load
+        actionString = @"load";
+    }
+    //set action string: unload
+    else
+    {
+        //unload
+        actionString = @"unload";
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"invoking %@ with %@ %@ ", LAUNCHCTL, actionString, plist]);
+    
+    //control launch item
+    // ->and check
+    execTask(LAUNCHCTL, @[actionString, plist]);
+    
+    return;
+}
+
 
 //determine if a file is signed by Apple proper
 BOOL isAppleBinary(NSString* path)

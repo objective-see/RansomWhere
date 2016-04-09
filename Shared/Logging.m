@@ -26,8 +26,8 @@ void logMsg(int level, NSString* msg)
     [formatter setDateFormat:@"HH:mm:ss.SSSS"];
     
     //alloc/init
-    // ->always start w/ 'RANSOMWHERE' + pid/tid
-    logPrefix = [NSMutableString stringWithFormat:@"%@: OBJECTIVE-SEE RANSOMWHERE (%d/%ld)", [formatter stringFromDate:[NSDate date]], getpid(), [[[NSThread currentThread] valueForKeyPath:@"private.seqNum"] integerValue]];
+    // ->always start w/ 'RANSOMWHERE?' + pid/tid
+    logPrefix = [NSMutableString stringWithFormat:@"%@: OBJECTIVE-SEE RANSOMWHERE? (%d/%ld)", [formatter stringFromDate:[NSDate date]], getpid(), [[[NSThread currentThread] valueForKeyPath:@"private.seqNum"] integerValue]];
     
     //if its error, add error to prefix
     if(LOG_ERR == level)

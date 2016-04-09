@@ -3,7 +3,7 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 9/25/14.
-//  Copyright © Objective-See. All rights reserved.
+//  Copyright (c) Objective-See. All rights reserved.
 //
 
 #import "Queue.h"

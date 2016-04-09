@@ -1,9 +1,9 @@
 //
 //  Utilities.h
-//  RansomWhere?
+//  RansomWhere
 //
 //  Created by Patrick Wardle on 10/31/14.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #ifndef __RansomWhere__Utilities__
@@ -91,6 +91,9 @@ NSString* infoPlistFile();
 
 //given a pid, get its parent (ppid)
 pid_t getParentID(int pid);
+
+//load or unload the launch daemon via '/bin/launchctl'
+void controlLaunchItem(NSUInteger action, NSString* plist);
 
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive);

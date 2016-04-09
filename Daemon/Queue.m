@@ -3,10 +3,8 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 9/26/14.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
-
-//TODO: https://developer.apple.com/library/mac/qa/qa1419/_index.html to increase stack size if too many threads? 
 
 #import "main.h"
 #import "Event.h"
@@ -248,16 +246,22 @@
     logMsg(LOG_DEBUG, @"5) is encrypted");
     #endif
     
+    //sync
+    @synchronized (self.lastEncryptedFiles)
+    {
+        
     //grab this processes' last encrypted file
     lastEncryptedFile = self.lastEncryptedFiles[event.processID];
+        
+    //always update/replace timestamp and file
+    self.lastEncryptedFiles[event.processID] = @{@"timestamp":[NSDate date], @"path":event.filePath};
+        
+    }//sync
     
     //when its new, add timestamp and file
     // ->then ignore, cuz want at least 2 encrypted files to trigger)
     if(nil == lastEncryptedFile)
     {
-        //add time stamp & path
-        self.lastEncryptedFiles[event.processID] = @{@"timestamp": [NSDate date], @"path":event.filePath};
-        
         //dbg msg
         #ifdef DEBUG
         logMsg(LOG_DEBUG, @"ignoring: first encrypted file for process");
@@ -271,8 +275,7 @@
     // ->check timestamp & path to make sure its recent enough and a new file
     else
     {
-        //ignore when its just the same file
-        // ->and don't update timestamp!
+        //ignore when file just the same
         if(YES == [lastEncryptedFile[@"path"] isEqualToString:event.filePath])
         {
             //dbg msg
@@ -284,24 +287,19 @@
             goto bail;
         }
         
-        //check if older than 5 seconds
-        // ->ignore (but still update timestamp)
+        //ignore when file is older than 5 seconds
         if([lastEncryptedFile[@"timestamp"] timeIntervalSinceNow] > 5)
         {
-            //update time stamp
-            self.lastEncryptedFiles[event.processID][@"timestamp"] = [NSDate date];
-            
             //dbg msg
             #ifdef DEBUG
             logMsg(LOG_DEBUG, @"ignoring: previously encrypted file(s) for process, too long ago");
             #endif
             
-            //too old
-            // ->so ignore proc for now
+            //ignore
             goto bail;
         }
     }
-    
+
     //dbg msg
     #ifdef DEBUG
     logMsg(LOG_DEBUG, @"6) was encrypted by process that's quickly encrypting a bunch of files");
@@ -353,7 +351,7 @@
         
         //alert user
         // ->note: will block until user responsed
-        response = [self alertUser:event];
+        response = [self alertUser:event prevEncryptedFile:lastEncryptedFile[@"path"]];
         
         //handle response
         // ->either resume or terminate process
@@ -369,7 +367,7 @@ bail:
 
 //show alert to the user
 // ->block until response, which is returned from this method
--(CFOptionFlags)alertUser:(Event*)event
+-(CFOptionFlags)alertUser:(Event*)event prevEncryptedFile:(NSString*)prevEncryptedFile
 {
     //user's response
     CFOptionFlags response = 0;
@@ -381,10 +379,10 @@ bail:
     CFStringRef body = NULL;
     
     //init title
-    title = (__bridge CFStringRef)([NSString stringWithFormat:@"RansomWhere: %@ 🔒'd a file", [event.binary.path lastPathComponent]]);
+    title = (__bridge CFStringRef)([NSString stringWithFormat:@"%@ is 🔒'ing files!", [event.binary.path lastPathComponent]]);
    
     //init body
-    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc: %@\r\n\r\nfile: %@", event.binary.path, event.filePath]);
+    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc: %@ (%d)\r\nfiles:  %@\r\n        %@...", event.binary.path, event.processID.unsignedIntValue, prevEncryptedFile, event.filePath]);
     
     //show alert
     // ->will block until user iteraction, then response saved in 'response' variable
@@ -424,7 +422,6 @@ bail:
             goto bail;
         }
         
-        //TODO: think about 'disallow' -by pid (like now?) or by path? (but not persistent)?
         //sync to add
         @synchronized(self.disallowedProcs)
         {

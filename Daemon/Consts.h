@@ -3,7 +3,7 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 3/28/16.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #ifndef Consts_h
@@ -37,16 +37,22 @@
 #define USER_APPROVED_BINARIES @"approvedBinaries.plist"
 
 //icon for user alert
-#define ALERT_ICON @"icon.png"
+#define ALERT_ICON @"alertIcon.png"
 
 //daemon destination folder
 #define DAEMON_DEST_FOLDER @"/Library/RansomWhere"
 
-//window data regex
-//  ^window_ : must start w/ 'window_
-//  \d+ : then match any # of digits
-//  .data$ : end in .data
-#define WINDOW_DATA_REGEX @"^window_\\d+.data$"
+//uninstall flag
+#define DAEMON_UNLOAD 0
+
+//install flag
+#define DAEMON_LOAD 1
+
+//daemon plist name
+#define DAEMON_PLIST @"com.objective-see.ransomwhere.plist"
+
+//path to launchctl
+#define LAUNCHCTL @"/bin/launchctl"
 
 //header size
 // ->just # of bytes to grab from start of file for image detections, etc

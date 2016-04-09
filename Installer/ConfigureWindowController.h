@@ -3,7 +3,7 @@
 //  RansomWhere (Installer)
 //
 //  Created by Patrick Wardle on 11/23/14.
-//  Copyright (c) 2015 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>

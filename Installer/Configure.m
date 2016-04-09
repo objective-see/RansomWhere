@@ -71,11 +71,11 @@
     
     //set daemon icon src path
     // ->orginally stored in installer app's /Resource bundle
-    paths[DAEMON_SRC_ICON_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:ICON_NAME];
+    paths[DAEMON_SRC_ICON_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:ALERT_ICON];
     
     //set daemon icon dest path
     // ->'/Library/RansomWhere/' + icon name
-    paths[DAEMON_DEST_ICON_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:ICON_NAME];
+    paths[DAEMON_DEST_ICON_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:ALERT_ICON];
     
     return paths;
 }

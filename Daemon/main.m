@@ -3,11 +3,12 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 3/20/16.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 
 #import "main.h"
 #import "Queue.h"
@@ -26,9 +27,11 @@
 // ->running/installed/user approved apps
 NSMutableDictionary* binaryList = nil;
 
-//TODO: allow apps from app store
+//global current user
+CFStringRef consoleUserName = NULL;
+
+//TODO: allow apps from app store (though this looks somewhat complex)
 //      see: https://github.com/ole/NSBundle-OBCodeSigningInfo/blob/master/NSBundle%2BOBCodeSigningInfo.m & https://github.com/rmaddy/VerifyStoreReceiptiOS
-//      though looks like not trivial to do...
 
 //main interface
 // ->init some procs, kick off file-system watcher, then just runloop()
@@ -118,6 +121,17 @@ int main(int argc, const char * argv[])
             //bail
             goto bail;
         }
+        
+        //grab user name
+        // ->also register callback for user changes
+        if(YES != initUserName())
+        {
+            //err msg
+            logMsg(LOG_ERR, @"failed to initialize callback for login/logout events");
+            
+            //bail
+            goto bail;
+        }
     
         //priority++
         setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
@@ -127,7 +141,7 @@ int main(int argc, const char * argv[])
         
         //msg
         // ->always print
-        syslog(LOG_ERR, "OBJECTIVE-SEE RANSOMWHERE: completed initializations; monitoring engaged!\n");
+        syslog(LOG_ERR, "OBJECTIVE-SEE RANSOMWHERE?: completed initializations; monitoring engaged!\n");
         
         //start file system monitoring
         [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FSMonitor alloc] init] withObject:nil];
@@ -139,6 +153,16 @@ int main(int argc, const char * argv[])
 //bail
 bail:
     
+    //release user name
+    if(NULL != consoleUserName)
+    {
+        //release
+        CFRelease(consoleUserName);
+        
+        //unset
+        consoleUserName = NULL;
+    }
+
     //dbg msg
     // ->shouldn't exit unless manually unloaded, reset mode, etc
     #ifdef DEBUG
@@ -148,7 +172,7 @@ bail:
     return 0;
 }
 
-//delete list of installed/approved apps, etc
+//delete list of installed/approved apps & restart daemon
 // ->note: as invoked via cmdline, use printf()'s for output
 BOOL reset()
 {
@@ -167,6 +191,9 @@ BOOL reset()
     
     //file for user approved bins
     NSString* approvedBinsFile = nil;
+    
+    //path to daemon's plist
+    NSString* daemonPlist =  nil;
     
     //init path to save list of installed apps
     installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
@@ -203,6 +230,15 @@ BOOL reset()
             printf("ERROR: failed to list of approvedBinsFile apps %s (%s)\n", approvedBinsFile.UTF8String, error.description.UTF8String);
         }
     }
+    
+    //init daemon's plist
+    daemonPlist = [@"/Library/LaunchDaemons" stringByAppendingPathComponent:DAEMON_PLIST];
+    
+    //stop daemom
+    controlLaunchItem(DAEMON_UNLOAD, daemonPlist);
+    
+    //start daemon
+    controlLaunchItem(DAEMON_LOAD, daemonPlist);
     
     //all good?
     if(YES != bAnyErrors)
@@ -547,4 +583,151 @@ BOOL processRunningProcs()
 bail:
     
     return wereProcessed;
+}
+
+
+//grab current user
+// ->note: NULL is returned if none, or user is 'loginwindow'
+static CFStringRef CopyCurrentConsoleUsername(SCDynamicStoreRef store)
+{
+    //result
+    CFStringRef userName = NULL;
+    
+    //grab user
+    userName = SCDynamicStoreCopyConsoleUser(store, NULL, NULL);
+    
+    //treat 'loginwindow' as no user
+    if((NULL != userName) &&
+       (CFEqual(userName, CFSTR("loginwindow"))) )
+    {
+        //release
+        CFRelease(userName);
+        
+        //unset
+        userName = NULL;
+    }
+    
+    return userName;
+}
+
+//callback function that's invoked when user changes
+// ->release old user name and safe new one into global
+static void userChangedCallback(SCDynamicStoreRef store, CFArrayRef changedKeys, void * info)
+{
+    //release previous user
+    if(NULL != consoleUserName)
+    {
+        //release
+        CFRelease(consoleUserName);
+        
+        //unset
+        consoleUserName = NULL;
+    }
+    
+    //grab new one
+    // ->might be NULL (user logged out), but that's ok
+    consoleUserName = CopyCurrentConsoleUsername(store);
+    
+    //dbg msg(s)
+    #ifdef DEBUG
+    
+    //user logged in
+    if(NULL != consoleUserName)
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current user name: %@", consoleUserName]);
+    }
+    
+    //no logged in user
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"no logged in user");
+    }
+    #endif
+    
+    return;
+}
+
+//get current user
+// ->then, setup callback for changes
+BOOL initUserName()
+{
+    //flag
+    BOOL wasInitialize = NO;
+    
+    //store
+    SCDynamicStoreRef store = NULL;
+    
+    //key
+    CFStringRef key = NULL;
+    
+    //key array
+    CFArrayRef keys = NULL;
+    
+    //runloop
+    CFRunLoopSourceRef runloopSource = NULL;
+    
+    //grab current user
+    consoleUserName = CopyCurrentConsoleUsername(store);
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current user name: %@", consoleUserName]);
+    #endif
+
+    //create store for user change notifications
+    store = SCDynamicStoreCreate(NULL, CFSTR("com.apple.dts.ConsoleUser"), userChangedCallback, NULL);
+    if(NULL == store)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //create store key for user
+    key = SCDynamicStoreKeyCreateConsoleUser(NULL);
+    if(NULL == key)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //create array for callback
+    keys = CFArrayCreate(NULL, (const void **)&key, 1, &kCFTypeArrayCallBacks);
+    if(NULL == keys)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //set callback
+    if(TRUE != SCDynamicStoreSetNotificationKeys(store, keys, NULL))
+    {
+        //bail
+        goto bail;
+    }
+    
+    //create runloop souce
+    runloopSource = SCDynamicStoreCreateRunLoopSource(NULL, store, 0);
+    if(NULL == runloopSource)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //add callback to runloop
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), runloopSource, kCFRunLoopDefaultMode);
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"registered for login in/out events");
+    #endif
+    
+    //happy
+    wasInitialize = YES;
+    
+//bail
+bail:
+    
+    return wasInitialize;
 }

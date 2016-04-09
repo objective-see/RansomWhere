@@ -37,7 +37,7 @@
 #define DAEMON_DEST_ICON_KEY @"destIcon"
 
 //icon name
-#define ICON_NAME @"icon.png"
+#define ALERT_ICON @"alertIcon.png"
 
 //uninstall flag
 #define DAEMON_UNLOAD 0
@@ -94,7 +94,5 @@
 //flag for error popup
 #define KEY_ERROR_SHOULD_EXIT @"shouldExit"
 
-//icon for daemon's user alert
-#define ALERT_ICON @"alertIcon.png"
 
 #endif

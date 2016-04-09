@@ -3,8 +3,10 @@
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 9/26/14.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
+
+@class Event;
 
 #import <Foundation/Foundation.h>
 #import "NSMutableArray+QueueAdditions.h"
@@ -41,5 +43,9 @@
 //dequeue
 // ->forever, process events from queue
 -(void)dequeue:(id)threadParam;
+
+//show alert to the user
+// ->block until response, which is returned from this method
+-(CFOptionFlags)alertUser:(Event*)event prevEncryptedFile:(NSString*)prevEncryptedFile;
 
 @end
