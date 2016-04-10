@@ -40,7 +40,7 @@ int main(int argc, const char * argv[])
     //pool
     @autoreleasepool
     {
-        //isEncrypted([NSString stringWithUTF8String:argv[1]]);
+        //NSLog(@"%d", isEncrypted([NSString stringWithUTF8String:argv[1]]));
         //return 0;
         
         //dbg msg
@@ -91,6 +91,11 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"enumerating all installed applications, to baseline");
+        #endif
+        
         //create binary objects for all baselined app
         // ->first time; generate list from OS (this might take a while)
         if(YES != processBaselinedApps())
@@ -102,6 +107,11 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"enumerating all 'user-approvied' applications");
+        #endif
+        
         //create binary objects for all (persistent) user-approved binaries
         if(YES != processApprovedBins())
         {
@@ -112,11 +122,16 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"enumerating all running processes");
+        #endif
+        
         //create binary objects for all currently running processes
         if(YES != processRunningProcs())
         {
             //err msg
-            logMsg(LOG_ERR, @"failed to enumerate/process running apps");
+            logMsg(LOG_ERR, @"failed to enumerate running processing");
             
             //bail
             goto bail;

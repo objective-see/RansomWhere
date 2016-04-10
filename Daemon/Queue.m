@@ -230,7 +230,6 @@
     logMsg(LOG_DEBUG, @"4) is large enough");
     #endif
     
-    
     //SKIP
     // ->any non-encrypted files (also ignores image files)
     if(YES != isEncrypted(event.filePath))
@@ -376,7 +375,7 @@ bail:
     title = (__bridge CFStringRef)([NSString stringWithFormat:@"%@ is 🔒'ing files!", [event.binary.path lastPathComponent]]);
    
     //init body
-    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc: %@ (%d)\r\nfiles:  %@\r\n         %@...", event.binary.path, event.processID.unsignedIntValue, prevEncryptedFile, event.filePath]);
+    body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc:\t%@ (%d)\r\nfiles:\t%@\r\n\t%@...", event.binary.path, event.processID.unsignedIntValue, prevEncryptedFile, event.filePath]);
     
     //show alert
     // ->will block until user iteraction, then response saved in 'response' variable

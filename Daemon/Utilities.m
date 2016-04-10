@@ -970,7 +970,7 @@ BOOL isEncrypted(NSString* path)
         //bail
         goto bail;
     }
-    
+
     //dbg msg
     #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"encryption results for %@: %@", path, results]);

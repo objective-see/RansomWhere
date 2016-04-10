@@ -14,13 +14,11 @@
 
 @implementation Binary
 
-//@synthesize pid;
 @synthesize name;
 @synthesize path;
 @synthesize isApple;
 @synthesize isApproved;
 @synthesize isBaseline;
-
 
 //init w/ an info dictionary
 -(id)init:(NSString*)binaryPath attributes:(NSDictionary*)attributes
@@ -51,7 +49,7 @@
 -(NSString *)description
 {
     //pretty print
-    return [NSString stringWithFormat: @"path=%@ (isApple:%d / isBaseline: %d / isApproved: %d", self.path, self.isApple, self.isBaseline, self.isApproved];
+    return [NSString stringWithFormat: @"path=%@ (isApple: %d / isBaseline: %d / isApproved: %d)", self.path, self.isApple, self.isBaseline, self.isApproved];
 }
 
 

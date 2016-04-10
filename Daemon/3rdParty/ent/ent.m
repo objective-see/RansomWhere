@@ -104,10 +104,14 @@ NSMutableDictionary* testFile(NSString* file)
     //get length
     length = fileData.length;
     
-    //init
-    rt_init();
+    //do rand tests
+    // ->combined thread safe function
+    rt_combo((void*)fileBytes, (int)length, &ent, &chisq, &montepi);
     
-    rt_add((void*)fileBytes, (int)length);
+    //init
+    //rt_init();
+    
+    //rt_add((void*)fileBytes, (int)length);
     
     //add each byte
     //for(NSUInteger index = 0; index < length; index++)
@@ -117,7 +121,7 @@ NSMutableDictionary* testFile(NSString* file)
     //}
 
 	//complete calculations
-	rt_end(&ent, &chisq, &montepi);
+	//rt_end(&ent, &chisq, &montepi);
     
     //save entropy
     results[@"entropy"] = [NSNumber numberWithDouble:ent];

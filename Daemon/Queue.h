@@ -34,7 +34,6 @@
 //process that were reported to the user
 @property(nonatomic, retain)NSMutableSet* reportedProcs;
 
-
 //pid -> last encrypted file timestamp
 @property(nonatomic, retain)NSMutableDictionary* lastEncryptedFiles;
 

@@ -46,7 +46,7 @@ bail:
 //description
 -(NSString*)description
 {
-    return [NSString stringWithFormat:@"(%@) %@ -> %@", self.processID, self.binary, self.filePath];
+    return [NSString stringWithFormat:@"(%@) %@ -> %@ (flags: %@)", self.processID, self.binary, self.filePath, self.flags];
 }
 
 

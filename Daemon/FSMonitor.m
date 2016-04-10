@@ -18,7 +18,7 @@
 
 //directories to watch
 // ->for now, anything under a user directory...
-NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
+NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared", @"/Users/0wned"};
 
 @implementation FSMonitor
 
@@ -117,6 +117,10 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
     //list of events to watch
     int8_t events[FSE_MAX_EVENTS] = {0};
     
+    //last path
+    // ->sometimes get two FS events for the same file?
+    NSString* lastPath = nil;
+    
     //path to file/dir
     NSString* path = nil;
 
@@ -208,7 +212,21 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
                 continue;
             }
             
-            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
+            //skip same path
+            if(YES == [path isEqualToString:lastPath])
+            {
+                #ifdef DEBUG
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"skipping event, as its same as last (%@)", path]);
+                #endif
+                
+                //skip
+                continue;
+            }
+            
+            //update
+            lastPath = path;
+            
+            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
             
             //skip any non-watched paths
             if(YES != [self isWatched:path])
@@ -241,6 +259,11 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
                 //skip
                 continue;
             }
+            
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"added event to queue: %@", event]);
+            #endif
             
             //add to global queue
             // ->this will trigger handling of event, alerts, etc
@@ -318,6 +341,7 @@ bail:
         goto bail;
     }
 
+    /*
     //new process
     // ->suspend it so have time to create binary object
     if(-1 == kill(pid, SIGSTOP))
@@ -332,7 +356,8 @@ bail:
     #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"suspended %@, now creating binary object for it", processPath]);
     #endif
-    
+    */
+     
     //create binary object
     binary = [[Binary alloc] init:processPath attributes:nil];
     
@@ -343,6 +368,7 @@ bail:
         binaryList[binary.path] = binary;
     }
     
+    /*
     //resume process
     if(-1 == kill(pid, SIGCONT))
     {
@@ -351,6 +377,7 @@ bail:
         
         //don't bail though
     }
+    */
     
 //bail
 bail:
