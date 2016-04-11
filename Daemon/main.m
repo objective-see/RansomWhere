@@ -262,7 +262,7 @@ BOOL reset()
         fullReset = YES;
         
         //dbg msg(s)
-        printf("\nRANDSOMWHERE: reset\n");
+        printf("\nRANSOMWHERE: reset\n");
         printf("\t      a) removed list of installed/approved binaries\n");
         printf("\t      b) stopped, then (re)started the launch daemon\n\n");
     }
