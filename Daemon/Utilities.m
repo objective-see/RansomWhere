@@ -100,14 +100,26 @@ NSMutableArray* enumerateInstalledApps()
     //installed apps
     NSMutableArray* installedApplications = nil;
     
+    //app path
+    NSString* appPath = nil;
+    
     //output from system profiler task
     NSData* taskOutput = nil;
     
     //serialized task output
     NSArray* serializedOutput = nil;
+
+    //an app's login items
+    NSArray* loginItems = nil;
+    
+    //all enumerated login items
+    NSMutableArray* enumeratedLoginItems = nil;
     
     //alloc array for installed apps
     installedApplications = [NSMutableArray array];
+    
+    //alloc array for enumerated login items
+    enumeratedLoginItems = [NSMutableArray array];
     
     //exec system profiler
     taskOutput = execTask(SYSTEM_PROFILER, @[@"SPApplicationsDataType", @"-xml",  @"-detailLevel", @"mini"]);
@@ -130,7 +142,7 @@ NSMutableArray* enumerateInstalledApps()
     @try
     {
         //save
-        installedApplications = serializedOutput[0][@"_items"];
+        installedApplications = [serializedOutput[0][@"_items"] mutableCopy];
     }
     @catch(NSException *exception)
     {
@@ -140,6 +152,54 @@ NSMutableArray* enumerateInstalledApps()
         //bail
         goto bail;
     }
+    
+    //also manually add any apps' login items
+    for(NSDictionary* installedApp in installedApplications)
+    {
+        //grab app path
+        appPath = [installedApp objectForKey:@"path"];
+        if(nil == appPath)
+        {
+            //skip
+            continue;
+        }
+        
+        //skip things not in /Applications
+        if(YES != [appPath hasPrefix:@"/Applications"])
+        {
+            //skip
+            continue;
+        }
+        
+        //get all files in .app/Contents/Library/LoginItems
+        loginItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[appPath stringByAppendingPathComponent:@"Contents/Library/LoginItems"] error:nil];
+        if(nil == loginItems)
+        {
+            //skip
+            continue;
+        }
+        
+        //now filter on .app, to really get the login items
+        loginItems = [loginItems filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.app'"]];
+        if(nil == loginItems)
+        {
+            //skip
+            continue;
+        }
+        
+        //add each
+        // ->note for now, only add 'path' key
+        //   TODO: add other info, or be careful checking for other keys
+        for(NSString* loginItem in loginItems)
+        {
+            //add
+            [enumeratedLoginItems addObject:@{@"path": [[appPath stringByAppendingPathComponent:@"Contents/Library/LoginItems"] stringByAppendingPathComponent:loginItem]}];
+        }
+    }
+    
+    //done iterating over installed apps
+    // ->so app all enumerated login items
+    [installedApplications addObjectsFromArray:enumeratedLoginItems];
     
 //bail
 bail:
