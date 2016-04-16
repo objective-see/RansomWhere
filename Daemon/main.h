@@ -42,4 +42,8 @@ BOOL processRunningProcs();
 // ->then, setup callback for changes
 BOOL initUserName();
 
+//check for update
+// ->query website for json file w/ version info
+void* checkForUpdate(void *threadParam);
+
 #endif /* main_h */

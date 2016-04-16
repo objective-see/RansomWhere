@@ -226,6 +226,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared", @"/Users/0wned"};
             //update
             lastPath = path;
             
+            //dbg msg
             //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
             
             //skip any non-watched paths

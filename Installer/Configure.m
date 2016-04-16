@@ -295,41 +295,50 @@ bail:
     //get info about daemon's paths
     daemonInfo = [self daemonInfo];
     
-    //stop daemom
-    if(YES != [self controlLaunchItem:DAEMON_UNLOAD plist:daemonInfo[DAEMON_DEST_PLIST_KEY]])
+    //when daemon's plist exists
+    // ->stop daemom
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_PLIST_KEY]])
     {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to stop daemon"]);
+        //stop daemon
+        if(YES != [self controlLaunchItem:DAEMON_UNLOAD plist:daemonInfo[DAEMON_DEST_PLIST_KEY]])
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to stop daemon"]);
+            
+            //set flag
+            bAnyErrors = YES;
+            
+            //keep uninstalling...
+        }
         
-        //set flag
-        bAnyErrors = YES;
-        
-        //keep uninstalling...
+        //delete plist
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_PLIST_KEY] error:&error])
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon plist %@ (%@)", daemonInfo[DAEMON_DEST_PLIST_KEY], error]);
+            
+            //set flag
+            bAnyErrors = YES;
+            
+            //keep uninstalling...
+        }
     }
     
-    //delete plist
-    if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_PLIST_KEY] error:&error])
+    //when daemon's folder exists
+    // ->delete daemon's folder (include's binary and anything else)
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER]])
     {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon plist %@ (%@)", daemonInfo[DAEMON_DEST_PLIST_KEY], error]);
-        
-        //set flag
-        bAnyErrors = YES;
-        
-        //keep uninstalling...
-    }
-    
-    //delete daemon's folder
-    // ->include's binary and anything else
-    if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_FOLDER] error:&error])
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon's folder %@ (%@)", daemonInfo[DAEMON_DEST_FOLDER], error]);
-        
-        //set flag
-        bAnyErrors = YES;
-        
-        //keep uninstalling...
+        //delete daemon's folder & contents
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_FOLDER] error:&error])
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon's folder %@ (%@)", daemonInfo[DAEMON_DEST_FOLDER], error]);
+            
+            //set flag
+            bAnyErrors = YES;
+            
+            //keep uninstalling...
+        }
     }
     
     //only success when there were no errors

@@ -6,6 +6,7 @@
 //  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
+#import <pthread.h>
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
@@ -42,6 +43,9 @@ int main(int argc, const char * argv[])
     {
         //NSLog(@"%d", isEncrypted([NSString stringWithUTF8String:argv[1]]));
         //return 0;
+        
+        //update thread
+        pthread_t updateThread = NULL;
         
         //dbg msg
         #ifdef DEBUG
@@ -160,6 +164,13 @@ int main(int argc, const char * argv[])
         
         //start file system monitoring
         [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FSMonitor alloc] init] withObject:nil];
+        
+        //start thread to handle update check
+        pthread_create(&updateThread, NULL, checkForUpdate, NULL);
+        
+        //detatch
+        // ->don't care about waiting for update thread to return
+        pthread_detach(updateThread);
         
         //run
         CFRunLoopRun();
@@ -443,6 +454,11 @@ BOOL processBaselinedApps()
         #endif
     }
     
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"processing %lu baselined applications", (unsigned long)installedApps.count]);
+    #endif
+    
     //iterate overall all installed apps
     // ->create binary objects for all, passing in 'baselined' flag
     for(NSString* appPath in installedApps)
@@ -599,7 +615,6 @@ bail:
     return wereProcessed;
 }
 
-
 //grab current user
 // ->note: NULL is returned if none, or user is 'loginwindow'
 static CFStringRef CopyCurrentConsoleUsername(SCDynamicStoreRef store)
@@ -753,6 +768,108 @@ bail:
         runloopSource = NULL;
     }
     
-    
     return wasInitialize;
+}
+
+//check for update
+// ->query website for json file w/ version info
+void* checkForUpdate(void *threadParam)
+{
+    //version string
+    NSMutableString* versionString = nil;
+    
+    //alloc string
+    versionString = [NSMutableString string];
+    
+    //user's response
+    CFOptionFlags response = 0;
+    
+    //header for alert
+    CFStringRef title = NULL;
+    
+    //body for alert
+    CFStringRef body = NULL;
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"in 'check for update' thread");
+    #endif
+    
+    //wait for user to login in
+    do
+    {
+        //nap
+        sleep(10);
+    
+    //user yet?
+    }while(NULL == consoleUserName);
+    
+    //nap a bit more
+    // ->just in case user is logging in
+    sleep(10);
+    
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"user logged in, checking for version");
+    #endif
+    
+    //ok got user
+    // ->check if available version is newer
+    // ->show update window
+    if(YES != isNewVersion(versionString))
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"no updates available (or check failed)");
+        #endif
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"a new version (%@) is available", versionString]);
+    #endif
+    
+    //init title for alert
+    title = (__bridge CFStringRef)([NSString stringWithFormat:@"a new version (%@) is available!", versionString]);
+    
+    //init body
+    body = (__bridge CFStringRef)([NSString stringWithFormat:@"currently, you have version %@ installed", getDaemonVersion()]);
+    
+    //show alert
+    // ->will block until user interaction, then response saved in 'response' variable
+    CFUserNotificationDisplayAlert(0.0f, kCFUserNotificationStopAlertLevel, (CFURLRef)[NSURL URLWithString:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:ALERT_ICON]], NULL, NULL, title, body, (__bridge CFStringRef)@"Upgrade", (__bridge CFStringRef)@"Ignore", NULL, &response);
+    
+    //user selected 'Upgrade'
+    // ->lazy, just open URL of product
+    if(UPDATE_INSTALL == response)
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"user selected 'upgrade' - launching browser");
+        #endif
+        
+        //open URL
+        // ->invokes user's default browser
+        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:PRODUCT_URL]];
+    }
+    //user selected 'Ignore'
+    // ->just log this, but nothing else needed
+    else
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"user selected 'ignore'");
+        #endif
+    }
+    
+//bail
+bail:
+    
+    //bye-bye
+    pthread_exit(NULL);
+    
 }

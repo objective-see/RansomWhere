@@ -108,21 +108,6 @@ NSMutableDictionary* testFile(NSString* file)
     // ->combined thread safe function
     rt_combo((void*)fileBytes, (int)length, &ent, &chisq, &montepi);
     
-    //init
-    //rt_init();
-    
-    //rt_add((void*)fileBytes, (int)length);
-    
-    //add each byte
-    //for(NSUInteger index = 0; index < length; index++)
-    //{
-        //add
-        //rt_add((void*)&fileBytes[index], 1);
-    //}
-
-	//complete calculations
-	//rt_end(&ent, &chisq, &montepi);
-    
     //save entropy
     results[@"entropy"] = [NSNumber numberWithDouble:ent];
     

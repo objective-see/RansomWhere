@@ -10,7 +10,20 @@
 #define Consts_h
 
 //version
+// TODO: update with each new release!
 #define DAEMON_VERSION @"1.0.0"
+
+//product url
+#define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
+
+//product version url
+#define PRODUCT_VERSION_URL @"https://objective-see.com/products/versions/ransomwhereVersion.json"
+
+//install update flag
+#define UPDATE_INSTALL 0
+
+//ignore update flag
+#define UPDATE_IGNORE 1
 
 //reset flag
 #define RESET_FLAG "-reset"

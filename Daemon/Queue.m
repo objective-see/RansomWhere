@@ -308,6 +308,19 @@
     logMsg(LOG_DEBUG, @"6) was encrypted by process that's quickly encrypting a bunch of files");
     #endif
     
+    //SKIP
+    // ->if user has logged out, ignore
+    if(NULL == consoleUserName)
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"ignoring: not user logged in");
+        #endif
+        
+        //skip
+        goto bail;
+    }
+    
     //dbg msg
     #ifdef DEBUG
     logMsg(LOG_DEBUG, @"suspending process and alerting user!");
@@ -378,7 +391,7 @@ bail:
     body = (__bridge CFStringRef)([NSString stringWithFormat:@"proc:\t%@ (%d)\r\nfiles:\t%@\r\n\t%@...", event.binary.path, event.processID.unsignedIntValue, prevEncryptedFile, event.filePath]);
     
     //show alert
-    // ->will block until user iteraction, then response saved in 'response' variable
+    // ->will block until user interaction, then response saved in 'response' variable
     CFUserNotificationDisplayAlert(0.0f, kCFUserNotificationStopAlertLevel, (CFURLRef)self.icon, NULL, NULL, title, body, (__bridge CFStringRef)@"Terminate", (__bridge CFStringRef)@"Allow", NULL, &response);
     
 //bail

@@ -28,6 +28,113 @@ NSString* getDaemonVersion()
     return DAEMON_VERSION;
 }
 
+//determine if there is a new version
+// -1, YES or NO
+BOOL isNewVersion(NSMutableString* versionString)
+{
+    //flag
+    BOOL newVersionExists = NO;
+    
+    //installed version
+    NSString* installedVersion = nil;
+    
+    //latest version
+    NSString* latestVersion = nil;
+    
+    //get installed version
+    installedVersion = getDaemonVersion();
+    
+    //get latest version
+    // ->will query internet (bb's website)
+    latestVersion = getLatestVersion();
+    if(nil == latestVersion)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //save version
+    [versionString setString:latestVersion];
+    
+    //set version flag
+    // ->YES/NO based on version comparision
+    newVersionExists = (NSOrderedAscending == [installedVersion compare:latestVersion options:NSNumericSearch]);
+    
+//bail
+bail:
+    
+    return newVersionExists;
+}
+
+
+//query interwebz to get latest version
+NSString* getLatestVersion()
+{
+    //version data
+    NSData* versionData = nil;
+    
+    //version dictionary
+    NSDictionary* versionDictionary = nil;
+    
+    //latest version
+    NSString* latestVersion = nil;
+    
+    //get version from remote URL
+    versionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSION_URL]];
+    if(nil == versionData)
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to load version data from %@", PRODUCT_VERSION_URL]);
+        #endif
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"downloaded version info: %@",  [[NSString alloc] initWithData:versionData encoding:NSUTF8StringEncoding]]);
+    #endif
+    
+    //convert JSON to dictionary
+    versionDictionary = [NSJSONSerialization JSONObjectWithData:versionData options:0 error:nil];
+    if(nil == versionDictionary)
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"failed serialized downloaded version data (into JSON)");
+        #endif
+        
+        //bail
+        goto bail;
+    }
+    
+    //extract latest version
+    latestVersion = versionDictionary[@"latestVersion"];
+    if(nil == latestVersion)
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"failed to extract 'latestVersion' from downloaded version data");
+        #endif
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"latest version: %@", latestVersion]);
+    #endif
+    
+//bail
+bail:
+    
+    return latestVersion;
+}
+
+
 //enumerate all running processes
 NSMutableArray* enumerateProcesses()
 {
@@ -1060,10 +1167,10 @@ BOOL isEncrypted(NSString* path)
         goto bail;
     }
     
-    //monte carlo pi error gotta above 0.5
+    //when monte carlo pi error is above 0.5
     // ->gotta have low chi square as well
     if( ([results[@"montecarlo"] doubleValue] > 0.5) &&
-        ([results[@"montecarlo"] doubleValue] > 500) )
+        ([results[@"chisquare"] doubleValue] > 500) )
     {
         //ignore
         goto bail;

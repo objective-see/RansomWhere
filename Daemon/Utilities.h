@@ -11,7 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
-//#import "OrderedDictionary.h"
+//query interwebz to get latest version
+NSString* getLatestVersion();
 
 //enumerate all running processes
 NSMutableArray* enumerateProcesses();
@@ -74,7 +75,7 @@ NSMutableArray* getUsers();
 NSString* getDaemonVersion();
 
 //determine if there is a new version
-NSInteger isNewVersion(NSMutableString* errMsg);
+BOOL isNewVersion(NSMutableString* versionString);
 
 //check if process is alive
 BOOL isProcessAlive(pid_t processID);
