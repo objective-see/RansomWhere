@@ -17,7 +17,7 @@
 #define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
 
 //product version url
-#define PRODUCT_VERSION_URL @"https://objective-see.com/products/versions/ransomwhereVersion.json"
+#define PRODUCT_VERSION_URL @"https://objective-see.com/products/versions/ransomwhere.json"
 
 //install update flag
 #define UPDATE_INSTALL 0

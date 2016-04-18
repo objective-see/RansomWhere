@@ -140,13 +140,13 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared", @"/Users/0wned"};
         goto bail;
     }
     
-    //explicity init all to FSE_IGNORE
+    //explicitly init all to FSE_IGNORE
     memset(events, FSE_IGNORE, FSE_MAX_EVENTS);
     
-    //manualy report FSE_CONTENT_MODIFIED
+    //report close w/ modifications
     events[FSE_CONTENT_MODIFIED] = FSE_REPORT;
     
-    //manualy report on renames
+    //report on renames
     events[FSE_RENAME] = FSE_REPORT;
     
     //clear out struct
