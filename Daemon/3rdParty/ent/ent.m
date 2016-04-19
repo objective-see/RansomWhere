@@ -48,8 +48,8 @@
 
 extern double pochisq(const double ax, const int df);
 
-//1 MB
-#define READ_CHUNK 1024*1024*5
+//3 MB
+#define READ_CHUNK 1024*1024*3
 
 //test a file
 // ->return a dictionary w/ entropy, chi square, and monte carlo pi 'error'
@@ -90,7 +90,7 @@ NSMutableDictionary* testFile(NSString* file)
         goto bail;
     }
     
-    //read in up to 1MB of file
+    //read in up to 3MB of file
     fileData = [handle readDataOfLength:READ_CHUNK];
     if(nil == fileData)
     {
