@@ -21,7 +21,6 @@
 		7DF708051CAE5B7500FF79D8 /* FSMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708001CAE5B7500FF79D8 /* FSMonitor.m */; };
 		7DF708151CB094AC00FF79D8 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708111CB094AC00FF79D8 /* Logging.m */; };
 		7DF7081B1CB0BBE700FF79D8 /* Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF708171CB0BBE700FF79D8 /* Binary.m */; };
-		7DF7081E1CB0CD8800FF79D8 /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DF7081D1CB0CD8800FF79D8 /* libbsm.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -65,7 +64,6 @@
 		7DF708121CB094AC00FF79D8 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = Shared/Logging.h; sourceTree = "<group>"; };
 		7DF708171CB0BBE700FF79D8 /* Binary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Binary.m; path = Daemon/Binary.m; sourceTree = "<group>"; };
 		7DF708181CB0BBE700FF79D8 /* Binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Binary.h; path = Daemon/Binary.h; sourceTree = "<group>"; };
-		7DF7081D1CB0CD8800FF79D8 /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
 		7DF7081F1CB0E62000FF79D8 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = main.h; path = Daemon/main.h; sourceTree = "<group>"; };
 		CDBC2B441C9EEF5300853C8A /* Daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Daemon; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -75,7 +73,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7DF7081E1CB0CD8800FF79D8 /* libbsm.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,7 +124,6 @@
 		CDBC2B3B1C9EEF5300853C8A = {
 			isa = PBXGroup;
 			children = (
-				7DF7081D1CB0CD8800FF79D8 /* libbsm.tbd */,
 				7DF708171CB0BBE700FF79D8 /* Binary.m */,
 				7DF708181CB0BBE700FF79D8 /* Binary.h */,
 				7DF708101CB094A100FF79D8 /* Shared */,

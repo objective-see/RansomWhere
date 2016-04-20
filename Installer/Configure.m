@@ -190,7 +190,7 @@ bail:
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_PATH_KEY] toPath:daemonInfo[DAEMON_DEST_PATH_KEY] error:&error])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy daemon into %@ (%@)", DAEMON_DEST_PATH_KEY, error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy daemon into %@ (%@)", daemonInfo[DAEMON_DEST_PATH_KEY], error]);
         
         //bail
         goto bail;

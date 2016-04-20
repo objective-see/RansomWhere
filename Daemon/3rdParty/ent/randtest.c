@@ -66,7 +66,7 @@ void rt_combo(void *buf, int bufl, double *r_ent, double *r_chisq, double *r_mon
     mp = 0;                /* Reset Monte Carlo accumulator pointer */
     mcount = 0; 	       /* Clear Monte Carlo tries */
     inmont = 0; 	       /* Clear Monte Carlo inside count */
-    incirc = 65535.0 * 65535.0;/* In-circle distance for Monte Carlo */
+    
     
     incirc = pow(pow(256.0, (double) (MONTEN / 2)) - 1, 2.0);
     
