@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7D1222721CC7619C00CD38C1 /* RansomWhere in Resources */ = {isa = PBXBuildFile; fileRef = 7D1222711CC7619C00CD38C1 /* RansomWhere */; };
 		7D1222741CC761A800CD38C1 /* com.objective-see.ransomwhere.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */; };
 		7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DCF017E1CB996E70051C574 /* alertIcon.png */; };
 		7DE29CFC1CABB59600DFA6A6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */; };
@@ -30,7 +29,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7D1222711CC7619C00CD38C1 /* RansomWhere */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = RansomWhere; path = DerivedData/RansomWhere/Build/Products/Release/RansomWhere; sourceTree = "<group>"; };
 		7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "com.objective-see.ransomwhere.plist"; sourceTree = "<group>"; };
 		7DCF017E1CB996E70051C574 /* alertIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = alertIcon.png; path = Installer/images/alertIcon.png; sourceTree = "<group>"; };
 		7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Installer/AppDelegate.h; sourceTree = "<group>"; };
@@ -113,7 +111,6 @@
 			isa = PBXGroup;
 			children = (
 				7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */,
-				7D1222711CC7619C00CD38C1 /* RansomWhere */,
 				7DF708091CB0941800FF79D8 /* Shared */,
 				7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */,
 				7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */,
@@ -225,7 +222,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D1222741CC761A800CD38C1 /* com.objective-see.ransomwhere.plist in Resources */,
-				7D1222721CC7619C00CD38C1 /* RansomWhere in Resources */,
 				7DE29D141CABB67A00DFA6A6 /* ErrorWindowController.xib in Resources */,
 				7DE29D1C1CAD0BBD00DFA6A6 /* icon.png in Resources */,
 				7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */,
@@ -253,7 +249,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\n#cp -R -f $BUILT_PRODUCTS_DIR/com.objective-see.ransomwhere.plist $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/Daemon /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/Applications/RansomWhere.app/Contents/Resources\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/com.objective-see.ransomwhere.plist /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/InstallationBuildProductsLocation/Applications/RansomWhere.app/Contents/Resources\n";
+			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\ncp -R -f $BUILT_PRODUCTS_DIR/com.objective-see.ransomwhere.plist $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/Daemon /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/Applications/RansomWhere.app/Contents/Resources\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/com.objective-see.ransomwhere.plist /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/InstallationBuildProductsLocation/Applications/RansomWhere.app/Contents/Resources\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

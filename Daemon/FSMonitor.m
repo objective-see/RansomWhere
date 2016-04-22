@@ -18,7 +18,7 @@
 
 //directories to watch
 // ->for now, anything under a user directory...
-NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared", @"/Users/0wned"};
+NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
 
 @implementation FSMonitor
 
