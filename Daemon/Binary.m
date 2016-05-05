@@ -18,6 +18,7 @@
 @synthesize path;
 @synthesize isApple;
 @synthesize isApproved;
+@synthesize isAppStore;
 @synthesize isBaseline;
 
 //init w/ an info dictionary
@@ -40,6 +41,9 @@
         //determine if signed by Apple proper
         self.isApple = isAppleBinary(self.path);
         
+        //determine if from official App Store
+        self.isAppStore = fromAppStore(self.path);
+        
     }//init self
 
     return self;
@@ -49,7 +53,7 @@
 -(NSString *)description
 {
     //pretty print
-    return [NSString stringWithFormat: @"path=%@ (isApple: %d / isBaseline: %d / isApproved: %d)", self.path, self.isApple, self.isBaseline, self.isApproved];
+    return [NSString stringWithFormat: @"path=%@ (isApple: %d / isAppStore: %d / isBaseline: %d / isApproved: %d)", self.path, self.isApple, self.isAppStore, self.isBaseline, self.isApproved];
 }
 
 

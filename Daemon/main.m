@@ -105,25 +105,27 @@ int main(int argc, const char * argv[])
         if(YES != processBaselinedApps())
         {
             //err msg
+            // ->but don't bail
             logMsg(LOG_ERR, @"failed to enumerate/process baselined apps");
             
             //bail
-            goto bail;
+            //goto bail;
         }
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerating all 'user-approvied' applications");
+        logMsg(LOG_DEBUG, @"enumerating all 'user-approved' applications");
         #endif
         
         //create binary objects for all (persistent) user-approved binaries
         if(YES != processApprovedBins())
         {
             //err msg
+            // ->but don't bail
             logMsg(LOG_ERR, @"failed to enumerate/process user-approved apps");
             
             //bail
-            goto bail;
+            //goto bail;
         }
         
         //dbg msg
@@ -374,7 +376,7 @@ BOOL processBaselinedApps()
             (0 == enumeratedApps.count) )
         {
             //err msg
-            logMsg(LOG_ERR, @"failed to enumerate installed apps");
+            logMsg(LOG_ERR, @"failed to enumerate installed appsz");
             
             //bail
             goto bail;

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		7D1222741CC761A800CD38C1 /* com.objective-see.ransomwhere.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */; };
+		7D3E40921CDB2F77002B0997 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3E40911CDB2F77002B0997 /* AboutWindowController.m */; };
+		7D3E40941CDB2F82002B0997 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3E40931CDB2F82002B0997 /* AboutWindow.xib */; };
 		7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DCF017E1CB996E70051C574 /* alertIcon.png */; };
 		7DE29CFC1CABB59600DFA6A6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */; };
 		7DE29CFD1CABB59600DFA6A6 /* Base.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29CE71CABB59600DFA6A6 /* Base.lproj */; };
@@ -30,6 +32,9 @@
 
 /* Begin PBXFileReference section */
 		7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "com.objective-see.ransomwhere.plist"; sourceTree = "<group>"; };
+		7D3E40901CDB2F77002B0997 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = Installer/AboutWindowController.h; sourceTree = "<group>"; };
+		7D3E40911CDB2F77002B0997 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = Installer/AboutWindowController.m; sourceTree = "<group>"; };
+		7D3E40931CDB2F82002B0997 /* AboutWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AboutWindow.xib; path = UI/AboutWindow.xib; sourceTree = "<group>"; };
 		7DCF017E1CB996E70051C574 /* alertIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = alertIcon.png; path = Installer/images/alertIcon.png; sourceTree = "<group>"; };
 		7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Installer/AppDelegate.h; sourceTree = "<group>"; };
 		7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Installer/AppDelegate.m; sourceTree = "<group>"; };
@@ -100,8 +105,9 @@
 			isa = PBXGroup;
 			children = (
 				7DE29D171CABB78600DFA6A6 /* MainMenu.xib */,
-				7DE29D151CABB72200DFA6A6 /* ConfigureWindowController.xib */,
+				7D3E40931CDB2F82002B0997 /* AboutWindow.xib */,
 				7DE29D131CABB67A00DFA6A6 /* ErrorWindowController.xib */,
+				7DE29D151CABB72200DFA6A6 /* ConfigureWindowController.xib */,
 			);
 			name = UI;
 			path = Installer;
@@ -110,6 +116,8 @@
 		CD7F087F19AE6DCA00FF00FC = {
 			isa = PBXGroup;
 			children = (
+				7D3E40901CDB2F77002B0997 /* AboutWindowController.h */,
+				7D3E40911CDB2F77002B0997 /* AboutWindowController.m */,
 				7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */,
 				7DF708091CB0941800FF79D8 /* Shared */,
 				7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */,
@@ -227,6 +235,7 @@
 				7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */,
 				7DE29CFD1CABB59600DFA6A6 /* Base.lproj in Resources */,
 				7DE29D161CABB72200DFA6A6 /* ConfigureWindowController.xib in Resources */,
+				7D3E40941CDB2F82002B0997 /* AboutWindow.xib in Resources */,
 				7DE29D041CABB59600DFA6A6 /* Images.xcassets in Resources */,
 				7DE29D1D1CAD0BBD00DFA6A6 /* ransomwhere.png in Resources */,
 				7DE29D001CABB59600DFA6A6 /* en.lproj in Resources */,
@@ -266,6 +275,7 @@
 				7DE29CFE1CABB59600DFA6A6 /* Configure.m in Sources */,
 				7DF7080F1CB0942400FF79D8 /* Exception.m in Sources */,
 				7DE29D121CABB5FE00DFA6A6 /* main.m in Sources */,
+				7D3E40921CDB2F77002B0997 /* AboutWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

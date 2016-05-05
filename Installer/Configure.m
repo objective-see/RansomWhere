@@ -102,6 +102,24 @@
         //dbg msg
         logMsg(LOG_DEBUG, @"installing...");
         
+        //if already installed though
+        // ->uninstall everything first
+        if(YES == [self isInstalled])
+        {
+            //dbg msg
+            logMsg(LOG_DEBUG, @"already installed, so fully uninstalling...");
+            
+            //uninstall (and stop)
+            if(YES != [self uninstall])
+            {
+                //bail
+                goto bail;
+            }
+            
+            //dbg msg
+            logMsg(LOG_DEBUG, @"uninstalled & stopped daemon");
+        }
+        
         //install daemon (and start)
         if(YES != [self install])
         {
@@ -248,11 +266,28 @@ bail:
     if(YES != setFileOwner(daemonInfo[DAEMON_DEST_PLIST_KEY], @0, @0, YES))
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon's plist %@ to be owned by root", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon's plist %@, to be owned by root", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
         
         //bail
         goto bail;
     }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set daemon's plist %@, to be owned by root", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
+    
+    //set plist's permissions to rw-r-r
+    // ->otherwise launchd will reject it
+    if(YES != setFilePermissions(daemonInfo[DAEMON_DEST_PLIST_KEY], 0644))
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon's plist %@, to be 'rw-r-r'", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set daemon's plist %@, to be 'rw-r-r'", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
     
     //start daemon
     if(YES != [self controlLaunchItem:DAEMON_LOAD plist:daemonInfo[DAEMON_DEST_PLIST_KEY]])

@@ -15,6 +15,7 @@
 
 @implementation AppDelegate
 
+@synthesize aboutWindowController;
 @synthesize errorWindowController;
 @synthesize configureWindowController;
 
@@ -42,20 +43,8 @@
         goto bail;
     }
     
-    //already installed?
-    // ->display uninstall window
-    if(YES == [configureObj isInstalled])
-    {
-        //show window
-        [self displayConfigureWindow:@"Uninstall" action:ACTION_UNINSTALL_FLAG];
-    }
-    //not installed
-    // ->display install window
-    else
-    {
-        //show window
-        [self displayConfigureWindow:[NSString stringWithFormat:@"Install v%@", getAppVersion()] action:ACTION_INSTALL_FLAG];
-    }
+    //show window
+    [self displayConfigureWindow:[configureObj isInstalled]];
     
 //bail
 bail:
@@ -63,8 +52,30 @@ bail:
     return;
 }
 
+
+//automatically invoked when user clicks 'About/Info'
+// ->show about window
+-(IBAction)about:(id)sender
+{
+    //alloc/init settings window
+    if(nil == self.aboutWindowController)
+    {
+        //alloc/init
+        aboutWindowController = [[AboutWindowController alloc] initWithWindowNibName:@"AboutWindow"];
+    }
+    
+    //center window
+    [[self.aboutWindowController window] center];
+    
+    //show it
+    [self.aboutWindowController showWindow:self];
+    
+    return;
+}
+
+
 //display configuration window w/ 'install' || 'uninstall' button
--(void)displayConfigureWindow:(NSString*)windowTitle action:(NSUInteger)action
+-(void)displayConfigureWindow:(BOOL)isInstalled
 {
     //alloc/init
     configureWindowController = [[ConfigureWindowController alloc] initWithWindowNibName:@"ConfigureWindowController"];
@@ -74,7 +85,7 @@ bail:
     [self.configureWindowController display];
     
     //configure it
-    [self.configureWindowController configure:windowTitle action:action];
+    [self.configureWindowController configure:isInstalled];
     
     return;
 }

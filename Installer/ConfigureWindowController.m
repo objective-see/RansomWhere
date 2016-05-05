@@ -15,7 +15,6 @@
 @implementation ConfigureWindowController
 
 @synthesize statusMsg;
-@synthesize windowTitle;
 @synthesize moreInfoButton;
 
 //automatically called when nib is loaded
@@ -30,46 +29,30 @@
 
 //configure window/buttons
 // ->also brings window to front
--(void)configure:(NSString*)title action:(NSUInteger)requestedAction
+-(void)configure:(BOOL)isInstalled
 {
     //set window title
-    [self window].title = title;
+    [self window].title = [NSString stringWithFormat:@"[version %@]", getAppVersion()];
     
     //dbg msg
     logMsg(LOG_DEBUG, @"configuring install/uninstall window");
     
-    //init button title
-    // ->based on action
-    switch(requestedAction)
-    {
-        //install
-        case ACTION_INSTALL_FLAG:
-            
-            //set
-            self.actionButton.title = ACTION_INSTALL;
-            
-            //init status msg
-            [self.statusMsg setStringValue:@"generically thwart ransomware 😇"];
-
-            break;
-            
-        //uninstall
-        case ACTION_UNINSTALL_FLAG:
-            
-            //set
-            self.actionButton.title = ACTION_UNINSTALL;
-            
-            //init status msg
-            [self.statusMsg setStringValue:@"disable & remove protection 😕"];
-
-            break;
-            
-        default:
-            
-            break;
-   
-    }//switch
+    //init status msg
+    [self.statusMsg setStringValue:@"generically thwart ransomware 😇"];
     
+    //endable 'uninstall' button when app is installed already
+    if(YES == isInstalled)
+    {
+        //enable
+        self.uninstallButton.enabled = YES;
+    }
+    //otherwise disable
+    else
+    {
+        //disable
+        self.uninstallButton.enabled = NO;
+    }
+
     //set delegate
     [self.window setDelegate:self];
 
@@ -98,21 +81,8 @@
     return;
 }
 
-//button handler for 'cancel'
-// ->just close window, which will trigger app exit
--(IBAction)cancel:(id)sender
-{
-    //dbg msg
-    logMsg(LOG_DEBUG, @"handling 'cancel'/'close' button click, exiting application");
-    
-    //close
-    [self.window close];
-    
-    return;
-}
-
-//button handler for all actions
--(IBAction)handleActionClick:(id)sender
+//button handler for uninstall/install
+-(IBAction)buttonHandler:(id)sender
 {
     //button title
     NSString* buttonTitle = nil;
@@ -125,6 +95,9 @@
     
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"handling action click: %@", buttonTitle]);
+    
+    //hide 'get more info' button
+    self.moreInfoButton.hidden = YES;
     
     //handle non-'close' clicks
     if(YES != [buttonTitle isEqualToString:ACTION_CLOSE])
@@ -166,14 +139,6 @@
             [self lifeCycleEvent:action];
         });
     }
-    
-    //handle 'close'
-    // ->just close window, which will trigger app exit
-    else
-    {
-        //close
-        [self.window close];
-    }
 
 //bail
 bail:
@@ -183,7 +148,7 @@ bail:
 
 //button handler for '?' button (on an error)
 // ->load objective-see's documentation for error(s) in default browser
--(IBAction)handleInfoClick:(id)sender
+-(IBAction)info:(id)sender
 {
     //url
     NSURL *helpURL = nil;
@@ -219,8 +184,12 @@ bail:
     dispatch_sync(dispatch_get_main_queue(),
     ^{
         //complete
-        [self beginEvent];
+        [self beginEvent:event];
     });
+    
+    //sleep
+    // ->allow 'install' || 'uninstall' msg to show up
+    sleep(1);
     
     //perform action (install | uninstall)
     // ->perform background actions
@@ -245,7 +214,7 @@ bail:
     dispatch_async(dispatch_get_main_queue(),
     ^{
         //complete
-        [self completeEvent:status];
+        [self completeEvent:status event:event];
     });
     
     return;
@@ -253,7 +222,7 @@ bail:
 
 //begin event
 // ->basically just update UI
--(void)beginEvent
+-(void)beginEvent:(NSUInteger)event
 {
     //status msg frame
     CGRect statusMsgFrame = {0};
@@ -271,14 +240,24 @@ bail:
     //align text left
     [self.statusMsg setAlignment:NSLeftTextAlignment];
     
-    //update status msg UI
-    [self.statusMsg setStringValue:[NSString stringWithFormat:@"%@ing...", [self.actionButton.title lowercaseString]]];
+    //install msg
+    if(ACTION_INSTALL_FLAG == event)
+    {
+        //update status msg
+        [self.statusMsg setStringValue:@"Installing..."];
+    }
+    //uninstall msg
+    else
+    {
+        //update status msg
+        [self.statusMsg setStringValue:@"Uninstalling..."];
+    }
     
     //disable action button
-    self.actionButton.enabled = NO;
+    self.uninstallButton.enabled = NO;
     
     //disable cancel button
-    self.cancelButton.enabled = NO;
+    self.installButton.enabled = NO;
     
     //show spinner
     [self.activityIndicator setHidden:NO];
@@ -291,10 +270,13 @@ bail:
 
 //complete event
 // ->update UI after background event has finished
--(void)completeEvent:(BOOL)success
+-(void)completeEvent:(BOOL)success event:(NSUInteger)event
 {
     //status msg frame
     CGRect statusMsgFrame = {0};
+    
+    //action
+    NSString* action = nil;
     
     //result msg
     NSString* resultMsg = nil;
@@ -305,11 +287,24 @@ bail:
     //generally want centered text
     [self.statusMsg setAlignment:NSCenterTextAlignment];
     
+    //set action msg for install
+    if(ACTION_INSTALL_FLAG == event)
+    {
+        //set msg
+        action = @"install";
+    }
+    //set action msg for uninstall
+    else
+    {
+        //set msg
+        action = @"uninstall";
+    }
+    
     //success
     if(YES == success)
     {
         //set result msg
-        resultMsg = [NSString stringWithFormat:@"RansomWhere? %@ed", self.actionButton.title];
+        resultMsg = [NSString stringWithFormat:@"RansomWhere? %@ed", action];
         
         //set font to black
         resultMsgColor = [NSColor blackColor];
@@ -318,14 +313,13 @@ bail:
     else
     {
         //set result msg
-        resultMsg = [[NSString stringWithFormat:@"error: %@ failed", self.actionButton.title] lowercaseString];
+        resultMsg = [NSString stringWithFormat:@"error: %@ failed", action];
         
         //set font to red
         resultMsgColor = [NSColor redColor];
         
         //show 'get more info' button
-        // ->don't have to worry about (re)hiding since the only option is to close the app
-        [self.moreInfoButton setHidden:NO];
+        self.moreInfoButton.hidden = NO;
     }
     
     //stop/hide spinner
@@ -349,37 +343,32 @@ bail:
     //set status msg
     [self.statusMsg setStringValue:resultMsg];
     
-    //in debug mode
-    // ->toggle action button; install, change to 'uninstall'
-    #ifdef DEBUG
-    if(YES == [self.actionButton.title isEqualToString:ACTION_INSTALL])
+    //toggle buttons
+    // ->after install turn on 'uninstall' and off 'install'
+    if(ACTION_INSTALL_FLAG == event)
     {
-        //toggle
-        self.actionButton.title = ACTION_UNINSTALL;
+        //enable uninstall
+        self.uninstallButton.enabled = YES;
+        
+        //disable install
+        self.installButton.enabled = NO;
     }
-    //toggle action button; uninstall, change to 'install'
+    //toggle buttons
+    // ->after uninstall turn off 'uninstall' and on 'install'
     else
     {
-        //toggle
-        self.actionButton.title = ACTION_INSTALL;
+        //disable
+        self.uninstallButton.enabled = NO;
+        
+        //enable close button
+        self.installButton.enabled = YES;
     }
-    
-    //enable action button
-    self.actionButton.enabled = YES;
-    #endif
-    
-    //change cancel button to 'close'
-    self.cancelButton.title = ACTION_CLOSE;
-    
-    //enable close button
-    self.cancelButton.enabled = YES;
-    
-    //make close button active/in focus
-    [self.window makeFirstResponder:self.cancelButton];
-    
+
     //ok to re-enable 'x' button
     [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:YES];
-
+    
+    //make 'x' button active/in focus
+    //[self.window makeFirstResponder:[self.window standardWindowButton:NSWindowCloseButton]];
     
     //(re)make window window key
     [self.window makeKeyAndOrderFront:self];

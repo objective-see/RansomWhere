@@ -16,15 +16,14 @@
 
 #import <Foundation/Foundation.h>
 
-//directories to watch
-// ->for now, anything under a user directory...
-NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
+//directories to ignore
+NSString* const IGNORE_DIRECTORIES[] = {@"~", @"/Users/Shared"};
 
 @implementation FSMonitor
 
 @synthesize eventQueue;
 @synthesize pidPathMappings;
-@synthesize watchDirectories;
+@synthesize ignoredDirectories;
 
 //init function
 // ->load watch paths, alloc queue, etc
@@ -54,6 +53,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
     return self;
 }
 
+/*
 //initialize paths to watch
 // ->expands '~'s in paths, as needed
 -(void)initWatchDirectories
@@ -94,6 +94,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
     
     return;
 }
+*/
 
 //monitor file-system events
 // ->new events are checked for path match, then added to queue for more intense processing/alerting
@@ -230,6 +231,7 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
             //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
             
             //skip any non-watched paths
+            // /tmp, or window_<digits>.data files
             if(YES != [self isWatched:path])
             {
                 //skip
@@ -241,7 +243,8 @@ NSString* const BASE_WATCH_PATHS[] = {@"~", @"/Users/Shared"};
             binary = [self getBinaryObject:fse->pid];
             if(nil == binary)
             {
-                //skip
+                //err creating obj
+                // ->so skip/ignore
                 continue;
             }
             
@@ -386,6 +389,65 @@ bail:
     return binary;
 }
 
+//determine if a path should be ignored
+-(BOOL)shouldIgnore:(NSString*)path
+{
+    //flag
+    BOOL ignore = NO;
+    
+    //path bytes
+    const char* utf8String = NULL;
+    
+    //init bytes
+    utf8String = path.UTF8String;
+    
+    //dot
+    char* dot = NULL;
+    
+    //slash
+    char* slash = NULL;
+    
+    //ignore any window_<digits>.data files
+    // ->start by seeing if file ends in '.data'
+    dot = strrchr(utf8String, '.');
+    if( (NULL != dot) &&
+       (0 == strcmp(dot, ".data")) )
+    {
+        //now check if the file name starts with '/window_'
+        slash = strrchr(utf8String, '/');
+        if( (NULL != slash) &&
+            (0 == strncmp(slash, "/window_", strlen("/window_"))) )
+        {
+            //got a window_xxx.data
+            // ->good enough match for now, so ignore
+            ignore = YES;
+            
+            //bail
+            goto bail;
+        }
+    }
+    
+    //then check all watch paths
+    for(NSString* watchDirectory in self.watchDirectories)
+    {
+        //check if path is being watched
+        if(YES == [path hasPrefix:watchDirectory])
+        {
+            //yups
+            watched = YES;
+            
+            //bail
+            break;
+        }
+    }
+    
+//bail
+bail:
+    
+    return watched;
+}
+
+/*
 //determine if a path is, or is under a watched path
 -(BOOL)isWatched:(NSString*)path
 {
@@ -440,6 +502,7 @@ bail:
     
     return watched;
 }
+*/
 
 //skip over args to get to next event file-system struct
 -(NSString*)advance2Next:(unsigned char*)ptrBuffer currentOffsetPtr:(int*)ptrCurrentOffset

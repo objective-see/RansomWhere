@@ -232,7 +232,7 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set ownership for %@ (%@)", path, fileOwner]);
+    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set ownership for %@ (%@)", path, fileOwner]);
     
     //do it recursively
     if(YES == recursive)
@@ -272,6 +272,41 @@ bail:
     
     return bRet;
 }
+
+//set permissions on a file
+BOOL setFilePermissions(NSString* path, int permissions)
+{
+    //ret var
+    BOOL bRet = NO;
+    
+    //error
+    NSError* error = nil;
+    
+    //attributes
+    NSDictionary* attributes = nil;
+    
+    //init attributes
+    attributes = @{NSFilePosixPermissions:[NSNumber numberWithInt:permissions]};
+    
+    //set attributes
+    if(YES != [[NSFileManager defaultManager] setAttributes:attributes ofItemAtPath:path error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set permmisions (%o) for %@", permissions, path]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //no errors
+    bRet = YES;
+    
+//bail
+bail:
+    
+    return bRet;
+}
+
 
 //get app's version
 // ->extracted from Info.plist

@@ -7,6 +7,7 @@
 //
 #import <Cocoa/Cocoa.h>
 
+#import "AboutWindowController.h"
 #import "ErrorWindowController.h"
 #import "ConfigureWindowController.h"
 
@@ -16,6 +17,9 @@
 }
 
 /* PROPERTIES */
+
+//about window controller
+@property(nonatomic, retain)AboutWindowController* aboutWindowController;
 
 //configure window controller
 @property(nonatomic, retain)ConfigureWindowController* configureWindowController;
@@ -27,7 +31,7 @@
 /* METHODS */
 
 //display configuration window w/ 'install' || 'uninstall' button
--(void)displayConfigureWindow:(NSString*)windowTitle action:(NSUInteger)action;
+-(void)displayConfigureWindow:(BOOL)isInstalled;
 
 //display error window
 -(void)displayErrorWindow:(NSDictionary*)errorInfo;

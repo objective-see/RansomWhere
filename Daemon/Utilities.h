@@ -11,6 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
+//TODO: cleanup unneeded function declarations
+
 //query interwebz to get latest version
 NSString* getLatestVersion();
 
@@ -22,12 +24,6 @@ NSMutableArray* getUserHomeDirs();
 
 //return path to launch daemon's plist
 NSString* launchDaemonPlist();
-
-//return path to launch agent's plist
-NSString* launchAgentPlist(NSString* userHomeDirectory);
-
-//return path to kext
-NSString* kextPath();
 
 //return path to app support directory
 // ->~/Library/Application Support/<app bundle id>
@@ -41,16 +37,13 @@ NSBundle* findAppBundle(NSString* binaryPath);
 // ->gets app's info dictionary
 NSDictionary* getAppInfo(NSString* appPath);
 
-//get an app's binary from its info dictionary
-//NSString* getAppBinary(NSDictionary* appInfo);
+//determine if a file is from the app store
+// ->gotta be signed w/ Apple Dev ID & have valid app receipt
+BOOL fromAppStore(NSString* path);
 
 //wait for a a plist
 // ->then extract a value for a key
 id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait);
-
-//given a 'short' path or process name
-// ->find the full path by scanning $PATH
-NSString* which(NSString* processName);
 
 //given a pid and process name, try to find full path
 NSString* getFullPath(NSNumber* processID, NSString* processName, BOOL tryWhich);
@@ -77,8 +70,9 @@ NSString* getDaemonVersion();
 //determine if there is a new version
 BOOL isNewVersion(NSMutableString* versionString);
 
-//check if process is alive
-BOOL isProcessAlive(pid_t processID);
+//get GUID (really just computer's MAC address)
+// ->from Apple's 'Get the GUID in OS X' (see: 'Validating Receipts Locally')
+NSData* getGUID();
 
 //check if current OS version is supported
 // ->for now, just...?

@@ -26,7 +26,7 @@
 @property (weak) IBOutlet NSButton *closeButton;
 
 //(optional) url for 'Info' button
-@property(nonatomic, retain)NSURL* errorURL;
+@property(nonatomic, retain) NSURL* errorURL;
 
 //flag indicating close button should exit app
 @property BOOL shouldExit;

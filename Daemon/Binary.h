@@ -24,6 +24,9 @@
 //flag indicating binary belongs to Apple OS
 @property BOOL isApple;
 
+//flag indicating binary is from official App Store
+@property BOOL isAppStore;
+
 //flag indicating binary was present at baseline
 @property BOOL isBaseline;
 

@@ -34,4 +34,7 @@ NSString* getVersion(int instanceFlag);
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive);
 
+//set permissions on a file
+BOOL setFilePermissions(NSString* path, int permissions);
+
 #endif

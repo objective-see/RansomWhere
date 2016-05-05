@@ -9,6 +9,7 @@
 #import "Consts.h"
 #import "Logging.h"
 #import "Utilities.h"
+#import "AppReceipt.h"
 #import "3rdParty/ent/ent.h"
 
 #import <syslog.h>
@@ -232,6 +233,9 @@ NSMutableArray* enumerateInstalledApps()
     taskOutput = execTask(SYSTEM_PROFILER, @[@"SPApplicationsDataType", @"-xml",  @"-detailLevel", @"mini"]);
     if(nil == taskOutput)
     {
+        //err msg
+        logMsg(LOG_ERR, @"failed to exec system profiler");
+        
         //bail
         goto bail;
     }
@@ -240,6 +244,9 @@ NSMutableArray* enumerateInstalledApps()
     serializedOutput = [NSPropertyListSerialization propertyListWithData:taskOutput options:kNilOptions format:NULL error:NULL];
     if(nil == serializedOutput)
     {
+        //err msg
+        logMsg(LOG_ERR, @"failed to serialize output from system profiler");
+        
         //bail
         goto bail;
     }
@@ -259,6 +266,9 @@ NSMutableArray* enumerateInstalledApps()
         //bail
         goto bail;
     }
+    
+    //TODO: remove
+    //logMsg(LOG_ERR, [NSString stringWithFormat:@"installed apps: %@", serializedOutput]);
     
     //also manually add any apps' login items
     for(NSDictionary* installedApp in installedApplications)
@@ -611,6 +621,355 @@ bail:
     return isApple;
 }
 
+//verify the receipt
+// ->check bundle ID, app version, and receipt's hash
+BOOL verifyReceipt(NSBundle* appBundle, AppReceipt* receipt)
+{
+    //flag
+    BOOL verified = NO;
+    
+    //guid
+    NSData* guid = nil;
+    
+    //hash data
+    NSMutableData *digestData = nil;
+    
+    //hash buffer
+    unsigned char digestBuffer[CC_SHA1_DIGEST_LENGTH] = {0};
+    
+    //check guid
+    guid = getGUID();
+    if(nil == guid)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //create data obj
+    digestData = [NSMutableData data];
+    
+    //add guid to data obj
+    [digestData appendData:guid];
+    
+    //add receipt's 'opaque value' to data obj
+    [digestData appendData:receipt.opaqueValue];
+    
+    //add receipt's bundle id data to data obj
+    [digestData appendData:receipt.bundleIdentifierData];
+    
+    //CHECK 1:
+    // ->app's bundle ID should match receipt's bundle ID
+    if(YES != [receipt.bundleIdentifier isEqualToString:appBundle.bundleIdentifier])
+    {
+        //bail
+        goto bail;
+    }
+    
+    //CHECK 2:
+    // ->app's version should match receipt's version
+    if(YES != [receipt.appVersion isEqualToString:appBundle.infoDictionary[@"CFBundleShortVersionString"]])
+    {
+        //bail
+        goto bail;
+    }
+    
+    //CHECK 3:
+    // ->verify receipt's hash (UUID)
+    
+    //init SHA 1 hash
+    CC_SHA1(digestData.bytes, (CC_LONG)digestData.length, digestBuffer);
+    
+    //check for hash match
+    if(0 != memcmp(digestBuffer, receipt.receiptHash.bytes, CC_SHA1_DIGEST_LENGTH))
+    {
+        //hash check failed
+        goto bail;
+    }
+    
+    //happy
+    verified = YES;
+    
+//bail
+bail:
+    
+    return verified;
+}
+
+//get GUID (really just computer's MAC address)
+// ->from Apple's 'Get the GUID in OS X' (see: 'Validating Receipts Locally')
+NSData* getGUID()
+{
+    //status var
+    __block kern_return_t kernResult = -1;
+    
+    //master port
+    __block mach_port_t  masterPort = 0;
+    
+    //matching dictionar
+    __block CFMutableDictionaryRef matchingDict = NULL;
+    
+    //iterator
+    __block io_iterator_t iterator = 0;
+    
+    //service
+    __block io_object_t service = 0;
+    
+    //registry property
+    __block CFDataRef registryProperty = NULL;
+    
+    //guid (MAC addr)
+    static NSData* guid = nil;
+    
+    //once token
+    static dispatch_once_t onceToken = 0;
+    
+    //only init guid once
+    dispatch_once(&onceToken,
+    ^{
+        
+        //get master port
+        kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
+        if(KERN_SUCCESS != kernResult)
+        {
+            //bail
+            goto bail;
+        }
+        
+        //get matching dictionary for 'en0'
+        matchingDict = IOBSDNameMatching(masterPort, 0, "en0");
+        if(NULL == matchingDict)
+        {
+            //bail
+            goto bail;
+        }
+        
+        //get matching services
+        kernResult = IOServiceGetMatchingServices(masterPort, matchingDict, &iterator);
+        if(KERN_SUCCESS != kernResult)
+        {
+            //bail
+            goto bail;
+        }
+        
+        //iterate over services, looking for 'IOMACAddress'
+        while((service = IOIteratorNext(iterator)) != 0)
+        {
+            //parent
+            io_object_t parentService = 0;
+            
+            //get parent
+            kernResult = IORegistryEntryGetParentEntry(service, kIOServicePlane, &parentService);
+            if(KERN_SUCCESS == kernResult)
+            {
+                //release prev
+                if(NULL != registryProperty)
+                {
+                    //release
+                    CFRelease(registryProperty);
+                }
+                
+                //get registry property for 'IOMACAddress'
+                registryProperty = (CFDataRef) IORegistryEntryCreateCFProperty(parentService, CFSTR("IOMACAddress"), kCFAllocatorDefault, 0);
+                
+                //release parent
+                IOObjectRelease(parentService);
+            }
+            
+            //release service
+            IOObjectRelease(service);
+        }
+        
+        //release iterator
+        IOObjectRelease(iterator);
+        
+        //convert guid to NSData*
+        // ->also release registry property
+        if(NULL != registryProperty)
+        {
+            //convert
+            guid = [NSData dataWithData:(__bridge NSData *)registryProperty];
+            
+            //release
+            CFRelease(registryProperty);
+        }
+        
+    //bail
+    bail:
+        
+        ;
+       
+    });//only once
+
+    
+    return guid;
+}
+
+//determine if file is signed with Apple Dev ID/cert
+BOOL isSignedDevID(NSString* binary)
+{
+    //flag
+    BOOL signedOK = NO;
+    
+    //code
+    SecStaticCodeRef staticCode = NULL;
+    
+    //signing reqs
+    SecRequirementRef requirementRef = NULL;
+    
+    //status
+    OSStatus status = -1;
+    
+    //create static code
+    status = SecStaticCodeCreateWithPath((__bridge CFURLRef)([NSURL fileURLWithPath:binary]), kSecCSDefaultFlags, &staticCode);
+    if(noErr != status)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //create req string w/ 'anchor apple generic'
+    status = SecRequirementCreateWithString(CFSTR("anchor apple generic"), kSecCSDefaultFlags, &requirementRef);
+    if( (noErr != status) ||
+        (requirementRef == NULL) )
+    {
+        //bail
+        goto bail;
+    }
+    
+    //check if file is signed w/ apple dev id by checking if it conforms to req string
+    status = SecStaticCodeCheckValidity(staticCode, kSecCSDefaultFlags, requirementRef);
+    if(noErr != status)
+    {
+        //bail
+        // ->just means app isn't signed by apple dev id
+        goto bail;
+    }
+    
+    //ok, happy
+    // ->file is signed by Apple Dev ID
+    signedOK = YES;
+    
+//bail
+bail:
+    
+    //free req reference
+    if(NULL != requirementRef)
+    {
+        //free
+        CFRelease(requirementRef);
+    }
+    
+    //free static code
+    if(NULL != staticCode)
+    {
+        //free
+        CFRelease(staticCode);
+    }
+    
+    return signedOK;
+}
+
+//determine if a file is from the app store
+// ->gotta be signed w/ Apple Dev ID & have valid app receipt
+BOOL fromAppStore(NSString* path)
+{
+    //flag
+    BOOL appStoreApp = NO;
+    
+    //app receipt
+    AppReceipt* appReceipt = nil;
+    
+    //path to app bundle
+    // ->just have binary
+    NSBundle* appBundle = nil;
+    
+    //find app bundle from binary
+    // ->likely not an application if this fails
+    appBundle = findAppBundle(path);
+    if(nil == appBundle)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //first make sure its signed with an Apple Dev ID
+    if(YES != isSignedDevID(path))
+    {
+        //bail
+        goto bail;
+    }
+    
+    //init
+    // ->will parse/decode, etc
+    appReceipt = [[AppReceipt alloc] init:appBundle];
+    if(nil == appReceipt)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //verify
+    if(YES != verifyReceipt(appBundle, appReceipt))
+    {
+        //bail
+        goto bail;
+    }
+    
+    //happy
+    // ->app is signed w/ dev ID & it receipt is solid
+    appStoreApp = YES;
+
+//bail
+bail:
+    
+    return appStoreApp;
+}
+
+
+//given a path to binary
+// parse it back up to find app's bundle
+NSBundle* findAppBundle(NSString* binaryPath)
+{
+    //app's bundle
+    NSBundle* appBundle = nil;
+    
+    //app's path
+    NSString* appPath = nil;
+    
+    //first just try full path
+    appPath = binaryPath;
+    
+    //try to find the app's bundle/info dictionary
+    do
+    {
+        //try to load app's bundle
+        appBundle = [NSBundle bundleWithPath:appPath];
+        
+        //check for match
+        // ->binary path's match
+        if( (nil != appBundle) &&
+           (YES == [appBundle.executablePath isEqualToString:binaryPath]))
+        {
+            //all done
+            break;
+        }
+        
+        //always unset bundle var since it's being returned
+        // ->and at this point, its not a match
+        appBundle = nil;
+        
+        //remove last part
+        // ->will try this next
+        appPath = [appPath stringByDeletingLastPathComponent];
+        
+    //scan until we get to root
+    // ->of course, loop will be exited if app info dictionary is found/loaded
+    } while( (nil != appPath) &&
+            (YES != [appPath isEqualToString:@"/"]) &&
+            (YES != [appPath isEqualToString:@""]) );
+    
+    return appBundle;
+}
 
 //set dir's|file's group/owner
 BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL recursive)

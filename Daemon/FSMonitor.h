@@ -27,13 +27,13 @@
 -(void)monitor;
 
 //determine if a path is, or is under a watched path
--(BOOL)isWatched:(NSString*)path;
+//-(BOOL)isWatched:(NSString*)path;
 
 
 /* PROPERTIES */
 
-//watched directories
-@property (nonatomic, retain)NSMutableSet* watchDirectories;
+//ignored directories
+@property (nonatomic, retain)NSMutableSet* ignoredDirectories;
 
 //file-system event queue
 @property (nonatomic, retain)Queue* eventQueue;
