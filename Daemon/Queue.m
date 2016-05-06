@@ -18,6 +18,7 @@
 @implementation Queue
 
 @synthesize icon;
+@synthesize whiteList;
 @synthesize eventQueue;
 @synthesize reportedProcs;
 @synthesize queueCondition;
@@ -49,7 +50,27 @@
         
         //init path to icon
         icon = [NSURL URLWithString:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:ALERT_ICON]];
-    
+        
+        //load white-listed procs
+        //whitelist = loadWhitelist(WHITE_LISTED_FILES);
+        // //init path to save list of installed apps
+        //installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
+        /*
+         
+         //load
+         installedApps = [NSMutableArray arrayWithContentsOfFile:installedAppsFile];
+         if(nil == installedApps)
+         {
+         //err msg
+         logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to load installed apps from %@", installedAppsFile]);
+         
+         //bail
+         goto bail;
+         }
+         
+         */
+
+        
         //kick off thread to watch/process items placed in queue
         [NSThread detachNewThreadSelector:@selector(dequeue:) toTarget:self withObject:nil];
     }

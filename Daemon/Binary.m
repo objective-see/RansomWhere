@@ -20,6 +20,7 @@
 @synthesize isApproved;
 @synthesize isAppStore;
 @synthesize isBaseline;
+@synthesize signingInfo;
 
 //init w/ an info dictionary
 -(id)init:(NSString*)binaryPath attributes:(NSDictionary*)attributes
@@ -38,11 +39,15 @@
         //save 'approved' flag
         self.isApproved = [[attributes objectForKey:@"approved"] boolValue];
         
-        //determine if signed by Apple proper
-        self.isApple = isAppleBinary(self.path);
+        //extract signing info
+        // ->from Apple, App Store, signing authorities, etc
+        self.signingInfo = extractSigningInfo(self.path);
         
-        //determine if from official App Store
-        self.isAppStore = fromAppStore(self.path);
+        //set flag for signed by Apple proper
+        self.isApple = [self.signingInfo[KEY_SIGNING_IS_APPLE] boolValue];
+        
+        //set flag for from official App Store
+        self.isAppStore = [self.signingInfo[KEY_SIGNING_IS_APP_STORE] boolValue];
         
     }//init self
 

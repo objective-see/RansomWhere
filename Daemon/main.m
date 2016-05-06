@@ -31,9 +31,6 @@ NSMutableDictionary* binaryList = nil;
 //global current user
 CFStringRef consoleUserName = NULL;
 
-//TODO: allow apps from app store (though this looks somewhat complex)
-//      see: https://github.com/ole/NSBundle-OBCodeSigningInfo/blob/master/NSBundle%2BOBCodeSigningInfo.m & https://github.com/rmaddy/VerifyStoreReceiptiOS
-
 //main interface
 // ->init some procs, kick off file-system watcher, then just runloop()
 int main(int argc, const char * argv[])
@@ -344,24 +341,8 @@ BOOL processBaselinedApps()
     //path to prev. saved list of installed apps
     NSString* installedAppsFile = nil;
     
-    //enumerated apps
-    // ->array of detailed app dictionaries
-    NSMutableArray* enumeratedApps = nil;
-    
-    //app bundle path
-    NSString* appBundlePath = nil;
-    
-    //app bundle
-    NSBundle* appBundle = nil;
-    
-    //app path
-    NSString* appPath = nil;
-    
     //binary object
     Binary* binary = nil;
-    
-    //alloc set for installed apps
-    installedApps = [NSMutableArray array];
     
     //init path to save list of installed apps
     installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
@@ -371,54 +352,17 @@ BOOL processBaselinedApps()
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
     {
         //enumerate
-        enumeratedApps = enumerateInstalledApps();
-        if( (nil == enumeratedApps) ||
-            (0 == enumeratedApps.count) )
+        installedApps = enumerateInstalledApps();
+        if( (nil == installedApps) ||
+            (0 == installedApps.count) )
         {
             //err msg
-            logMsg(LOG_ERR, @"failed to enumerate installed appsz");
+            logMsg(LOG_ERR, @"failed to enumerate installed apps");
             
             //bail
             goto bail;
         }
         
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerated all installed applications");
-        #endif
-        
-        //process all enumerated apps
-        // ->extract app path and load bundle to get full path
-        for(NSDictionary* enumeratedApp in enumerateInstalledApps())
-        {
-            //grab path to app's bundle
-            appBundlePath = [enumeratedApp objectForKey:@"path"];
-            if(nil == appBundlePath)
-            {
-                //skip
-                continue;
-            }
-            
-            //load app bundle
-            appBundle = [NSBundle bundleWithPath:appBundlePath];
-            if(nil == appBundle)
-            {
-                //skip
-                continue;
-            }
-            
-            //grab full path to app's binary
-            appPath = appBundle.executablePath;
-            if(nil == appPath)
-            {
-                //skip
-                continue;
-            }
-            
-            //save
-            [installedApps addObject:appPath];
-        }
-       
         //save to disk
         if(YES != [installedApps writeToFile:installedAppsFile atomically:NO])
         {

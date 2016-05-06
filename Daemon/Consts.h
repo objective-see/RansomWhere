@@ -49,6 +49,9 @@
 //user approved binaries
 #define USER_APPROVED_BINARIES @"approvedBinaries.plist"
 
+//white list
+#define WHITE_LIST @"whiteList.plist"
+
 //icon for user alert
 #define ALERT_ICON @"alertIcon.png"
 
@@ -86,6 +89,18 @@
 
 //tiff
 #define MAGIC_TIFF 0x2A004D4D
+
+//signing status
+#define KEY_SIGNATURE_STATUS @"signatureStatus"
+
+//signing authorities
+#define KEY_SIGNING_AUTHORITIES @"signingAuthorities"
+
+//signed by apple
+#define KEY_SIGNING_IS_APPLE @"signedByApple"
+
+//from app store
+#define KEY_SIGNING_IS_APP_STORE @"fromAppStore"
 
 
 #endif /* Consts_h */

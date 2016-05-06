@@ -16,14 +16,10 @@
 
 #import <Foundation/Foundation.h>
 
-//directories to ignore
-NSString* const IGNORE_DIRECTORIES[] = {@"~", @"/Users/Shared"};
-
 @implementation FSMonitor
 
 @synthesize eventQueue;
 @synthesize pidPathMappings;
-@synthesize ignoredDirectories;
 
 //init function
 // ->load watch paths, alloc queue, etc
@@ -33,68 +29,16 @@ NSString* const IGNORE_DIRECTORIES[] = {@"~", @"/Users/Shared"};
     self = [super init];
     if(nil != self)
     {
-        //init watch directories
-        // ->expands, saves into iVar, etc
-        [self initWatchDirectories];
-        
         //alloc/init event queue
         eventQueue = [[Queue alloc] init];
         
         //alloc/init pid -> path mappings
         pidPathMappings = [NSMutableDictionary dictionary];
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watching %@, for encrypted files", self.watchDirectories]);
-        #endif
-        
+    
     }
     
     return self;
 }
-
-/*
-//initialize paths to watch
-// ->expands '~'s in paths, as needed
--(void)initWatchDirectories
-{
-    //all user home directories
-    NSMutableArray* homeDirectories = nil;
-    
-    //init array
-    watchDirectories = [NSMutableSet set];
-    
-    //get all user home directories
-    homeDirectories = getUserHomeDirs();
-    
-    //add each watch path
-    // ->note: extra logic is needed to expand each `~` into current user
-    for(NSUInteger i=0; i<sizeof(BASE_WATCH_PATHS)/sizeof(BASE_WATCH_PATHS[0]); i++)
-    {
-        //non '~' paths
-        // ->just add
-        if(NSNotFound == [BASE_WATCH_PATHS[i] rangeOfString:@"~"].location)
-        {
-            //add
-            [self.watchDirectories addObject:BASE_WATCH_PATHS[i]];
-        }
-        //otherwise
-        // ->expand path (replacing '~' with each user's home directory)
-        else
-        {
-            //add each user home directory
-            for(NSString* homeDirectory in homeDirectories)
-            {
-                //add
-                [self.watchDirectories addObject:[BASE_WATCH_PATHS[i] stringByReplacingOccurrencesOfString:@"~" withString:homeDirectory]];
-            }
-        }
-    
-    }//all paths
-    
-    return;
-}
-*/
 
 //monitor file-system events
 // ->new events are checked for path match, then added to queue for more intense processing/alerting
@@ -231,8 +175,8 @@ NSString* const IGNORE_DIRECTORIES[] = {@"~", @"/Users/Shared"};
             //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
             
             //skip any non-watched paths
-            // /tmp, or window_<digits>.data files
-            if(YES != [self isWatched:path])
+            //->e.g. window_<digits>.data files
+            if(YES == [self shouldIgnore:path])
             {
                 //skip
                 continue;
@@ -344,24 +288,7 @@ bail:
         //all set
         goto bail;
     }
-
-    /*
-    //new process
-    // ->suspend it so have time to create binary object
-    if(-1 == kill(pid, SIGSTOP))
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to suspend (%d) %@, with %d", pid, processPath, errno]);
-        
-        //don't bail though
-    }
     
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"suspended %@, now creating binary object for it", processPath]);
-    #endif
-    */
-     
     //create binary object
     binary = [[Binary alloc] init:processPath attributes:nil];
     
@@ -372,17 +299,6 @@ bail:
         binaryList[binary.path] = binary;
     }
     
-    /*
-    //resume process
-    if(-1 == kill(pid, SIGCONT))
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to resume (%d) %@, with %d", pid, processPath, errno]);
-        
-        //don't bail though
-    }
-    */
-    
 //bail
 bail:
     
@@ -390,69 +306,11 @@ bail:
 }
 
 //determine if a path should be ignored
+// ->for now, just window_<digits>.data files
 -(BOOL)shouldIgnore:(NSString*)path
 {
     //flag
     BOOL ignore = NO;
-    
-    //path bytes
-    const char* utf8String = NULL;
-    
-    //init bytes
-    utf8String = path.UTF8String;
-    
-    //dot
-    char* dot = NULL;
-    
-    //slash
-    char* slash = NULL;
-    
-    //ignore any window_<digits>.data files
-    // ->start by seeing if file ends in '.data'
-    dot = strrchr(utf8String, '.');
-    if( (NULL != dot) &&
-       (0 == strcmp(dot, ".data")) )
-    {
-        //now check if the file name starts with '/window_'
-        slash = strrchr(utf8String, '/');
-        if( (NULL != slash) &&
-            (0 == strncmp(slash, "/window_", strlen("/window_"))) )
-        {
-            //got a window_xxx.data
-            // ->good enough match for now, so ignore
-            ignore = YES;
-            
-            //bail
-            goto bail;
-        }
-    }
-    
-    //then check all watch paths
-    for(NSString* watchDirectory in self.watchDirectories)
-    {
-        //check if path is being watched
-        if(YES == [path hasPrefix:watchDirectory])
-        {
-            //yups
-            watched = YES;
-            
-            //bail
-            break;
-        }
-    }
-    
-//bail
-bail:
-    
-    return watched;
-}
-
-/*
-//determine if a path is, or is under a watched path
--(BOOL)isWatched:(NSString*)path
-{
-    //flag
-    BOOL watched = NO;
     
     //path bytes
     const char* utf8String = NULL;
@@ -479,15 +337,17 @@ bail:
         {
             //got a window_xxx.data
             // ->good enough match for now, so ignore
-            goto bail;
+            ignore = YES;
         }
     }
-        
+    
+    /* could also ignore files in /tmp, NSTemporaryDirectory(), etc
+    
     //then check all watch paths
-    for(NSString* watchDirectory in self.watchDirectories)
+    for(NSString* ingoreDir in self.ingoreDirs)
     {
         //check if path is being watched
-        if(YES == [path hasPrefix:watchDirectory])
+        if(YES == [path hasPrefix:ingoreDir])
         {
             //yups
             watched = YES;
@@ -497,12 +357,14 @@ bail:
         }
     }
     
-//bail
-bail:
+    */
     
-    return watched;
+    
+//bail
+//bail:
+    
+    return ignore;
 }
-*/
 
 //skip over args to get to next event file-system struct
 -(NSString*)advance2Next:(unsigned char*)ptrBuffer currentOffsetPtr:(int*)ptrCurrentOffset

@@ -21,6 +21,9 @@
 //binary name
 @property (nonatomic, retain)NSString* name;
 
+//signing info
+@property(nonatomic, retain)NSDictionary* signingInfo;
+
 //flag indicating binary belongs to Apple OS
 @property BOOL isApple;
 

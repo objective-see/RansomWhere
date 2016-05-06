@@ -211,23 +211,23 @@ NSMutableArray* enumerateInstalledApps()
     //app path
     NSString* appPath = nil;
     
+    //app binary
+    NSString* appBinary = nil;
+    
     //output from system profiler task
     NSData* taskOutput = nil;
     
     //serialized task output
     NSArray* serializedOutput = nil;
-
-    //an app's login items
-    NSArray* loginItems = nil;
     
-    //all enumerated login items
-    NSMutableArray* enumeratedLoginItems = nil;
+    //internal apps/binaries
+    NSMutableArray* internalBinaries = nil;
     
     //alloc array for installed apps
     installedApplications = [NSMutableArray array];
     
-    //alloc array for enumerated login items
-    enumeratedLoginItems = [NSMutableArray array];
+    //alloc array internal apps
+    internalBinaries = [NSMutableArray array];
     
     //exec system profiler
     taskOutput = execTask(SYSTEM_PROFILER, @[@"SPApplicationsDataType", @"-xml",  @"-detailLevel", @"mini"]);
@@ -253,10 +253,34 @@ NSMutableArray* enumerateInstalledApps()
     
     //wrap to parse
     // ->grab list of installed apps from '_items' key
+    //   also enumerate any internal apps (login items, etc.)
     @try
     {
         //save
-        installedApplications = [serializedOutput[0][@"_items"] mutableCopy];
+        for(NSDictionary* installedApp in serializedOutput[0][@"_items"])
+        {
+            //grab app path
+            appPath = [installedApp objectForKey:@"path"];
+            if(nil == appPath)
+            {
+                //skip
+                continue;
+            }
+            
+            //get app's binary
+            appBinary = findAppBinary(appPath);
+            if(nil == appBinary)
+            {
+                //skip
+                continue;
+            }
+            
+            //add to list
+            [installedApplications addObject:appBinary];
+            
+            //also add any internal/child executables in app bundle
+            [installedApplications addObjectsFromArray:enumerateInternalApps(appPath)];
+        }
     }
     @catch(NSException *exception)
     {
@@ -267,61 +291,65 @@ NSMutableArray* enumerateInstalledApps()
         goto bail;
     }
     
-    //TODO: remove
-    //logMsg(LOG_ERR, [NSString stringWithFormat:@"installed apps: %@", serializedOutput]);
-    
-    //also manually add any apps' login items
-    for(NSDictionary* installedApp in installedApplications)
-    {
-        //grab app path
-        appPath = [installedApp objectForKey:@"path"];
-        if(nil == appPath)
-        {
-            //skip
-            continue;
-        }
-        
-        //skip things not in /Applications
-        if(YES != [appPath hasPrefix:@"/Applications"])
-        {
-            //skip
-            continue;
-        }
-        
-        //get all files in .app/Contents/Library/LoginItems
-        loginItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[appPath stringByAppendingPathComponent:@"Contents/Library/LoginItems"] error:nil];
-        if(nil == loginItems)
-        {
-            //skip
-            continue;
-        }
-        
-        //now filter on .app, to really get the login items
-        loginItems = [loginItems filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.app'"]];
-        if(nil == loginItems)
-        {
-            //skip
-            continue;
-        }
-        
-        //add each
-        // ->note for now, only add 'path' key
-        //   TODO: add other info, or be careful checking for other keys
-        for(NSString* loginItem in loginItems)
-        {
-            //add
-            [enumeratedLoginItems addObject:@{@"path": [[appPath stringByAppendingPathComponent:@"Contents/Library/LoginItems"] stringByAppendingPathComponent:loginItem]}];
-        }
-    }
-    
-    //done iterating over installed apps
-    // ->so app all enumerated login items
-    [installedApplications addObjectsFromArray:enumeratedLoginItems];
-    
 //bail
 bail:
     
     return installedApplications;
+}
+
+//get all internal apps of an app
+// ->login items, helper apps in frameworks, etc
+NSMutableArray* enumerateInternalApps(NSString* parentApp)
+{
+    //internal apps
+    NSMutableArray* internalApps = nil;
+    
+    //directory enumerator
+    NSDirectoryEnumerator* enumerator = nil;
+    
+    //current file
+    NSString* currentFile = nil;
+    
+    //full path
+    NSString* fullPath = nil;
+    
+    //app binary
+    NSString* appBinary = nil;
+    
+    //alloc
+    internalApps = [NSMutableArray array];
+    
+    //init directory enumerator
+    enumerator = [[NSFileManager defaultManager] enumeratorAtPath:parentApp];
+    
+    //iterate over all files
+    // ->find and .apps
+    while(currentFile = [enumerator nextObject])
+    {
+        //create full path
+        fullPath = [parentApp stringByAppendingPathComponent:currentFile];
+        
+        //for now
+        // ->only process applications
+        if(YES != [fullPath hasSuffix:@".app"])
+        {
+            //ignore
+            continue;
+        }
+        
+        //get app's binary
+        appBinary = findAppBinary(fullPath);
+        if(nil == appBinary)
+        {
+            //ignore
+            continue;
+        }
+        
+        //save
+        [internalApps addObject:appBinary];
+    }
+    
+    return internalApps;
 }
 
 //get process's path
@@ -869,6 +897,143 @@ bail:
     return signedOK;
 }
 
+//get the signing info of a file
+NSDictionary* extractSigningInfo(NSString* path)
+{
+    //info dictionary
+    NSMutableDictionary* signingStatus = nil;
+    
+    //code
+    SecStaticCodeRef staticCode = NULL;
+    
+    //status
+    OSStatus status = !STATUS_SUCCESS;
+    
+    //signing information
+    CFDictionaryRef signingInformation = NULL;
+    
+    //cert chain
+    NSArray* certificateChain = nil;
+    
+    //index
+    NSUInteger index = 0;
+    
+    //cert
+    SecCertificateRef certificate = NULL;
+    
+    //common name on chert
+    CFStringRef commonName = NULL;
+    
+    //flags
+    SecCSFlags csFlags = kSecCSDefaultFlags;
+    
+    //init signing status
+    signingStatus = [NSMutableDictionary dictionary];
+    
+    //create static code
+    status = SecStaticCodeCreateWithPath((__bridge CFURLRef)([NSURL fileURLWithPath:path]), kSecCSDefaultFlags, &staticCode);
+    
+    //save signature status
+    signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
+    
+    //check signature
+    status = SecStaticCodeCheckValidity(staticCode, csFlags, NULL);
+    
+    //(re)save signature status
+    signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
+    
+    //if file is signed
+    // ->grab signing authorities
+    if(STATUS_SUCCESS == status)
+    {
+        //grab signing authorities
+        status = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation, &signingInformation);
+        
+        //sanity check
+        if(STATUS_SUCCESS != status)
+        {
+            //err msg
+            NSLog(@"OBJECTIVE-SEE ERROR: SecCodeCopySigningInformation() failed on %@ with %d", path, status);
+            
+            //bail
+            goto bail;
+        }
+        
+        //signed by Apple proper?
+        signingStatus[KEY_SIGNING_IS_APPLE] = [NSNumber numberWithBool:isAppleBinary(path)];
+        
+        //not signed by Apple proper
+        // ->check if from official app store
+        if(YES != [signingStatus[KEY_SIGNING_IS_APPLE] boolValue])
+        {
+            //from app store?
+            signingStatus[KEY_SIGNING_IS_APP_STORE] = [NSNumber numberWithBool:fromAppStore(path)];
+        }
+    }
+    
+    //init array for certificate names
+    signingStatus[KEY_SIGNING_AUTHORITIES] = [NSMutableArray array];
+    
+    //get cert chain
+    certificateChain = [(__bridge NSDictionary*)signingInformation objectForKey:(__bridge NSString*)kSecCodeInfoCertificates];
+    
+    //handle case there is no cert chain
+    // ->adhoc? (/Library/Frameworks/OpenVPN.framework/Versions/Current/bin/openvpn-service)
+    if(0 == certificateChain.count)
+    {
+        //set
+        [signingStatus[KEY_SIGNING_AUTHORITIES] addObject:@"signed, but no signing authorities (adhoc?)"];
+    }
+    
+    //got cert chain
+    // ->add each to list
+    else
+    {
+        //get name of all certs
+        for(index = 0; index < certificateChain.count; index++)
+        {
+            //extract cert
+            certificate = (__bridge SecCertificateRef)([certificateChain objectAtIndex:index]);
+            
+            //get common name
+            status = SecCertificateCopyCommonName(certificate, &commonName);
+            
+            //skip ones that error out
+            if( (STATUS_SUCCESS != status) ||
+               (NULL == commonName))
+            {
+                //skip
+                continue;
+            }
+            
+            //save
+            [signingStatus[KEY_SIGNING_AUTHORITIES] addObject:(__bridge NSString*)commonName];
+            
+            //release name
+            CFRelease(commonName);
+        }
+    }
+    
+//bail
+bail:
+    
+    //free signing info
+    if(NULL != signingInformation)
+    {
+        //free
+        CFRelease(signingInformation);
+    }
+    
+    //free static code
+    if(NULL != staticCode)
+    {
+        //free
+        CFRelease(staticCode);
+    }
+    
+    return signingStatus;
+}
+
 //determine if a file is from the app store
 // ->gotta be signed w/ Apple Dev ID & have valid app receipt
 BOOL fromAppStore(NSString* path)
@@ -923,6 +1088,38 @@ BOOL fromAppStore(NSString* path)
 bail:
     
     return appStoreApp;
+}
+
+//given a bundle
+// ->find its executable
+NSString* findAppBinary(NSString* appPath)
+{
+    //binary
+    NSString* binary = nil;
+    
+    //bundle
+    NSBundle* bundle = nil;
+    
+    //load app bundle
+    bundle = [NSBundle bundleWithPath:appPath];
+    if(nil == bundle)
+    {
+        //bail
+        goto bail;
+    }
+        
+    //grab full path to app's binary
+    binary = bundle.executablePath;
+    if(nil == binary)
+    {
+        //bail
+        goto bail;
+    }
+    
+//bail
+bail:
+
+    return binary;
 }
 
 
@@ -1253,6 +1450,5 @@ bail:
     
     return isImage;
 }
-
 
 

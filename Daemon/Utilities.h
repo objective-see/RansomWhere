@@ -33,6 +33,9 @@ NSString* supportDirectory();
 // parse it back up to find app's bundle
 NSBundle* findAppBundle(NSString* binaryPath);
 
+//get the signing info of a file
+NSDictionary* extractSigningInfo(NSString* path);
+
 //given a path to an application
 // ->gets app's info dictionary
 NSDictionary* getAppInfo(NSString* appPath);
@@ -60,6 +63,10 @@ NSDictionary* getCurrentConsoleUser();
 //generate list of all installed applications
 // ->done via system_profiler, w/ 'SPApplicationsDataType' flag
 NSMutableArray* enumerateInstalledApps();
+
+//get all internal apps of an app
+// ->login items, helper apps in frameworks, etc
+NSMutableArray* enumerateInternalApps(NSString* parentApp);
 
 //get all users
 NSMutableArray* getUsers();
@@ -110,6 +117,10 @@ NSMutableSet* readSetFromFile(NSString* file);
 
 //examines header for image signatures (e.g. 'GIF87a')
 BOOL isAnImage(NSData* header);
+
+//given a bundle
+// ->find its executable
+NSString* findAppBinary(NSString* appPath);
 
 
 #endif /* defined(__BlockBlock__Utilities__) */
