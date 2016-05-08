@@ -278,7 +278,7 @@ NSMutableArray* enumerateInstalledApps()
             //add to list
             [installedApplications addObject:appBinary];
             
-            //also add any internal/child executables in app bundle
+            //also add any internal/child apps in app bundle
             [installedApplications addObjectsFromArray:enumerateInternalApps(appPath)];
         }
     }
@@ -322,10 +322,21 @@ NSMutableArray* enumerateInternalApps(NSString* parentApp)
     //init directory enumerator
     enumerator = [[NSFileManager defaultManager] enumeratorAtPath:parentApp];
     
-    //iterate over all files
-    // ->find and .apps
-    while(currentFile = [enumerator nextObject])
+    //iterate over all files looking for any .apps
+    // ->weird loop stuff needs for autorelease memory stuffz
+    while(YES)
     {
+        //pool
+        @autoreleasepool {
+            
+        //grab next file
+        currentFile = [enumerator nextObject];
+        if(nil == currentFile)
+        {
+            //all done
+            break;
+        }
+        
         //create full path
         fullPath = [parentApp stringByAppendingPathComponent:currentFile];
         
@@ -347,7 +358,10 @@ NSMutableArray* enumerateInternalApps(NSString* parentApp)
         
         //save
         [internalApps addObject:appBinary];
-    }
+
+        }//pool
+    
+    }//while(YES)
     
     return internalApps;
 }
@@ -754,7 +768,7 @@ NSData* getGUID()
     //only init guid once
     dispatch_once(&onceToken,
     ^{
-        
+    
         //get master port
         kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
         if(KERN_SUCCESS != kernResult)
@@ -827,7 +841,6 @@ NSData* getGUID()
         ;
        
     });//only once
-
     
     return guid;
 }
@@ -943,11 +956,11 @@ NSDictionary* extractSigningInfo(NSString* path)
     signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
     
     //if file is signed
-    // ->grab signing authorities
+    // ->grab signing id and signing authorities
     if(STATUS_SUCCESS == status)
     {
         //grab signing authorities
-        status = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation, &signingInformation);
+        status = SecCodeCopySigningInformation(staticCode, kSecCSDefaultFlags|kSecCSSigningInformation, &signingInformation);
         
         //sanity check
         if(STATUS_SUCCESS != status)
@@ -958,6 +971,9 @@ NSDictionary* extractSigningInfo(NSString* path)
             //bail
             goto bail;
         }
+        
+        //grab signing ID
+        signingStatus[KEY_SIGNATURE_IDENTIFIER] = [(__bridge NSDictionary*)signingInformation objectForKey:(__bridge NSString*)kSecCodeInfoIdentifier];
         
         //signed by Apple proper?
         signingStatus[KEY_SIGNING_IS_APPLE] = [NSNumber numberWithBool:isAppleBinary(path)];
@@ -1449,6 +1465,98 @@ BOOL isAnImage(NSData* header)
 bail:
     
     return isImage;
+}
+
+//check if binary's signing auth has been whitelisted
+BOOL isInWhiteList(NSArray* signingAuths)
+{
+    //flag
+    BOOL isWhiteListed = NO;
+    
+    //whitelisted apps
+    static NSSet* whiteList = nil;
+    
+    //once token
+    static dispatch_once_t onceToken = 0;
+    
+    //only init whitelist just once
+    dispatch_once(&onceToken,
+    ^{
+        
+        //load whitelisted apps
+        whiteList = loadSet(WHITE_LIST_FILE);
+        
+    });//only once
+    
+    //check each signing auth
+    for(NSString* signingAuth in signingAuths)
+    {
+        //check
+        if(YES == [whiteList containsObject:signingAuth])
+        {
+            //found!
+            isWhiteListed = YES;
+            
+            //done
+            break;
+        }
+    }
+    
+    return isWhiteListed;
+}
+
+//check if binary has been graylisted
+// ->based on binaries code signing ID
+BOOL isInGrayList(NSString* signingID)
+{
+    //flag
+    BOOL isGrayListed = NO;
+    
+    //graylisted apps
+    static NSSet* grayList = nil;
+    
+    //once token
+    static dispatch_once_t onceToken = 0;
+    
+    //only init graylist just once
+    dispatch_once(&onceToken,
+    ^{
+      
+        //load graylisted apps
+        grayList = loadSet(WHITE_LIST_FILE);
+      
+    });//only once
+    
+    //check if graylist'd
+    isGrayListed = [grayList containsObject:signingID];
+    
+    return isGrayListed;
+}
+
+//load a file into an NSSet
+NSSet* loadSet(NSString* filePath)
+{
+    //array
+    NSArray* array = nil;
+    
+    //set
+    NSSet* set = nil;
+    
+    //load file into array
+    array = [NSArray arrayWithContentsOfFile:filePath];
+    if(nil == array)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //convert to set
+    set = [NSSet setWithArray:array];
+    
+//bail
+bail:
+    
+    return set;
 }
 
 

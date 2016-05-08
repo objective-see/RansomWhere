@@ -51,6 +51,9 @@
 //daemon plist name
 #define DAEMON_PLIST @"com.objective-see.ransomwhere.plist"
 
+//user approved binaries
+#define USER_APPROVED_BINARIES @"approvedBinaries.plist"
+
 //path to launchctl
 #define LAUNCHCTL @"/bin/launchctl"
 

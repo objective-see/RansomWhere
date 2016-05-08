@@ -49,8 +49,11 @@
 //user approved binaries
 #define USER_APPROVED_BINARIES @"approvedBinaries.plist"
 
-//white list
-#define WHITE_LIST @"whiteList.plist"
+//whitelist
+#define WHITE_LIST_FILE @"whiteList.plist"
+
+//graylist
+#define GRAY_LIST_FILE @"grayList.plist"
 
 //icon for user alert
 #define ALERT_ICON @"alertIcon.png"
@@ -92,6 +95,9 @@
 
 //signing status
 #define KEY_SIGNATURE_STATUS @"signatureStatus"
+
+//code signing id
+#define KEY_SIGNATURE_IDENTIFIER @"signingIdentifier"
 
 //signing authorities
 #define KEY_SIGNING_AUTHORITIES @"signingAuthorities"

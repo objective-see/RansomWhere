@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7D1222741CC761A800CD38C1 /* com.objective-see.ransomwhere.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */; };
 		7D3E40921CDB2F77002B0997 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3E40911CDB2F77002B0997 /* AboutWindowController.m */; };
 		7D3E40941CDB2F82002B0997 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3E40931CDB2F82002B0997 /* AboutWindow.xib */; };
+		7D3E409B1CDEF40C002B0997 /* com.objective-see.ransomwhere.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D3E40981CDEF40C002B0997 /* com.objective-see.ransomwhere.plist */; };
+		7D3E409C1CDEF40C002B0997 /* graylist.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D3E40991CDEF40C002B0997 /* graylist.plist */; };
+		7D3E409D1CDEF40C002B0997 /* whitelist.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D3E409A1CDEF40C002B0997 /* whitelist.plist */; };
 		7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DCF017E1CB996E70051C574 /* alertIcon.png */; };
 		7DE29CFC1CABB59600DFA6A6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */; };
 		7DE29CFD1CABB59600DFA6A6 /* Base.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29CE71CABB59600DFA6A6 /* Base.lproj */; };
@@ -31,10 +33,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "com.objective-see.ransomwhere.plist"; sourceTree = "<group>"; };
 		7D3E40901CDB2F77002B0997 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = Installer/AboutWindowController.h; sourceTree = "<group>"; };
 		7D3E40911CDB2F77002B0997 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = Installer/AboutWindowController.m; sourceTree = "<group>"; };
 		7D3E40931CDB2F82002B0997 /* AboutWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AboutWindow.xib; path = UI/AboutWindow.xib; sourceTree = "<group>"; };
+		7D3E40981CDEF40C002B0997 /* com.objective-see.ransomwhere.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "com.objective-see.ransomwhere.plist"; path = "Installer/DaemonResources/com.objective-see.ransomwhere.plist"; sourceTree = "<group>"; };
+		7D3E40991CDEF40C002B0997 /* graylist.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = graylist.plist; path = Installer/DaemonResources/graylist.plist; sourceTree = "<group>"; };
+		7D3E409A1CDEF40C002B0997 /* whitelist.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = whitelist.plist; path = Installer/DaemonResources/whitelist.plist; sourceTree = "<group>"; };
 		7DCF017E1CB996E70051C574 /* alertIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = alertIcon.png; path = Installer/images/alertIcon.png; sourceTree = "<group>"; };
 		7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Installer/AppDelegate.h; sourceTree = "<group>"; };
 		7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Installer/AppDelegate.m; sourceTree = "<group>"; };
@@ -80,6 +84,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7D3E40971CDEF3E8002B0997 /* DaemonResources */ = {
+			isa = PBXGroup;
+			children = (
+				7D3E40981CDEF40C002B0997 /* com.objective-see.ransomwhere.plist */,
+				7D3E40991CDEF40C002B0997 /* graylist.plist */,
+				7D3E409A1CDEF40C002B0997 /* whitelist.plist */,
+			);
+			name = DaemonResources;
+			sourceTree = "<group>";
+		};
 		7DE29D1E1CAD0BD300DFA6A6 /* images */ = {
 			isa = PBXGroup;
 			children = (
@@ -118,7 +132,6 @@
 			children = (
 				7D3E40901CDB2F77002B0997 /* AboutWindowController.h */,
 				7D3E40911CDB2F77002B0997 /* AboutWindowController.m */,
-				7D1222731CC761A800CD38C1 /* com.objective-see.ransomwhere.plist */,
 				7DF708091CB0941800FF79D8 /* Shared */,
 				7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */,
 				7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */,
@@ -135,6 +148,7 @@
 				7DE29CED1CABB59600DFA6A6 /* en.lproj */,
 				7DE29CE71CABB59600DFA6A6 /* Base.lproj */,
 				7DE29CF31CABB59600DFA6A6 /* Images.xcassets */,
+				7D3E40971CDEF3E8002B0997 /* DaemonResources */,
 				CD7F089219AE6DCA00FF00FC /* Supporting Files */,
 				CD7C872019D4428100EC7F0A /* UI */,
 				CD7F088A19AE6DCA00FF00FC /* Frameworks */,
@@ -229,15 +243,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7D1222741CC761A800CD38C1 /* com.objective-see.ransomwhere.plist in Resources */,
 				7DE29D141CABB67A00DFA6A6 /* ErrorWindowController.xib in Resources */,
 				7DE29D1C1CAD0BBD00DFA6A6 /* icon.png in Resources */,
 				7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */,
+				7D3E409C1CDEF40C002B0997 /* graylist.plist in Resources */,
 				7DE29CFD1CABB59600DFA6A6 /* Base.lproj in Resources */,
 				7DE29D161CABB72200DFA6A6 /* ConfigureWindowController.xib in Resources */,
 				7D3E40941CDB2F82002B0997 /* AboutWindow.xib in Resources */,
 				7DE29D041CABB59600DFA6A6 /* Images.xcassets in Resources */,
 				7DE29D1D1CAD0BBD00DFA6A6 /* ransomwhere.png in Resources */,
+				7D3E409B1CDEF40C002B0997 /* com.objective-see.ransomwhere.plist in Resources */,
+				7D3E409D1CDEF40C002B0997 /* whitelist.plist in Resources */,
 				7DE29D001CABB59600DFA6A6 /* en.lproj in Resources */,
 				7DE29D191CABB78600DFA6A6 /* MainMenu.xib in Resources */,
 			);
@@ -258,7 +274,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\ncp -R -f $BUILT_PRODUCTS_DIR/com.objective-see.ransomwhere.plist $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/Daemon /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/Applications/RansomWhere.app/Contents/Resources\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/com.objective-see.ransomwhere.plist /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/InstallationBuildProductsLocation/Applications/RansomWhere.app/Contents/Resources\n";
+			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\n\n#cp -R -f /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/Daemon /Users/patrickw/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/Applications/RansomWhere.app/Contents/Resources\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

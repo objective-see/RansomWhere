@@ -81,6 +81,8 @@
 }
 
 //perform install || uninstall logic
+
+//TODO: copy over white & gray list
 -(BOOL)configure:(NSUInteger)parameter
 {
     //return var
@@ -103,14 +105,14 @@
         logMsg(LOG_DEBUG, @"installing...");
         
         //if already installed though
-        // ->uninstall everything first
+        // ->uninstall everything first, except user's pref
         if(YES == [self isInstalled])
         {
             //dbg msg
             logMsg(LOG_DEBUG, @"already installed, so fully uninstalling...");
             
             //uninstall (and stop)
-            if(YES != [self uninstall])
+            if(YES != [self uninstall:NO])
             {
                 //bail
                 goto bail;
@@ -137,7 +139,8 @@
         logMsg(LOG_DEBUG, @"uninstalling...");
         
         //uninstall (and stop)
-        if(YES != [self uninstall])
+        // ->also delete user's prefs
+        if(YES != [self uninstall:YES])
         {
             //bail
             goto bail;
@@ -289,6 +292,19 @@ bail:
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set daemon's plist %@, to be 'rw-r-r'", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
     
+    //TODO: copy in white & grey list
+    // ->set everything to be owned by root?
+    /// in a loop once, or make a help function
+    /*
+    
+     //NSString *bundlePathWithFile = [[NSBundle mainBundle] pathForResource:@"sample.txt" ofType:nil];
+    [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:DAEMON_PLIST];
+     
+    */
+    
+    
+    
+    
     //start daemon
     if(YES != [self controlLaunchItem:DAEMON_LOAD plist:daemonInfo[DAEMON_DEST_PLIST_KEY]])
     {
@@ -312,7 +328,7 @@ bail:
 // a) stop it
 // b) delete plist from to /Library/LauchDaemons
 // c) delete daemon binary & folder; /Library/RansomWhere
--(BOOL)uninstall
+-(BOOL)uninstall:(BOOL)saveUserPrefs
 {
     //return/status var
     BOOL wasUninstalled = NO;
@@ -323,6 +339,9 @@ bail:
     
     //info dictionary
     NSMutableDictionary* daemonInfo = nil;
+    
+    //directory enumerator
+    NSDirectoryEnumerator* fileEnumerator = nil;
     
     //error
     NSError* error = nil;
@@ -360,21 +379,58 @@ bail:
     }
     
     //when daemon's folder exists
-    // ->delete daemon's folder (include's binary and anything else)
+    // ->delete it all (when not saving user prefs), or everything, but
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER]])
     {
-        //delete daemon's folder & contents
-        if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_FOLDER] error:&error])
+        //delete entire folder & contents
+        if(YES != saveUserPrefs)
         {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon's folder %@ (%@)", daemonInfo[DAEMON_DEST_FOLDER], error]);
-            
-            //set flag
-            bAnyErrors = YES;
-            
-            //keep uninstalling...
+            //delete
+            if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_FOLDER] error:&error])
+            {
+                //err msg
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon's folder %@ (%@)", daemonInfo[DAEMON_DEST_FOLDER], error]);
+                
+                //set flag
+                bAnyErrors = YES;
+                
+                //keep uninstalling...
+            }
         }
-    }
+        //TODO: test
+        //otherwise delete everythiing but user prefs
+        else
+        {
+            //init directory enumerator
+            fileEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:daemonInfo[DAEMON_DEST_FOLDER]];
+            
+            //delete all, but user files
+            for(NSString* file in fileEnumerator)
+            {
+                //skip user files
+                if(YES == [file isEqualToString:USER_APPROVED_BINARIES])
+                {
+                    //skip
+                    continue;
+                }
+                
+                //delete file
+                if(YES != [[NSFileManager defaultManager] removeItemAtPath:[daemonInfo[DAEMON_DEST_FOLDER] stringByAppendingPathComponent:file] error:&error])
+                {
+                    //err msg
+                    logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon's folder %@ (%@)", daemonInfo[DAEMON_DEST_FOLDER], error]);
+                    
+                    //set flag
+                    bAnyErrors = YES;
+                    
+                    //keep uninstalling...
+                }
+                
+            }//all files
+        
+        }//keep user files
+    
+    }//folder exists
     
     //only success when there were no errors
     if(YES != bAnyErrors)

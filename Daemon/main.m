@@ -402,7 +402,7 @@ BOOL processBaselinedApps()
     
     //dbg msg
     #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"processing %lu baselined applications", (unsigned long)installedApps.count]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"processing %lu installed applications", (unsigned long)installedApps.count]);
     #endif
     
     //iterate overall all installed apps
@@ -540,7 +540,7 @@ BOOL processRunningProcs()
         }
         
         //init binary object
-        binary = [[Binary alloc] init:processPath attributes:nil];
+        binary = [[Binary alloc] init:processPath attributes:@{@"processID":processID}];
         if(nil == binary)
         {
             //skip

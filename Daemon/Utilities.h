@@ -122,5 +122,14 @@ BOOL isAnImage(NSData* header);
 // ->find its executable
 NSString* findAppBinary(NSString* appPath);
 
+//load a file into an NSSet
+NSSet* loadSet(NSString* filePath);
+
+//check if binary has been graylisted
+BOOL isInGrayList(NSString* path);
+
+//check if binary's signing auth has been whitelisted
+BOOL isInWhiteList(NSArray* signingAuths);
+
 
 #endif /* defined(__BlockBlock__Utilities__) */

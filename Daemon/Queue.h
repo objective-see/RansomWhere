@@ -37,8 +37,6 @@
 //pid -> last encrypted file timestamp
 @property(nonatomic, retain)NSMutableDictionary* lastEncryptedFiles;
 
-//white-listed apps
-@property(nonatomic, retain)NSMutableSet* whiteList;
 
 
 /* METHODS */

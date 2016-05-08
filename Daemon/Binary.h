@@ -36,6 +36,15 @@
 //flag indicating binary was approved
 @property BOOL isApproved;
 
+//flag indicating binary is from the internet
+@property BOOL isInternet;
+
+//whitelisted (via signing auth)
+@property BOOL isWhiteListed;
+
+//graylisted (via signing id)
+@property BOOL isGrayListed;
+
 /* METHODS */
 
 //init w/ an info dictionary

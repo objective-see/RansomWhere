@@ -27,6 +27,10 @@
 //control a launch item
 // ->either load/unload the launch daemon via '/bin/launchctl'
 -(BOOL)controlLaunchItem:(NSUInteger)action plist:(NSString*)plist;
+
+//uninstall daemon
+-(BOOL)uninstall:(BOOL)saveUserPrefs;
+
 @end
 
 #endif
