@@ -40,7 +40,7 @@
     //init status msg
     [self.statusMsg setStringValue:@"generically thwart ransomware 😇"];
     
-    //endable 'uninstall' button when app is installed already
+    //enable 'uninstall' button when app is installed already
     if(YES == isInstalled)
     {
         //enable
@@ -52,6 +52,10 @@
         //disable
         self.uninstallButton.enabled = NO;
     }
+    
+    //make 'install' have focus
+    // ->more likely they'll be upgrading
+    [self.window makeFirstResponder:self.installButton];
 
     //set delegate
     [self.window setDelegate:self];
@@ -366,9 +370,6 @@ bail:
 
     //ok to re-enable 'x' button
     [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:YES];
-    
-    //make 'x' button active/in focus
-    //[self.window makeFirstResponder:[self.window standardWindowButton:NSWindowCloseButton]];
     
     //(re)make window window key
     [self.window makeKeyAndOrderFront:self];

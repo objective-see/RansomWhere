@@ -479,85 +479,6 @@ bail:
     return taskPath;
 }
 
-
-//get all user home directories
-NSMutableArray* getUserHomeDirs()
-{
-    //installed users
-    NSMutableArray* users = nil;
-    
-    //user home directories
-    NSArray* userHomeDirectories = nil;
-    
-    //alloc
-    users = [NSMutableArray array];
-    
-    //check all users
-    // ->do any have the launch agent installed?
-    for(ODRecord* userRecord in getUsers())
-    {
-        //extract home dirs
-        userHomeDirectories = [userRecord valuesForAttribute:kODAttributeTypeNFSHomeDirectory error:NULL];
-        
-        //check if there is a home dir
-        if(0 == [userHomeDirectories count])
-        {
-            //skip
-            continue;
-        }
-        
-        //also skip any that start with /var
-        if(YES == [userHomeDirectories.firstObject hasPrefix:@"/var"])
-        {
-            //skip
-            continue;
-        }
-        
-        //add first directory
-        [users addObject:userHomeDirectories.firstObject];
-    }
-    
-    return users;
-
-}
-
-//get all users
-NSMutableArray* getUsers()
-{
-    //users
-    NSMutableArray* users = nil;
-    
-    //root node
-    ODNode *root = nil;
-    
-    //user query
-    ODQuery *userQuery = nil;
-    
-    //alloc
-    users = [NSMutableArray array];
-    
-    //init root node
-    root = [ODNode nodeWithSession:[ODSession defaultSession] name:@"/Local/Default" error:nil];
-    
-    //make query
-    userQuery = [ODQuery queryWithNode:root forRecordTypes:kODRecordTypeUsers attribute:nil matchType:0 queryValues:nil returnAttributes:nil maximumResults:0 error:nil];
-    
-    //iterate over all users and save
-    for(ODRecord* record in [userQuery resultsAllowingPartial:NO error:nil])
-    {
-        //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"record: %@", record]);
-        
-        //save
-        [users addObject:record];
-    }
-    
-    //dbg msg
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"all users: %@", users]);
-    
-    return users;
-}
-
 //load or unload the launch daemon via '/bin/launchctl'
 void controlLaunchItem(NSUInteger action, NSString* plist)
 {
@@ -1559,4 +1480,262 @@ bail:
     return set;
 }
 
+//given a 'BSD name' for a mounted filesystem (ex: '/dev/disk1s2')
+// ->find the orginal disk image (dmg) that was mounted at this location
+NSString* findDMG(char* mountFrom)
+{
+    //orginal disk image (.dmg)
+    NSString* matchingDMGPath = nil;
+    
+    //matching dictionary for service lookup
+    CFMutableDictionaryRef matchingDictionary = NULL;
+    
+    //(top-level) iterator
+    io_iterator_t iterator = 0;
+    
+    //current dmg entry
+    io_service_t dmgEntry = 0;
+    
+    //current dmg path
+    io_struct_inband_t dmgPath;
+    
+    //curent BSD path
+    io_struct_inband_t bsdName = {0};
+    
+    //child 1
+    io_service_t childOne = 0;
+    
+    //child 2
+    io_service_t childTwo = 0;
+    
+    //child 3
+    io_service_t childThree = 0;
+    
+    //current path size
+    // ->4096 from 'io_struct_inband_t' def
+    uint32_t pathSize = 4096;
+    
+    //offset pointer
+    char* offsetPointer = NULL;
+    
+    //get matching dictionary for 'IOHDIXHDDriveOutKernel'
+    // ->don't need to release as IOServiceGetMatchingServices() consumes a reference
+    matchingDictionary = IOServiceMatching("IOHDIXHDDriveOutKernel");
+    if(NULL == matchingDictionary)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //get iterator
+    if(KERN_SUCCESS != IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDictionary, &iterator))
+    {
+        //bail
+        goto bail;
+    }
+    
+    //iterate over all IOHDIXHDDriveOutKernel entries
+    // ->grab 'image-path' then get its 'BSD Name' to see if it matches what was passed in
+    while(0 != (dmgEntry = IOIteratorNext(iterator)))
+    {
+        //reset size
+        pathSize = 4096;
+        
+        //reset
+        memset(dmgPath, 0, pathSize);
+        
+        //release first child
+        if(0 != childOne)
+        {
+            //release
+            IOObjectRelease(childOne);
+        }
+        
+        //release second child
+        if(0 != childTwo)
+        {
+            //release
+            IOObjectRelease(childTwo);
+        }
+        
+        //release third child
+        if(0 != childThree)
+        {
+            //release
+            IOObjectRelease(childThree);
+        }
+        
+        //get 'image-path' property
+        if(KERN_SUCCESS != IORegistryEntryGetProperty(dmgEntry, "image-path", dmgPath, &pathSize))
+        {
+            //release
+            IOObjectRelease(dmgEntry);
+            
+            //skip
+            continue;
+        }
+        
+        //find 'IODiskImageBlockStorageDeviceOutKernel' child
+        childOne = findChild(dmgEntry, "IODiskImageBlockStorageDeviceOutKernel");
+        if(0 == childOne)
+        {
+            //release
+            IOObjectRelease(dmgEntry);
+            
+            //skip
+            continue;
+        }
+        
+        //find 'IOBlockStorageDriver' child
+        childTwo = findChild(childOne, "IOBlockStorageDriver");
+        if(0 == childTwo)
+        {
+            //release
+            IOObjectRelease(dmgEntry);
+            
+            //skip
+            continue;
+        }
+        
+        //find 'IOMedia' child
+        childThree = findChild(childTwo, "IOMedia");
+        if(0 == childThree)
+        {
+            //release
+            IOObjectRelease(dmgEntry);
+            
+            //skip
+            continue;
+        }
+        
+        //extract 'BSD name' for current .dmg
+        if(KERN_SUCCESS != IORegistryEntryGetProperty(childThree, "BSD Name", bsdName, &pathSize))
+        {
+            //release
+            IOObjectRelease(dmgEntry);
+            
+            //skip
+            continue;
+        }
+        
+        //init offset pointer
+        //->then compare with the passed in BSD name
+        offsetPointer = mountFrom + strlen("/dev/");
+        if( (0 == strlen(offsetPointer)) ||
+           (0 != strncmp(bsdName, offsetPointer, strlen(bsdName))) )
+        {
+            //release
+            IOObjectRelease(dmgEntry);
+            
+            //skip
+            continue;
+        }
+        
+        //found .dmg!
+        // ->save path
+        matchingDMGPath = [NSString stringWithUTF8String:dmgPath];
+        
+        //release
+        IOObjectRelease(childOne);
+        
+        //release
+        IOObjectRelease(childTwo);
+        
+        //release
+        IOObjectRelease(childThree);
+        
+        //release
+        IOObjectRelease(dmgEntry);
+        
+        //all set
+        break;
+        
+    } //all 'IOHDIXHDDriveOutKernel' entries
+    
+    
+//bail
+bail:
+    
+    //release iterator
+    if(0 != iterator)
+    {
+        //release
+        IOObjectRelease(iterator);
+    }
+    
+    return matchingDMGPath;
+}
+
+
+//given a parent
+// ->finds (first) child that matches specified class name
+io_service_t findChild(io_service_t parent, const char* name)
+{
+    //iterator
+    io_iterator_t iterator = 0;
+    
+    //(matched) child
+    io_service_t child = 0;
+    
+    //candidate child
+    io_service_t candidateChild = 0;
+    
+    //currern child's class
+    io_name_t currentClass = {0};
+    
+    //init iterator
+    if(KERN_SUCCESS != IORegistryEntryGetChildIterator(parent, kIOServicePlane, &iterator))
+    {
+        //bail
+        goto bail;
+    }
+    
+    //iterate over all children
+    // ->look for child that matches name
+    while((candidateChild = IOIteratorNext(iterator)))
+    {
+        //get class
+        if(KERN_SUCCESS != IOObjectGetClass(candidateChild, currentClass))
+        {
+            //release
+            IOObjectRelease(candidateChild);
+            
+            //skip
+            continue;
+        }
+        
+        //check for match
+        if(0 == strncmp(currentClass, name, strlen(name)))
+        {
+            //found child
+            child = candidateChild;
+            
+            //retain
+            IOObjectRetain(child);
+        }
+        
+        //always release candidate
+        IOObjectRelease(candidateChild);
+        
+        //stop looking if child was found
+        if(0 != child)
+        {
+            //all done
+            break;
+        }
+        
+    }//all children
+    
+//bail
+bail:
+    
+    //release iterator
+    if(0 != iterator)
+    {
+        //release
+        IOObjectRelease(iterator);
+    }
+    
+    return child;
+}
 

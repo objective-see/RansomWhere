@@ -56,7 +56,7 @@
     //set daemon src path
     // ->orginally stored in installer app's /Resource bundle
     paths[DAEMON_SRC_PATH_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:DAEMON_NAME];
-    
+
     //set daemon dest path
     // ->'/Library/RansomWhere/' + daemon name
     paths[DAEMON_DEST_PATH_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:DAEMON_NAME];
@@ -72,17 +72,34 @@
     //set daemon icon src path
     // ->orginally stored in installer app's /Resource bundle
     paths[DAEMON_SRC_ICON_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:ALERT_ICON];
-    
+
     //set daemon icon dest path
     // ->'/Library/RansomWhere/' + icon name
     paths[DAEMON_DEST_ICON_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:ALERT_ICON];
+    
+    //set daemon whitelist src path
+    // ->orginally stored in installer app's /Resource bundle
+    paths[DAEMON_SRC_WHITE_LIST] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:WHITE_LIST_FILE];
+    
+    //set daemon whitelist dest path
+    // ->'/Library/RansomWhere/' + whitelist.plist
+    paths[DAEMON_DEST_WHITE_LIST] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:WHITE_LIST_FILE];
+    
+    //set daemon graylist src path
+    // ->orginally stored in installer app's /Resource bundle
+    paths[DAEMON_SRC_GRAY_LIST] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:GRAY_LIST_FILE];
+    
+    //set daemon graylist dest path
+    // ->'/Library/RansomWhere/' + graylist.plist
+    paths[DAEMON_DEST_GRAY_LIST] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:GRAY_LIST_FILE];
+    
+//bail
+bail:
     
     return paths;
 }
 
 //perform install || uninstall logic
-
-//TODO: copy over white & gray list
 -(BOOL)configure:(NSUInteger)parameter
 {
     //return var
@@ -109,10 +126,10 @@
         if(YES == [self isInstalled])
         {
             //dbg msg
-            logMsg(LOG_DEBUG, @"already installed, so fully uninstalling...");
+            logMsg(LOG_DEBUG, @"already installed, so partially uninstalling...");
             
             //uninstall (and stop)
-            if(YES != [self uninstall:NO])
+            if(YES != [self uninstall:PARTIAL_UNINSTALL])
             {
                 //bail
                 goto bail;
@@ -140,7 +157,7 @@
         
         //uninstall (and stop)
         // ->also delete user's prefs
-        if(YES != [self uninstall:YES])
+        if(YES != [self uninstall:FULL_UNINSTALL])
         {
             //bail
             goto bail;
@@ -173,9 +190,12 @@ bail:
     //info dictionary
     NSMutableDictionary* daemonInfo = nil;
     
+    //all files
+    NSArray* files = nil;
+    
     //error
     NSError* error = nil;
-    
+
     //get info about daemon's paths
     daemonInfo = [self daemonInfo];
     
@@ -206,6 +226,16 @@ bail:
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created %@", daemonInfo[DAEMON_DEST_FOLDER]]);
     }
     
+    //check daemon was found in installer
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_PATH_KEY]])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to find %@", daemonInfo[DAEMON_SRC_PATH_KEY]]);
+        
+        //bail
+        goto bail;
+    }
+
     //move daemon binary into persistent location
     // ->'/Library/RansomWhere/' + daemon name
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_PATH_KEY] toPath:daemonInfo[DAEMON_DEST_PATH_KEY] error:&error])
@@ -217,42 +247,17 @@ bail:
         goto bail;
     }
     
-    //move icon for user alert into persistent location
-    // ->'/Library/RansomWhere/' + icon name
-    if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_ICON_KEY] toPath:daemonInfo[DAEMON_DEST_ICON_KEY] error:&error])
+    //check daemon plist was found in installer
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_PLIST_KEY]])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy user alert icon into %@ (%@)", daemonInfo[DAEMON_DEST_ICON_KEY], error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to find %@", daemonInfo[DAEMON_SRC_PLIST_KEY]]);
         
         //bail
         goto bail;
     }
     
-    //set group/owner to root/wheel
-    if(YES != setFileOwner(daemonInfo[DAEMON_DEST_ICON_KEY], @0, @0, YES))
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon %@ to be owned by root", daemonInfo[DAEMON_DEST_ICON_KEY]]);
-        
-        //bail
-        goto bail;
-    }
-
-
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_PATH_KEY], daemonInfo[DAEMON_DEST_PATH_KEY]]);
-
-    //set group/owner to root/wheel
-    if(YES != setFileOwner(daemonInfo[DAEMON_DEST_PATH_KEY], @0, @0, YES))
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon %@ to be owned by root", daemonInfo[DAEMON_DEST_PATH_KEY]]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //move daemon plist into /Libary/LauchDaemons
+    //move daemon plist into /Libary/LaunchDaemons
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_PLIST_KEY] toPath:daemonInfo[DAEMON_DEST_PLIST_KEY] error:&error])
     {
         //err msg
@@ -261,22 +266,19 @@ bail:
         //bail
         goto bail;
     }
-
+    
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_PLIST_KEY], daemonInfo[DAEMON_DEST_PLIST_KEY]]);
     
-    //set group/owner to root/wheel
+    //set plist's group/owner to root/wheel
     if(YES != setFileOwner(daemonInfo[DAEMON_DEST_PLIST_KEY], @0, @0, YES))
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set daemon's plist %@, to be owned by root", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set %@, to be owned by root", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
         
         //bail
         goto bail;
     }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set daemon's plist %@, to be owned by root", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
     
     //set plist's permissions to rw-r-r
     // ->otherwise launchd will reject it
@@ -292,18 +294,92 @@ bail:
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set daemon's plist %@, to be 'rw-r-r'", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
     
-    //TODO: copy in white & grey list
-    // ->set everything to be owned by root?
-    /// in a loop once, or make a help function
-    /*
+    //check daemon alert icon was found in installer
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_ICON_KEY]])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to find %@", daemonInfo[DAEMON_SRC_ICON_KEY]]);
+        
+        //bail
+        goto bail;
+    }
+
+    //move icon for user alert into persistent location
+    // ->'/Library/RansomWhere/' + icon name
+    if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_ICON_KEY] toPath:daemonInfo[DAEMON_DEST_ICON_KEY] error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy user alert icon into %@ (%@)", daemonInfo[DAEMON_DEST_ICON_KEY], error]);
+        
+        //bail
+        goto bail;
+    }
+
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_PATH_KEY], daemonInfo[DAEMON_DEST_PATH_KEY]]);
     
-     //NSString *bundlePathWithFile = [[NSBundle mainBundle] pathForResource:@"sample.txt" ofType:nil];
-    [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:DAEMON_PLIST];
-     
-    */
+    //check daemon whitelist was found in installer
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_WHITE_LIST]])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to find %@", daemonInfo[DAEMON_SRC_WHITE_LIST]]);
+        
+        //bail
+        goto bail;
+    }
+
+    //copy over whitelist
+    if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_WHITE_LIST] toPath:daemonInfo[DAEMON_DEST_WHITE_LIST] error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy user whitelist %@ (%@)", daemonInfo[DAEMON_DEST_WHITE_LIST], error]);
+        
+        //bail
+        goto bail;
+    }
     
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_WHITE_LIST], daemonInfo[DAEMON_DEST_WHITE_LIST]]);
     
+    //check daemon graylist was found in installer
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_GRAY_LIST]])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to find %@", daemonInfo[DAEMON_SRC_GRAY_LIST]]);
+        
+        //bail
+        goto bail;
+    }
     
+    //copy over graylist
+    if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_GRAY_LIST] toPath:daemonInfo[DAEMON_DEST_GRAY_LIST] error:&error])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy user graylist %@ (%@)", daemonInfo[DAEMON_DEST_GRAY_LIST], error]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_GRAY_LIST], daemonInfo[DAEMON_DEST_GRAY_LIST]]);
+    
+    //get all files
+    files = [[NSFileManager defaultManager] directoryContentsAtPath:daemonInfo[DAEMON_DEST_FOLDER]];
+    
+    //set em all to be owned as root
+    for(NSString* file in files)
+    {
+        //set group/owner to root/wheel
+        if(YES != setFileOwner([daemonInfo[DAEMON_DEST_FOLDER] stringByAppendingPathComponent:file], @0, @0, YES))
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set %@, to be owned by root", [daemonInfo[DAEMON_DEST_FOLDER] stringByAppendingPathComponent:file]]);
+            
+            //bail
+            goto bail;
+        }
+    }
     
     //start daemon
     if(YES != [self controlLaunchItem:DAEMON_LOAD plist:daemonInfo[DAEMON_DEST_PLIST_KEY]])
@@ -328,7 +404,7 @@ bail:
 // a) stop it
 // b) delete plist from to /Library/LauchDaemons
 // c) delete daemon binary & folder; /Library/RansomWhere
--(BOOL)uninstall:(BOOL)saveUserPrefs
+-(BOOL)uninstall:(NSUInteger)type
 {
     //return/status var
     BOOL wasUninstalled = NO;
@@ -383,7 +459,7 @@ bail:
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER]])
     {
         //delete entire folder & contents
-        if(YES != saveUserPrefs)
+        if(FULL_UNINSTALL == type)
         {
             //delete
             if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_FOLDER] error:&error])
@@ -397,8 +473,7 @@ bail:
                 //keep uninstalling...
             }
         }
-        //TODO: test
-        //otherwise delete everythiing but user prefs
+        //otherwise delete everything but user prefs
         else
         {
             //init directory enumerator

@@ -11,16 +11,11 @@
 
 #import <Foundation/Foundation.h>
 
-//TODO: cleanup unneeded function declarations
-
 //query interwebz to get latest version
 NSString* getLatestVersion();
 
 //enumerate all running processes
 NSMutableArray* enumerateProcesses();
-
-//get all user home directories
-NSMutableArray* getUserHomeDirs();
 
 //return path to launch daemon's plist
 NSString* launchDaemonPlist();
@@ -44,18 +39,11 @@ NSDictionary* getAppInfo(NSString* appPath);
 // ->gotta be signed w/ Apple Dev ID & have valid app receipt
 BOOL fromAppStore(NSString* path);
 
-//wait for a a plist
-// ->then extract a value for a key
-id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait);
-
 //given a pid and process name, try to find full path
 NSString* getFullPath(NSNumber* processID, NSString* processName, BOOL tryWhich);
 
 //exec a process and grab it's output
 NSData* execTask(NSString* binaryPath, NSArray* arguments);
-
-//bring an app to foreground (to get an icon in the dock) or background
-void transformProcess(ProcessApplicationTransformState location);
 
 //get info about current logged in/active user
 NSDictionary* getCurrentConsoleUser();
@@ -67,9 +55,6 @@ NSMutableArray* enumerateInstalledApps();
 //get all internal apps of an app
 // ->login items, helper apps in frameworks, etc
 NSMutableArray* enumerateInternalApps(NSString* parentApp);
-
-//get all users
-NSMutableArray* getUsers();
 
 //get version of self
 NSString* getDaemonVersion();
@@ -91,9 +76,6 @@ NSDictionary* getOSVersion();
 //get path to app's (self) 'Info.plist' file
 NSString* infoPlistFile();
 
-//given a pid, get its parent (ppid)
-pid_t getParentID(int pid);
-
 //load or unload the launch daemon via '/bin/launchctl'
 void controlLaunchItem(NSUInteger action, NSString* plist);
 
@@ -108,12 +90,6 @@ NSString* getProcessPath(pid_t pid);
 
 //determine if a file is signed by Apple proper
 BOOL isAppleBinary(NSString* path);
-
-//write an NSSet to file
-BOOL writeSetToFile(NSSet* set, NSString* file);
-
-//read an NSSet from file
-NSMutableSet* readSetFromFile(NSString* file);
 
 //examines header for image signatures (e.g. 'GIF87a')
 BOOL isAnImage(NSData* header);
@@ -130,6 +106,14 @@ BOOL isInGrayList(NSString* path);
 
 //check if binary's signing auth has been whitelisted
 BOOL isInWhiteList(NSArray* signingAuths);
+
+//given a 'BSD name' for a mounted filesystem (ex: '/dev/disk1s2')
+// ->find the orginal disk image (dmg) that was mounted at this location
+NSString* findDMG(char* mountFrom);
+
+//given a parent
+// ->finds (first) child that matches specified class name
+io_service_t findChild(io_service_t parent, const char* name);
 
 
 #endif /* defined(__BlockBlock__Utilities__) */

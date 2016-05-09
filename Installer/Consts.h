@@ -36,8 +36,26 @@
 //daemon destination icon key
 #define DAEMON_DEST_ICON_KEY @"destIcon"
 
+//daemon source white list
+#define DAEMON_SRC_WHITE_LIST @"srcWhiteList"
+
+//daemon destination white list
+#define DAEMON_DEST_WHITE_LIST @"destWhiteList"
+
+//daemon source gray list
+#define DAEMON_SRC_GRAY_LIST @"srcGrayList"
+
+//daemon destination gray list
+#define DAEMON_DEST_GRAY_LIST @"destGrayList"
+
 //icon name
 #define ALERT_ICON @"alertIcon.png"
+
+//delete user pref
+#define FULL_UNINSTALL 0
+
+//keep user prefs
+#define PARTIAL_UNINSTALL 1
 
 //uninstall flag
 #define DAEMON_UNLOAD 0
@@ -96,6 +114,12 @@
 
 //flag for error popup
 #define KEY_ERROR_SHOULD_EXIT @"shouldExit"
+
+//whitelist
+#define WHITE_LIST_FILE @"whiteList.plist"
+
+//graylist
+#define GRAY_LIST_FILE @"grayList.plist"
 
 
 #endif

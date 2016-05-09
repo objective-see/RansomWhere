@@ -29,7 +29,7 @@
 -(id)init:(NSString*)binaryPath attributes:(NSDictionary*)attributes
 {
     //flag
-    BOOL wasSuspended = YES;
+    BOOL wasSuspended = NO;
     
     //init super
     self = [super init];
@@ -67,7 +67,7 @@
             //TODO: remove
             else
             {
-                logMsg(LOG_ERR, [NSString stringWithFormat:@"suspended %@ (%@)", [attributes objectForKey:@"processID"], self.path]);
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"suspended %@ (%@)", [attributes objectForKey:@"processID"], self.path]);
             }
             
             //set flag
@@ -117,12 +117,57 @@
     //flag
     BOOL fromInternet = NO;
     
+    //stat fs struct
+    struct statfs statFS = {0};
+    
+    //dmg
+    NSString* diskImage = nil;
+    
     //dictionary for quarantine attributes
     NSDictionary* quarantineAttributes = nil;
     
     //get attributes
     if( (YES != [[NSURL fileURLWithPath:self.path] getResourceValue:&quarantineAttributes forKey:NSURLQuarantinePropertiesKey error:NULL]) ||
         (nil == quarantineAttributes) )
+    {
+        //app on images don't have quarantine attributes
+        // ->so check if its on /Volumes and then manually look up
+        if(YES != [self.path hasPrefix:@"/Volumes"])
+        {
+            //bail
+            goto bail;
+        }
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ might be from a .dmg (will check)", self.path]);
+        #endif
+        
+        //get stat info
+        if(-1 == statfs(self.path.UTF8String, &statFS))
+        {
+            //bail
+            goto bail;
+        }
+        
+        //find dmg that app/binary is on
+        diskImage = findDMG(statFS.f_mntfromname);
+        if(nil == diskImage)
+        {
+            //bail
+            goto bail;
+        }
+        
+        //check if .dmg has quarantine attributes
+        if(YES != [[NSURL fileURLWithPath:diskImage] getResourceValue:&quarantineAttributes forKey:NSURLQuarantinePropertiesKey error:NULL])
+        {
+            //bail
+            goto bail;
+        }
+    }
+    
+    //check (again?) if binary or its .dmg has quarantine attributes
+    if(nil == quarantineAttributes)
     {
         //bail
         goto bail;

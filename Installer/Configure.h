@@ -29,7 +29,7 @@
 -(BOOL)controlLaunchItem:(NSUInteger)action plist:(NSString*)plist;
 
 //uninstall daemon
--(BOOL)uninstall:(BOOL)saveUserPrefs;
+-(BOOL)uninstall:(NSUInteger)type;
 
 @end
 

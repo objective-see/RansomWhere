@@ -11,7 +11,7 @@
 
 //version
 // TODO: update with each new release!
-#define DAEMON_VERSION @"1.0.0"
+#define DAEMON_VERSION @"1.1.0"
 
 //product url
 #define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
