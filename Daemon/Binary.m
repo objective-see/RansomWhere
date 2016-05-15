@@ -45,16 +45,21 @@
         // ->from Apple, App Store, signing authorities, etc
         self.signingInfo = extractSigningInfo(self.path);
         
-        //set flag for signed by Apple proper
-        self.isApple = [self.signingInfo[KEY_SIGNING_IS_APPLE] boolValue];
-        
-        //set flag for from official App Store
-        self.isAppStore = [self.signingInfo[KEY_SIGNING_IS_APP_STORE] boolValue];
-        
-        //check lists (white & gray)
-        // ->gotta be happily signed for checks
+        //perform more signing checks and lists
+        // ->gotta be happily signed for checks though
         if(0 == [self.signingInfo[KEY_SIGNATURE_STATUS] intValue])
         {
+            //set flag for signed by Apple proper
+            self.isApple = [self.signingInfo[KEY_SIGNING_IS_APPLE] boolValue];
+        
+            //when not Apple proper
+            // ->set flag for from official App Store
+            if(YES != isApple)
+            {
+                //set flag
+                self.isAppStore = [self.signingInfo[KEY_SIGNING_IS_APP_STORE] boolValue];
+            }
+        
             //set flag if its whitelisted (via signing auths)
             self.isWhiteListed = isInWhiteList(self.signingInfo[KEY_SIGNING_AUTHORITIES]);
             
