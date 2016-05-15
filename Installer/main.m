@@ -5,26 +5,80 @@
 //  Created by Patrick Wardle on 1/2/16.
 //  Copyright (c) 2016 Objective-See. All rights reserved.
 //
-#import "Logging.h"
 
-#import <syslog.h>
-#import <Cocoa/Cocoa.h>
-
-
-
-/* METHODS DECLARATIONS */
-
-//spawn self as root
-BOOL spawnAsRoot(char* path2Self);
-
-/*CODE */
+#import "main.h"
 
 //main
-// ->spawn self as r00t
+// ->handle args, spawn self as r00t, etc.
 int main(int argc, char *argv[])
 {
     //return var
     int retVar = -1;
+    
+    //handle '-install' / '-uninstall'
+    // ->this performs non-UI logic for easier automated deployment
+    if(2 == argc)
+    {
+        //first check rooot
+        if(0 != geteuid())
+        {
+            //err msg
+            printf("\nRANSOMWHERE? ERROR: '%s' option, requires root\n\n", argv[1]);
+            
+            //bail
+            goto bail;
+        }
+        
+        //handle install
+        if(0 == strcmp(argv[1], INSTALL_FLAG))
+        {
+            //install
+            if(YES != cmdlineInstall())
+            {
+                //err msg
+                printf("\nRANSOMWHERE? ERROR: install failed\n\n");
+                
+                //bail
+                goto bail;
+            }
+            
+            //dbg msg
+            printf("RANSOMWHERE?: install ok!\n");
+            
+            //happy
+            retVar = 0;
+        }
+        
+        //handle uninstall
+        else if(0 == strcmp(argv[1], UNINSTALL_FLAG))
+        {
+            //uninstall
+            if(YES != cmdlineUninstall())
+            {
+                //err msg
+                printf("\nRANSOMWHERE? ERROR: install failed\n\n");
+            }
+            
+            //dbg msg
+            printf("RANSOMWHERE?: uninstall ok!\n");
+            
+            //happy
+            retVar = 0;
+        }
+
+        //invalid arg
+        else
+        {
+            //err msg
+            printf("\nRANSOMWHERE? ERROR: '%s', is an invalid option\n\n", argv[1]);
+            
+            //bail
+            goto bail;
+        }
+        
+        //always pau
+        goto bail;
+    }
     
     //check for r00t
     // ->then spawn self via auth exec
@@ -127,3 +181,18 @@ bail:
     
     return bRet;
 }
+
+//install
+BOOL cmdlineInstall()
+{
+    //do it!
+    return [[[Configure alloc] init] configure:ACTION_INSTALL_FLAG];
+}
+
+//uninstall
+BOOL cmdlineUninstall()
+{
+    //do it!
+    return [[[Configure alloc] init] configure:ACTION_UNINSTALL_FLAG];
+}
+

@@ -39,6 +39,7 @@
 		7D3E40981CDEF40C002B0997 /* com.objective-see.ransomwhere.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "com.objective-see.ransomwhere.plist"; path = "Installer/DaemonResources/com.objective-see.ransomwhere.plist"; sourceTree = "<group>"; };
 		7D3E40991CDEF40C002B0997 /* graylist.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = graylist.plist; path = Installer/DaemonResources/graylist.plist; sourceTree = "<group>"; };
 		7D3E409A1CDEF40C002B0997 /* whitelist.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = whitelist.plist; path = Installer/DaemonResources/whitelist.plist; sourceTree = "<group>"; };
+		7D3E409E1CE1B9B3002B0997 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		7DCF017E1CB996E70051C574 /* alertIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = alertIcon.png; path = Installer/images/alertIcon.png; sourceTree = "<group>"; };
 		7DE29CE51CABB59600DFA6A6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Installer/AppDelegate.h; sourceTree = "<group>"; };
 		7DE29CE61CABB59600DFA6A6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Installer/AppDelegate.m; sourceTree = "<group>"; };
@@ -180,6 +181,7 @@
 				7DE29D0E1CABB5FE00DFA6A6 /* Installer-Info.plist */,
 				7DE29D0F1CABB5FE00DFA6A6 /* Installer-Prefix.pch */,
 				7DE29D101CABB5FE00DFA6A6 /* main.m */,
+				7D3E409E1CE1B9B3002B0997 /* main.h */,
 			);
 			name = "Supporting Files";
 			path = Installer;

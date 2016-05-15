@@ -219,15 +219,9 @@ NSMutableArray* enumerateInstalledApps()
     
     //serialized task output
     NSArray* serializedOutput = nil;
-    
-    //internal apps/binaries
-    NSMutableArray* internalBinaries = nil;
-    
+
     //alloc array for installed apps
     installedApplications = [NSMutableArray array];
-    
-    //alloc array internal apps
-    internalBinaries = [NSMutableArray array];
     
     //exec system profiler
     taskOutput = execTask(SYSTEM_PROFILER, @[@"SPApplicationsDataType", @"-xml",  @"-detailLevel", @"mini"]);
@@ -270,6 +264,13 @@ NSMutableArray* enumerateInstalledApps()
             //get app's binary
             appBinary = findAppBinary(appPath);
             if(nil == appBinary)
+            {
+                //skip
+                continue;
+            }
+            
+            //skip if app binary not found on disk
+            if(YES != [[NSFileManager defaultManager] fileExistsAtPath:appBinary])
             {
                 //skip
                 continue;
@@ -355,7 +356,14 @@ NSMutableArray* enumerateInternalApps(NSString* parentApp)
             //ignore
             continue;
         }
-        
+            
+        //skip if app binary not found on disk
+        if(YES != [[NSFileManager defaultManager] fileExistsAtPath:appBinary])
+        {
+            //skip
+            continue;
+        }
+            
         //save
         [internalApps addObject:appBinary];
 
@@ -1315,10 +1323,27 @@ BOOL isEncrypted(NSString* path)
     //ignore image files
     // ->looks for well known headers at start of file
     if( (nil != results[@"header"]) &&
-        (YES == isAnImage(results[@"header"])) )
+        (YES == isImage(results[@"header"])) )
     {
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file is an image; %#x", *(unsigned int*)[results[@"header"] bytes]]);
+        #endif
+        
         //ignore
         goto bail;
+    }
+    
+    //ignore gzip'd files
+    if( (nil != results[@"header"]) &&
+        (YES == isGzip(results[@"header"])) )
+    {
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file gzip'd; %x", *(unsigned int*)[results[@"header"] bytes]]);
+        #endif
+        
+        //ignore
+        goto bail;
+        
     }
     
     //encrypted files have super high entropy
@@ -1339,7 +1364,7 @@ BOOL isEncrypted(NSString* path)
     //when monte carlo pi error is above 0.5
     // ->gotta have low chi square as well
     if( ([results[@"montecarlo"] doubleValue] > 0.5) &&
-        ([results[@"chisquare"] doubleValue] > 500) )
+        ([results[@"chisquare"] doubleValue] > 400) )
     {
         //ignore
         goto bail;
@@ -1357,10 +1382,10 @@ bail:
 
 //examines header for image signatures (e.g. 'GIF87a')
 // ->see: https://en.wikipedia.org/wiki/List_of_file_signatures for image signatures
-BOOL isAnImage(NSData* header)
+BOOL isImage(NSData* header)
 {
     //flag
-    BOOL isImage = NO;
+    BOOL anImage = NO;
     
     //header bytes as 4byte int
     unsigned int magic = 0;
@@ -1376,7 +1401,7 @@ BOOL isAnImage(NSData* header)
         (MAGIC_TIFF == magic) )
     {
         //set flag
-        isImage = YES;
+        anImage = YES;
         
         //bail
         goto bail;
@@ -1385,7 +1410,38 @@ BOOL isAnImage(NSData* header)
 //bail
 bail:
     
-    return isImage;
+    return anImage;
+}
+
+//examines header for gzip signature
+// ->for gzip, this is 0x1f 0x8b 0x08
+BOOL isGzip(NSData* header)
+{
+    //flag
+    BOOL isGzipped = NO;
+    
+    //first 3 bytes
+    unsigned char* magic = {0};
+    
+    //grab bytes
+    magic = (unsigned char*)header.bytes;
+    
+    //check for magic header value
+    if( (magic[0] == 0x1F) &&
+        (magic[1] == 0x8B) &&
+        (magic[2] == 0x08) )
+    {
+        //set flag
+        isGzipped = YES;
+        
+        //bail
+        goto bail;
+    }
+    
+//bail
+bail:
+    
+    return isGzipped;
 }
 
 //check if binary's signing auth has been whitelisted
@@ -1405,7 +1461,7 @@ BOOL isInWhiteList(NSArray* signingAuths)
     ^{
         
         //load whitelisted apps
-        whiteList = loadSet(WHITE_LIST_FILE);
+        whiteList = loadSet([DAEMON_DEST_FOLDER stringByAppendingPathComponent:WHITE_LIST_FILE]);
         
     });//only once
     
@@ -1444,7 +1500,7 @@ BOOL isInGrayList(NSString* signingID)
     ^{
       
         //load graylisted apps
-        grayList = loadSet(WHITE_LIST_FILE);
+        grayList = loadSet([DAEMON_DEST_FOLDER stringByAppendingPathComponent:GRAY_LIST_FILE]);
       
     });//only once
     

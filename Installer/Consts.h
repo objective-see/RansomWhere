@@ -12,6 +12,9 @@
 //product url
 #define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
 
+//errors url
+#define ERRORS_URL @"https://objective-see.com/errors.html"
+
 //general error URL
 #define FATAL_ERROR_URL @"https://objective-see.com/errors.html"
 
@@ -86,10 +89,6 @@
 //action to kick off UI installer
 #define ACTION_UNINSTALL_UI @"Uninstall_UI"
 
-//button title
-// ->Close
-#define ACTION_CLOSE @"Close"
-
 //flag to uninstall
 #define ACTION_UNINSTALL_FLAG 0
 
@@ -120,6 +119,12 @@
 
 //graylist
 #define GRAY_LIST_FILE @"grayList.plist"
+
+//install flag
+#define INSTALL_FLAG "-install"
+
+//uninstall flag
+#define UNINSTALL_FLAG "-uninstall"
 
 
 #endif

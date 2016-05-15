@@ -2,8 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
+	<string>Developer ID Application: Adobe Systems, Inc.</string>
+	<string>Developer ID Application: Bitdefender SRL (GUNFMW623Y)</string>
+	<string>Developer ID Application: Eclipse Foundation, Inc. (JCDTMS22B4)</string>
 	<string>Developer ID Application: Google Inc.</string>
 	<string>Developer ID Application: Kaspersky Lab UK Limited</string>
+	<string>Developer ID Application: Malwarebytes Corporation (GVZRY6KDKR)</string>
+	<string>Developer ID Application: Mozilla Corporation</string>
 	<string>Developer ID Application: Valve Corporation</string>
 </array>
 </plist>

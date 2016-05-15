@@ -36,9 +36,6 @@
 //flag indicating binary was approved
 @property BOOL isApproved;
 
-//flag indicating binary is from the internet
-@property BOOL isInternet;
-
 //whitelisted (via signing auth)
 @property BOOL isWhiteListed;
 

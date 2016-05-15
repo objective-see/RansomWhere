@@ -32,7 +32,7 @@
 -(void)configure:(BOOL)isInstalled
 {
     //set window title
-    [self window].title = [NSString stringWithFormat:@"[version %@]", getAppVersion()];
+    [self window].title = [NSString stringWithFormat:@"version %@", getAppVersion()];
     
     //dbg msg
     logMsg(LOG_DEBUG, @"configuring install/uninstall window");
@@ -103,46 +103,45 @@
     //hide 'get more info' button
     self.moreInfoButton.hidden = YES;
     
-    //handle non-'close' clicks
-    if(YES != [buttonTitle isEqualToString:ACTION_CLOSE])
+    //set action
+    // ->install daemon
+    if(YES == [buttonTitle isEqualToString:ACTION_INSTALL])
     {
-        //set action
-        // ->install daemon
-        if(YES == [buttonTitle isEqualToString:ACTION_INSTALL])
-        {
-            //set
-            action = ACTION_INSTALL_FLAG;
-        }
-        //set action
-        // ->uninstall daemon
-        else
-        {
-            //set
-            action = ACTION_UNINSTALL_FLAG;
-        }
-        
-        //disable 'x' button
-        // ->don't want user killing app during install/upgrade
-        [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:NO];
-        
-        //clear status msg
-        [self.statusMsg setStringValue:@""];
-        
-        //force redraw of status msg
-        // ->sometime doesn't refresh (e.g. slow VM)
-        [self.statusMsg setNeedsDisplay:YES];
+        //set
+        action = ACTION_INSTALL_FLAG;
+    }
+    //set action
+    // ->uninstall daemon
+    else
+    {
+        //set
+        action = ACTION_UNINSTALL_FLAG;
+    }
+    
+    //disable 'x' button
+    // ->don't want user killing app during install/upgrade
+    [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:NO];
+    
+    //clear status msg
+    [self.statusMsg setStringValue:@""];
+    
+    //force redraw of status msg
+    // ->sometime doesn't refresh (e.g. slow VM)
+    [self.statusMsg setNeedsDisplay:YES];
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing RansomWhere?", buttonTitle]);
+    
+    //invoke logic to install/uninstall
+    // ->do in background so UI doesn't block
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+    ^{
+        //install/uninstall
+        [self lifeCycleEvent:action];
         
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing RansomWhere?", buttonTitle]);
-        
-        //invoke logic to install/uninstall
-        // ->do in background so UI doesn't block
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
-        ^{
-            //install/uninstall
-            [self lifeCycleEvent:action];
-        });
-    }
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"done %@'ing RansomWhere?", buttonTitle]);
+    });
 
 //bail
 bail:

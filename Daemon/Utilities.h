@@ -92,7 +92,10 @@ NSString* getProcessPath(pid_t pid);
 BOOL isAppleBinary(NSString* path);
 
 //examines header for image signatures (e.g. 'GIF87a')
-BOOL isAnImage(NSData* header);
+BOOL isImage(NSData* header);
+
+//examines header for gzip signatures (e.g. '1f 8b 08')
+BOOL isGzip(NSData* header);
 
 //given a bundle
 // ->find its executable

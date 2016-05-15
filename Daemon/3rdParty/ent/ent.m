@@ -123,11 +123,12 @@ NSMutableDictionary* testFile(NSString* file)
         //save
         results[@"header"] = [NSData dataWithBytes:fileBytes length:HEADER_SIZE];
     }
-    
-	//printf("\nEntropy = %f bits per bytes\n", ent);
-    //printf("Chi square distribution is %1.2f\n", chisq);
-    //printf("Monte Carlo value for Pi is %1.9f (error %1.2f percent)\n\n", montepi, 100.0 * (fabs(PI - montepi) / PI));
 
+    /*
+	printf("\nEntropy = %f bits per bytes\n", ent);
+    printf("Chi square distribution is %1.2f\n", chisq);
+    printf("Monte Carlo value for Pi is %1.9f (error %1.2f percent)\n\n", montepi, 100.0 * (fabs(PI - montepi) / PI));
+    */
    
 //bail
 bail:

@@ -21,9 +21,6 @@
 #import "FSMonitor.h"
 #import "3rdParty/ent/ent.h"
 
-//sudo chown -R root:wheel  /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
-//sudo chmod 4755 /Users/patrick/objective-see/tbd/DerivedData/tbd/Build/Products/Debug/tbd
-
 //global list of binary objects
 // ->running/installed/user approved apps
 NSMutableDictionary* binaryList = nil;
@@ -46,7 +43,7 @@ int main(int argc, const char * argv[])
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"daemon instance");
+        logMsg(LOG_DEBUG, @"daemon instance started!");
         #endif
         
         //sanity check
@@ -82,7 +79,7 @@ int main(int argc, const char * argv[])
         binaryList = [NSMutableDictionary dictionary];
         
         //init paths
-        // ->this logic will only be needed if daemon is executed from non-standard location
+        // ->this logic will only be needed if daemon is executed from non-standard location (i.e. debugger)
         if(YES != initPaths())
         {
             //err msg
@@ -94,7 +91,7 @@ int main(int argc, const char * argv[])
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerating all installed applications, to baseline");
+        logMsg(LOG_DEBUG, @"enumerating all installed applications, to baseline system");
         #endif
         
         //create binary objects for all baselined app
@@ -139,7 +136,7 @@ int main(int argc, const char * argv[])
             //bail
             goto bail;
         }
-        
+            
         //grab user name
         // ->also register callback for user changes
         if(YES != initUserName())
@@ -412,6 +409,9 @@ BOOL processBaselinedApps()
         //init binary object
         binary = [[Binary alloc] init:appPath attributes:@{@"baselined":[NSNumber numberWithBool:YES]}];
         
+        //nap to reduce CPU warnings/usage
+        [NSThread sleepForTimeInterval:0.05];
+        
         //add to global list
         // ->path is key; object is value
         binaryList[binary.path] = binary;
@@ -520,7 +520,7 @@ BOOL processRunningProcs()
     }
     
     //iterate over all running processes
-    // ->create process obj & save into global list
+    // ->create binary objs & save into global list
     for(NSNumber* processID in runningProcesses)
     {
         //get process path from pid
@@ -550,6 +550,9 @@ BOOL processRunningProcs()
         //add to global list
         // ->path is key; object is value
         binaryList[binary.path] = binary;
+        
+        //nap to reduce CPU warnings/usage
+        [NSThread sleepForTimeInterval:0.05];
     }
     
     //happy
@@ -753,7 +756,6 @@ void* checkForUpdate(void *threadParam)
     //nap a bit more
     // ->just in case user is logging in
     sleep(10);
-    
     
     //dbg msg
     #ifdef DEBUG
