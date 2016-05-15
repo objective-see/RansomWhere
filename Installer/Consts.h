@@ -126,5 +126,11 @@
 //uninstall flag
 #define UNINSTALL_FLAG "-uninstall"
 
+//OS version x
+#define OS_MAJOR_VERSION_X 10
+
+//OS version lion
+#define OS_MINOR_VERSION_LION 8
+
 
 #endif

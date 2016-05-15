@@ -74,6 +74,10 @@
     
     //binary object
     Binary* binary = nil;
+    
+    //pool
+    @autoreleasepool
+    {
 
     //alloc buffer
     fsEvents = malloc(BUFSIZE);
@@ -238,6 +242,9 @@ bail:
         //unset
         fsEvents = NULL;
     }
+        
+    }//pool
+    
     
     return;
 }
@@ -288,7 +295,7 @@ bail:
         //all set
         goto bail;
     }
-    
+   
     //create binary object
     binary = [[Binary alloc] init:processPath attributes:nil];
     
@@ -338,30 +345,11 @@ bail:
             //got a window_xxx.data
             // ->good enough match for now, so ignore
             ignore = YES;
-        }
-    }
-    
-    /* could also ignore files in /tmp, NSTemporaryDirectory(), etc
-    
-    //then check all watch paths
-    for(NSString* ingoreDir in self.ingoreDirs)
-    {
-        //check if path is being watched
-        if(YES == [path hasPrefix:ingoreDir])
-        {
-            //yups
-            watched = YES;
             
-            //bail
-            break;
+            //TODO:
+            // ->add bail if more checks are addedd below
         }
     }
-    
-    */
-    
-    
-//bail
-//bail:
     
     return ignore;
 }

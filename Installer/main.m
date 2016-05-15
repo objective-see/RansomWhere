@@ -15,9 +15,13 @@ int main(int argc, char *argv[])
     //return var
     int retVar = -1;
     
+    @autoreleasepool
+    {
+    
     //handle '-install' / '-uninstall'
     // ->this performs non-UI logic for easier automated deployment
-    if(2 == argc)
+    if( (argc >= 2) &&
+        (YES != [[NSString stringWithUTF8String:argv[1]] hasPrefix:@"-psn_"]) )
     {
         //first check rooot
         if(0 != geteuid())
@@ -111,9 +115,13 @@ int main(int argc, char *argv[])
         //app away
         retVar = NSApplicationMain(argc, (const char **)argv);
     }
+        
+    }//pool
     
 //bail
 bail:
+        
+    
     
     return retVar;
 }

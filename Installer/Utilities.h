@@ -21,7 +21,6 @@ NSUInteger execTask(NSString* path, NSArray* arguments);
 NSString* getAppVersion();
 
 //is current OS version supported?
-// ->for now, just OS X 10.11.* (El Capitan)
 BOOL isSupportedOS();
 
 //get OS version

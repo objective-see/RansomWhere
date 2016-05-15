@@ -111,7 +111,7 @@ BOOL isSupportedOS()
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
     
     //gotta be OS X
-    if(10 != [osVersionInfo[@"majorVersion"] intValue])
+    if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
     {
         //err msg
         logMsg(LOG_ERR, [NSString stringWithFormat:@"OS major version %@ not supported", osVersionInfo[@"majorVersion"]]);
@@ -120,8 +120,8 @@ BOOL isSupportedOS()
         goto bail;
     }
     
-    //gotta be OS X 1)
-    if([osVersionInfo[@"minorVersion"] intValue] < 10)
+    //gotta be OS X at least lion (10.8)
+    if([osVersionInfo[@"minorVersion"] intValue] < OS_MINOR_VERSION_LION)
     {
         //err msg
         logMsg(LOG_ERR, [NSString stringWithFormat:@"OS minor version %@ not supported", osVersionInfo[@"minor"]]);

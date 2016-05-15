@@ -63,6 +63,16 @@ int main(int argc, const char * argv[])
         // ->install exception handlers
         installExceptionHandlers();
         
+        //check OS version
+        if(YES != isSupportedOS())
+        {
+            //err msg
+            logMsg(LOG_ERR, @"unsupported OS (requires OS X 10.8+)");
+            
+            //bail
+            goto bail;
+        }
+        
         //handle '-reset'
         // ->delete list of installed/approved apps, etc
         if( (2 == argc) &&
@@ -121,7 +131,7 @@ int main(int argc, const char * argv[])
             //bail
             //goto bail;
         }
-        
+    
         //dbg msg
         #ifdef DEBUG
         logMsg(LOG_DEBUG, @"enumerating all running processes");
@@ -136,7 +146,7 @@ int main(int argc, const char * argv[])
             //bail
             goto bail;
         }
-            
+        
         //grab user name
         // ->also register callback for user changes
         if(YES != initUserName())
@@ -170,7 +180,8 @@ int main(int argc, const char * argv[])
         
         //run
         CFRunLoopRun();
-    }
+    
+    }//pool
     
 //bail
 bail:
@@ -727,9 +738,6 @@ void* checkForUpdate(void *threadParam)
     //version string
     NSMutableString* versionString = nil;
     
-    //alloc string
-    versionString = [NSMutableString string];
-    
     //user's response
     CFOptionFlags response = 0;
     
@@ -738,6 +746,13 @@ void* checkForUpdate(void *threadParam)
     
     //body for alert
     CFStringRef body = NULL;
+    
+    //pool
+    @autoreleasepool
+    {
+    
+    //alloc string
+    versionString = [NSMutableString string];
     
     //dbg msg
     #ifdef DEBUG
@@ -816,7 +831,11 @@ void* checkForUpdate(void *threadParam)
     
 //bail
 bail:
+        
+    ;
     
+    }//pool
+        
     //bye-bye
     pthread_exit(NULL);
     

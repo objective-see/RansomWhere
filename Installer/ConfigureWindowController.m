@@ -328,6 +328,9 @@ bail:
     //stop/hide spinner
     [self.activityIndicator stopAnimation:nil];
     
+    //hide spinner
+    [self.activityIndicator setHidden:YES];
+    
     //grab exiting frame
     statusMsgFrame = self.statusMsg.frame;
     

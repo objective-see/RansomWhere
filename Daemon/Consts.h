@@ -13,6 +13,12 @@
 // TODO: update with each new release!
 #define DAEMON_VERSION @"1.1.0"
 
+//OS version x
+#define OS_MAJOR_VERSION_X 10
+
+//OS version lion
+#define OS_MINOR_VERSION_LION 8
+
 //product url
 #define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
 

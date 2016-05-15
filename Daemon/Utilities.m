@@ -29,6 +29,120 @@ NSString* getDaemonVersion()
     return DAEMON_VERSION;
 }
 
+//get OS version
+NSDictionary* getOSVersion()
+{
+    //os version info
+    NSMutableDictionary* osVersionInfo = nil;
+    
+    //major v
+    SInt32 majorVersion = 0;
+    
+    //minor v
+    SInt32 minorVersion = 0;
+    
+    //bug fix v
+    SInt32 fixVersion = 0;
+    
+    //alloc dictionary
+    osVersionInfo = [NSMutableDictionary dictionary];
+    
+    //get major version
+    if(STATUS_SUCCESS != Gestalt(gestaltSystemVersionMajor, &majorVersion))
+    {
+        //reset
+        osVersionInfo = nil;
+        
+        //bail
+        goto bail;
+    }
+    
+    //get minor version
+    if(STATUS_SUCCESS != Gestalt(gestaltSystemVersionMinor, &minorVersion))
+    {
+        //reset
+        osVersionInfo = nil;
+        
+        //bail
+        goto bail;
+    }
+    
+    //get bug fix version
+    if(STATUS_SUCCESS != Gestalt(gestaltSystemVersionBugFix, &fixVersion))
+    {
+        //reset
+        osVersionInfo = nil;
+        
+        //bail
+        goto bail;
+    }
+    
+    //set major version
+    osVersionInfo[@"majorVersion"] = [NSNumber numberWithInteger:majorVersion];
+    
+    //set minor version
+    osVersionInfo[@"minorVersion"] = [NSNumber numberWithInteger:minorVersion];
+    
+    //set bug fix version
+    osVersionInfo[@"bugfixVersion"] = [NSNumber numberWithInteger:fixVersion];
+    
+//bail
+bail:
+    
+    return osVersionInfo;
+}
+
+
+//is current OS version supported?
+// ->for now, just OS X 10.10+
+BOOL isSupportedOS()
+{
+    //support flag
+    BOOL isSupported = NO;
+    
+    //OS version info
+    NSDictionary* osVersionInfo = nil;
+    
+    //get OS version info
+    osVersionInfo = getOSVersion();
+    if(nil == osVersionInfo)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
+    
+    //gotta be OS X
+    if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"OS major version %@ not supported", osVersionInfo[@"majorVersion"]]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //gotta be OS X at least lion (10.8)
+    if([osVersionInfo[@"minorVersion"] intValue] < OS_MINOR_VERSION_LION)
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"OS minor version %@ not supported", osVersionInfo[@"minor"]]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //OS version is supported
+    isSupported = YES;
+    
+//bail
+bail:
+    
+    return isSupported;
+}
+
 //determine if there is a new version
 // -1, YES or NO
 BOOL isNewVersion(NSMutableString* versionString)
