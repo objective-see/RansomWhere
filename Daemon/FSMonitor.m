@@ -347,7 +347,7 @@ bail:
             ignore = YES;
             
             //TODO:
-            // ->add bail if more checks are addedd below
+            // ->add bail if more checks are added below
         }
     }
     
@@ -422,8 +422,10 @@ bail:
         argType = (unsigned short*)(char*)(ptrBuffer + *ptrCurrentOffset);
         argLen  = (unsigned short*)(char*)(ptrBuffer + *ptrCurrentOffset + 2);
         
+        //done length is 0x2
         if(*argType == FSE_ARG_DONE)
         {
+            //set length
             arg_len = 0x2;
         }
         else
