@@ -998,36 +998,43 @@ NSDictionary* extractSigningInfo(NSString* path)
     //(re)save signature status
     signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
     
-    //if file is signed
-    // ->grab signing id and signing authorities
-    if(STATUS_SUCCESS == status)
+    //bail if not signed/errors
+    if(STATUS_SUCCESS != status)
     {
-        //grab signing authorities
-        status = SecCodeCopySigningInformation(staticCode, kSecCSDefaultFlags|kSecCSSigningInformation, &signingInformation);
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"starting thread to process all enumerated binaries");
+        #endif
         
-        //sanity check
-        if(STATUS_SUCCESS != status)
-        {
-            //err msg
-            NSLog(@"OBJECTIVE-SEE ERROR: SecCodeCopySigningInformation() failed on %@ with %d", path, status);
-            
-            //bail
-            goto bail;
-        }
+        //bail
+        goto bail;
+    }
+    
+    //grab signing authorities
+    status = SecCodeCopySigningInformation(staticCode, kSecCSDefaultFlags|kSecCSSigningInformation, &signingInformation);
+    
+    //sanity check
+    if(STATUS_SUCCESS != status)
+    {
+        //err msg
+        //NSLog(@"OBJECTIVE-SEE ERROR: SecCodeCopySigningInformation() failed on %@ with %d", path, status);
         
-        //grab signing ID
-        signingStatus[KEY_SIGNATURE_IDENTIFIER] = [(__bridge NSDictionary*)signingInformation objectForKey:(__bridge NSString*)kSecCodeInfoIdentifier];
-        
-        //signed by Apple proper?
-        signingStatus[KEY_SIGNING_IS_APPLE] = [NSNumber numberWithBool:isAppleBinary(path)];
-        
-        //not signed by Apple proper
-        // ->check if from official app store
-        if(YES != [signingStatus[KEY_SIGNING_IS_APPLE] boolValue])
-        {
-            //from app store?
-            signingStatus[KEY_SIGNING_IS_APP_STORE] = [NSNumber numberWithBool:fromAppStore(path)];
-        }
+        //bail
+        goto bail;
+    }
+    
+    //grab signing ID
+    signingStatus[KEY_SIGNATURE_IDENTIFIER] = [(__bridge NSDictionary*)signingInformation objectForKey:(__bridge NSString*)kSecCodeInfoIdentifier];
+    
+    //signed by Apple proper?
+    signingStatus[KEY_SIGNING_IS_APPLE] = [NSNumber numberWithBool:isAppleBinary(path)];
+    
+    //not signed by Apple proper
+    // ->check if from official app store
+    if(YES != [signingStatus[KEY_SIGNING_IS_APPLE] boolValue])
+    {
+        //from app store?
+        signingStatus[KEY_SIGNING_IS_APP_STORE] = [NSNumber numberWithBool:fromAppStore(path)];
     }
     
     //init array for certificate names
@@ -1573,9 +1580,13 @@ BOOL isInWhiteList(NSArray* signingAuths)
     //only init whitelist just once
     dispatch_once(&onceToken,
     ^{
-        
         //load whitelisted apps
         whiteList = loadSet([DAEMON_DEST_FOLDER stringByAppendingPathComponent:WHITE_LIST_FILE]);
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded whitelist %@", whiteList]);
+        #endif
         
     });//only once
     
@@ -1612,9 +1623,13 @@ BOOL isInGrayList(NSString* signingID)
     //only init graylist just once
     dispatch_once(&onceToken,
     ^{
-      
         //load graylisted apps
         grayList = loadSet([DAEMON_DEST_FOLDER stringByAppendingPathComponent:GRAY_LIST_FILE]);
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded graylist %@", grayList]);
+        #endif
       
     });//only once
     

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7D3E408D1CDAF76F002B0997 /* AppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3E408C1CDAF76F002B0997 /* AppReceipt.m */; };
+		7D4701141CF25CEB009B65D5 /* Enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4701131CF25CEB009B65D5 /* Enumerator.m */; };
 		7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD90BCC1CB38B66001D68BB /* Exception.m */; };
 		7DF707EA1CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707E91CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m */; };
 		7DF707F21CAE5B1A00FF79D8 /* chisq.c in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707EC1CAE5B1A00FF79D8 /* chisq.c */; };
@@ -38,6 +39,8 @@
 /* Begin PBXFileReference section */
 		7D3E408B1CDAF76F002B0997 /* AppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppReceipt.h; path = Daemon/AppReceipt.h; sourceTree = "<group>"; };
 		7D3E408C1CDAF76F002B0997 /* AppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppReceipt.m; path = Daemon/AppReceipt.m; sourceTree = "<group>"; };
+		7D4701121CF25CEB009B65D5 /* Enumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Enumerator.h; path = Daemon/Enumerator.h; sourceTree = "<group>"; };
+		7D4701131CF25CEB009B65D5 /* Enumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Enumerator.m; path = Daemon/Enumerator.m; sourceTree = "<group>"; };
 		7DD90BCC1CB38B66001D68BB /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = Shared/Exception.m; sourceTree = "<group>"; };
 		7DD90BCD1CB38B66001D68BB /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = Shared/Exception.h; sourceTree = "<group>"; };
 		7DF707E81CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+QueueAdditions.h"; path = "Daemon/3rdParty/NSMutableArray+QueueAdditions.h"; sourceTree = "<group>"; };
@@ -116,6 +119,8 @@
 		CDBC2B3B1C9EEF5300853C8A = {
 			isa = PBXGroup;
 			children = (
+				7D4701121CF25CEB009B65D5 /* Enumerator.h */,
+				7D4701131CF25CEB009B65D5 /* Enumerator.m */,
 				7D3E408B1CDAF76F002B0997 /* AppReceipt.h */,
 				7D3E408C1CDAF76F002B0997 /* AppReceipt.m */,
 				7DF708171CB0BBE700FF79D8 /* Binary.m */,
@@ -215,6 +220,7 @@
 				7DF708021CAE5B7500FF79D8 /* main.m in Sources */,
 				7DF708041CAE5B7500FF79D8 /* Utilities.m in Sources */,
 				7DF707F41CAE5B1A00FF79D8 /* iso8859.c in Sources */,
+				7D4701141CF25CEB009B65D5 /* Enumerator.m in Sources */,
 				7D3E408D1CDAF76F002B0997 /* AppReceipt.m in Sources */,
 				7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */,
 			);

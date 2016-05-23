@@ -14,16 +14,16 @@
 #import "main.h"
 #import "Queue.h"
 #import "Consts.h"
-#import "Logging.h"
 #import "Binary.h"
+#import "Logging.h"
 #import "Exception.h"
 #import "Utilities.h"
 #import "FSMonitor.h"
+#import "Enumerator.h"
 #import "3rdParty/ent/ent.h"
 
-//global list of binary objects
-// ->running/installed/user approved apps
-NSMutableDictionary* binaryList = nil;
+//global enumerator object
+Enumerator* enumerator = nil;
 
 //global current user
 CFStringRef consoleUserName = NULL;
@@ -43,7 +43,7 @@ int main(int argc, const char * argv[])
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"daemon instance started!");
+        logMsg(LOG_DEBUG, @"daemon started!");
         #endif
         
         //sanity check
@@ -85,9 +85,6 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
-        //alloc global dictionary for binary list
-        binaryList = [NSMutableDictionary dictionary];
-        
         //init paths
         // ->this logic will only be needed if daemon is executed from non-standard location (i.e. debugger)
         if(YES != initPaths())
@@ -99,53 +96,26 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerating all installed applications, to baseline system");
-        #endif
-        
-        //create binary objects for all baselined app
-        // ->first time; generate list from OS (this might take a while)
-        if(YES != processBaselinedApps())
-        {
-            //err msg
-            // ->but don't bail
-            logMsg(LOG_ERR, @"failed to enumerate/process baselined apps");
-            
-            //bail
-            //goto bail;
-        }
+        //init enumerator
+        enumerator = [[Enumerator alloc] init];
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerating all 'user-approved' applications");
+        logMsg(LOG_DEBUG, @"enumerating all baselined/approved/running binaries");
         #endif
+
+        //enumerate all baselined/approved/running binaries
+        // ->adds/classfies them into bins2Process dictionary
+        [enumerator enumerateBinaries];
         
-        //create binary objects for all (persistent) user-approved binaries
-        if(YES != processApprovedBins())
-        {
-            //err msg
-            // ->but don't bail
-            logMsg(LOG_ERR, @"failed to enumerate/process user-approved apps");
-            
-            //bail
-            //goto bail;
-        }
-    
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerating all running processes");
+        logMsg(LOG_DEBUG, @"starting thread to process all enumerated binaries");
         #endif
         
-        //create binary objects for all currently running processes
-        if(YES != processRunningProcs())
-        {
-            //err msg
-            logMsg(LOG_ERR, @"failed to enumerate running processing");
-            
-            //bail
-            goto bail;
-        }
+        //process all enumerated binaries/apps and stuff in background
+        // ->takes time and is CPU intensive, but want to start monitoring ASAP
+        [NSThread detachNewThreadSelector:@selector(processBinaries) toTarget:enumerator withObject:nil];
         
         //grab user name
         // ->also register callback for user changes
@@ -336,244 +306,6 @@ bail:
     return pathsInitd;
 }
 
-//load list of apps installed at time of baseline
-// ->first time; generate them (this might take a while)
-BOOL processBaselinedApps()
-{
-    //flag
-    BOOL wereProcessed = NO;
-    
-    //list of installed apps
-    NSMutableArray* installedApps = nil;
-
-    //path to prev. saved list of installed apps
-    NSString* installedAppsFile = nil;
-    
-    //binary object
-    Binary* binary = nil;
-    
-    //init path to save list of installed apps
-    installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
-    
-    //enumerate apps if necessary
-    // ->done via system_profiler, w/ 'SPApplicationsDataType' flag (slow!)
-    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
-    {
-        //enumerate
-        installedApps = enumerateInstalledApps();
-        if( (nil == installedApps) ||
-            (0 == installedApps.count) )
-        {
-            //err msg
-            logMsg(LOG_ERR, @"failed to enumerate installed apps");
-            
-            //bail
-            goto bail;
-        }
-        
-        //save to disk
-        if(YES != [installedApps writeToFile:installedAppsFile atomically:NO])
-        {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save installed apps to %@", installedAppsFile]);
-            
-            //bail
-            goto bail;
-        }
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saved list of installed apps to %@", installedAppsFile]);
-        #endif
-    }
-    
-    //already enumerated
-    // ->load them from disk into memory
-    else
-    {
-        //load
-        installedApps = [NSMutableArray arrayWithContentsOfFile:installedAppsFile];
-        if(nil == installedApps)
-        {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to load installed apps from %@", installedAppsFile]);
-            
-            //bail
-            goto bail;
-        }
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded list of installed apps from %@", installedAppsFile]);
-        #endif
-    }
-    
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"processing %lu installed applications", (unsigned long)installedApps.count]);
-    #endif
-    
-    //iterate overall all installed apps
-    // ->create binary objects for all, passing in 'baselined' flag
-    for(NSString* appPath in installedApps)
-    {
-        //init binary object
-        binary = [[Binary alloc] init:appPath attributes:@{@"baselined":[NSNumber numberWithBool:YES]}];
-        
-        //nap to reduce CPU warnings/usage
-        [NSThread sleepForTimeInterval:0.05];
-        
-        //add to global list
-        // ->path is key; object is value
-        binaryList[binary.path] = binary;
-    }
-    
-    //happy
-    wereProcessed = YES;
-    
-//bail
-bail:
-    
-    return wereProcessed;
-}
-
-//create binary objects for all (persistent) user-approved binaries
-BOOL processApprovedBins()
-{
-    //flag
-    BOOL wereProcessed = NO;
-    
-    //file for user approved bins
-    NSString* approvedBinsFile = nil;
-    
-    //array for approved bins
-    NSMutableArray* userApprovedBins = nil;
-    
-    //binary object
-    Binary* binary = nil;
-    
-    //init path for where to save user approved binaries
-    approvedBinsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_BINARIES];
-    
-    //bail if file doesn't exist yet
-    // ->for example, first time daemon is run
-    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:approvedBinsFile])
-    {
-        //not an error though!
-        wereProcessed = YES;
-        
-        //bail
-        goto bail;
-    }
-    
-    //load from disk
-    userApprovedBins = [NSMutableArray arrayWithContentsOfFile:approvedBinsFile];
-    if(nil == userApprovedBins)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to loaded user approved binaries from %@", approvedBinsFile]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"loaded list of user approved binaries from %@", approvedBinsFile]);
-    #endif
-    
-    //iterate overall all approved binaries
-    // ->create binary objects for all, passing in 'approved' flag
-    for(NSString* binaryPath in userApprovedBins)
-    {
-        //init binary object
-        binary = [[Binary alloc] init:binaryPath attributes:@{@"approved":[NSNumber numberWithBool:YES]}];
-        
-        //add to global list
-        // ->path is key; object is value
-        binaryList[binary.path] = binary;
-    }
-    
-    //happy
-    wereProcessed = YES;
-    
-//bail
-bail:
-    
-    return wereProcessed;
-}
-
-//create binary objects for all currently running processes
-BOOL processRunningProcs()
-{
-    //flag
-    BOOL wereProcessed = NO;
-    
-    //running processes
-    NSMutableArray* runningProcesses = nil;
-    
-    //process path
-    NSString* processPath = nil;
-    
-    //binary object
-    Binary* binary = nil;
-    
-    //enumerate all running processes
-    runningProcesses = enumerateProcesses();
-    if( (nil == runningProcesses) ||
-        (0 == runningProcesses.count) )
-    {
-        //err msg
-        logMsg(LOG_ERR, @"failed to enumerate running processes");
-        
-        //bail
-        goto bail;
-    }
-    
-    //iterate over all running processes
-    // ->create binary objs & save into global list
-    for(NSNumber* processID in runningProcesses)
-    {
-        //get process path from pid
-        processPath = getProcessPath(processID.unsignedIntValue);
-        if(nil == processPath)
-        {
-            //skip
-            continue;
-        }
-        
-        //skip existing binary objects
-        // ->since existings ones will be baselined/approved, so don't want to overwrite
-        if(nil != binaryList[processPath])
-        {
-            //skip
-            continue;
-        }
-        
-        //init binary object
-        binary = [[Binary alloc] init:processPath attributes:@{@"processID":processID}];
-        if(nil == binary)
-        {
-            //skip
-            continue;
-        }
-        
-        //add to global list
-        // ->path is key; object is value
-        binaryList[binary.path] = binary;
-        
-        //nap to reduce CPU warnings/usage
-        [NSThread sleepForTimeInterval:0.05];
-    }
-    
-    //happy
-    wereProcessed = YES;
-    
-//bail
-bail:
-    
-    return wereProcessed;
-}
 
 //grab current user
 // ->note: NULL is returned if none, or user is 'loginwindow'

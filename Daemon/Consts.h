@@ -114,5 +114,14 @@
 //from app store
 #define KEY_SIGNING_IS_APP_STORE @"fromAppStore"
 
+//key for baselined binaries
+#define KEY_BASELINED_BINARY @"baselined"
+
+//key for user-approved binaries
+#define KEY_APPROVED_BINARY @"approved"
+
+//key for running binaries
+#define KEY_RUNNING_BINARY @"running"
+
 
 #endif /* Consts_h */

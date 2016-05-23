@@ -9,6 +9,8 @@
 #ifndef main_h
 #define main_h
 
+#import "Enumerator.h"
+
 #import <Foundation/Foundation.h>
 
 /* GLOBALS */
@@ -16,8 +18,8 @@
 //global current user
 extern CFStringRef consoleUserName;
 
-//global list of binary objects
-extern NSMutableDictionary* binaryList;
+//global enumerator object
+extern Enumerator* enumerator;
 
 /* FUNCTIONS */
 
@@ -27,6 +29,10 @@ BOOL reset();
 //init paths
 // ->this logic will only be needed if daemon is executed from non-standard location
 BOOL initPaths();
+
+//process baselined apps, approved bins, & running procs
+// ->takes time and is CPU intensive, but want to start monitoring ASAP
+void* processBinaries(void *threadParam);
 
 //create binary objects for all baselined app
 // ->first time; generate list from OS (this might take a while)

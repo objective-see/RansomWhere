@@ -57,7 +57,7 @@ NSUInteger execTask(NSString* path, NSArray* arguments)
     taskStatus = [task terminationStatus];
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"task exited with %lu", (unsigned long)taskStatus]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"task (%@) exited with %lu", path, (unsigned long)taskStatus]);
 
 //bail
 bail:

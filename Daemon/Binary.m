@@ -6,11 +6,13 @@
 //  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
+#import "main.h"
 #import "Consts.h"
 #import "Binary.h"
-#import "FSMonitor.h"
 #import "Logging.h"
+#import "FSMonitor.h"
 #import "Utilities.h"
+#import "Enumerator.h"
 
 @implementation Binary
 
@@ -35,11 +37,29 @@
         // ->note: always called with path
         self.path = binaryPath;
         
-        //save 'baseline' flag
-        self.isBaseline = [[attributes objectForKey:@"baselined"] boolValue];
+        //binaries from FS monitor have nil attributes
+        // ->but process might be baselined/approved, just not processed yet
+        if( (nil == attributes) &&
+            (YES != enumerator.processingComplete) )
+        {
+            //save 'baseline' flag
+            self.isBaseline = [enumerator.bins2Process[KEY_BASELINED_BINARY] containsObject:binaryPath];
+            
+            //save 'approved' flag
+            self.isApproved = [enumerator.bins2Process[KEY_APPROVED_BINARY] containsObject:binaryPath];
+        X
+        }
         
-        //save 'approved' flag
-        self.isApproved = [[attributes objectForKey:@"approved"] boolValue];
+        //grab values
+        // ->if not specified, will just get set to 'NO'
+        else
+        {
+            //save 'baseline' flag
+            self.isBaseline = [[attributes objectForKey:KEY_BASELINED_BINARY] boolValue];
+            
+            //save 'approved' flag
+            self.isApproved = [[attributes objectForKey:KEY_APPROVED_BINARY] boolValue];
+        }
         
         //extract signing info (do this first!)
         // ->from Apple, App Store, signing authorities, etc
@@ -80,7 +100,7 @@
 -(NSString *)description
 {
     //pretty print
-    return [NSString stringWithFormat: @"path=%@ (isApple: %d / isAppStore: %d / isBaseline: %d / isApproved: %d / isWhiteListed: %d / isGrayListed: %d)", self.path, self.isApple, self.isAppStore, self.isBaseline, self.isApproved, self.isWhiteListed, self.isGrayListed];
+    return [NSString stringWithFormat: @"path=%@ (isApple: %d / isAppStore: %d / isBaseline: %d / isApproved: %d / isWhiteListed: %d / isGrayListed: %d / signing info:%@)", self.path, self.isApple, self.isAppStore, self.isBaseline, self.isApproved, self.isWhiteListed, self.isGrayListed, self.signingInfo];
 }
 
 @end

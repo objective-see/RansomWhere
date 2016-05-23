@@ -164,6 +164,7 @@
             //skip same path
             if(YES == [path isEqualToString:lastPath])
             {
+                //dbg msg
                 #ifdef DEBUG
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"skipping event, as its same as last (%@)", path]);
                 #endif
@@ -262,6 +263,7 @@ bail:
     //process path
     NSString* processPath = nil;
     
+    //TODO: remove? is proc_pidpath that slow?
     //check if there is a valid ('cached') pid->path mapping
     // ->will be for recent existing procs (for now, 60 seconds)
     pidProcMapping = [self.pidPathMappings objectForKey:[NSNumber numberWithUnsignedInt:pid]];
@@ -287,23 +289,37 @@ bail:
         [self.pidPathMappings setObject:@{@"timestamp": [NSDate date], @"path": processPath} forKey:[NSNumber numberWithUnsignedInt:pid]];
     }
     
-    //see if there's an existing process object
-    // ->if so, all set, so can bail to return binary to caller
-    binary = binaryList[processPath];
-    if(nil != binary)
+    //sync to check
+    @synchronized(enumerator.binaryList)
     {
-        //all set
-        goto bail;
+        //see if there's an existing process object
+        // ->if so, all set, so can bail to return binary to caller
+        binary = enumerator.binaryList[processPath];
+        if(nil != binary)
+        {
+            //all set
+            goto bail;
+        }
     }
-   
+
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ (%d) is new binary, will create", processPath, pid]);
+    #endif
+    
     //create binary object
+    // ->this is kinda slow so don't do in a @sync
     binary = [[Binary alloc] init:processPath attributes:nil];
     
     //sync to add
-    @synchronized(binaryList)
+    @synchronized(enumerator.binaryList)
     {
-        //add
-        binaryList[binary.path] = binary;
+        //still nil?
+        if(nil == enumerator.binaryList[processPath])
+        {
+            //add
+            enumerator.binaryList[processPath] = binary;
+        }
     }
     
 //bail
@@ -346,8 +362,7 @@ bail:
             // ->good enough match for now, so ignore
             ignore = YES;
             
-            //TODO:
-            // ->add bail if more checks are added below
+            //TODO: add bail if more checks are added below
         }
     }
     
