@@ -128,12 +128,6 @@ int main(int argc, const char * argv[])
             goto bail;
         }
     
-        //priority++
-        setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
-        
-        //io policy++
-        setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_IMPORTANT);
-        
         //msg
         // ->always print
         syslog(LOG_ERR, "OBJECTIVE-SEE RANSOMWHERE?: completed initializations; monitoring engaged!\n");

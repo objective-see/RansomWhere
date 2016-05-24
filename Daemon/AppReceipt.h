@@ -1,6 +1,6 @@
 //
 //  AppReceipt.h
-//  fromAppStore
+//  RansomWhere?
 //
 //  Created by Patrick Wardle on 5/1/16.
 //

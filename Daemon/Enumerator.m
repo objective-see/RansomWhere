@@ -93,11 +93,58 @@
     
     //lower priority
     // 0.0 is the lowest
-    [NSThread setThreadPriority:0.1];
+    [NSThread setThreadPriority:0.0];
+    
+    //process running binaries first
+    // ->ideally will mean less binary 'misses' in FS monitor
+    for(NSString* binaryPath in self.bins2Process[KEY_RUNNING_BINARY])
+    {
+        //sync
+        @synchronized(self.binaryList)
+        {
+            //check if already created
+            // ->FS monitor might have already processed (new) binary
+            if(nil != self.binaryList[binaryPath])
+            {
+                //skip
+                continue;
+            }
+        }
+        
+        //init binary object
+        // ->pass in nil for attributes to trigger lookup (approved/baseline) logic
+        binary = [[Binary alloc] init:binaryPath attributes:nil];
+        
+        //nap to reduce CPU warnings/usage
+        [NSThread sleepForTimeInterval:0.25];
+        
+        //sync
+        @synchronized(self.binaryList)
+        {
+            //add to global list
+            // ->path is key; object is value
+            self.binaryList[binary.path] = binary;
+        }
+        
+    }//running processes
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"done processing running binaries");
+    #endif
     
     //enumerate all keys
+    // ->process baselined/approved keys
     for(NSString* key in self.bins2Process)
     {
+        //skip running apps
+        // ->already processed (above)
+        if(YES == [key isEqualToString:KEY_RUNNING_BINARY])
+        {
+            //skip
+            continue;
+        }
+        
         //generate binary objects for enumerated binaries
         for(NSString* binaryPath in self.bins2Process[key])
         {
@@ -114,10 +161,11 @@
             }
             
             //init binary object
-            binary = [[Binary alloc] init:binaryPath attributes:@{KEY_BASELINED_BINARY:[NSNumber numberWithBool:YES]}];
+            // ->key passes in attributes (KEY_BASELINED_BINARY, etc)
+            binary = [[Binary alloc] init:binaryPath attributes:@{key:[NSNumber numberWithBool:YES]}];
             
             //nap to reduce CPU warnings/usage
-            [NSThread sleepForTimeInterval:0.25];
+            [NSThread sleepForTimeInterval:1.0];
             
             //sync
             @synchronized (self.binaryList)
@@ -133,6 +181,12 @@
 
     //set flag
     self.processingComplete = YES;
+    
+    //priority++
+    setpriority(PRIO_PROCESS, getpid(), PRIO_MIN+1);
+    
+    //io policy++
+    setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_IMPORTANT);
     
     //dbg msg
     #ifdef DEBUG
@@ -321,15 +375,6 @@ bail:
             continue;
         }
     
-        //skip existing binary objects
-        // ->since existings ones will be baselined/approved, so don't want to overwrite
-        if( (YES == [self.bins2Process[KEY_BASELINED_BINARY] containsObject:processPath]) ||
-            (YES == [self.bins2Process[KEY_APPROVED_BINARY] containsObject:processPath]))
-        {
-            //skip
-            continue;
-        }
-        
         //save into list for binares to process
         [self.bins2Process[KEY_RUNNING_BINARY] addObject:processPath];
     }

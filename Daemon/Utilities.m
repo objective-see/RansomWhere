@@ -431,6 +431,9 @@ NSMutableArray* enumerateInternalApps(NSString* parentApp)
     //app binary
     NSString* appBinary = nil;
     
+    //count
+    NSUInteger count = 0;
+    
     //alloc
     internalApps = [NSMutableArray array];
     
@@ -451,6 +454,13 @@ NSMutableArray* enumerateInternalApps(NSString* parentApp)
             //all done
             break;
         }
+            
+        //nap to reduce CPU warnings/usage
+        if(0 == count++ % 1024)
+        {
+            //nap
+            [NSThread sleepForTimeInterval:0.05];
+        }
         
         //create full path
         fullPath = [parentApp stringByAppendingPathComponent:currentFile];
@@ -462,7 +472,7 @@ NSMutableArray* enumerateInternalApps(NSString* parentApp)
             //ignore
             continue;
         }
-        
+            
         //get app's binary
         appBinary = findAppBinary(fullPath);
         if(nil == appBinary)
@@ -651,9 +661,6 @@ BOOL isAppleBinary(NSString* path)
     status = SecStaticCodeCreateWithPath((__bridge CFURLRef)([NSURL fileURLWithPath:path]), kSecCSDefaultFlags, &staticCode);
     if(STATUS_SUCCESS != status)
     {
-        //err msg
-        syslog(LOG_ERR, "OBJECTIVE-SEE ERROR: SecStaticCodeCreateWithPath() failed on %s with %d", [path UTF8String], status);
-        
         //bail
         goto bail;
     }
@@ -664,8 +671,10 @@ BOOL isAppleBinary(NSString* path)
     if( (STATUS_SUCCESS != status) ||
         (requirementRef == NULL) )
     {
-        //err msg
-        syslog(LOG_ERR, "OBJECTIVE-SEE ERROR: SecRequirementCreateWithString() failed on %s with %d", [path UTF8String], status);
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"SecRequirementCreateWithString(%@) failed with %d\n", path, status]);
+        #endif
         
         //bail
         goto bail;
@@ -988,9 +997,15 @@ NSDictionary* extractSigningInfo(NSString* path)
     
     //create static code
     status = SecStaticCodeCreateWithPath((__bridge CFURLRef)([NSURL fileURLWithPath:path]), kSecCSDefaultFlags, &staticCode);
-    
-    //save signature status
-    signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
+    if( (NULL == staticCode) ||
+        (STATUS_SUCCESS != status) )
+    {
+        //save signature status
+        signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
+        
+        //bail
+        goto bail;
+    }
     
     //check signature
     status = SecStaticCodeCheckValidity(staticCode, csFlags, NULL);
@@ -1003,7 +1018,7 @@ NSDictionary* extractSigningInfo(NSString* path)
     {
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"starting thread to process all enumerated binaries");
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"SecStaticCodeCheckValidity(%@) failed with %d\n", path, status]);
         #endif
         
         //bail
@@ -1013,6 +1028,9 @@ NSDictionary* extractSigningInfo(NSString* path)
     //grab signing authorities
     status = SecCodeCopySigningInformation(staticCode, kSecCSDefaultFlags|kSecCSSigningInformation, &signingInformation);
     
+    //(re)save signature status
+    signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
+                           
     //sanity check
     if(STATUS_SUCCESS != status)
     {
@@ -1122,6 +1140,16 @@ BOOL fromAppStore(NSString* path)
         //bail
         goto bail;
     }
+    
+    //bail if it doesn't have an receipt
+    // ->done here, since checking signature is expensive!
+    if( (nil == appBundle.appStoreReceiptURL) ||
+        (YES != [[NSFileManager defaultManager] fileExistsAtPath:appBundle.appStoreReceiptURL.path]) )
+    {
+        //bail
+        goto bail;
+    }
+    
     
     //first make sure its signed with an Apple Dev ID
     if(YES != isSignedDevID(path))

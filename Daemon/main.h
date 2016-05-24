@@ -30,20 +30,6 @@ BOOL reset();
 // ->this logic will only be needed if daemon is executed from non-standard location
 BOOL initPaths();
 
-//process baselined apps, approved bins, & running procs
-// ->takes time and is CPU intensive, but want to start monitoring ASAP
-void* processBinaries(void *threadParam);
-
-//create binary objects for all baselined app
-// ->first time; generate list from OS (this might take a while)
-BOOL processBaselinedApps();
-
-//create binary objects for all (persistent) user-approved binaries
-BOOL processApprovedBins();
-
-//create binary objects for all currently running processes
-BOOL processRunningProcs();
-
 //get current user
 // ->then, setup callback for changes
 BOOL initUserName();

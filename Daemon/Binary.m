@@ -47,7 +47,6 @@
             
             //save 'approved' flag
             self.isApproved = [enumerator.bins2Process[KEY_APPROVED_BINARY] containsObject:binaryPath];
-        X
         }
         
         //grab values
@@ -73,16 +72,17 @@
             self.isApple = [self.signingInfo[KEY_SIGNING_IS_APPLE] boolValue];
         
             //when not Apple proper
-            // ->set flag for from official App Store
+            // ->check flag for from official App Store or is whitelisted
             if(YES != isApple)
             {
                 //set flag
                 self.isAppStore = [self.signingInfo[KEY_SIGNING_IS_APP_STORE] boolValue];
+                
+                //set flag if its whitelisted (via signing auths)
+                // ->apple's bins aren't in whitelist.plist)
+                self.isWhiteListed = isInWhiteList(self.signingInfo[KEY_SIGNING_AUTHORITIES]);
             }
         
-            //set flag if its whitelisted (via signing auths)
-            self.isWhiteListed = isInWhiteList(self.signingInfo[KEY_SIGNING_AUTHORITIES]);
-            
             //only can be gray, if not white!
             if(YES != self.isWhiteListed)
             {
