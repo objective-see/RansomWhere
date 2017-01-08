@@ -17,26 +17,15 @@
 
 /* PROPERTIES */
 
-//list of installed launch agents
-// ->during upgrade, want to upgrade all
-@property NSMutableArray* installedLaunchAgents;
-
-//flag indicating core (daemon) should be started
-@property BOOL shouldStartDaemon;
 
 /* METHODS */
 
+//class method
+// ->check if already installed (launch agent)
++(BOOL)isInstalled;
+
 //main install method
 -(BOOL)install;
-
-//check if any component is installed
--(NSUInteger)installState;
-
-//get list of all users its installed for 
--(NSMutableArray*)allInstalledUsers;
-
-//install launch agent
--(BOOL)installLaunchAgent:(NSMutableArray*)installedUsers isUpgrade:(BOOL)isAnUpgrade;
 
 //install launch daemon
 -(BOOL)installLaunchDaemon;
@@ -45,8 +34,19 @@
 // ->copy kext (bundle) to /Library/Extensions and set permissions
 -(BOOL)installKext;
 
-//check if install is to a newer version
--(BOOL)isUpgrade;
+//install launch agent
+-(BOOL)installLaunchAgent:(NSMutableArray*)installedUsers;
+
+//create install dir
+// -> /Library/BlockBlock
+-(BOOL)createInstallDirectory:(NSString*)directory;
+
+//copy binary into install directory
+-(BOOL)installBinary:(NSString*)path;
+
+//launch agent can be installed for other users
+// ->so iterate over all users and save any existing launch agent paths
+-(NSMutableArray*)existingLaunchAgents;
 
 //load the template launch item plist
 -(NSMutableDictionary*)loadLaunchItemPlist;

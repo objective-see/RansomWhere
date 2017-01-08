@@ -161,7 +161,6 @@ bail:
     //dbg msg
     //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"registered plugins: %@", self.plugins]);
 
-    
     //dbg msg
     //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"plugin mappings: %@", self.pluginMappings]);
     
@@ -217,7 +216,7 @@ bail:
             else if(YES == [path hasSuffix:@"~"])
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path wiht ~ at end: %@", path]);
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path with ~ at end: %@", path]);
                 
                 //expand all
                 for(NSNumber* key in registeredAgents)
@@ -249,7 +248,7 @@ bail:
 
 //TODO: close/kill thread on exit/disable?!?
 //have to use fsevents directly since the FSEvents Framework doesn't give us the pID of the creator :/
-//note: http://www.opensource.apple.com/source/xnu/xnu-2782.1.97/bsd/vfs/vfs_fsevents.c "Using /dev/fsevents directly is unsupported." - can ignore this warning
+// note: http://www.opensource.apple.com/source/xnu/xnu-2782.1.97/bsd/vfs/vfs_fsevents.c "Using /dev/fsevents directly is unsupported." - can ignore this warning
 -(void)startWatch:(id)threadParam
 {
     //file handle
@@ -327,7 +326,7 @@ bail:
     
     //set depth
     // ->bumped this since events were being dropped
-    clonedArgs.event_queue_depth = 10000;
+    clonedArgs.event_queue_depth = 4096;
     
     //set list
     clonedArgs.event_list = events;
@@ -345,7 +344,7 @@ bail:
         goto bail;
     }
     
-    //We no longer need original..
+    //no longer need original...
     close(fsed);
     
     //monitor forever
@@ -494,6 +493,9 @@ bail:
     //grab global process list
     processList = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList;
     
+    //dbg msg
+    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process list %@", [processList description]]);
+    
     //get process path
     // ->will fail if process exited (this is handled in 'else' clause below)
     if(0 != proc_pidpath(fsEvent->pid, pidPath, PROC_PIDPATHINFO_MAXSIZE))
@@ -593,7 +595,7 @@ bail:
         if(nil == watchEvent.process)
         {
             //dbg msg
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find process (%d) in %@", fsEvent->pid, [processList description]]);
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find process (%d)", fsEvent->pid]);
             
             //create process object
             watchEvent.process = [[Process alloc] initWithPid:fsEvent->pid infoDictionary:@{@"ppid": [NSNumber numberWithInt:parentID]}];

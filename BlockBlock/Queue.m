@@ -64,6 +64,9 @@
     // ->this var is just for convience/shorthand
     NSMutableDictionary* reportedWatchEvents = nil;
     
+    //flag
+    BOOL whiteListed = YES;
+    
     //init
     // ->grab global
     reportedWatchEvents = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).reportedWatchEvents;
@@ -76,6 +79,9 @@
             
         //always reset this var
         previousWatchEvent = nil;
+            
+        //reset flag
+        whiteListed = NO;
             
         //lock
         [self.queueCondition lock];
@@ -93,14 +99,49 @@
         //unlock
         [self.queueCondition unlock];
             
-        //check if new event is related to last one
+        //1ST
+        // ->check if its whitelisted
+        for(NSMutableDictionary* whitelistedEvent in ((AppDelegate*)[[NSApplication sharedApplication] delegate]).whiteList)
+        {
+            //check for match
+            if(YES == [currentWatchEvent matchesWhiteListed:whitelistedEvent])
+            {
+                //dbg msg
+                logMsg(LOG_DEBUG, @"automatically allowing whitelisted event");
+                
+                //set flag
+                whiteListed = YES;
+                
+                //automatically allow it
+                // ->plugins will be same
+                [currentWatchEvent.plugin allow:currentWatchEvent];
+                
+                //bail from loop
+                break;
+            }
+        }
+            
+        //handled?
+        if(YES == whiteListed)
+        {
+            //loop to process next event
+            continue;
+        }
+            
+        //2ND:
+        // ->check if new event is related to last one
         if(YES == [lastWatchEvent isRelated:currentWatchEvent])
         {
+            //dbg msg
+            logMsg(LOG_DEBUG, @"is a related event");
+
             //set
             previousWatchEvent = lastWatchEvent;
         }
-        //also check if new event matches a 'remembered' one
-        else
+            
+        //3RD:
+        // ->check if new event matches a 'remembered' one
+        if(nil == previousWatchEvent)
         {
             //iterated over all 'remembered' watch events
             // ->check if current watch event matches any
@@ -109,6 +150,9 @@
                 //check for match
                 if(YES == [currentWatchEvent matchesRemembered:rememberedWatchEvent])
                 {
+                    //dbg msg
+                    logMsg(LOG_DEBUG, @"is a remembered event");
+                    
                     //got match
                     // ->save
                     previousWatchEvent = rememberedWatchEvent;
@@ -124,15 +168,15 @@
         if(nil != previousWatchEvent)
         {
             //dbg msg
-            logMsg(LOG_DEBUG, @"watch event is RELATED || 'REMEMBERED'");
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"event is related/remembered: %@ %@ (%@ -> %@)", currentWatchEvent.process.path, currentWatchEvent.plugin.alertMsg, currentWatchEvent.path, currentWatchEvent.itemObject]);
             
             //prev. event one was blocked
             // ->block this one too
             if(YES == previousWatchEvent.wasBlocked)
             {
                 //dbg msg
-                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"automatically blocking related/remembered event: %@ %@ (%@ -> %@)", currentWatchEvent.process.path, currentWatchEvent.plugin.alertMsg, currentWatchEvent.path, currentWatchEvent.itemObject]);
-            
+                logMsg(LOG_DEBUG, @"automatically blocking related/remembered event");
+                
                 //automatically block it
                 // ->plugins will be same
                 [lastWatchEvent.plugin block:currentWatchEvent];
@@ -147,12 +191,12 @@
                 //automatically allow it
                 // ->plugins will be same
                 [lastWatchEvent.plugin allow:currentWatchEvent];
-
             }
             
         }//related/'remembered' event
     
-        //its new/unrelated
+        //it's new
+        // ->and not whitelisted, related, nor remembered
         else
         {
             //dbg msg
@@ -183,6 +227,7 @@
                     [self pruneWatchEvents:reportedWatchEvents];
                 }
             }
+            
             //since current watch event was handled
             // ->save to check if event is related
             lastWatchEvent = currentWatchEvent;

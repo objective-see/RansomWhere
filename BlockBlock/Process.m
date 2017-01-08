@@ -208,7 +208,7 @@
     else
     {
         //dbg msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to extract UID for process: %d (%d/%zu)", self.pid, sysctlResult, procBufferSize]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to extract UID for process: %d (%d/%zu)", self.pid, sysctlResult, procBufferSize]);
         
         //try (again) via global process list
         // ->really need UID to tell what session alert is for!
@@ -257,7 +257,7 @@
 -(NSString *)description
 {
     //pretty print
-    return [NSString stringWithFormat: @"pid:%d ppid=%d name=%@ path=%@, bundle=%@", self.pid, self.ppid, self.name, self.path, self.bundle];
+    return [NSString stringWithFormat: @"pid:%d ppid=%d name=%@ path=%@", self.pid, self.ppid, self.name, self.path];
 }
 
 //get an icon for a process

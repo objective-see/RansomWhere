@@ -747,6 +747,9 @@ bail:
     // ->this var is just for convience/shorthand
     NSMutableDictionary* reportedWatchEvents = nil;
     
+    //white-listed object
+    NSMutableDictionary* whiteListEvent = nil;
+    
     //grab alert selection
     alertSelection = notification.userInfo;
     
@@ -791,6 +794,32 @@ bail:
         {
             //save
             [((NSMutableArray*)((AppDelegate*)[[NSApplication sharedApplication] delegate]).rememberedWatchEvents) addObject:reportedWatchEvent];
+            
+            //if it's an 'allow'
+            // ->persist it to disk as a 'white-listed' item
+            if(ALLOW_WATCH_EVENT == [alertSelection[@"action"] integerValue])
+            {
+                //init
+                whiteListEvent = [NSMutableDictionary dictionary];
+                
+                //add process path
+                whiteListEvent[@"processPath"] = reportedWatchEvent.process.path;
+                
+                //add process path
+                whiteListEvent[@"itemPath"] = reportedWatchEvent.path;
+                
+                //add process path
+                whiteListEvent[@"itemObject"] = reportedWatchEvent.itemObject;
+                
+                //add to whitelist
+                [((NSMutableArray*)((AppDelegate*)[[NSApplication sharedApplication] delegate]).whiteList) addObject:whiteListEvent];
+                
+                ////save to disk
+                [((NSMutableArray*)((AppDelegate*)[[NSApplication sharedApplication] delegate]).whiteList) writeToFile:[INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE] atomically:YES];
+                
+                //dbg msg
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updated whitelist'd event (%@)", [INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE]]);
+            }
         }
         
         //invoke plugin to block

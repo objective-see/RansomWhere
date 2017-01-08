@@ -25,6 +25,7 @@
 
 @synthesize watcher;
 @synthesize orginals;
+@synthesize whiteList;
 @synthesize controlObj;
 @synthesize eventQueue;
 @synthesize interProcComms;
@@ -36,10 +37,10 @@
 @synthesize rememberedWatchEvents;
 @synthesize statusBarMenuController;
 
+
 //for testing
 //@synthesize alertWindowController;
 
-//TODO: signature status in alert! (signed, etc)
 
 //automatically invoked when app is loaded
 // ->parse args to determine what action to take
@@ -135,7 +136,7 @@
         
         //display configure window w/ 'install' button
         // ->if user clicks 'install', install logic will begin
-        [self displayConfigureWindow:[NSString stringWithFormat:@"Install BLOCKBLOCK (v. %@)", getVersion(VERSION_INSTANCE_SELF)] action:ACTION_INSTALL_FLAG];
+        [self displayConfigureWindow];
     }
     
     //otherwise handle action
@@ -144,7 +145,8 @@
     {
         //INSTALL (auth'd)
         // ->install, then start both launch daemon && agent
-        if(YES == [arguments[1] isEqualToString:ACTION_INSTALL])
+        if( (YES == [arguments[1] isEqualToString:ACTION_INSTALL]) ||
+            (YES == [arguments[1] isEqualToString:CMD_INSTALL]) )
         {
             //installer should always exit (at end of this function)
             shouldExit = YES;
@@ -170,7 +172,7 @@
             installObj = [[Install alloc] init];
             
             //install
-            // ->move into /Applications, create launch daemon and agent, etc
+            // ->move into /Library/BlockBlock, create launch daemon and agent, etc
             if(YES != [installObj install])
             {
                 //err msg
@@ -186,34 +188,24 @@
             //dbg msg
             logMsg(LOG_DEBUG, @"now starting daemon & agent");
            
-            //check if daemon needs to be started
-            if(YES == installObj.shouldStartDaemon)
+            //start launch daemon
+            if(YES != [controlObj startDaemon])
             {
-                //start launch daemon
-                if(YES != [controlObj startDaemon])
-                {
-                    //err msg
-                    logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: starting BLOCKBLOCK (daemon) failed");
-                    
-                    //stop it
-                    [controlObj stopDaemon];
-                    
-                    //bail
-                    goto bail;
-                }
+                //err msg
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: starting BLOCKBLOCK (daemon) failed");
+                
+                //bail
+                goto bail;
             }
             
             //start all launch agents
-            for(NSString* installedLaunchAgent in installObj.installedLaunchAgents)
+            for(NSString* installedLaunchAgent in [installObj existingLaunchAgents])
             {
                 //start launch agent
                 if(YES != [controlObj startAgent:installedLaunchAgent])
                 {
                     //err msg
                     logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: starting BLOCKBLOCK (agent) failed");
-                    
-                    //stop it
-                    [controlObj stopAgent:installedLaunchAgent];
                     
                     //bail
                     goto bail;
@@ -250,6 +242,9 @@
             
             //init dictionary for reported watch events
             reportedWatchEvents = [NSMutableDictionary dictionary];
+            
+            //load white-list
+            whiteList = [NSMutableArray arrayWithContentsOfFile:WHITE_LIST_FILE];
             
             //init list for 'remembered' watch events
             rememberedWatchEvents = [NSMutableArray array];
@@ -348,7 +343,7 @@
             
             //display configure window w/ 'install' button
             // ->if user clicks 'install', install logic will begin
-            [self displayConfigureWindow:[NSString stringWithFormat:@"Uninstall BLOCKBLOCK (v. %@)", getVersion(VERSION_INSTANCE_SELF)] action:ACTION_UNINSTALL_FLAG];
+            [self displayConfigureWindow];
             
             //no errors
             exitStatus = STATUS_SUCCESS;
@@ -356,7 +351,8 @@
         }//uninstall (UI)
         
         //UNINSTALL
-        else if(YES == [arguments[1] isEqualToString:ACTION_UNINSTALL])
+        else if( (YES == [arguments[1] isEqualToString:ACTION_UNINSTALL]) ||
+                 (YES == [arguments[1] isEqualToString:CMD_UNINSTALL]) )
         {
             //should always exit
             shouldExit = YES;
@@ -389,6 +385,9 @@
         {
             //err msg
             logMsg(LOG_ERR, [NSString stringWithFormat:@"%@ is an invalid argument", arguments[1]]);
+            
+            //should always exit
+            shouldExit = YES;
 
             //bail
             goto bail;
@@ -439,7 +438,7 @@ bail:
     uninstallObj = [[Uninstall alloc] init];
     
     //install
-    // ->move into /Applications, create launch daemon and agent, etc
+    // ->move into /Library/BlockBlock, create launch daemon and agent, etc
     if(YES != [uninstallObj uninstall])
     {
         //err msg
@@ -474,6 +473,14 @@ bail:
     //init event queue
     eventQueue = [[Queue alloc] init];
     
+    //load white-list item
+    self.whiteList = [NSMutableArray arrayWithContentsOfFile:[INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE]];
+    if(nil == self.whiteList)
+    {
+        //no items yet
+        whiteList = [NSMutableArray array];
+    }
+    
     //enable IPC notification for daemon
     [interProcComms enableNotification:RUN_INSTANCE_DAEMON];
     
@@ -487,22 +494,6 @@ bail:
     //start file watching
     // ->monitors 'auto-run' locations
     [watcher watch];
-    
-    /* for testing exception handling
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
-     
-        //int a = getpid();
-        //int b = 0;
-        
-        //printf("results: %d\n", a/b);
-    
-    
-        //NSMutableArray *a = [NSMutableArray array];
-        //[a addObject:nil];
-        
-    });
-    */
     
     return;
 }
@@ -609,8 +600,8 @@ bail:
     return;
 }
 
-//display configuration window to w/ 'install' || 'uninstall' button
--(void)displayConfigureWindow:(NSString*)windowTitle action:(NSUInteger)action
+//display configuration window
+-(void)displayConfigureWindow
 {
     //configure window
     ConfigureWindowController* configureWindowController = nil;
@@ -618,15 +609,9 @@ bail:
     //alloc/init
     configureWindowController = [[ConfigureWindowController alloc] initWithWindowNibName:@"ConfigureWindowController"];
     
-    //init window title
-    //windowTitle = [NSString stringWithFormat:@"Uninstall BLOCKBLOCK (v. %@)", getVersion(VERSION_INSTANCE_SELF)];
-    
     //display it
     // ->call this first to so that outlets are connected (not nil)
     [configureWindowController display];
-    
-    //configure it
-    [configureWindowController configure:windowTitle action:action];
     
     return;
 }
@@ -640,60 +625,6 @@ bail:
     //init menu
     [self.statusBarMenuController setupStatusItem];
     
-    //ensure outlet connections are made (e.g. not NULL)
-    //[self.statusBarMenuController showWindow:self];
-    
-    //configure
-    //[self.statusBarMenuController configure];
-    
-    /*
-    
-    //get contents of 'Info.plist'
-    plistContents = [NSMutableDictionary dictionaryWithContentsOfFile:launchAgentPlist(NSHomeDirectory())];
-    
-    //check if 'first time run' key is set
-    // ->then automatically show popup, and update key (so not shown again)
-    if( (nil != plistContents) &&
-        (nil == plistContents[IS_FIRST_RUN]) )
-    {
-        //dbg msg
-        logMsg(LOG_DEBUG, @"first time! showing popup");
-        
-        //automatically show popover
-        // ->after 1 second
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(),
-        ^{
-            //show
-            [self.statusBarMenuController showPopover];
-        });
-        
-        //automatically hide popup if user has not
-        // ->after 5 seconds
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 4 * NSEC_PER_SEC), dispatch_get_main_queue(),
-        ^{
-           //hide
-           [self.statusBarMenuController hidePopover];
-        });
-        
-        //set key
-        plistContents[IS_FIRST_RUN] = @"NO";
-        
-        //save to disk
-        [plistContents writeToFile:launchAgentPlist(NSHomeDirectory()) atomically:YES];
-        
-    }
-    //not the first time
-    else
-    {
-        //dbg msg
-        logMsg(LOG_DEBUG, @"not first time");
-        
-        //init menu
-        [self.statusBarMenuController initMenu];
-    }
-    
-     
-    */
     return;
 }
 

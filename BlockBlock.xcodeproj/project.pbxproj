@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		7D0215131BF1D27D0005CF0F /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D0215121BF1D27D0005CF0F /* libbsm.tbd */; };
+		7D13FACE1E1E2167006813BE /* CustomNSButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D13FACD1E1E2167006813BE /* CustomNSButton.m */; };
+		7D13FAD31E221370006813BE /* signed.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FACF1E221370006813BE /* signed.png */; };
+		7D13FAD41E221370006813BE /* signedApple.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD01E221370006813BE /* signedApple.png */; };
+		7D13FAD51E221370006813BE /* unknown.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD11E221370006813BE /* unknown.png */; };
+		7D13FAD61E221370006813BE /* unsigned.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD21E221370006813BE /* unsigned.png */; };
+		7D13FAD91E2215CA006813BE /* Signing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D13FAD71E2215CA006813BE /* Signing.m */; };
 		7D7361041C293DD7000558BA /* AppLoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D7361021C293DD7000558BA /* AppLoginItem.m */; };
 		7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */; };
 		7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */; };
@@ -79,6 +85,14 @@
 
 /* Begin PBXFileReference section */
 		7D0215121BF1D27D0005CF0F /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
+		7D13FACC1E1E2167006813BE /* CustomNSButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomNSButton.h; path = BlockBlock/CustomNSButton.h; sourceTree = "<group>"; };
+		7D13FACD1E1E2167006813BE /* CustomNSButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomNSButton.m; path = BlockBlock/CustomNSButton.m; sourceTree = "<group>"; };
+		7D13FACF1E221370006813BE /* signed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = signed.png; path = BlockBlock/images/signed.png; sourceTree = "<group>"; };
+		7D13FAD01E221370006813BE /* signedApple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = signedApple.png; path = BlockBlock/images/signedApple.png; sourceTree = "<group>"; };
+		7D13FAD11E221370006813BE /* unknown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = unknown.png; path = BlockBlock/images/unknown.png; sourceTree = "<group>"; };
+		7D13FAD21E221370006813BE /* unsigned.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = unsigned.png; path = BlockBlock/images/unsigned.png; sourceTree = "<group>"; };
+		7D13FAD71E2215CA006813BE /* Signing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Signing.m; path = BlockBlock/Signing.m; sourceTree = "<group>"; };
+		7D13FAD81E2215CA006813BE /* Signing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signing.h; path = BlockBlock/Signing.h; sourceTree = "<group>"; };
 		7D7361021C293DD7000558BA /* AppLoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppLoginItem.m; path = BlockBlock/plugins/AppLoginItem.m; sourceTree = "<group>"; };
 		7D7361031C293DD7000558BA /* AppLoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppLoginItem.h; path = BlockBlock/plugins/AppLoginItem.h; sourceTree = "<group>"; };
 		7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PrefsWindow.xib; path = BlockBlock/ui/PrefsWindow.xib; sourceTree = SOURCE_ROOT; };
@@ -248,6 +262,8 @@
 		CD7F087F19AE6DCA00FF00FC = {
 			isa = PBXGroup;
 			children = (
+				7D13FAD71E2215CA006813BE /* Signing.m */,
+				7D13FAD81E2215CA006813BE /* Signing.h */,
 				7D774F271C017C9000A9CCE4 /* PrefsWindowController.h */,
 				7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */,
 				CD6974F81B013AB600CE819B /* ParentsWindowController.h */,
@@ -275,6 +291,8 @@
 				CD8401321A044B0B000A1C5A /* Utilities.h */,
 				CDB4D9E319FCD9410069BE62 /* Process.h */,
 				CDB4D9E419FCD9410069BE62 /* Process.m */,
+				7D13FACC1E1E2167006813BE /* CustomNSButton.h */,
+				7D13FACD1E1E2167006813BE /* CustomNSButton.m */,
 				CDB4D9E019F61E480069BE62 /* OrderedDictionary.h */,
 				CDB4D9E119F61E480069BE62 /* OrderedDictionary.m */,
 				CDB4D9DB19F4CDE90069BE62 /* ProcessMonitor.h */,
@@ -339,7 +357,6 @@
 				CD8381291A7D94FA00AC0D96 /* Images.xcassets */,
 				CDD738C31A5F7FE800B825BA /* Base.lproj */,
 				CDD738C61A5F7FE800B825BA /* en.lproj */,
-				CDD738CB1A5F7FE800B825BA /* images */,
 				CD7C871319D43EAD00EC7F0A /* AppDelegate.h */,
 				CD7C871419D43EAD00EC7F0A /* AppDelegate.m */,
 				CD7C872419D4432C00EC7F0A /* Watcher.h */,
@@ -365,6 +382,10 @@
 		CD8381371A7DAA0F00AC0D96 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7D13FACF1E221370006813BE /* signed.png */,
+				7D13FAD01E221370006813BE /* signedApple.png */,
+				7D13FAD11E221370006813BE /* unknown.png */,
+				7D13FAD21E221370006813BE /* unsigned.png */,
 				7D774F2C1C018DA600A9CCE4 /* settings.png */,
 				CD9282DE1B0133B8007A5E03 /* parentsIcon.png */,
 				CD9282DF1B0133B8007A5E03 /* parentsIconBG.png */,
@@ -414,14 +435,6 @@
 			path = ../BlockBlock/en.lproj;
 			sourceTree = "<group>";
 		};
-		CDD738CB1A5F7FE800B825BA /* images */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = images;
-			path = ../BlockBlock/images;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -449,11 +462,12 @@
 		CD7F088019AE6DCA00FF00FC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0710;
+				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = Synack;
 				TargetAttributes = {
 					CD7F088719AE6DCA00FF00FC = {
 						DevelopmentTeam = VBG97UB4TA;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -481,12 +495,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */,
+				7D13FAD51E221370006813BE /* unknown.png in Resources */,
 				CD7C871F19D43F9C00EC7F0A /* MainMenu.xib in Resources */,
 				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
 				7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */,
 				CD9282E11B0133B8007A5E03 /* parentsIcon.png in Resources */,
 				CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */,
 				CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */,
+				7D13FAD61E221370006813BE /* unsigned.png in Resources */,
 				CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */,
 				CD7620A71AF3629400CFCB68 /* statusONWhite.png in Resources */,
 				CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */,
@@ -496,6 +512,7 @@
 				CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */,
 				CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */,
 				CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */,
+				7D13FAD31E221370006813BE /* signed.png in Resources */,
 				CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */,
 				CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */,
 				CDE36C991AD500EE00371F4E /* bbText.png in Resources */,
@@ -507,6 +524,7 @@
 				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
 				7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */,
 				CD9282E31B0133B8007A5E03 /* parentsIconOver.png in Resources */,
+				7D13FAD41E221370006813BE /* signedApple.png in Resources */,
 				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
 				CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */,
 				CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */,
@@ -530,7 +548,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\ncp -R -f /Users/patrickw/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext /Users/patrickw/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
+			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n#cp -R -f /Users/patrickw/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext /Users/patrickw/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -544,8 +562,10 @@
 				CDB4D9E519FCD9410069BE62 /* Process.m in Sources */,
 				CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */,
 				CD7C874C19D50F3B00EC7F0A /* Kext.m in Sources */,
+				7D13FACE1E1E2167006813BE /* CustomNSButton.m in Sources */,
 				CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */,
 				7D7361041C293DD7000558BA /* AppLoginItem.m in Sources */,
+				7D13FAD91E2215CA006813BE /* Signing.m in Sources */,
 				CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */,
 				CD8401331A044B0B000A1C5A /* Utilities.m in Sources */,
 				CD7C872619D4432C00EC7F0A /* Watcher.m in Sources */,
@@ -626,14 +646,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -666,14 +691,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -690,8 +720,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VBG97UB4TA;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
 				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";
@@ -705,8 +736,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VBG97UB4TA;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BlockBlock/BlockBlock-Prefix.pch";
 				INFOPLIST_FILE = "BlockBlock/BlockBlock-Info.plist";

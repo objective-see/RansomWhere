@@ -33,6 +33,11 @@
 //unload and remove kext
 -(BOOL)uninstallKext;
 
+//uninstall app
+// ->checks location of both old and new
+-(BOOL)uninstallApp;
+
+
 @end
 
 #endif

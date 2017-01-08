@@ -51,8 +51,17 @@
     //directory flag
     BOOL isDirectory = NO;
     
+    //app login item directory
+    NSString* loginItemDirectory = nil;
+    
+    //app login item
+    NSString* loginItem = nil;
+    
+    //current wait time
+    float currentWait = 0.0f;
+    
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is a app helper login item", watchEvent.path]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is/or has an app helper login item", watchEvent.path]);
     
     //ignore anything that's not a directory
     // ->since app helper login items are bundles (directories)
@@ -70,24 +79,64 @@
         //bail
         goto bail;
     }
-
-    //skip things that don't look like an app login item
-    // ->'/Applications/*/Contents/Library/LoginItems/*.app'
-    if(YES != [self.matchPredicate evaluateWithObject:watchEvent.path])
+    
+    //bail if it doesn't end in .app
+    // ->should at least get an alert for either the top-level app, or the login item app
+    if(YES != [watchEvent.path hasSuffix:@".app"])
     {
-        //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is not a regex match, so ignoring", watchEvent.path]);
-        
         //bail
         goto bail;
     }
     
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ matches regex, so not ignoring", watchEvent.path]);
-    
-    //set flag
-    shouldIgnore = NO;
-    
+    //path ends in .app, check if its an app login item
+    // ->if not, often don't get the notification for the login item
+    //   so manually try find one
+    if(YES != [self.matchPredicate evaluateWithObject:watchEvent.path])
+    {
+        //init login item directory
+        loginItemDirectory = [NSString pathWithComponents:@[watchEvent.path, @"/Contents/Library/LoginItems/"]];
+        
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"looking for login item in %@", loginItemDirectory]);
+        
+        //try manually find it
+        do
+        {
+            //nap (.1 seconds)
+            [NSThread sleepForTimeInterval:WAIT_INTERVAL];
+            
+            //grab any .app bundles in app's LoginItems/
+            loginItem = [[[[NSFileManager defaultManager] contentsOfDirectoryAtPath:loginItemDirectory error:nil] filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.app'"]] firstObject];
+
+            //found it?
+            if(nil != loginItem)
+            {
+                //update watch path
+                watchEvent.path = [NSString pathWithComponents:@[loginItemDirectory, loginItem]];
+                
+                //set flag
+                shouldIgnore = NO;
+                
+                //exit loop
+                break;
+            }
+            
+            //inc
+            currentWait += WAIT_INTERVAL;
+            
+        //while timeout isn't hit
+        } while(currentWait < 1.0f);
+    }
+    //fsevent for the login item
+    else
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ matches regex, so not ignoring", watchEvent.path]);
+        
+        //set flag
+        shouldIgnore = NO;
+    }
+
 //bail
 bail:
 
@@ -223,7 +272,7 @@ bail:
 // ->try load bundle in a loop (as it might not exist yet), then extract binary
 -(NSString*)startupItemBinary:(WatchEvent*)watchEvent
 {
-    //name of kext
+    //name of binary
     NSString* binary = nil;
     
     //max wait time
@@ -239,7 +288,7 @@ bail:
     //dbg msg
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting app login item binary for %@", watchEvent.path]);
     
-    //try to get name of kext
+    //try to get name of binary
     // ->might have to try several time since bundle may not exist right away...
     do
     {
@@ -250,7 +299,7 @@ bail:
         // ->and see if name is available
         bundle = [NSBundle bundleWithPath:watchEvent.path];
         
-        //extract kext name
+        //extract binary name
         if( (nil != bundle) &&
             (nil != bundle.executablePath) )
         {
@@ -264,7 +313,7 @@ bail:
         //inc
         currentWait += WAIT_INTERVAL;
         
-        //while timeout isn't hit
+    //while timeout isn't hit
     } while(currentWait < maxWait);
     
     //sanity check

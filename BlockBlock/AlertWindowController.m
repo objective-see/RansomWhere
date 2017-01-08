@@ -75,7 +75,7 @@
     
     //set delegate
     self.window.delegate = self;
-
+    
     //iterate over all keys
     // ->add value from dictionary into object
     for(NSString* key in alertInfo)
@@ -139,11 +139,19 @@
             continue;
         }
         
+        //signing icon
+        // ->image name, so load image
+        else if(YES == [key isEqualToString:@"signingIcon"])
+        {
+            //load image
+            self.signedIcon.image = [NSImage imageNamed:alertInfo[key]];
+            
+            //next
+            continue;
+        }
+        
         //get instance variable by name
         instanceVariable = class_getInstanceVariable([self class], [[NSString stringWithFormat:@"_%s", [key UTF8String]] UTF8String]);
-        
-        //check
-        // ->this is ok if this fails since passed keys aren't needed/used by the window
         if(NULL == instanceVariable)
         {
             //next
@@ -223,6 +231,13 @@
     // ->block or allow
     NSInteger action = 0;
     
+    //sanity check
+    if(nil == self.watchEventUUID)
+    {
+        //bail
+        goto bail;
+    }
+    
     //set action
     // ->allow
     if(sender == self.allowButton)
@@ -258,6 +273,9 @@
     
     //close window
     [self close];
+    
+//bail
+bail:
     
     return;
 }

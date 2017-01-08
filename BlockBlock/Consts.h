@@ -21,6 +21,12 @@
 //wait interval
 #define WAIT_INTERVAL 0.1f
 
+//directory for binaries/whitelists, etc
+#define INSTALL_DIRECTORY @"/Library/BlockBlock"
+
+//white list file
+#define WHITE_LIST_FILE @"whiteList.plist"
+
 //user's defaults
 #define NSUSER_DEFAULTS @"Library/Preferences/com.objectiveSee.BlockBlock.plist"
 
@@ -47,9 +53,6 @@
 
 //label for launch daemon
 #define LAUNCH_AGENT_LABEL @"com.objectiveSee.blockblock.agent"
-
-//app path
-#define APPLICATION_PATH @"/Applications/BlockBlock.app"
 
 //app name
 #define APPLICATION_NAME @"BlockBlock.app"
@@ -86,11 +89,17 @@
 // ->Close
 #define ACTION_CLOSE @"Close"
 
-//flag to uninstall
-#define ACTION_UNINSTALL_FLAG 0
+//install flag
+#define CMD_INSTALL @"-install"
 
-//flag to install
-#define ACTION_INSTALL_FLAG 1
+//uninstall flag
+#define CMD_UNINSTALL @"-uninstall"
+
+//uninstall button
+#define BUTTON_UNINSTALL 100
+
+//install button
+#define BUTTON_INSTALL 101
 
 /* User selections */
 
@@ -259,5 +268,14 @@
 
 //log to file flag
 #define LOG_TO_FILE 0x10
+
+//signature status
+#define KEY_SIGNATURE_STATUS @"signatureStatus"
+
+//signing auths
+#define KEY_SIGNING_AUTHORITIES @"signingAuthorities"
+
+//file belongs to apple?
+#define KEY_SIGNING_IS_APPLE @"signedByApple"
 
 #endif

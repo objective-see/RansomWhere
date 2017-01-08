@@ -568,7 +568,7 @@ NSString* getVersion(NSUInteger instance)
     else if(VERSION_INSTANCE_INSTALLED == instance)
     {
         //get info dictionary
-        infoDictionary = getAppInfo(APPLICATION_PATH);
+        infoDictionary = getAppInfo([INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME]);
     }
     
     //extract version string

@@ -21,6 +21,7 @@
 //     distribution.
 //
 
+//TODO: fixed!?
 #import "OrderedDictionary.h"
 
 @implementation OrderedDictionary
@@ -46,7 +47,7 @@
 //description
 -(NSString*)description
 {
-    return dictionary.description;
+    return [dictionary description];
 }
 
 //remove

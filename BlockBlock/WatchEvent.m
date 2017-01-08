@@ -8,6 +8,7 @@
 
 #import "Consts.h"
 #import "Logging.h"
+#import "Signing.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
@@ -32,7 +33,6 @@
 @synthesize wasBlocked;
 @synthesize reportedUID;
 @synthesize shouldRemember;
-
 
 
 //init
@@ -93,11 +93,11 @@
 }
 
 //determines if a new watch event matches a prev. 'remembered' event
-// ->checks path and item
+// ->checks process (path), startup item path and item (binary or cmd)
 -(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent
 {
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is remembered", rememberedEvent]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is remembered (%@)", self, rememberedEvent]);
     
     //check 1:
     // ->different startup item path
@@ -112,10 +112,21 @@
     
     //check 2:
     // ->different startup item binary/cmd
-    if(YES != [self.itemObject isEqualToString: rememberedEvent.itemObject])
+    if(YES != [self.itemObject isEqualToString:rememberedEvent.itemObject])
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemObject, rememberedEvent.itemObject]);
+        
+        //nope!
+        return NO;
+    }
+    
+    //check 3:
+    // ->different process
+    if(YES != [self.process.path isEqualToString:rememberedEvent.process.path])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process path %@ != %@", self.process.path, rememberedEvent.process.path]);
         
         //nope!
         return NO;
@@ -125,12 +136,61 @@
     return YES;
 }
 
+//matches a white-listed event
+// ->checks process (path), startup item path, item (binary or cmd), and UID
+-(BOOL)matchesWhiteListed:(NSDictionary*)whitelistedEvent
+{
+    //dbg msg
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is whitelisted (%@)", self, whitelistedEvent]);
+    
+    //check 1:
+    // ->different startup item path
+    if(YES != [self.path isEqualToString:whitelistedEvent[@"itemPath"]])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"path %@ != %@", self.path, whitelistedEvent[@"itemPath"]]);
+        
+        //nope!
+        return NO;
+    }
+    
+    //check 2:
+    // ->different startup item binary/cmd
+    if(YES != [self.itemObject isEqualToString:whitelistedEvent[@"itemObject"]])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemObject, whitelistedEvent[@"itemObject"]]);
+        
+        //nope!
+        return NO;
+    }
+    
+    //check 3:
+    // ->different process
+    if(YES != [self.process.path isEqualToString:whitelistedEvent[@"processPath"]])
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process path %@ != %@", self.process.path, whitelistedEvent[@"processPath"]]);
+        
+        //nope!
+        return NO;
+    }
+    
+    //appears to match
+    return YES;
+}
+
+
+
 //takes a watch event and creates an alert dictionary that's serializable into a plist
 // ->needed since notification framework can only handle dictionaries of this kind
 -(NSMutableDictionary*)createAlertDictionary
 {
     //watch event as dictionary
     NSMutableDictionary* alertInfo = nil;
+    
+    //signing info
+    NSDictionary* signingInfo = nil;
     
     //alloc dictionary
     alertInfo = [NSMutableDictionary dictionary];
@@ -150,6 +210,64 @@
     //add alert msg
     alertInfo[@"alertMsg"] = [self valueForStringItem:self.plugin.alertMsg];
     
+    //get signing info
+    signingInfo = extractSigningInfo(self.process.path);
+    switch([signingInfo[KEY_SIGNATURE_STATUS] intValue])
+    {
+        //happily signed
+        case noErr:
+            
+            //item signed by apple
+            if(YES == [signingInfo[KEY_SIGNING_IS_APPLE] boolValue])
+            {
+                //set icon
+                alertInfo[@"signingIcon"] = @"signedApple";
+                
+                //set details
+                alertInfo[@"processSigning"] = @"Apple Code Signing Certification Authority";
+            }
+            //signed by dev id/ad hoc, etc
+            else
+            {
+                //set icon
+                alertInfo[@"signingIcon"] = @"signed";
+                
+                //set signing auth
+                if(0 != [signingInfo[KEY_SIGNING_AUTHORITIES] count])
+                {
+                    //add code-signing auth
+                    alertInfo[@"processSigning"] = [signingInfo[KEY_SIGNING_AUTHORITIES] firstObject];
+                }
+                //no auths
+                else
+                {
+                    //no auths
+                    alertInfo[@"processSigning"] = @"no signing authorities (ad hoc?)";
+                }
+            }
+            
+            break;
+            
+        //unsigned
+        case errSecCSUnsigned:
+            
+            //set icon
+            alertInfo[@"signingIcon"] = @"unsigned";
+            
+            //set details
+            alertInfo[@"processSigning"] = @"unsigned (errSecCSUnsigned)";
+            
+            break;
+            
+        default:
+            
+            //set icon
+            alertInfo[@"signingIcon"] = @"unknown";
+            
+            //set details
+            alertInfo[@"processSigning"] = [NSString stringWithFormat:@"unknown (status/error: %ld)", (long)[signingInfo[KEY_SIGNATURE_STATUS] integerValue]];
+    }
+
     /* for bottom of alert window */
     
     //add process name

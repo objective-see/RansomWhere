@@ -98,6 +98,7 @@
 					7D20D68C1BFDAA7D00FD6ECF = {
 						CreatedOnToolsVersion = 7.1;
 						DevelopmentTeam = VBG97UB4TA;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -229,6 +230,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VBG97UB4TA;
 				INFOPLIST_FILE = BlockBlockKext/Info.plist;
 				MODULE_NAME = com.objectiveSee.BlockBlockKext;
 				MODULE_START = start;
@@ -247,6 +249,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VBG97UB4TA;
 				INFOPLIST_FILE = BlockBlockKext/Info.plist;
 				MODULE_NAME = com.objectiveSee.BlockBlockKext;
 				MODULE_START = start;

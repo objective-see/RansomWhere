@@ -29,6 +29,10 @@
 @property (weak) IBOutlet NSTextField* alertMsg;
 
 //top
+// ->icon/image for signing info
+@property (weak) IBOutlet NSImageView *signedIcon;
+
+//top
 // ->name of process/label
 @property (weak) IBOutlet NSTextField *processLabel;
 
@@ -54,6 +58,10 @@
 //bottom
 // ->process path
 @property (weak) IBOutlet NSTextField *processPath;
+
+//bottom
+// ->process signing info
+@property (weak) IBOutlet NSTextField *processSigning;
 
 //bottom
 // ->process id

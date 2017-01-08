@@ -46,13 +46,15 @@
 // ->checks paths, etc
 -(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent;
 
+//matches a white-listed event
+// ->checks process (path), startup item path, item (binary or cmd), and UID
+-(BOOL)matchesWhiteListed:(NSDictionary*)whitelistedEvent;
+
 //takes a watch event and creates an alert dictionary that's serializable into a plist
 // ->needed since notification framework can only handle dictionaries of this kind
 -(NSMutableDictionary*)createAlertDictionary;
 
 /* PROPERTIES */
-
-
 
 @property BOOL wasBlocked;
 @property NSUInteger flags;

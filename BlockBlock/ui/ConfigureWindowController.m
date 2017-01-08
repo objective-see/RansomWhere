@@ -8,10 +8,10 @@
 #import "Consts.h"
 #import "Control.h"
 #import "Logging.h"
-#import "ConfigureWindowController.h"
 #import "Logging.h"
 #import "Install.h"
 #import "Utilities.h"
+#import "ConfigureWindowController.h"
 
 //TODO: detect unloading of launch agent? or deletion of app - make sure this doesn't make the system unbootable!!!!
 
@@ -42,105 +42,13 @@
     //make white
     [self.window setBackgroundColor: NSColor.whiteColor];
     
-    return;
-}
-
-//configure window/buttons
-// ->also brings to front
--(void)configure:(NSString*)title action:(NSUInteger)requestedAction
-{
-    //save window title
-    self.windowTitle = title;
-    
-    //save action
-    self.action = requestedAction;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"configuring install/uninstall window");
-    
-    //init button title
-    // ->based on action
-    switch (self.action)
+    //disable uninstall button if not installed
+    if(YES != [Install isInstalled])
     {
-        //install
-        case ACTION_INSTALL_FLAG:
-
-            //set
-            self.buttonTitle = ACTION_INSTALL;
-            
-            break;
-            
-        //uninstall
-        case ACTION_UNINSTALL_FLAG:
-            
-            //set
-            self.buttonTitle = ACTION_UNINSTALL;
-            
-            break;
-            
-        default:
-            break;
+        //disable
+        self.uninstallButton.enabled = NO;
     }
     
-    //more detailed button title
-    // ->in case of install, can either be '(re)Install' or 'Upgrade'
-    NSString* detailedStatus = nil;
-    
-    //set window title
-    [self window].title = self.windowTitle;
-    
-    //check if install window should be further customized
-    // ->e.g. when BlockBlock is already installed
-    if(ACTION_INSTALL_FLAG == self.action)
-    {
-        //check
-        // ->returns action
-        detailedStatus = [self shouldCustomizeInstallUI];
-    
-        //customize futher
-        if(nil != detailedStatus)
-        {
-            //set msg about reinstalling
-            if(YES == [detailedStatus isEqualToString:ACTION_REINSTALL])
-            {
-                //init status msg
-                [self.statusMsg setStringValue:@"this version is already installed"];
-            }
-            
-            //set msg about upgrading
-            else if(YES == [detailedStatus isEqualToString:ACTION_UPGRADE])
-            {
-                //init status msg
-                [self.statusMsg setStringValue:@"older version is installed"];
-            }
-        }
-    }
-    
-    //set button title
-    // ->non-detailed case (just 'install' or 'uninstall')
-    if(nil == detailedStatus)
-    {
-        //set title
-        self.actionButton.title = self.buttonTitle;
-    }
-    //set button title
-    // ->detailed case ('reinstall' or 'upgrade')
-    else
-    {
-        //set title
-        self.actionButton.title = detailedStatus;
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@/%@", self.actionButton.title, self.window.title]);
-    
-    //save instance
-    // ->needed to ensure window isn't ARC-dealloc'd when this function returns
-    self.instance = self;
-    
-    //set delegate
-    [self.window setDelegate:self];
-
     return;
 }
 
@@ -159,90 +67,13 @@
     //make window front
     [NSApp activateIgnoringOtherApps:YES];
     
-    return;
-}
+    //save instance
+    // ->needed to ensure window isn't ARC-dealloc'd when this function returns
+    self.instance = self;
+    
+    //set delegate
+    [self.window setDelegate:self];
 
-//check if already installed
-// ->then check version and return detailed action (reinstall or upgrade)
--(NSString*)shouldCustomizeInstallUI
-{
-    //action (reinstall or upgrade)
-    NSString* detailedAction =  nil;
-    
-    //installed version
-    NSString* installedVersion = nil;
-    
-    //current version (of this instance)
-    NSString* currentVersion = nil;
-    
-    //install object
-    Install* installObj = nil;
-    
-    //init
-    installObj = [[Install alloc] init];
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"seeing if should customize install UI");
-    
-    //get installed version
-    // ->returns nil if nothing is currently installed
-    installedVersion = getVersion(VERSION_INSTANCE_INSTALLED);
-    if(nil != installedVersion)
-    {
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"installed version: %@", installedVersion]);
-        
-        //get version of self
-        currentVersion = getVersion(VERSION_INSTANCE_SELF);
-        if(nil == currentVersion)
-        {
-            //err msg
-            logMsg(LOG_ERR, @"failed to get current version");
-            
-            //this should never happen
-            goto bail;
-        }
-        
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current (self's) version: %@", currentVersion]);
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"compare: %d/%lu", [installedVersion isEqualToString:currentVersion], (unsigned long)[installObj installState]]);
-        
-        //check if versions are equal and that we are already fully installed
-        // ->set action to reinstall
-        if( (YES == [installedVersion isEqualToString:currentVersion]) &&
-            (INSTALL_STATE_FULL == [installObj installState]) )
-        {
-            //installed already (and same version!)
-            detailedAction = ACTION_REINSTALL;
-        }
-        
-        //check if current verison is greater than installed version
-        // ->set action to upgrade
-        else if(YES == [currentVersion isGreaterThan:installedVersion])
-        {
-            //current version is newer!
-            detailedAction = ACTION_UPGRADE;
-        }
-        
-    }//got installed version
-    
-//bail
-bail:
-    
-    return detailedAction;
-}
-
-
-//button handler for 'cancel'
-// ->note: exit logic handled in 'windowWillClose' delegate callback method
--(IBAction)cancel:(id)sender
-{
-    //dbg msg
-    logMsg(LOG_DEBUG, @"handling 'cancel' button click, exiting process");
-    
-    //close
-    [self.window close];
-    
     return;
 }
 
@@ -261,6 +92,9 @@ bail:
     //handle non-'close' clicks
     if(YES != [button isEqualToString:ACTION_CLOSE])
     {
+        //save action
+        self.action = ((NSButton*)sender).tag;
+        
         //disable 'x' button
         // ->don't want user killing app during install/upgrade
         [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:NO];
@@ -279,8 +113,11 @@ bail:
         // ->do in background so UI doesn't block
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
         ^{
+            //set
+            self.buttonTitle = ((NSButton*)sender).title;
+            
             //install/uninstall
-            [self lifeCycleEvent:self.action];
+            [self lifeCycleEvent];
         });
     }
     
@@ -320,16 +157,13 @@ bail:
 
 //perform install | uninstall via Control obj
 // ->invoked on background thread so that UI doesn't block
--(void)lifeCycleEvent:(NSUInteger)event
+-(void)lifeCycleEvent
 {
     //status var
     BOOL status = NO;
     
     //control object
     Control* controlObj;
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"handling life cycle event, %lu", (unsigned long)event]);
     
     //alloc control object
     controlObj = [[Control alloc] init];
@@ -394,11 +228,11 @@ bail:
     //update status msg UI
     [self.statusMsg setStringValue:[NSString stringWithFormat:@"%@ing...", [self.buttonTitle lowercaseString]]];
     
-    //disable action button
-    self.actionButton.enabled = NO;
+    //disable install button
+    self.installButton.enabled = NO;
     
-    //disable cancel button
-    self.cancelButton.enabled = NO;
+    //disable uninstall button
+    self.uninstallButton.enabled = NO;
     
     //show spinner
     [self.activityIndicator setHidden:NO];
@@ -473,17 +307,34 @@ bail:
     //set status msg
     [self.statusMsg setStringValue:resultMsg];
     
-    //set button title to 'close'
-    self.actionButton.title = ACTION_CLOSE;
-    
-    //enable
-    self.actionButton.enabled = YES;
+    //install logic
+    if(BUTTON_INSTALL == self.action)
+    {
+        //set button title to 'close'
+        self.installButton.title = ACTION_CLOSE;
+        
+        //enable
+        self.installButton.enabled = YES;
+        
+        //make it active
+        [self.window makeFirstResponder:self.installButton];
+        
+    }
+    //uninstall logic
+    else
+    {
+        //set button title to 'close'
+        self.uninstallButton.title = ACTION_CLOSE;
+        
+        //enable
+        self.uninstallButton.enabled = YES;
+        
+        //make it active
+        [self.window makeFirstResponder:self.uninstallButton];
+    }
     
     //ok to re-enable 'x' button
     [[self.window standardWindowButton:NSWindowCloseButton] setEnabled:YES];
-    
-    //make it active
-    [self.window makeFirstResponder:self.actionButton];
     
     //(re)make window window key
     [self.window makeKeyAndOrderFront:self];

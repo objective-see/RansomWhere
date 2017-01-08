@@ -77,6 +77,10 @@
 // ->used to verify response (back from user)
 @property (nonatomic, retain)NSMutableDictionary* reportedWatchEvents;
 
+//list of persistently white-listed items
+// ->used to automatically allow subsequent events
+@property (nonatomic, retain)NSMutableArray* whiteList;
+
 //list of 'remembered' watch events
 // ->used to automatically allow/block subsequent events
 @property (nonatomic, retain)NSMutableArray* rememberedWatchEvents;
@@ -99,8 +103,8 @@
 // ->init status bar and enable IPC
 -(void)startBlockBlocking_Agent;
 
-//display configuration window to w/ 'install' || 'uninstall' button
--(void)displayConfigureWindow:(NSString*)windowTitle action:(NSUInteger)action;
+//display configuration window
+-(void)displayConfigureWindow;
 
 //initialize status menu bar
 -(void)loadStatusBar;
