@@ -139,12 +139,65 @@
             continue;
         }
         
+        //skip signing info
+        // ->this is processed when process/item binary is processed
+        if( (YES == [key isEqualToString:@"processSigning"]) ||
+            (YES == [key isEqualToString:@"itemSigning"]) )
+        {
+            //next
+            continue;
+        }
+        
         //signing icon
         // ->image name, so load image
         else if(YES == [key isEqualToString:@"signingIcon"])
         {
             //load image
             self.signedIcon.image = [NSImage imageNamed:alertInfo[key]];
+            
+            //next
+            continue;
+        }
+        
+        //handle process name
+        // ->combine with process signing info
+        else if(YES == [key isEqualToString:@"processName"])
+        {
+            //add any signing info
+            if(nil != [alertInfo objectForKey:@"processSigning"])
+            {
+                //combine and set
+                self.processName.attributedStringValue = [self binarySigningInfo:alertInfo[@"processName"] signingInfo:alertInfo[@"processSigning"]];
+            }
+            //no signing info
+            // ->just set as is
+            else
+            {
+                //set
+                self.processName.stringValue = alertInfo[@"processName"];
+            }
+            
+            //next
+            continue;
+        }
+        
+        //handle item name
+        // ->combine with item's (binary) signing info
+        else if(YES == [key isEqualToString:@"itemName"])
+        {
+            //add any signing info
+            if(nil != [alertInfo objectForKey:@"itemSigning"])
+            {
+                //combine and set
+                self.itemName.attributedStringValue = [self binarySigningInfo:alertInfo[@"itemName"] signingInfo:alertInfo[@"itemSigning"]];
+            }
+            //no signing info
+            // ->just set as is
+            else
+            {
+                //set
+                self.itemName.stringValue = alertInfo[@"itemName"];
+            }
             
             //next
             continue;
@@ -188,6 +241,31 @@
     [[self window] center];
 
     return;
+}
+
+//build string with process/binary name + signing info
+-(NSAttributedString*)binarySigningInfo:(NSString*)name signingInfo:(NSString*)signingInfo
+{
+    //info
+    NSMutableAttributedString* info = nil;
+
+    //combine both
+    info = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (%@)", name, signingInfo] attributes:@{NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:11]}];
+    
+    //edit name
+    // ->bold and bigger
+    [info beginEditing];
+    
+    //make bigger
+    [info addAttribute:NSFontAttributeName value:[NSFont fontWithName:@"Menlo-Bold" size:13] range:NSMakeRange(0, name.length)];
+    
+    //make name bold
+    [info applyFontTraits:NSBoldFontMask range:NSMakeRange(0, name.length)];
+    
+    //done editing
+    [info endEditing];
+    
+    return info;
 }
 
 //automatically invoked when mouse entered

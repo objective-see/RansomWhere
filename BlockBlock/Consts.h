@@ -278,4 +278,8 @@
 //file belongs to apple?
 #define KEY_SIGNING_IS_APPLE @"signedByApple"
 
+//UID for _hidd
+// ->test: $ id -u _hidd
+#define HID_UID 261
+
 #endif

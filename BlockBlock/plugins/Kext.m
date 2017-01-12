@@ -189,13 +189,16 @@ bail:
         [NSThread sleepForTimeInterval:WAIT_INTERVAL];
         
         //load bundle
-        // ->and see if name is available
+        // ->use name of binary
         bundle = [NSBundle bundleWithPath:watchEvent.path];
         if( (nil != bundle) &&
-            (nil != bundle.infoDictionary[@"CFBundleName"]) )
+            (nil != bundle.infoDictionary[@"CFBundleExecutable"]) )
         {
             //save it
-            kextName = bundle.infoDictionary[@"CFBundleName"];
+            kextName = [bundle.infoDictionary[@"CFBundleExecutable"] lastPathComponent];
+            
+            //dbg msg
+            logMsg(LOG_DEBUG, [NSString stringWithFormat: @"extracted name: %@", kextName]);
             
             //got name, so bail
             break;
@@ -207,8 +210,16 @@ bail:
     //while timeout isn't hit
     } while(currentWait < maxWait);
     
-    //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat: @"extracted name: %@", kextName]);
+    //couldn't extract?
+    // ->just use name from path
+    if(nil == kextName)
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"couldn't extract kext name, using file name");
+        
+        //set
+        kextName = [watchEvent.path lastPathComponent];
+    }
     
     return kextName;
 }

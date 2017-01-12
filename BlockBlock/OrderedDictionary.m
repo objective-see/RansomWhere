@@ -21,7 +21,6 @@
 //     distribution.
 //
 
-//TODO: fixed!?
 #import "OrderedDictionary.h"
 
 @implementation OrderedDictionary

@@ -85,7 +85,6 @@
     return shouldIgnore;
 }
 
-
 //invoked when user clicks 'allow'
 -(void)allow:(WatchEvent *)watchEvent
 {

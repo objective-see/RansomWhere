@@ -136,11 +136,13 @@
 // ->either from bundle or via 'which'
 -(void)determinePath
 {
+    //dbg msg
     logMsg(LOG_DEBUG, @"determining path");
     
     //try to get path from bundle
     if(nil != self.bundle)
     {
+        //dbg msg
         logMsg(LOG_DEBUG, @"determining path from bundle");
         
         //extract path
@@ -151,6 +153,7 @@
     // ->use 'which' helper function
     else if(nil != self.name)
     {
+        //dbg msg
         logMsg(LOG_DEBUG, @"determining path from name");
         
         //resolve
@@ -159,7 +162,6 @@
 
     return;
 }
-
 
 //get a process's UID
 // ->save into 'uid' iVar

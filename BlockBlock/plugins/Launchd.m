@@ -156,17 +156,12 @@
 
 
 //get the name of the launch item
-// ->'Label' from plist
+// ->use name of binary from plist
 -(NSString*)startupItemName:(WatchEvent*)watchEvent
 {
-    //name of launch item
-    NSString* itemName = nil;
-    
-    //get name
-    // ->just value for 'Label'
-    itemName = getValueFromPlist(watchEvent.path, @"Label", 1.0f);
-    
-    return itemName;
+    //get binary path
+    // ->just return binary name
+    return [[self startupItemBinary:watchEvent] lastPathComponent];
 }
 
 //get the binary (path) of the launch item
@@ -192,7 +187,7 @@
             itemBinary = [(NSArray*)programArgs firstObject];
         }
         //otherwise, its likely a string
-        // ->just use as is
+        // ->just use as is (assume no args)
         else if(YES == [programArgs isKindOfClass:[NSString class]])
         {
             //assign
@@ -200,7 +195,7 @@
         }
     }
     //when 'ProgramArguments' fails
-    // ->check for just 'Program'
+    // ->check for just 'Program' key and use that
     else
     {
         //get value for 'ProgramArguments'

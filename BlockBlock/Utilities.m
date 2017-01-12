@@ -177,7 +177,7 @@ id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait)
         //nap for 1/10th of a second
         [NSThread sleepForTimeInterval:WAIT_INTERVAL];
         
-        //try up to 1 second
+    //try up to 1 second
     }while(count++ < maxWait/WAIT_INTERVAL);
     
     return plistValue;

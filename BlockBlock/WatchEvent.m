@@ -83,10 +83,13 @@
     }
     
     //case 4:
-    // ->watch items paths aren't related means unrelated watch events
-    // TODO: use 'in directory' code - google this!
-    // check both paths to make sure a isn't in b and b isn't in a
-    
+    // ->differnt paths
+    //   ...i think this is ok to do, since plugins really closely check for exact match
+    if(YES != [self.path isEqualToString:newWatchEvent.path])
+    {
+        //nope!
+        return NO;
+    }
     
     //events appear to be related
     return YES;
@@ -210,7 +213,7 @@
     //add alert msg
     alertInfo[@"alertMsg"] = [self valueForStringItem:self.plugin.alertMsg];
     
-    //get signing info
+    //get signing info for process
     signingInfo = extractSigningInfo(self.process.path);
     switch([signingInfo[KEY_SIGNATURE_STATUS] intValue])
     {
@@ -224,7 +227,7 @@
                 alertInfo[@"signingIcon"] = @"signedApple";
                 
                 //set details
-                alertInfo[@"processSigning"] = @"Apple Code Signing Certification Authority";
+                alertInfo[@"processSigning"] = @"Apple Code Signing Cert Auth";
             }
             //signed by dev id/ad hoc, etc
             else
@@ -255,7 +258,7 @@
             alertInfo[@"signingIcon"] = @"unsigned";
             
             //set details
-            alertInfo[@"processSigning"] = @"unsigned (errSecCSUnsigned)";
+            alertInfo[@"processSigning"] = @"unsigned";
             
             break;
             
@@ -298,6 +301,58 @@
     {
         //lookup
         alertInfo[@"itemBinary"] = [self valueForStringItem:[self.plugin startupItemBinary:self]];
+    }
+    
+    //generate signing info for item binary
+    // ->but only if its a file (binary), not a cmd
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:alertInfo[@"itemBinary"]])
+    {
+        //get signing info
+        signingInfo = extractSigningInfo(alertInfo[@"itemBinary"]);
+        switch([signingInfo[KEY_SIGNATURE_STATUS] intValue])
+        {
+            //happily signed
+            // ->check if apple, or 3rd-party
+            case noErr:
+                
+                //item signed by apple
+                if(YES == [signingInfo[KEY_SIGNING_IS_APPLE] boolValue])
+                {
+                    //set
+                    alertInfo[@"itemSigning"] = @"Apple Code Signing Cert Auth";
+                }
+                //signed by dev id/ad hoc, etc
+                else
+                {
+                    //set signing auth
+                    if(0 != [signingInfo[KEY_SIGNING_AUTHORITIES] count])
+                    {
+                        //add code-signing auth
+                        alertInfo[@"itemSigning"] = [signingInfo[KEY_SIGNING_AUTHORITIES] firstObject];
+                    }
+                    //no auths
+                    else
+                    {
+                        //no auths
+                        alertInfo[@"itemSigning"] = @"no signing authorities (ad hoc?)";
+                    }
+                }
+                
+                break;
+                
+            //unsigned
+            case errSecCSUnsigned:
+                
+                //set
+                alertInfo[@"itemSigning"] = @"unsigned";
+                
+                break;
+                
+            default:
+                
+                //set details
+                alertInfo[@"itemSigning"] = [NSString stringWithFormat:@"unknown (status/error: %ld)", (long)[signingInfo[KEY_SIGNATURE_STATUS] integerValue]];
+        }
     }
     
     //add process pid

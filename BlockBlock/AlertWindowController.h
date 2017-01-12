@@ -60,10 +60,6 @@
 @property (weak) IBOutlet NSTextField *processPath;
 
 //bottom
-// ->process signing info
-@property (weak) IBOutlet NSTextField *processSigning;
-
-//bottom
 // ->process id
 @property (weak) IBOutlet NSTextField *processID;
 

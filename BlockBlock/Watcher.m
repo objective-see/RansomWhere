@@ -72,7 +72,7 @@
     //start it
     [self.watcherThread start];
     
-    //TODO wait a bit until thread sets OK!?
+    //TODO wait a bit until thread sets OK!?/no error
     
     //no errors
     bRet = YES;
@@ -679,7 +679,6 @@ bail:
                 path = [NSString stringWithUTF8String:(const char*)(ptrBuffer + *ptrCurrentOffset + 4)];
             }
                
-            
             arg_len = (4 + *argLen);
         }
         
@@ -744,7 +743,6 @@ bail:
                 //all set
                 // ->so exit loop
                 break;
-                
             }
             
             //dbg msg
