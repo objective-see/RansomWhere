@@ -41,7 +41,9 @@
     if(INSTALL_STATE_NONE != [Install installedState])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"already installed (will uninstall)");
+        #endif
         
         //alloc uninstall obj
         uninstallObj = [[Uninstall alloc] init];
@@ -60,7 +62,9 @@
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:KEXT_LOAD])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"kext loader (%@) not found", KEXT_LOAD]);
+        #endif
         
         //bail
         goto bail;
@@ -98,7 +102,9 @@
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"installed launch agent(s)");
+    #endif
     
     //install as launch daemon
     // ->just copy launch item plist file into /Library/LaunchDaemon directory
@@ -112,7 +118,9 @@
     }
         
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"installed launch deamon");
+    #endif
     
     //install kext
     // ->copy kext (bundle) to /Library/Extensions and set permissions
@@ -126,7 +134,9 @@
     }
         
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"installed kext");
+    #endif
     
     //no errors
     bRet = YES;
@@ -153,7 +163,9 @@ bail:
     NSMutableArray* existingLaunchAgents;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"checking installed state");
+    #endif
     
     //get all installed launch agents
     existingLaunchAgents = [Install existingLaunchAgents];
@@ -171,7 +183,9 @@ bail:
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:kextPath()])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"not installed for anybody");
+        #endif
         
         //set
         state = INSTALL_STATE_NONE;
@@ -186,7 +200,9 @@ bail:
         (YES == [[[existingLaunchAgents firstObject] objectForKey:@"plist"] isEqualToString:launchAgentPlist(userHomeDirectory)]) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"only installed for self");
+        #endif
         
         //set
         state = INSTALL_STATE_SELF_ONLY;
@@ -202,7 +218,9 @@ bail:
         if(YES == [[existingLaunchAgent objectForKey:@"plist"] isEqualToString:launchAgentPlist(userHomeDirectory)])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"installed for self and others");
+            #endif
             
             //set
             state = INSTALL_STATE_SELF_AND_OTHERS;
@@ -213,7 +231,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"only installed for others");
+    #endif
     
     //if we get here
     // ->means it's just installed for others!
@@ -330,7 +350,9 @@ bail:
     BOOL installedBinary = NO;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"installing binary %@ to %@", [NSBundle mainBundle].bundlePath, path]);
+    #endif
     
     //move self into /Library/BlockBlock
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:[NSBundle mainBundle].bundlePath toPath:path error:&error])
@@ -400,6 +422,11 @@ bail:
     //current user's launch agent plist
     NSString* userLaunchAgentPlist = nil;
     
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"installing launch agent (prev ones: %@)", prevInstalledAgents]);
+    #endif
+    
     //alloc
     installedLaunchAgents = [NSMutableArray array];
     
@@ -425,10 +452,10 @@ bail:
     
     //check if current user is in prev installed launch agents
     // ->if not, need to add since we want to install it obvisouly for self (too)
-    for(NSDictionary* prevInstalledAgents in prevInstalledAgents)
+    for(NSDictionary* prevInstalledAgent in prevInstalledAgents)
     {
         //check
-        if(YES == [prevInstalledAgents[@"plist"] isEqualToString:userLaunchAgentPlist])
+        if(YES == [prevInstalledAgent[@"plist"] isEqualToString:userLaunchAgentPlist])
         {
             //exits
             includesCurrentUser = YES;
@@ -450,11 +477,12 @@ bail:
         
         //add
         [prevInstalledAgents addObject:@{@"uid":consoleUser[@"uid"], @"plist":userLaunchAgentPlist}];
-
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"configuring plist for launch agent(s): %@", prevInstalledAgents]);
+    #endif
     
     //update label
     launchItemPlist[@"Label"] = LAUNCH_AGENT_LABEL;
@@ -503,7 +531,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saving updated plist %@ to %@", launchItemPlist, launchAgent[@"plist"]]);
+        #endif
     }
     
     //no errors
@@ -536,7 +566,9 @@ bail:
         launchItemPlist[@"ProgramArguments"][0] = [NSString pathWithComponents:@[[INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME], BINARY_SUB_PATH]];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"configuring plist for launch daemon");
+        #endif
         
         //update label
         launchItemPlist[@"Label"] = LAUNCH_DAEMON_LABEL;
@@ -545,7 +577,9 @@ bail:
         launchItemPlist[@"ProgramArguments"][1] = ACTION_RUN_DAEMON;
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saving updated plist %@ to %@", launchItemPlist, launchDaemonPlist()]);
+        #endif
             
         //save (updated/config'd) plist to launch item directory
         if(YES != [launchItemPlist writeToFile:launchDaemonPlist() atomically:YES])
@@ -592,7 +626,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied kext to %@", kextPath()]);
+    #endif
     
     //always set group/owner to root/wheel
     setFileOwner(kextPath(), @0, @0, YES);

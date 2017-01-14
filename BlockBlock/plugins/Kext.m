@@ -24,7 +24,9 @@
     if(nil != self)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"init'ing %@ (%p)", NSStringFromClass([self class]), self]);
+        #endif
         
         //set type
         self.type = PLUGIN_TYPE_KEXT;
@@ -52,7 +54,9 @@
         (YES != isDirectory) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is not a directory, so ignoring", watchEvent.path]);
+        #endif
         
         //bail
         goto bail;
@@ -64,7 +68,9 @@
         (FSE_RENAME == watchEvent.flags) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is a directory and has 'FSE_CREATE_DIR/FSE_RENAME' set (not ignoring)", watchEvent.path]);
+        #endif
         
         //don't ignore
         shouldIgnore = NO;
@@ -97,7 +103,9 @@ bail:
     NSString* bundleID = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
+    #endif
     
     //load bundle
     // ->need bundle (kext) ID
@@ -111,7 +119,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got kext id: %@", bundleID]);
+    #endif
     
     //try unload kext
     if(nil != bundleID)
@@ -132,7 +142,9 @@ bail:
         else
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"successfully unloaded kext");
+            #endif
         }
     }
     
@@ -147,7 +159,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"kext was blocked!");
+    #endif
     
     //happy
     wasBlocked = YES;
@@ -176,7 +190,9 @@ bail:
     float currentWait = 0.0f;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting kext name for %@", watchEvent.path]);
+    #endif
     
     //try to get name of kext
     // ->might have to try several time since Info.plist may not exist right away...
@@ -198,7 +214,9 @@ bail:
             kextName = [bundle.infoDictionary[@"CFBundleExecutable"] lastPathComponent];
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat: @"extracted name: %@", kextName]);
+            #endif
             
             //got name, so bail
             break;
@@ -215,7 +233,9 @@ bail:
     if(nil == kextName)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"couldn't extract kext name, using file name");
+        #endif
         
         //set
         kextName = [watchEvent.path lastPathComponent];
@@ -242,7 +262,9 @@ bail:
     float currentWait = 0.0f;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting kext binary for %@", watchEvent.path]);
+    #endif
 
     //try to get name of kext
     // ->might have to try several time since bundle may not exist right away...
@@ -252,7 +274,9 @@ bail:
         [NSThread sleepForTimeInterval:WAIT_INTERVAL];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"napping...waiting for kext's binary name"]);
+        #endif
         
         //load bundle
         // ->and see if name is available
@@ -276,7 +300,9 @@ bail:
     } while(currentWait < maxWait);
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted name: %@", kextBinary]);
+    #endif
 
     return kextBinary;
 }

@@ -78,7 +78,9 @@
     NSError* error = nil;
 
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"beginning uninstall (as r00t)");
+    #endif
     
     //alloc
     launchAgents = [NSMutableArray array];
@@ -89,13 +91,28 @@
     //get installed launch agents
     launchAgents = [Install existingLaunchAgents];
     
+    //bail if not installed for anybody
+    // ->only could happen when invoked via cmdline ('-uninstall')
+    if(INSTALL_STATE_NONE == installedState)
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"bailing since not installed");
+        #endif
+        
+        //bail
+        goto bail;
+    }
+    
     //full uninstall when current user is only one w/ it installed
     // or when invoked via installer, since want everybody on the same version
     if( (YES == viaInstaller) ||
         (INSTALL_STATE_SELF_ONLY == installedState) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"performing FULL uninstall");
+        #endif
 
         //init destination path of app
         appPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
@@ -118,11 +135,13 @@
             }
             
             //just logic for dbg msg
+            #ifdef DEBUG
             else
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, @"fully uninstalled kext");
             }
+            #endif
         }
         
         //when launch daemon's plist is present
@@ -143,11 +162,13 @@
             }
             
             //just logic for dbg msg
+            #ifdef DEBUG
             else
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, @"fully uninstalled launch daemon");
             }
+            #endif
         }
         
         //uninstall launch agent(s)
@@ -162,12 +183,15 @@
             //don't bail
             // ->might as well keep on uninstalling other components
         }
+        
         //just logic for dbg msg
+        #ifdef DEBUG
         else
         {
             //dbg msg
             logMsg(LOG_DEBUG, @"fully uninstalled launch agent");
         }
+        #endif
         
         //uninstall app
         // ->handle case for both old & new
@@ -184,7 +208,9 @@
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"deleted application");
+        #endif
         
         //remove install directory
         if(YES == [[NSFileManager defaultManager] fileExistsAtPath:INSTALL_DIRECTORY])
@@ -207,7 +233,9 @@
     else
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"performing PARTIAL uninstall logic");
+        #endif
         
         //get console user
         consoleUser = getCurrentConsoleUser();
@@ -225,7 +253,9 @@
         if(YES == [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist(userHomeDirectory)])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"uninstalling %@", launchAgentPlist(userHomeDirectory)]);
+            #endif
         
             //uninstall launch agent
             if(YES != [self uninstallLaunchAgent:@[@{@"uid":consoleUser[@"uid"], @"plist":launchAgentPlist(userHomeDirectory)}]])
@@ -241,11 +271,13 @@
             }
             
             //just logic for dbg msg
+            #ifdef DEBUG
             else
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, @"fully uninstalled launch agent");
             }
+            #endif
         }
         
     }//partial uninstall
@@ -266,12 +298,15 @@
             //don't bail
             // ->might as well keep on uninstalling other components
         }
+        
         //just logic for dbg msg
+        #ifdef DEBUG
         else
         {
             //dbg msg
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"removed app's support directory, %@", supportDirectory()]);
         }
+        #endif
     }
     
 //bail
@@ -297,10 +332,9 @@ bail:
     NSError* error = nil;
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found: %@", launchDaemonPlist()]);
-        
-    //dbg msg
-    logMsg(LOG_DEBUG, @"will attempt to stop daemon");
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"will attempt to stop daemon: %@", launchDaemonPlist()]);
+    #endif
     
     //stop launch daemon
     if(YES != [controlObj stopDaemon])
@@ -313,7 +347,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"stopped launch daemon");
+    #endif
     
     //delete launch daemon's plist
     if(YES != [[NSFileManager defaultManager] removeItemAtPath:launchDaemonPlist() error:&error])
@@ -326,7 +362,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted launch daemon's plist (%@)", launchDaemonPlist()]);
+    #endif
     
     //no errors
     bRet = YES;
@@ -350,7 +388,9 @@ bail:
     for(NSDictionary* installedLaunchAgent in installedLaunchAgents)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"attempting to stop launch agent %@", installedLaunchAgent]);
+        #endif
         
         //stop launch agent
         if(YES != [controlObj stopAgent:installedLaunchAgent[@"plist"] uid:installedLaunchAgent[@"uid"]])
@@ -363,7 +403,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"stopped launch agent");
+        #endif
         
         //delete launch agent's plist
         if(YES != [[NSFileManager defaultManager] removeItemAtPath:installedLaunchAgent[@"plist"] error:&error])
@@ -376,7 +418,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted launch agent's plist (%@)", installedLaunchAgent]);
+        #endif
     }
     
     //no errors
@@ -404,7 +448,9 @@ bail:
     path = kextPath();
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"uninstalling kext (%@)", path]);
+    #endif
     
     //stop (unload) kext
     if(YES != [controlObj stopKext])
@@ -416,11 +462,13 @@ bail:
     }
     //stopped ok
     // ->just dbg msg
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"stopped kext");
     }
+    #endif
     
     //delete kext
     if(YES != [[NSFileManager defaultManager] removeItemAtPath:path error:&error])
@@ -433,7 +481,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"deleted kext");
+    #endif
     
     //no errors
     bRet = YES;
@@ -468,7 +518,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted application (%@)", [@"/Applications" stringByAppendingPathComponent:APPLICATION_NAME]]);
+        #endif
     }
     //check new location
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:[INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME]])
@@ -484,7 +536,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted application (%@)", [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME]]);
+        #endif
     }
     
     //no errors

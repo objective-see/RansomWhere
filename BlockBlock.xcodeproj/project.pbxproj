@@ -18,6 +18,7 @@
 		7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */; };
 		7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */; };
 		7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F2C1C018DA600A9CCE4 /* settings.png */; };
+		7D902D691E2AE207006124A5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D671E2AE207006124A5 /* MainMenu.xib */; };
 		CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CD06BD211A6C5D7C00DE285A /* LoginItem.m */; };
 		CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */; };
 		CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */; };
@@ -39,7 +40,6 @@
 		CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A41AF3629400CFCB68 /* statusONWhite@2x.png */; };
 		CD7C871519D43EAD00EC7F0A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C871419D43EAD00EC7F0A /* AppDelegate.m */; };
 		CD7C871C19D43F0200EC7F0A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C871A19D43F0200EC7F0A /* main.m */; };
-		CD7C871F19D43F9C00EC7F0A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */; };
 		CD7C872619D4432C00EC7F0A /* Watcher.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C872519D4432C00EC7F0A /* Watcher.m */; };
 		CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD7C872719D4459A00EC7F0A /* watchList.plist */; };
 		CD7C874119D4C58700EC7F0A /* AlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C873F19D4C58700EC7F0A /* AlertWindowController.m */; };
@@ -69,7 +69,6 @@
 		CDCA50851A47DA700086B4D3 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = CDCA50831A47DA700086B4D3 /* Logging.m */; };
 		CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD5681E1A5E37770094BC3A /* Launchd.m */; };
 		CDD738BF1A5F7D0500B825BA /* StatusBarPopoverController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */; };
-		CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C41A5F7FE800B825BA /* MainMenu.xib */; };
 		CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C71A5F7FE800B825BA /* Credits.rtf */; };
 		CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CDD738C91A5F7FE800B825BA /* InfoPlist.strings */; };
 		CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */ = {isa = PBXBuildFile; fileRef = CDD738D41A5F7FE800B825BA /* launchAgent.plist */; };
@@ -99,6 +98,7 @@
 		7D774F271C017C9000A9CCE4 /* PrefsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrefsWindowController.h; path = BlockBlock/PrefsWindowController.h; sourceTree = "<group>"; };
 		7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PrefsWindowController.m; path = BlockBlock/PrefsWindowController.m; sourceTree = "<group>"; };
 		7D774F2C1C018DA600A9CCE4 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = BlockBlock/images/settings.png; sourceTree = "<group>"; };
+		7D902D681E2AE207006124A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
 		CD06BD201A6C5D7C00DE285A /* LoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginItem.h; path = BlockBlock/plugins/LoginItem.h; sourceTree = "<group>"; };
 		CD06BD211A6C5D7C00DE285A /* LoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginItem.m; path = BlockBlock/plugins/LoginItem.m; sourceTree = "<group>"; };
 		CD3CE6871A22C53400B4F940 /* ConfigureWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigureWindowController.h; path = BlockBlock/ui/ConfigureWindowController.h; sourceTree = "<group>"; };
@@ -137,7 +137,6 @@
 		CD7C871819D43F0200EC7F0A /* BlockBlock-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "BlockBlock-Info.plist"; path = "BlockBlock/BlockBlock-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CD7C871919D43F0200EC7F0A /* BlockBlock-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "BlockBlock-Prefix.pch"; path = "BlockBlock/BlockBlock-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		CD7C871A19D43F0200EC7F0A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BlockBlock/main.m; sourceTree = SOURCE_ROOT; };
-		CD7C871E19D43F9C00EC7F0A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = BlockBlock/Base.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
 		CD7C872419D4432C00EC7F0A /* Watcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Watcher.h; path = BlockBlock/Watcher.h; sourceTree = SOURCE_ROOT; };
 		CD7C872519D4432C00EC7F0A /* Watcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Watcher.m; path = BlockBlock/Watcher.m; sourceTree = SOURCE_ROOT; };
 		CD7C872719D4459A00EC7F0A /* watchList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = watchList.plist; path = BlockBlock/watchList.plist; sourceTree = SOURCE_ROOT; };
@@ -184,7 +183,6 @@
 		CDD5681E1A5E37770094BC3A /* Launchd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Launchd.m; path = BlockBlock/plugins/Launchd.m; sourceTree = "<group>"; };
 		CDD738BA1A5F7D0500B825BA /* StatusBarPopoverController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarPopoverController.h; path = BlockBlock/StatusBarPopoverController.h; sourceTree = "<group>"; };
 		CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarPopoverController.m; path = BlockBlock/StatusBarPopoverController.m; sourceTree = "<group>"; };
-		CDD738C51A5F7FE800B825BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
 		CDD738C81A5F7FE800B825BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
 		CDD738CA1A5F7FE800B825BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
 		CDD738D41A5F7FE800B825BA /* launchAgent.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = launchAgent.plist; path = BlockBlock/launchAgent.plist; sourceTree = "<group>"; };
@@ -237,7 +235,6 @@
 				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
 				CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */,
 				CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */,
-				CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */,
 			);
 			name = ui;
 			sourceTree = "<group>";
@@ -419,7 +416,7 @@
 		CDD738C31A5F7FE800B825BA /* Base.lproj */ = {
 			isa = PBXGroup;
 			children = (
-				CDD738C41A5F7FE800B825BA /* MainMenu.xib */,
+				7D902D671E2AE207006124A5 /* MainMenu.xib */,
 			);
 			name = Base.lproj;
 			path = ../BlockBlock/Base.lproj;
@@ -496,7 +493,6 @@
 			files = (
 				CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */,
 				7D13FAD51E221370006813BE /* unknown.png in Resources */,
-				CD7C871F19D43F9C00EC7F0A /* MainMenu.xib in Resources */,
 				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
 				7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */,
 				CD9282E11B0133B8007A5E03 /* parentsIcon.png in Resources */,
@@ -519,9 +515,9 @@
 				CD7620A51AF3629400CFCB68 /* statusOFFWhite.png in Resources */,
 				CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */,
 				CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */,
-				CDD738D71A5F7FE800B825BA /* MainMenu.xib in Resources */,
 				CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */,
 				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
+				7D902D691E2AE207006124A5 /* MainMenu.xib in Resources */,
 				7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */,
 				CD9282E31B0133B8007A5E03 /* parentsIconOver.png in Resources */,
 				7D13FAD41E221370006813BE /* signedApple.png in Resources */,
@@ -598,18 +594,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		CD7C871D19D43F9C00EC7F0A /* MainMenu.xib */ = {
+		7D902D671E2AE207006124A5 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CD7C871E19D43F9C00EC7F0A /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-		CDD738C41A5F7FE800B825BA /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CDD738C51A5F7FE800B825BA /* Base */,
+				7D902D681E2AE207006124A5 /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";

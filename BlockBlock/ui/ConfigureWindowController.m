@@ -13,9 +13,6 @@
 #import "Utilities.h"
 #import "ConfigureWindowController.h"
 
-//TODO: detect unloading of launch agent? or deletion of app - make sure this doesn't make the system unbootable!!!!
-
-
 @implementation ConfigureWindowController
 
 @synthesize action;
@@ -94,7 +91,9 @@
     button = ((NSButton*)sender).title;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"handling action click: %@", button]);
+    #endif
     
     //handle non-'close' clicks
     if(YES != [button isEqualToString:ACTION_CLOSE])
@@ -114,7 +113,9 @@
         [self.statusMsg setNeedsDisplay:YES];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@'ing BlockBlock", button]);
+        #endif
         
         //invoke logic to install/uninstall
         // ->do in background so UI doesn't block
@@ -132,9 +133,6 @@
     // ->note: should always exit
     else
     {
-        //dbg msg
-        logMsg(LOG_DEBUG, @"closing...");
-        
         //close
         [self.window close];
     }
@@ -357,7 +355,9 @@ bail:
 -(void)windowWillClose:(NSNotification *)notification
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"configure window: windowWillClose()");
+    #endif
     
     //exit
     [NSApp terminate:self];

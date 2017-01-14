@@ -63,7 +63,9 @@
     installExceptionHandlers();
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"applicationDidFinishLaunching: loaded in process %d as %d\n", getpid(), geteuid()]);
+    #endif
     
     /* BEGIN: FOR TESTING ALERT WINDOW */
     /*
@@ -108,7 +110,9 @@
         ( (0x2 == arguments.count) && (YES == [arguments[1] hasPrefix:@"-psn"]) ))
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: kicking off initial install...");
+        #endif
         
         //make foreground so it has an dock icon, etc
         transformProcess(kProcessTransformToForegroundApplication);
@@ -132,7 +136,9 @@
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@ is supported", [[NSProcessInfo processInfo] operatingSystemVersionString]]);
+        #endif
         
         //display configure window w/ 'install' button
         // ->if user clicks 'install', install logic will begin
@@ -152,7 +158,9 @@
             shouldExit = YES;
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: installing (and starting) BLOCKBLOCK");
+            #endif
             
             //ui instance is calling waitpid
             // ->so briefly nap to give it time to enter that call...
@@ -163,6 +171,13 @@
             {
                 //err msg
                 logMsg(LOG_ERR, @"applicationDidFinishLaunching, r00t is required for install");
+                
+                //printf err if cmdline
+                if(YES == [arguments[1] isEqualToString:CMD_INSTALL])
+                {
+                    //err msg
+                    printf("ERROR: must be run as r00t to install\n\n");
+                }
             
                 //bail
                 goto bail;
@@ -178,21 +193,34 @@
                 //err msg
                 logMsg(LOG_ERR, @"applicationDidFinishLaunching, installation failed");
                 
+                //printf() err if cmdline
+                if(YES == [arguments[1] isEqualToString:CMD_INSTALL])
+                {
+                    //err msg
+                    printf("ERROR: installation failed\n\n");
+                }
+                
                 //bail
                 goto bail;
             }
             
             //dbg msg
-            logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: installed BLOCKBLOCK");
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: installed BLOCKBLOCK, now will start!");
+            #endif
             
-            //dbg msg
-            logMsg(LOG_DEBUG, @"now starting daemon & agent");
-           
             //start launch daemon
             if(YES != [controlObj startDaemon])
             {
                 //err msg
                 logMsg(LOG_ERR, @"applicationDidFinishLaunching, starting BLOCKBLOCK (daemon) failed");
+                
+                //printf() err if cmdline
+                if(YES == [arguments[1] isEqualToString:CMD_INSTALL])
+                {
+                    //err msg
+                    printf("ERROR: failed to start launch daemon\n\n");
+                }
                 
                 //bail
                 goto bail;
@@ -207,13 +235,29 @@
                     //err msg
                     logMsg(LOG_ERR, @"applicationDidFinishLaunching, starting BLOCKBLOCK (agent) failed");
                     
+                    //printf() err if cmdline
+                    if(YES == [arguments[1] isEqualToString:CMD_INSTALL])
+                    {
+                        //err msg
+                        printf("ERROR: failed to start launch agent\n\n");
+                    }
+                    
                     //bail
                     goto bail;
                 }
             }
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: started BLOCKBLOCK");
+            #endif
+            
+            //printf() if cmdline
+            if(YES == [arguments[1] isEqualToString:CMD_INSTALL])
+            {
+                //dbg msg
+                printf("installed BLOCKBLOCK\n");
+            }
             
             //no errors
             exitStatus = STATUS_SUCCESS;
@@ -225,7 +269,9 @@
         else if(YES == [arguments[1] isEqualToString:ACTION_RUN_DAEMON])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: starting BLOCKBLOCK (daemon)");
+            #endif
             
             //must be r00t
             if(0 != geteuid())
@@ -279,7 +325,9 @@
         else if(YES == [arguments[1] isEqualToString:ACTION_RUN_AGENT])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: starting BLOCKBLOCK (agent)");
+            #endif
             
             //alloc/init prefs
             prefsWindowController = [[PrefsWindowController alloc] initWithWindowNibName:@"PrefsWindow"];
@@ -299,7 +347,9 @@
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
                 {
                     //dbg msg
+                    #ifdef DEBUG
                     logMsg(LOG_DEBUG, @"checking for update");
+                    #endif
                     
                     //check
                     [self checkForUpdate];
@@ -350,7 +400,7 @@
             
         }//uninstall (UI)
         
-        //UNINSTALL
+        //UNINSTALL (auth'd)
         else if( (YES == [arguments[1] isEqualToString:ACTION_UNINSTALL]) ||
                  (YES == [arguments[1] isEqualToString:CMD_UNINSTALL]) )
         {
@@ -358,12 +408,18 @@
             shouldExit = YES;
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: uninstalling BLOCKBLOCK");
+            #endif
             
             //ui instance is calling waitpid
             // ->so briefly nap to give it time to enter that call...
-            [NSThread sleepForTimeInterval:0.25f];
-            
+            if(YES != [arguments[1] isEqualToString:CMD_UNINSTALL])
+            {
+                //sleep
+                [NSThread sleepForTimeInterval:0.25f];
+            }
+        
             //init uninstall
             // ->kick off uninstall logic
             if(YES != [self initUninstall])
@@ -371,8 +427,22 @@
                 //err msg
                 logMsg(LOG_ERR, @"applicationDidFinishLaunching, failed to init uninstall");
                 
+                //printf() err if cmdline
+                if(YES == [arguments[1] isEqualToString:CMD_UNINSTALL])
+                {
+                    //err msg
+                    printf("ERROR: failed to stop/uninstall BLOCKBLOCK\n");
+                }
+                
                 //bail
                 goto bail;
+            }
+            
+            //printf() if cmdline
+            else if(YES == [arguments[1] isEqualToString:CMD_UNINSTALL])
+            {
+                //dmg msg
+                printf("uninstalled BLOCKBLOCK\n");
             }
             
             //no errors
@@ -402,7 +472,9 @@ bail:
     if(YES == shouldExit)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"manually exiting %d", shouldExit]);
+        #endif
         
         //good bye!
         exit(exitStatus);
@@ -419,7 +491,9 @@ bail:
     BOOL bUninstalled = NO;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: uninstalling BLOCKBLOCK");
+    #endif
     
     //must be r00t
     if(0 != geteuid())
@@ -456,10 +530,14 @@ bail:
 -(void)startBlockBlocking_Daemon
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"startBlockBlocking_Daemon: starting BLOCKBLOCK Daemon");
+    #endif
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current user: %@", getCurrentConsoleUser()]);
+    #endif
     
     //create/init watcher
     watcher = [[Watcher alloc] init];
@@ -507,7 +585,9 @@ bail:
     if(YES == isNewVersion(versionString))
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"a new version (%@) is available", versionString]);
+        #endif
         
         //new version!
         // ->show update popup on main thread
@@ -548,7 +628,9 @@ bail:
     NSDictionary* currentUser = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"startBlockBlocking_Agent: starting BLOCKBLOCK agent");
+    #endif
     
     //wait till user logs in
     // ->otherwise bad things happen when trying to connect to the window server/status bar
@@ -574,7 +656,9 @@ bail:
     } while(YES);
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"user logged in/UI session ok!");
+    #endif
     
     //enable IPC notification for agent
     [self.interProcComms enableNotification:RUN_INSTANCE_AGENT];

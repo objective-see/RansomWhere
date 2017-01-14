@@ -28,7 +28,9 @@
     processUID = CGEventGetIntegerValueField(event.CGEvent, kCGEventSourceUserID);
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking mouse event (%lld/%lld)", processID, processUID]);
+    #endif
     
     //allow if root, or uid (root) or _hidd (261)
     if( (0 != processID) &&

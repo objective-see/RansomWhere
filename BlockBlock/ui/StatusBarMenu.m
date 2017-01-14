@@ -294,7 +294,7 @@ bail:
         //dbg msg
         // ->and log to file (if logging is enabled)
         logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'enable'");
-        
+    
         //set button to enabled
         // ->but only YOSEMITE+
         if(YES != preYosemite)
@@ -327,7 +327,9 @@ bail:
     logMsg(LOG_DEBUG|LOG_TO_FILE, @"user clicked: 'uninstall'");
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"exec'ing UI instance of uninstaller");
+    #endif
     
     //kick of uninstaller
     // ->self, with 'Uninstall_UI' as argument
@@ -348,7 +350,9 @@ bail:
     PrefsWindowController* prefsWindowController = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"displaying preferences window");
+    #endif
     
     //grab controller
     prefsWindowController = ((AppDelegate*)[[NSApplication sharedApplication] delegate]).prefsWindowController;

@@ -107,7 +107,9 @@
             if(YES == [currentWatchEvent matchesWhiteListed:whitelistedEvent])
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, @"automatically allowing whitelisted event");
+                #endif
                 
                 //set flag
                 whiteListed = YES;
@@ -133,7 +135,9 @@
         if(YES == [lastWatchEvent isRelated:currentWatchEvent])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"is a related event");
+            #endif
 
             //set
             previousWatchEvent = lastWatchEvent;
@@ -151,7 +155,9 @@
                 if(YES == [currentWatchEvent matchesRemembered:rememberedWatchEvent])
                 {
                     //dbg msg
+                    #ifdef DEBUG
                     logMsg(LOG_DEBUG, @"is a remembered event");
+                    #endif
                     
                     //got match
                     // ->save
@@ -168,14 +174,18 @@
         if(nil != previousWatchEvent)
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"event is related/remembered: %@ %@ (%@ -> %@)", currentWatchEvent.process.path, currentWatchEvent.plugin.alertMsg, currentWatchEvent.path, currentWatchEvent.itemObject]);
+            #endif
             
             //prev. event one was blocked
             // ->block this one too
             if(YES == previousWatchEvent.wasBlocked)
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, @"automatically blocking related/remembered event");
+                #endif
                 
                 //automatically block it
                 // ->plugins will be same
@@ -186,7 +196,9 @@
             else
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, @"automatically allowing related/remembered event");
+                #endif
                 
                 //automatically allow it
                 // ->plugins will be same
@@ -200,7 +212,9 @@
         else
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"NEW WATCH EVENT (will broadcast): %@", currentWatchEvent]);
+            #endif
         
             //make an alert dictionary
             // ->contains everything needed to display the alert to the user
@@ -217,7 +231,9 @@
                 reportedWatchEvents[[currentWatchEvent.uuid UUIDString]] = currentWatchEvent;
                 
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"added watch event %@ to dictionary (%@)", currentWatchEvent.uuid,  ((AppDelegate*)[[NSApplication sharedApplication] delegate]).reportedWatchEvents]);
+                #endif
                 
                 //check on number of stored watch events
                 // ->prune (remove old ones) if needed
@@ -268,7 +284,9 @@
     NSArray* keys = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"pruning watch events...");
+    #endif
     
     //get all keys
     keys = [reportedWatchEvents allKeys];
@@ -278,7 +296,9 @@
     for(NSString* key in keys)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"obj: %@", reportedWatchEvents[key]]);
+        #endif
         
         //check for old events
         // ->anything over 1 hr

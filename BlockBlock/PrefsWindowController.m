@@ -157,7 +157,9 @@ bail:
         if(NSOnState != self.enableLoggingBtn.state)
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"selecting logging, then disabling");
+            #endif
             
             //select logging
             self.enableLoggingBtn.state = NSOnState;
@@ -178,7 +180,9 @@ bail:
         if(YES == self.loggingViaPassive)
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"unselecting logging");
+            #endif
             
             //unselect logging (as well)
             self.enableLoggingBtn.state = NSOffState;
@@ -188,7 +192,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"enabling logging button");
+        #endif
 
         //always enable logging button
         self.enableLoggingBtn.enabled = YES;

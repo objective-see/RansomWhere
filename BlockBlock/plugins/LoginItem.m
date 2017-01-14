@@ -28,7 +28,9 @@
     if(nil != self)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"init'ing %@ (%p)", NSStringFromClass([self class]), self]);
+        #endif
         
         //set type
         self.type = PLUGIN_TYPE_LOGIN_ITEM;
@@ -52,14 +54,18 @@
         (FSE_RENAME == watchEvent.flags) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE/FSE_RENAME' set (not maybe ignoring)", watchEvent.path]);
+        #endif
         
         //only care about new login items
         // ->(might be another file edits which are ok to ignore)
         if(nil != [self findLoginItem:watchEvent])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"found new login item, so NOT IGNORING");
+            #endif
             
             //don't ignore
             shouldIgnore = NO;
@@ -67,12 +73,14 @@
             //TODO: save this in watch event when later don't have to re-lookup (avoids race cond)
         }
     }
-    //dbg
+    //dbg msg
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%lu is a flag the %@ plugin doesn't care about....", (unsigned long)watchEvent.flags, NSStringFromClass([self class])]);
     }
+    #endif
     
     //if ignoring
     // ->still update originals
@@ -98,7 +106,9 @@
 -(void)newAgent:(NSDictionary*)newUser
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"LOGIN ITEMS, handling new agent %@/%@", newUser, self.watchPaths]);
+    #endif
     
     //iterate over plugin's watch paths
     // ->any that are user specific (~) save original login items for new user
@@ -108,7 +118,9 @@
         if(YES == [watchPath hasPrefix:@"~"])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"LOGIN ITEMS, saving orginals for %@", watchPath]);
+            #endif
 
             //matched
             // ->save orginals
@@ -161,7 +173,9 @@
     NSDictionary* loginItems = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updating orginals of user's login items at: %@", path]);
+    #endif
     
     //load login items
     loginItems = [NSDictionary dictionaryWithContentsOfFile:path];
@@ -215,7 +229,9 @@
     currentLoginItems = [NSMutableDictionary dictionary];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"ORIGINALS: %@", ((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals]);
+    #endif
     
     //grab original login items
     plistData = [((AppDelegate*)[[NSApplication sharedApplication] delegate]).orginals objectForKey:watchEvent.path];
@@ -249,7 +265,9 @@
     if(0x0 == newLoginItems.count)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"didn't find any new login items...");
+        #endif
         
         //reset
         newLoginItem = nil;
@@ -259,7 +277,9 @@
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new login items: %@", newLoginItems]);
+    #endif
     
     //sanity check
     if(0x1 != newLoginItems.count)
@@ -302,8 +322,9 @@
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new login item: %@", newLoginItem]);
-    
+    #endif
     
 //bail
 bail:
@@ -405,7 +426,9 @@ bail:
     pid_t loginItemPID = 0;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
+    #endif
     
     //alloc dictionary
     actionInfo = [NSMutableDictionary dictionary];
@@ -449,11 +472,13 @@ bail:
     }
     //deleted OK
     // ->just log msg
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", loginItemPath]);
     }
+    #endif
     
     //get most recent process that matches path
     loginItemPID = mostRecentProc(((AppDelegate*)[[NSApplication sharedApplication] delegate]).processMonitor.processList, loginItemPath);
@@ -462,7 +487,11 @@ bail:
     if(0 != loginItemPID)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"killing %@ (pid: %d)", loginItemPath, loginItemPID]);
+        #endif
+        
+        //kill
         if(0 != kill(loginItemPID, SIGKILL))
         {
             //err msg
@@ -471,11 +500,13 @@ bail:
     }
     //pid not found
     // ->just log msg about this (might not have been started yet, etc)
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find pid for %@", loginItemPath]);
     }
+    #endif
     
     //happy
     wasBlocked = YES;
@@ -513,7 +544,9 @@ bail:
     appleScriptCmd = [NSString stringWithFormat:@"tell application \"System Events\" to delete login item \"%@\"", name];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"exec'ing: %@", appleScriptCmd]);
+    #endif
     
     //init apple script
     appleScript = [[NSAppleScript alloc] initWithSource:appleScriptCmd];
@@ -529,7 +562,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"exec'ing %@ to delete login item", appleScript]);
+    #endif
     
     //execute apple script
     // ->should delete login item
@@ -546,7 +581,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"launch item was blocked %@", appleScriptResult]);
+    #endif
     
     //happy
     wasDeleted = YES;

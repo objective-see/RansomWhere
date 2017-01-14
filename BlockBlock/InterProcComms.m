@@ -60,7 +60,9 @@
 -(void)enableNotification:(NSUInteger)type
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"enabling notification for %lu", (unsigned long)type]);
+    #endif
     
     //launch daemon
     // ->alert processor and uninstall listeners
@@ -82,7 +84,9 @@
     else if(type == RUN_INSTANCE_AGENT)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"ADDING OBSERVER: %@", self]);
+        #endif
         
         //register listener for to show alerts (in UI)
         // ->will be invoked from background (launch daemon) instance...
@@ -120,7 +124,9 @@
     activeUser = getCurrentConsoleUser();
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"will broadcast login item delete msg");
+    #endif
     
     //sanity check
     // ->make sure there is a target uid
@@ -157,7 +163,9 @@
     NSDictionary* newUser = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"got msg from UI (agent) to register agent");
+    #endif
     
     //assign
     newUser = notification.userInfo;
@@ -171,7 +179,9 @@
     [((AppDelegate*)[[NSApplication sharedApplication] delegate]).watcher updateWatchedPaths:self.registeredAgents];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"alerting all plugins of new agent");
+    #endif
     
     //alert all plugins of new agent
     // ->allow them to plugin-specific logic
@@ -217,8 +227,10 @@
     userInfo[KEY_USER_NAME] = NSUserName();
         
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to register with daemon", userInfo]);
-        
+    #endif
+    
     //send notification to background (daemon) instance
     // ->tell it to register client
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:SHOULD_HANDLE_AGENT_REGISTRATION_NOTIFICATION object:nil userInfo:userInfo options:NSNotificationDeliverImmediately | NSNotificationPostToAllSessions];
@@ -248,7 +260,9 @@
     }
 
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"sending %@ to daemon", actionInfo]);
+    #endif
     
     //send notification to background (daemon) instance
     // ->tell it to block/allow event
@@ -278,14 +292,18 @@
     if(0 == watchEvent.process.uid)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"watch event is associated with r00t");
+        #endif
         
         //handle Login Item case
         // ->this is special, since always r00t, but need to find correct session (might not be active)
         if(PLUGIN_TYPE_LOGIN_ITEM == watchEvent.plugin.type)
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"login item session lookup");
+            #endif
             
             //check all users
             // ->do any have the launch agent installed?
@@ -298,7 +316,9 @@
                     targetUID = [userID intValue];
                     
                     //dbg msg
+                    #ifdef DEBUG
                     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"setting uid to %u", targetUID]);
+                    #endif
                     
                     //found match
                     // ->can bail
@@ -329,7 +349,9 @@
             targetUID = [activeUser[@"uid"] intValue];
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"setting uid to active one: %u", targetUID]);
+            #endif
         }
         
     }//watchevent is associated with r00t session
@@ -353,7 +375,9 @@ bail:
     watchEvent.reportedUID = [userInfo[KEY_TARGET_UID] intValue];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"broadcasting request to UI agent(s) to display alert");
+    #endif
     
     //send notification to UI (agent) to display alert to user
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:SHOULD_DISPLAY_ALERT_NOTIFICATION
@@ -370,7 +394,9 @@ bail:
 -(void)sendErrorToAgent:(NSDictionary*)errorInfo
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"broadcasting request to UI agent(s) to display error");
+    #endif
     
     //send notification to UI (agent) to display alert to user
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:SHOULD_DISPLAY_ERROR_NOTIFICATION
@@ -394,13 +420,17 @@ bail:
     AlertWindowController* alertWindow = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got request from daemon to show alert (ui) :%d/%@", getpid(), getCurrentConsoleUser()]);
+    #endif
     
     //extract target UID
     targetUID = [notification.userInfo[KEY_TARGET_UID] intValue];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking alert is for this session: %d matches %d?", targetUID, getuid()]);
+    #endif
     
     //check if target UID matches UI of this session
     // ->or also, is for all sessions
@@ -408,7 +438,9 @@ bail:
         (targetUID != UID_ALL_SESSIONS) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"alert is *NOT* for this session! (ignoring)");
+        #endif
         
         //bail
         goto bail;
@@ -441,7 +473,9 @@ bail:
     else if(YES == ((AppDelegate*)[[NSApplication sharedApplication] delegate]).prefsWindowController.passiveMode)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"passive mode enable, so not showing alert");
+        #endif
         
         //dbg msg
         // ->and log to file (if logging is enabled)
@@ -454,7 +488,9 @@ bail:
     else
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"showing alert to user");
+        #endif
         
         //dbg msg
         // ->and log to file (if logging is enabled)
@@ -531,7 +567,9 @@ bail:
     targetUID = [userInfo[KEY_TARGET_UID] intValue];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking error msg is for this session: %d matches %d?", targetUID, getuid()]);
+    #endif
     
     //check if target UID matches UI of this session
     // ->or also, is for all sessions
@@ -539,7 +577,9 @@ bail:
         (targetUID != UID_ALL_SESSIONS) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"error msg is *NOT* for this session! (ignoring)");
+        #endif
         
         //bail
         goto bail;
@@ -610,7 +650,9 @@ bail:
     actionInfo = notification.userInfo;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got apple script request from daemon: %@", actionInfo]);
+    #endif
     
     //sanity check
     if( (nil == actionInfo[KEY_ACTION]) ||
@@ -627,13 +669,17 @@ bail:
     targetUID = [notification.userInfo[KEY_TARGET_UID] intValue];
 
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking action is for this session: %d matches %d?", targetUID, getuid()]);
+    #endif
     
     //check if target UID matches UI of this session
     if(targetUID != getuid())
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"action is *NOT* for this session! (ignoring)");
+        #endif
         
         //bail
         goto bail;
@@ -647,7 +693,9 @@ bail:
         case ACTION_DELETE_LOGIN_ITEM:
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"blocking/deleting login item");
+            #endif
             
             //delete login item
             // ->display error if it fails
@@ -712,7 +760,9 @@ bail:
             else
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, @"deleted login item!");
+                #endif
             }
         
             break;
@@ -754,7 +804,9 @@ bail:
     alertSelection = notification.userInfo;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got alert response from user: %@", notification.userInfo]);
+    #endif
     
     //sanity check
     if( (nil == alertSelection[KEY_WATCH_EVENT_UUID]) ||
@@ -786,7 +838,9 @@ bail:
     if(nil != reportedWatchEvent)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found watch event for %@", alertSelection[KEY_WATCH_EVENT_UUID]]);
+        #endif
         
         //save it if user selected 'remember'
         if( (nil != alertSelection[KEY_REMEMBER]) &&
@@ -818,7 +872,9 @@ bail:
                 [((NSMutableArray*)((AppDelegate*)[[NSApplication sharedApplication] delegate]).whiteList) writeToFile:[INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE] atomically:YES];
                 
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updated whitelist'd event (%@)", [INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE]]);
+                #endif
             }
         }
         
@@ -826,7 +882,9 @@ bail:
         if(BLOCK_WATCH_EVENT == [alertSelection[@"action"] integerValue])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"blocking %@'s attempt to create %@", reportedWatchEvent.process.path, reportedWatchEvent.path]);
+            #endif
             
             //invoke plugin's block method
             // ->send error msg if blocking fails
@@ -860,13 +918,15 @@ bail:
                 // ->it will display the alert
                 [self sendErrorToAgent:errorInfo];
             }
-            //success
-            // ->for msg/logging logic only
+            
+            //dbg msg
+            #ifdef DEBUG
             else
             {
                 //dbg msg
                 logMsg(LOG_DEBUG, @"successfully blocked");
             }
+            #endif
             
             //indicate it was blocked
             // ->needed for subsequent (automated) processing
@@ -876,7 +936,9 @@ bail:
         else if(ALLOW_WATCH_EVENT == [alertSelection[@"action"] integerValue])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"allowing %@'s attempt to create %@", reportedWatchEvent.process.path, reportedWatchEvent.path]);
+            #endif
             
             //invoke plugin's block method
             [reportedWatchEvent.plugin allow:reportedWatchEvent];

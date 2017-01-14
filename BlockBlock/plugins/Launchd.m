@@ -23,7 +23,9 @@
     if(nil != self)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"init'ing %@ (%p)", NSStringFromClass([self class]), self]);
+        #endif
         
         //set type
         self.type = PLUGIN_TYPE_LAUNCHD;
@@ -50,7 +52,9 @@
         [[watchEvent.path pathExtension] isEqualToString:@"plist"] )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ has 'FSE_CREATE_FILE || FSE_RENAME' set and is a plist (not ignoring)", watchEvent.path]);
+        #endif
         
         //don't ignore
         shouldIgnore = NO;
@@ -77,7 +81,9 @@
     NSUInteger status = -1;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"PLUGIN %@: blocking %@", NSStringFromClass([self class]), watchEvent.path]);
+    #endif
     
     //STEP 1: unload launch item via launchctl
     
@@ -90,12 +96,14 @@
         
         //don't bail since still want to delete, etc
     }
-    //just dbg output
+    //dbg msg
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"unload %@", watchEvent.path]);
     }
+    #endif
     
     //STEP 2: delete launch item binary
    
@@ -113,12 +121,15 @@
             
             //don't bail since still want to delete plist...
         }
-        //just dbg output
+        
+        #ifdef DEBUG
+        //dbg msg
         else
         {
             //dbg msg
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", itemBinary]);
         }
+        #endif
     }
     //couldn't get path to binary
     // ->just log msg (since still want to try delete plist)
@@ -138,15 +149,20 @@
         
         //don't bail since still want to delete plist...
     }
-    //just dbg output
+    
+    //dbg msg
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"deleted %@", watchEvent.path]);
     }
+    #endif
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"launch item was blocked!");
+    #endif
     
     //happy
     wasBlocked = YES;

@@ -100,14 +100,18 @@
 -(BOOL)matchesRemembered:(WatchEvent*)rememberedEvent
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is remembered (%@)", self, rememberedEvent]);
+    #endif
     
     //check 1:
     // ->different startup item path
     if(YES != [self.path isEqualToString:rememberedEvent.path])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"path %@ != %@", self.path, rememberedEvent.path]);
+        #endif
         
         //nope!
         return NO;
@@ -118,7 +122,9 @@
     if(YES != [self.itemObject isEqualToString:rememberedEvent.itemObject])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemObject, rememberedEvent.itemObject]);
+        #endif
         
         //nope!
         return NO;
@@ -129,7 +135,9 @@
     if(YES != [self.process.path isEqualToString:rememberedEvent.process.path])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process path %@ != %@", self.process.path, rememberedEvent.process.path]);
+        #endif
         
         //nope!
         return NO;
@@ -144,14 +152,18 @@
 -(BOOL)matchesWhiteListed:(NSDictionary*)whitelistedEvent
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is whitelisted (%@)", self, whitelistedEvent]);
+    #endif
     
     //check 1:
     // ->different startup item path
     if(YES != [self.path isEqualToString:whitelistedEvent[@"itemPath"]])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"path %@ != %@", self.path, whitelistedEvent[@"itemPath"]]);
+        #endif
         
         //nope!
         return NO;
@@ -162,7 +174,9 @@
     if(YES != [self.itemObject isEqualToString:whitelistedEvent[@"itemObject"]])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ != %@", self.itemObject, whitelistedEvent[@"itemObject"]]);
+        #endif
         
         //nope!
         return NO;
@@ -173,7 +187,9 @@
     if(YES != [self.process.path isEqualToString:whitelistedEvent[@"processPath"]])
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process path %@ != %@", self.process.path, whitelistedEvent[@"processPath"]]);
+        #endif
         
         //nope!
         return NO;
@@ -363,7 +379,9 @@
     
     //dbg msg
     // ->here since don't want to print out icon!
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"ALERT INFO dictionary: %@", alertInfo]);
+    #endif
     
     //finally add icon
     // note: don't try to log this!
@@ -547,7 +565,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"processHierarchy %@", processHierarchy]);
+    #endif
     
     //add the index value to each process in the hierarchy
     // ->used to populate outline/table

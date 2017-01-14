@@ -81,7 +81,9 @@
     fread(&authPID, sizeof(self.authPID), 0x1, commsPipe);
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got pid from (auth'd) child: %d", self.authPID]);
+    #endif
     
     //no errors
     bRet = YES;
@@ -146,7 +148,7 @@ bail:
     if(STATUS_SUCCESS != installerResult)
     {
         //err msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"installed (child) failed with %d", installerResult]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"installer, (child) failed with %d", installerResult]);
         
         //bail
         goto bail;
@@ -184,10 +186,14 @@ bail:
     [[NSUserDefaults standardUserDefaults] setPersistentDomain:[NSDictionary dictionary] forName:[[NSBundle mainBundle] bundleIdentifier]];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"removed app/user's preferences");
+    #endif
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"auth'd %@ (%d) spawned OK, will wait...", parameter, self.authPID]);
+    #endif
     
     //wait till (auth'd) installer complete
     if(YES != [self waitTillPau])
@@ -197,7 +203,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"auth'd %@ exited OK", parameter]);
+    #endif
 
     //no errors
     bRet = YES;
@@ -281,11 +289,15 @@ bail:
         [parameters addObject:plist];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current UID: %d", currentUID]);
+        #endif
     }
 
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"performing %@", parameters]);
+    #endif
     
     //control launch item
     // ->and check
@@ -335,7 +347,9 @@ bail:
     [parameters addObject:kextPath()];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"starting kext with %@", parameters]);
+    #endif
 
     //load kext
     status = execTask(KEXT_LOAD, parameters, YES);
@@ -380,7 +394,9 @@ bail:
     [parameters addObject:KEXT_LABEL];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"stopping kext with %@", parameters]);
+    #endif
     
     //unload kext
     status = execTask(KEXT_UNLOAD, parameters, YES);

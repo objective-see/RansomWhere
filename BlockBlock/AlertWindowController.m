@@ -122,7 +122,9 @@
             self.processHierarchy = alertInfo[key];
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process heirarchy: %@", self.processHierarchy]);
+            #endif
             
             //next
             continue;

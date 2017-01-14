@@ -160,7 +160,9 @@ id getValueFromPlist(NSString* plistFile, NSString* key, float maxWait)
             [NSThread sleepForTimeInterval:WAIT_INTERVAL];
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"napping...plist");
+            #endif
             
             //try to load content's of Info.plist
             plistContents = [NSDictionary dictionaryWithContentsOfFile:plistFile];
@@ -301,7 +303,9 @@ NSUInteger execTask(NSString* path, NSArray* arguments, BOOL waitUntilExit)
     if(YES == waitUntilExit)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"waiting for task to exit");
+        #endif
         
         //wait
         [task waitUntilExit];
@@ -310,7 +314,9 @@ NSUInteger execTask(NSString* path, NSArray* arguments, BOOL waitUntilExit)
         taskStatus = [task terminationStatus];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"task exited with %lu", (unsigned long)taskStatus]);
+        #endif
 
     }
     //don't wait
@@ -618,7 +624,9 @@ NSString* getLatestVersion()
     latestVersion = versionDictionary[@"latestVersion"];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"latest version: %@", latestVersion]);
+    #endif
     
 //bail
 bail:
@@ -643,10 +651,12 @@ BOOL isProcessAlive(pid_t processID)
     
     //is alive?
     if( (0 == signalStatus) ||
-       ( (0 != signalStatus) && (errno != ESRCH) ) )
+        ( (0 != signalStatus) && (errno != ESRCH) ) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"agent (%d) is ALIVE", processID]);
+        #endif
         
         //alive!
         bIsAlive = YES;
@@ -679,7 +689,9 @@ BOOL isSupportedOS()
     if(10 != [osVersionInfo[@"majorVersion"] intValue])
     {
         //err msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS major version %@ not supported", osVersionInfo[@"majorVersion"]]);
+        #endif
         
         //bail
         goto bail;
@@ -689,7 +701,9 @@ BOOL isSupportedOS()
     if([osVersionInfo[@"minorVersion"] intValue] < 9)
     {
         //err msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS minor version %@ not supported", osVersionInfo[@"minor"]]);
+        #endif
         
         //bail
         goto bail;
@@ -734,7 +748,9 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set ownership for %@ (%@)", path, fileOwner]);
+    #endif
     
     //do it recursively
     if(YES == recursive)
@@ -974,7 +990,9 @@ pid_t getParentID(int pid)
         parentID = processStruct.kp_eproc.e_ppid;
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted parent ID %d for process: %d", parentID, pid]);
+        #endif
     }
     
     return parentID;

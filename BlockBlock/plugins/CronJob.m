@@ -26,7 +26,9 @@
     if(nil != self)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"init'ing %@ (%p)", NSStringFromClass([self class]), self]);
+        #endif
         
         //set type
         self.type = PLUGIN_TYPE_CRON_JOB;
@@ -69,7 +71,9 @@
     NSString* newCronJob = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOB %@ flag: %lu' set", watchEvent.path, (unsigned long)watchEvent.flags]);
+    #endif
     
     //create/modification/rename of file
     // ->note: OS does a rename
@@ -153,7 +157,9 @@
 -(void)newAgent:(NSDictionary*)newUser
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, handling new agent %@/%@", newUser, self.watchPaths]);
+    #endif
     
     //iterate over plugin's watch paths
     // ->any that are user specific (~) save original cron jobs for new user
@@ -163,7 +169,9 @@
         if(YES == [watchPath hasSuffix:@"~"])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, saving orginals for %@", watchPath]);
+            #endif
             
             //matched
             // ->save orginals
@@ -182,13 +190,17 @@
     NSData* cronJobs = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updating orginals of user's cron jobs at: %@", path]);
+    #endif
     
     //load login items
     cronJobs = [NSData dataWithContentsOfFile:path];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"user's originals: %@", [[NSString alloc] initWithData:cronJobs encoding:NSUTF8StringEncoding]]);
+    #endif
 
     //save em
     if(nil != cronJobs)
@@ -250,7 +262,9 @@
     relativeComplement = [newCronJobs filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF IN %@", originalCronJobs]];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new jobs: %@", relativeComplement]);
+    #endif
     
     //grab first new one
     //TODO: handle multiple cron jobs?
@@ -292,16 +306,22 @@
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, found %@ at index %lu", watchEvent.itemObject, (unsigned long)index]);
+    #endif
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, before %@", [cronJobs componentsJoinedByString:@"\n"]]);
+    #endif
     
     //remove unwanted cron job
     [cronJobs removeObjectAtIndex:index];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"CRON JOBS, after; %@", [cronJobs componentsJoinedByString:@"\n"]]);
+    #endif
     
     //update file
     [[cronJobs componentsJoinedByString:@"\n"] writeToFile:watchEvent.path atomically:YES];

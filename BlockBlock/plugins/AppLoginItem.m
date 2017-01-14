@@ -28,7 +28,9 @@
     if(nil != self)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"init'ing %@ (%p)", NSStringFromClass([self class]), self]);
+        #endif
         
         //set type
         self.type = PLUGIN_TYPE_APP_LOGIN_ITEM;
@@ -61,7 +63,9 @@
     float currentWait = 0.0f;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"checking if %@ is/or has an app helper login item", watchEvent.path]);
+    #endif
     
     //ignore anything that's not a directory
     // ->since app helper login items are bundles (directories)
@@ -97,7 +101,9 @@
         loginItemDirectory = [NSString pathWithComponents:@[watchEvent.path, @"/Contents/Library/LoginItems/"]];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"looking for login item in %@", loginItemDirectory]);
+        #endif
         
         //try manually find it
         do
@@ -131,7 +137,9 @@
     else
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ matches regex, so not ignoring", watchEvent.path]);
+        #endif
         
         //set flag
         shouldIgnore = NO;
@@ -176,23 +184,32 @@ bail:
     if(0 != loginItemPID)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"killing %@ (pid: %d)", watchEvent.path, loginItemPID]);
+        #endif
+        
+        //kill
         if(0 != kill(loginItemPID, SIGKILL))
         {
             //err msg
             logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to kill login item %@ (pid: %d)", watchEvent.path, loginItemPID]);
         }
     }
+    
     //pid not found
     // ->just log msg about this (might not have been started yet, etc)
+    #ifdef DEBUG
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find pid for %@", watchEvent.path]);
     }
+    #endif
     
+    #ifdef DEBUG
     //dbg msg
     logMsg(LOG_DEBUG, @"application login item was blocked!");
+    #endif
     
     //happy
     wasBlocked = YES;
@@ -221,7 +238,9 @@ bail:
     float currentWait = 0.0f;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting app login item name for %@", watchEvent.path]);
+    #endif
     
     //try to get name of kext
     // ->might have to try several time since Info.plist may not exist right away...
@@ -260,7 +279,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat: @"extracted name: %@", name]);
+    #endif
     
 //bail
 bail:
@@ -286,7 +307,9 @@ bail:
     float currentWait = 0.0f;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracting app login item binary for %@", watchEvent.path]);
+    #endif
     
     //try to get name of binary
     // ->might have to try several time since bundle may not exist right away...
@@ -320,14 +343,18 @@ bail:
     if(nil == binary)
     {
         //dbg err msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"failed to find binary for app login item");
+        #endif
         
         //bail
         goto bail;
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted name: %@", binary]);
+    #endif
     
 //bail
 bail:

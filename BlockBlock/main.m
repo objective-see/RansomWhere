@@ -34,18 +34,18 @@ int main(int argc, const char * argv[])
     }
     
     //dbg msg
+    #ifdef DEBUG 
     logMsg(LOG_DEBUG, @"launched, in main()");
+    #endif
     
-    //debug mode logic
+    //dbg msg
+    // ->display args
     #ifdef DEBUG
-    
-    //log args
     for(int i = 0; i < argc; i++)
     {
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"arg[%d]: %s", i, argv[i]]);
     }
-    
     #endif
     
     //for daemon
@@ -70,7 +70,9 @@ int main(int argc, const char * argv[])
         } while(YES);
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"daemon continuing, as user logged in/UI session ok!");
+        #endif
     }
     
     //rest of logic is performed in app delegate

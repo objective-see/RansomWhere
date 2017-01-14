@@ -124,7 +124,9 @@ bail:
     for(NSDictionary* watchItem in self.watchItems)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"watch item: %@/%@", watchItem, NSClassFromString(watchItem[@"class"])]);
+        #endif
         
         //init plugin
         // ->will also init paths
@@ -144,7 +146,9 @@ bail:
             if(NSNotFound != [path rangeOfString:@"~"].location)
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"skipping plugin path: %@ - will be expanded shortly", path]);
+                #endif
                 
                 //skip
                 continue;
@@ -180,13 +184,17 @@ bail:
     NSString* expandedPath = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"updating watch paths");
+    #endif
     
     //update plugin mappings
     for(PluginBase* plugin in self.plugins)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"plugin: %@/%@", plugin, plugin.watchPaths]);
+        #endif
         
         //add all plugin's watch paths
         // -> paths with ~s are expanded into all registered users
@@ -196,7 +204,9 @@ bail:
             if(NSNotFound != [path rangeOfString:@"~/"].location)
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path: %@", path]);
+                #endif
                 
                 //expand all
                 for(NSNumber* key in registeredAgents)
@@ -214,7 +224,9 @@ bail:
             else if(YES == [path hasSuffix:@"~"])
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, [NSString stringWithFormat:@"expanding plugin path with ~ at end: %@", path]);
+                #endif
                 
                 //expand all
                 for(NSNumber* key in registeredAgents)
@@ -238,13 +250,13 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updated watch list/plugin mappings: %@", pluginMappings]);
+    #endif
     
     return;
 }
 
-
-//TODO: close/kill thread on exit/disable?!?
 //have to use fsevents directly since the FSEvents Framework doesn't give us the pID of the creator :/
 // note: http://www.opensource.apple.com/source/xnu/xnu-2782.1.97/bsd/vfs/vfs_fsevents.c "Using /dev/fsevents directly is unsupported." - can ignore this warning
 -(void)startWatch:(id)threadParam
@@ -283,7 +295,9 @@ bail:
     fsEvents = malloc(BUFSIZE);
 
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file watcher thread off and running"]);
+    #endif
     
     //init matched path
     matchedPath = [NSMutableString string];
@@ -336,7 +350,7 @@ bail:
     if(ioctl(fsed, FSEVENTS_CLONE, &clonedArgs) < 0)
     {
         //err msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to clone fs descrption (via ioctl)"]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to clone fs descrption (via ioctl)"]);
         
         //bail
         goto bail;
@@ -403,7 +417,9 @@ bail:
                 if(YES != [handlerPlugin shouldIgnore:watchEvent])
                 {
                     //dbg msg
+                    #ifdef DEBUG
                     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"NON-ignored watch event: %@", watchEvent]);
+                    #endif
                     
                     //now, save item's binary
                     // ->needed to match 'remembered' items
@@ -413,19 +429,22 @@ bail:
                     // ->this will trigger alert, and handling of event, etc
                     [((AppDelegate*)[[NSApplication sharedApplication] delegate]).eventQueue enqueue:watchEvent];
                 }
+                
                 //ignore
+                // ->just dbg msg
+                #ifdef DEBUG
                 else
                 {
                     //dbg msg
                     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"plugin: %@, decided to ignore event", handlerPlugin]);
                 }
+                #endif
                 
             }//found plugin
         
         }//while parsing data
             
-        //pool
-        }
+        }//pool
         
     }//while read events
     
@@ -474,7 +493,9 @@ bail:
     Process* processFromList = nil;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"creating watch event for %@ (%d)", path, fsEvent->pid]);
+    #endif
     
     //init object for watch event
     watchEvent = [[WatchEvent alloc] init];
@@ -502,7 +523,9 @@ bail:
         processInfo = [[NSMutableDictionary alloc] init];
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got path from pid: %s", pidPath]);
+        #endif
         
         //set path
         processInfo[@"path"] = [NSString stringWithUTF8String:pidPath];
@@ -562,7 +585,9 @@ bail:
     else
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to get path from pid %d...will lookup from process monitor", fsEvent->pid]);
+        #endif
         
         //try get process for one of the process monitor
         // ->do in loop since they might be buffering/processing
@@ -593,7 +618,9 @@ bail:
         if(nil == watchEvent.process)
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find process (%d)", fsEvent->pid]);
+            #endif
             
             //create process object
             watchEvent.process = [[Process alloc] initWithPid:fsEvent->pid infoDictionary:@{@"ppid": [NSNumber numberWithInt:parentID]}];
@@ -751,14 +778,18 @@ bail:
             if(YES == ((PluginBase*)self.pluginMappings[strippedPath]).ignoreKids)
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, @"plugin only cares about top-level matches");
+                #endif
                 
                 //check if original path, minus last directory, is what we just matched
                 // ->if so, this means we have a top level match
                 if(YES == [[path stringByDeletingLastPathComponent] isEqualToString:strippedPath])
                 {
                     //dbg msg
+                    #ifdef DEBUG
                     logMsg(LOG_DEBUG, @"got exact match");
+                    #endif
                     
                     //extract plugin
                     handlerPlugin = self.pluginMappings[strippedPath];
@@ -775,7 +806,9 @@ bail:
             else
             {
                 //dbg msg
+                #ifdef DEBUG
                 logMsg(LOG_DEBUG, @"plugin doesn't need exact match (sub match is ok)");
+                #endif
 
                 //extract plugin
                 handlerPlugin = self.pluginMappings[strippedPath];

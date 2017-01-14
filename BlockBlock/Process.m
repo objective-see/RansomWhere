@@ -137,13 +137,17 @@
 -(void)determinePath
 {
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"determining path");
+    #endif
     
     //try to get path from bundle
     if(nil != self.bundle)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"determining path from bundle");
+        #endif
         
         //extract path
         self.path = self.bundle.executablePath;
@@ -154,7 +158,9 @@
     else if(nil != self.name)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"determining path from name");
+        #endif
         
         //resolve
         self.path = which(self.name);
@@ -189,7 +195,9 @@
     NSUInteger count = 0;
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"looking up UID for %@/%d", self.name, self.pid]);
+    #endif
     
     //init mib
     int mib[mibLength] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, self.pid};
@@ -205,12 +213,16 @@
         self.uid = processStruct.kp_eproc.e_ucred.cr_uid;
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted UID for process: %d", self.uid]);
+        #endif
     }
     else
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to extract UID for process: %d (%d/%zu)", self.pid, sysctlResult, procBufferSize]);
+        #endif
         
         //try (again) via global process list
         // ->really need UID to tell what session alert is for!
@@ -309,7 +321,9 @@
         (nil == self.icon) )
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"getting icon for shared workspace: %@", self.path]);
+        #endif
         
         //extract icon
         self.icon = [[NSWorkspace sharedWorkspace] iconForFile:self.path];

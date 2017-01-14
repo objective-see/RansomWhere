@@ -161,7 +161,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"created system socket & set options, now entering recv() loop");
+    #endif
     
     //foreverz
     // ->listen/parse process creation events from kext
@@ -181,7 +183,9 @@ bail:
             (bytesReceived != kernEventMsg->total_size))
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, [NSString stringWithFormat:@"recv count: %d, wanted: %d", (int)bytesReceived, kernEventMsg->total_size]);
+            #endif
             
             //ignore
             continue;
@@ -193,9 +197,6 @@ bail:
             //skip
             continue;
         }
-        
-        //dbg msg
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"got msg from kernel, size: %d", kernEventMsg->total_size]);
         
         //zero out process path
         bzero(path, sizeof(path));
