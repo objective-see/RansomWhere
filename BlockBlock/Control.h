@@ -22,7 +22,7 @@
 
 //control a launch item
 // ->either load/unload the launch daemon/agent(s)
--(BOOL)controlLaunchItem:(NSUInteger)itemType plist:(NSString*)plist action:(NSString*)action;
+-(BOOL)controlLaunchItem:(NSUInteger)itemType plist:(NSString*)plist uid:(NSNumber*)uid action:(NSString*)action;
 
 //start kext
 -(BOOL)startKext;
@@ -37,10 +37,10 @@
 -(BOOL)stopDaemon;
 
 //start the launch agent(s)
--(BOOL)startAgent:(NSString*)plist;
+-(BOOL)startAgent:(NSString*)plist uid:(NSNumber*)uid;
 
 //stop the launch agent
--(BOOL)stopAgent:(NSString*)plist;
+-(BOOL)stopAgent:(NSString*)plist uid:(NSNumber*)uid;
 
 //wait till the instance of the (auth'd) self exists
 -(BOOL)waitTillPau;

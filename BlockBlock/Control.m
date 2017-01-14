@@ -53,7 +53,7 @@
     if(errAuthorizationSuccess != osStatus)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: AuthorizationCreate() failed with %d", osStatus]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"AuthorizationCreate() failed with %d", osStatus]);
         
         //bail
         goto bail;
@@ -70,7 +70,7 @@
     if(errAuthorizationSuccess != osStatus)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: AuthorizationExecuteWithPrivileges() failed with %d", osStatus]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"AuthorizationExecuteWithPrivileges() failed with %d", osStatus]);
         
         //bail
         goto bail;
@@ -120,7 +120,7 @@ bail:
     if(returnedPID <= 0)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: waitpid() failed with %d/%d", returnedPID, errno]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"waitpid() failed with %d/%d", returnedPID, errno]);
         
         //bail
         goto bail;
@@ -161,42 +161,6 @@ bail:
     return bRet;
 }
 
-
-//instantiate uninstaller object
-// ->then invoke 'uninstall' method
--(BOOL)invokeUninstallLogic
-{
-    //return var
-    BOOL bRet = NO;
-    
-    //uninstaller obj
-    Uninstall* uninstallObj = nil;
-    
-    //alloc uninstall obj
-    uninstallObj = [[Uninstall alloc] init];
-    
-    //uninstall
-    if(YES != [uninstallObj uninstall])
-    {
-        //err msg
-        logMsg(LOG_ERR, @"failed to uninstall");
-        
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    logMsg(LOG_DEBUG, @"uninstall logic returned ok");
-    
-    //no errors
-    bRet = YES;
-    
-//bail
-bail:
-    
-    return bRet;
-}
-
 //spawns auth'd instance of installer/uninstaller
 // ->then wait till it exits
 -(BOOL)execControlInstance:(NSString*)parameter
@@ -209,7 +173,7 @@ bail:
     if(YES != [self spawnAuthInstance:parameter])
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to spawn elevated self to perform install");
+        logMsg(LOG_ERR, @"failed to spawn elevated self to perform install");
         
         //bail
         goto bail;
@@ -246,19 +210,13 @@ bail:
 
 //control a launch item
 // ->either load/unload the launch daemon/agent via '/bin/launchctl'
--(BOOL)controlLaunchItem:(NSUInteger)itemType plist:(NSString*)plist action:(NSString*)action
+-(BOOL)controlLaunchItem:(NSUInteger)itemType plist:(NSString*)plist uid:(NSNumber*)uid action:(NSString*)action
 {
     //return var
     BOOL bRet = NO;
     
     //status
     NSUInteger status = -1;
-    
-    //console user info
-    NSDictionary* consoleUserInfo = nil;
-
-    //console uid
-    uid_t consoleUID = 0;
     
     //current uid
     uid_t currentUID = 0;
@@ -271,9 +229,6 @@ bail:
     
     //save current euid
     currentUID = getuid();
-    
-    //user's home directory
-    NSString* userDirectory = nil;
     
     //init launch item's plist
     // ->daemon
@@ -309,35 +264,11 @@ bail:
             goto bail;
         }
         
-        //get current console user
-        consoleUserInfo = getCurrentConsoleUser();
-        
-        //sanity check
-        if( (nil == consoleUserInfo) ||
-            (nil == consoleUserInfo[@"uid"]) ||
-            (nil == consoleUserInfo[@"homeDirectory"]) )
-        {
-            //err msg
-            logMsg(LOG_ERR, @"failed to get current console user/required info");
-            
-            //bail
-            goto bail;
-        }
-        
-        //extact uid
-        consoleUID = [consoleUserInfo[@"uid"] unsignedIntValue];
-        
-        //extract user directory
-        userDirectory = consoleUserInfo[@"homeDirectory"];
-        
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"console uid: %d", consoleUID]);
-        
         //add 'asuser' as first arg
         [parameters addObject:@"asuser"];
         
         //add console uid as second arg
-        [parameters addObject:[NSString stringWithFormat:@"%d", consoleUID]];
+        [parameters addObject:[NSString stringWithFormat:@"%d", [uid intValue]]];
         
         //add path to launchctl (again) as third arg
         [parameters addObject:LAUNCHCTL];
@@ -347,7 +278,7 @@ bail:
         
         //arg 5
         // ->path to launch agent plist
-        [parameters addObject:launchAgentPlist(userDirectory)];
+        [parameters addObject:plist];
         
         //dbg msg
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current UID: %d", currentUID]);
@@ -476,28 +407,28 @@ bail:
 -(BOOL)startDaemon
 {
     //load launch daemon
-    return [self controlLaunchItem:LAUNCH_ITEM_DAEMON plist:launchDaemonPlist() action:@"load"];
+    return [self controlLaunchItem:LAUNCH_ITEM_DAEMON plist:launchDaemonPlist() uid:nil action:@"load"];
 }
 
 //start the launch agent(s)
--(BOOL)startAgent:(NSString*)plist
+-(BOOL)startAgent:(NSString*)plist uid:(NSNumber*)uid
 {
     //load launch agent(s)
-    return [self controlLaunchItem:LAUNCH_ITEM_AGENT plist:plist action:@"load"];
+    return [self controlLaunchItem:LAUNCH_ITEM_AGENT plist:plist uid:uid action:@"load"];
 }
 
 //stop the launch daemon
 -(BOOL)stopDaemon
 {
     //unload launch daemon
-    return [self controlLaunchItem:LAUNCH_ITEM_DAEMON plist:launchDaemonPlist() action:@"unload"];
+    return [self controlLaunchItem:LAUNCH_ITEM_DAEMON plist:launchDaemonPlist() uid:nil action:@"unload"];
 }
 
 //stop the launch agent
--(BOOL)stopAgent:(NSString*)plist
+-(BOOL)stopAgent:(NSString*)plist uid:(NSNumber*)uid
 {
     //unload launch agent
-    return [self controlLaunchItem:LAUNCH_ITEM_AGENT plist:plist action:@"unload"];
+    return [self controlLaunchItem:LAUNCH_ITEM_AGENT plist:plist uid:uid action:@"unload"];
 }
 
 

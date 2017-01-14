@@ -28,7 +28,7 @@
     
     //list of installed launch agents
     // ->can be multiple ones if other users have installed
-    NSMutableArray* launchAgentPaths = nil;
+    NSMutableArray* launchAgents = nil;
     
     //destination path to binary
     NSString* destBinaryPath = nil;
@@ -36,9 +36,9 @@
     //init destination path for binary
     destBinaryPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
 
-    //check if already installed
+    //check if already installed for anybody
     // ->if so, uninstall to get a clean slate!
-    if(YES == [Install isInstalled])
+    if(INSTALL_STATE_NONE != [Install installedState])
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"already installed (will uninstall)");
@@ -48,10 +48,11 @@
         
         //launch agent can be installed for other users
         // ->grab existing launch agent paths *before* uninstalling
-        launchAgentPaths = [self existingLaunchAgents];
+        launchAgents = [Install existingLaunchAgents];
     
-        //fully uninstall
-        [uninstallObj uninstall];
+        //uninstall
+        // ->pass in 'YES' to say invoked via installer
+        [uninstallObj uninstall:YES];
     }
     
     //first check for '/sbin/kextload'
@@ -69,7 +70,7 @@
     if(YES != [self createInstallDirectory:INSTALL_DIRECTORY])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to create install directory (%@)", INSTALL_DIRECTORY]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to create install directory (%@)", INSTALL_DIRECTORY]);
         
         //bail
         goto bail;
@@ -79,7 +80,7 @@
     if(YES != [self installBinary:destBinaryPath])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to install binary (%@)", destBinaryPath]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to install binary (%@)", destBinaryPath]);
         
         //bail
         goto bail;
@@ -87,24 +88,24 @@
     
     //install as launch agent
     // ->copy launch item plist file into current and other (prev installed) ~/Library/LaunchAgents
-    if(YES != [self installLaunchAgent:launchAgentPaths])
+    if(YES != [self installLaunchAgent:launchAgents])
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to install launch agent(s)");
+        logMsg(LOG_ERR, @"failed to install launch agent(s)");
         
         //bail
         goto bail;
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, @"installed launch agent component(s)");
+    logMsg(LOG_DEBUG, @"installed launch agent(s)");
     
     //install as launch daemon
     // ->just copy launch item plist file into /Library/LaunchDaemon directory
     if(YES != [self installLaunchDaemon])
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to install launch agent");
+        logMsg(LOG_ERR, @"failed to install launch agent");
         
         //bail
         goto bail;
@@ -118,7 +119,7 @@
     if(YES != [self installKext])
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to install kext");
+        logMsg(LOG_ERR, @"failed to install kext");
         
         //bail
         goto bail;
@@ -136,18 +137,26 @@ bail:
     return bRet;
 }
 
-//class method
-// ->check if already installed (launch agent)
-+(BOOL)isInstalled
+//get install state
+// ->a) not installed at all
+//   b) installed for just user
+//   c) installed for other user(s)
++(NSUInteger)installedState
 {
-    //flag
-    BOOL installed = NO;
+    //status
+    NSUInteger state = INSTALL_STATE_NONE;
     
     //home directory
     NSString* userHomeDirectory = nil;
     
+    //(all) installed launch agents
+    NSMutableArray* existingLaunchAgents;
+    
     //dbg msg
-    logMsg(LOG_DEBUG, @"checking if already installed");
+    logMsg(LOG_DEBUG, @"checking installed state");
+    
+    //get all installed launch agents
+    existingLaunchAgents = [Install existingLaunchAgents];
     
     //grab home directory of current user
     userHomeDirectory = [getCurrentConsoleUser() objectForKey:@"homeDirectory"];
@@ -157,39 +166,93 @@ bail:
         userHomeDirectory = NSHomeDirectory();
     }
     
-    //check for launch agent
-    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist(userHomeDirectory)])
+    //CHECK 1:
+    // ->check for kext to see if its installed at all
+    if(YES != [[NSFileManager defaultManager] fileExistsAtPath:kextPath()])
     {
         //dbg msg
-        logMsg(LOG_DEBUG, @"launch agent exists, so installed already");
+        logMsg(LOG_DEBUG, @"not installed for anybody");
         
-        //installed!
-        installed = YES;
+        //set
+        state = INSTALL_STATE_NONE;
+        
+        //all set
+        goto bail;
     }
-
-    return installed;
+    
+    //CHECK 2:
+    // ->check if only installed for current user
+    if( (1 == existingLaunchAgents.count) &&
+        (YES == [[[existingLaunchAgents firstObject] objectForKey:@"plist"] isEqualToString:launchAgentPlist(userHomeDirectory)]) )
+    {
+        //dbg msg
+        logMsg(LOG_DEBUG, @"only installed for self");
+        
+        //set
+        state = INSTALL_STATE_SELF_ONLY;
+        
+        //all set
+        goto bail;
+    }
+    
+    //check if installed for self and others
+    for(NSDictionary* existingLaunchAgent in existingLaunchAgents)
+    {
+        //self included?
+        if(YES == [[existingLaunchAgent objectForKey:@"plist"] isEqualToString:launchAgentPlist(userHomeDirectory)])
+        {
+            //dbg msg
+            logMsg(LOG_DEBUG, @"installed for self and others");
+            
+            //set
+            state = INSTALL_STATE_SELF_AND_OTHERS;
+            
+            //all set
+            goto bail;
+        }
+    }
+    
+    //dbg msg
+    logMsg(LOG_DEBUG, @"only installed for others");
+    
+    //if we get here
+    // ->means it's just installed for others!
+    state = INSTALL_STATE_OTHERS_ONLY;
+    
+//bail
+bail:
+    
+    return state;
 }
 
 //launch agent can be installed for other users
 // ->so iterate over all users and save any existing launch agent paths
--(NSMutableArray*)existingLaunchAgents
++(NSMutableArray*)existingLaunchAgents
 {
-    //(per) user existing plist
-    NSString* existingPlist = nil;
-    
     //array of all installed launch agents
-    NSMutableArray* existingPlists = nil;
+    NSMutableArray* existingLaunchAgents = nil;
     
     //user home directories
     NSArray* userHomeDirectories = nil;
     
+    //user's id
+    NSString* userID = nil;
+    
     //alloc
-    existingPlists = [NSMutableArray array];
+    existingLaunchAgents = [NSMutableArray array];
     
     //check all users
     // ->do any have the launch agent installed?
     for(ODRecord* userRecord in getUsers())
     {
+        //get uid
+        userID = [[userRecord valuesForAttribute:kODAttributeTypeUniqueID error:NULL] firstObject];
+        if(nil == userID)
+        {
+            //skip
+            continue;
+        }
+        
         //extract home dirs
         userHomeDirectories = [userRecord valuesForAttribute:kODAttributeTypeNFSHomeDirectory error:NULL];
         if(0 == [userHomeDirectories count])
@@ -199,17 +262,17 @@ bail:
         }
         
         //get path to where launch agent plist would be
-        existingPlist = launchAgentPlist([userHomeDirectories firstObject]);
-        
-        //save those that exist
-        if(YES == [[NSFileManager defaultManager] fileExistsAtPath:existingPlist])
+        if(YES != [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist([userHomeDirectories firstObject])])
         {
-            //save
-            [existingPlists addObject:existingPlist];
+            //skip
+            continue;
         }
+        
+        //add to list
+        [existingLaunchAgents addObject:@{@"uid":[NSNumber numberWithInt:[userID intValue]], @"plist":launchAgentPlist([userHomeDirectories firstObject])}];
     }
     
-    return existingPlists;
+    return existingLaunchAgents;
 }
 
 //create install dir
@@ -273,7 +336,7 @@ bail:
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:[NSBundle mainBundle].bundlePath toPath:path error:&error])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to copy self (bundle) into %@ (%@)", path, error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy self (bundle) into %@ (%@)", path, error]);
         
         //bail
         goto bail;
@@ -307,10 +370,13 @@ bail:
 
 //install launch agent
 // ->might have to install to multiple locations, if multiple users had it installed
--(BOOL)installLaunchAgent:(NSMutableArray*)destinationPaths
+-(BOOL)installLaunchAgent:(NSMutableArray*)prevInstalledAgents
 {
     //return/status var
     BOOL bRet = NO;
+    
+    //flag
+    BOOL includesCurrentUser = NO;
 
     //launch item dir
     NSString* launchAgentDirectory = nil;
@@ -320,6 +386,9 @@ bail:
     
     //launch item plist
     NSMutableDictionary* launchItemPlist = nil;
+    
+    //console user
+    NSDictionary* consoleUser = nil;
     
     //user's directory permissions
     // ->used to match any created directories
@@ -340,8 +409,11 @@ bail:
     //update first arg (path to binary) to location of installed binary
     launchItemPlist[@"ProgramArguments"][0] = [NSString pathWithComponents:@[[INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME], BINARY_SUB_PATH]];
     
+    //get console user
+    consoleUser = getCurrentConsoleUser();
+    
     //grab home directory of current user
-    userHomeDirectory = [getCurrentConsoleUser() objectForKey:@"homeDirectory"];
+    userHomeDirectory = consoleUser[@"homeDirectory"];
     if(nil == userHomeDirectory)
     {
         //try another way
@@ -351,22 +423,38 @@ bail:
     //expand
     userLaunchAgentPlist = launchAgentPlist(userHomeDirectory);
     
-    //ensure that current user is in list of destination paths
-    if(YES != [destinationPaths containsObject:userLaunchAgentPlist])
+    //check if current user is in prev installed launch agents
+    // ->if not, need to add since we want to install it obvisouly for self (too)
+    for(NSDictionary* prevInstalledAgents in prevInstalledAgents)
+    {
+        //check
+        if(YES == [prevInstalledAgents[@"plist"] isEqualToString:userLaunchAgentPlist])
+        {
+            //exits
+            includesCurrentUser = YES;
+            
+            //can stop searching
+            break;
+        }
+    }
+    
+    //need to add current user to list?
+    if(YES != includesCurrentUser)
     {
         //need to alloc?
-        if(nil == destinationPaths)
+        if(nil == prevInstalledAgents)
         {
             //alloc
-            destinationPaths = [NSMutableArray array];
+            prevInstalledAgents = [NSMutableArray array];
         }
         
         //add
-        [destinationPaths addObject:userLaunchAgentPlist];
+        [prevInstalledAgents addObject:@{@"uid":consoleUser[@"uid"], @"plist":userLaunchAgentPlist}];
+
     }
     
     //dbg msg
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"configuring plist for launch agent(s): %@", destinationPaths]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"configuring plist for launch agent(s): %@", prevInstalledAgents]);
     
     //update label
     launchItemPlist[@"Label"] = LAUNCH_AGENT_LABEL;
@@ -375,16 +463,16 @@ bail:
     launchItemPlist[@"ProgramArguments"][1] = ACTION_RUN_AGENT;
     
     //write out (updated/config'd) launch agent plist(s) to for all users that had it installed
-    for(NSString* launchAgentPlist in destinationPaths)
+    for(NSDictionary* launchAgent in prevInstalledAgents)
     {
         //init directory for launch agent
-        launchAgentDirectory = [launchAgentPlist stringByDeletingLastPathComponent];
+        launchAgentDirectory = [launchAgent[@"plist"] stringByDeletingLastPathComponent];
         
         //create it
         if(YES != [[NSFileManager defaultManager] createDirectoryAtPath:launchAgentDirectory withIntermediateDirectories:YES attributes:nil error:nil])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to create launch agent dir: %@", launchAgentDirectory]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to create launch agent dir: %@", launchAgentDirectory]);
             
             //bail
             goto bail;
@@ -405,17 +493,17 @@ bail:
         }
         
         //save to disk
-        if(YES != [launchItemPlist writeToFile:launchAgentPlist atomically:YES])
+        if(YES != [launchItemPlist writeToFile:launchAgent[@"plist"] atomically:YES])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to save launch agent plist: %@", launchAgentPlist]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to save launch agent plist: %@", launchAgent[@"plist"]]);
         
             //bail
             goto bail;
         }
         
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saving updated plist %@ to %@", launchItemPlist, launchAgentPlist]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saving updated plist %@ to %@", launchItemPlist, launchAgent[@"plist"]]);
     }
     
     //no errors
@@ -463,7 +551,7 @@ bail:
         if(YES != [launchItemPlist writeToFile:launchDaemonPlist() atomically:YES])
         {
             //err msg
-            logMsg(LOG_ERR, @"ERROR: failed to save launch item plist");
+            logMsg(LOG_ERR, @"failed to save launch item plist");
             
             //bail
             goto bail;
@@ -497,7 +585,7 @@ bail:
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:KEXT_NAME] toPath:kextPath() error:&error])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to copy kext into /Library/Extensions (%@)", error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to copy kext into /Library/Extensions (%@)", error]);
         
         //bail
         goto bail;
@@ -532,7 +620,7 @@ bail:
     if(nil == sourcePath)
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to find launch item plist");
+        logMsg(LOG_ERR, @"failed to find launch item plist");
         
         //bail
         goto bail;
@@ -545,7 +633,7 @@ bail:
     if(nil == launchItemPlist)
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to load launch item plist");
+        logMsg(LOG_ERR, @"failed to load launch item plist");
         
         //bail
         goto bail;

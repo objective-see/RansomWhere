@@ -66,7 +66,7 @@ void exceptionHandler(NSException *exception)
 	logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", errorMessage]);
     
     //err msg
-    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@/%@", [exception.callStackSymbols description], [exception.callStackReturnAddresses description]]);
+    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", [exception.callStackSymbols description]]);
     
     //add main error msg
     errorInfo[KEY_ERROR_MSG] = @"ERROR: unrecoverable fault";
@@ -158,7 +158,7 @@ void signalHandler(int signal, siginfo_t *info, void *context)
     logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", errorMessage]);
     
     //err msg
-    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@/%@", [[NSThread callStackSymbols] description], [[NSThread callStackReturnAddresses] description]]);
+    logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", [[NSThread callStackSymbols] description]]);
     
     //add main error msg
     errorInfo[KEY_ERROR_MSG] = @"ERROR: unrecoverable fault";

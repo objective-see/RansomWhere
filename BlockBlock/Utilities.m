@@ -383,7 +383,7 @@ void transformProcess(ProcessApplicationTransformState location)
     {
         //err msg
         // ->ignored by the process, but good to log...
-        logMsg(LOG_ERR, @"ERROR: failed to transform process to foreground");
+        logMsg(LOG_ERR, @"failed to transform process to foreground");
     }
     
     return;

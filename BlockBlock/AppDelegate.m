@@ -162,7 +162,7 @@
             if(0 != geteuid())
             {
                 //err msg
-                logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: r00t is required for install");
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching, r00t is required for install");
             
                 //bail
                 goto bail;
@@ -176,7 +176,7 @@
             if(YES != [installObj install])
             {
                 //err msg
-                logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: installation failed");
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching, installation failed");
                 
                 //bail
                 goto bail;
@@ -192,20 +192,20 @@
             if(YES != [controlObj startDaemon])
             {
                 //err msg
-                logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: starting BLOCKBLOCK (daemon) failed");
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching, starting BLOCKBLOCK (daemon) failed");
                 
                 //bail
                 goto bail;
             }
             
             //start all launch agents
-            for(NSString* installedLaunchAgent in [installObj existingLaunchAgents])
+            for(NSDictionary* installedLaunchAgent in [Install existingLaunchAgents])
             {
                 //start launch agent
-                if(YES != [controlObj startAgent:installedLaunchAgent])
+                if(YES != [controlObj startAgent:installedLaunchAgent[@"plist"] uid:installedLaunchAgent[@"uid"]])
                 {
                     //err msg
-                    logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: starting BLOCKBLOCK (agent) failed");
+                    logMsg(LOG_ERR, @"applicationDidFinishLaunching, starting BLOCKBLOCK (agent) failed");
                     
                     //bail
                     goto bail;
@@ -369,7 +369,7 @@
             if(YES != [self initUninstall])
             {
                 //err msg
-                logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: failed to init uninstall");
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching, failed to init uninstall");
                 
                 //bail
                 goto bail;
@@ -411,15 +411,12 @@ bail:
     return;
 }
 
-//make the instance of the uninstall process foreground
-// ->then show the 'configure' window (w/ 'uninstall' button)
+//init uninstall object
+// ->then invoke uninstall logic
 -(BOOL)initUninstall
 {
     //ret var
     BOOL bUninstalled = NO;
-    
-    //unistall obj
-    Uninstall* uninstallObj = nil;
     
     //dbg msg
     logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: uninstalling BLOCKBLOCK");
@@ -428,21 +425,18 @@ bail:
     if(0 != geteuid())
     {
         //err msg
-        logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: r00t is required for uninstall");
+        logMsg(LOG_ERR, @"applicationDidFinishLaunching, r00t is required for uninstall");
         
         //bail
         goto bail;
     }
     
-    //init install object
-    uninstallObj = [[Uninstall alloc] init];
-    
-    //install
-    // ->move into /Library/BlockBlock, create launch daemon and agent, etc
-    if(YES != [uninstallObj uninstall])
+    //uninstall
+    // ->pass in no, saying this wasn't invoked via installer 
+    if(YES != [[[Uninstall alloc] init] uninstall:NO])
     {
         //err msg
-        logMsg(LOG_ERR, @"applicationDidFinishLaunching: ERROR: uninstallation failed");
+        logMsg(LOG_ERR, @"applicationDidFinishLaunching, uninstallation failed");
         
         //bail
         goto bail;

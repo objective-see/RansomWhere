@@ -35,7 +35,6 @@ int main(int argc, const char * argv[])
     
     //dbg msg
     logMsg(LOG_DEBUG, @"launched, in main()");
-
     
     //debug mode logic
     #ifdef DEBUG

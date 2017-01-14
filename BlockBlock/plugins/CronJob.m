@@ -16,7 +16,6 @@
 #import "ProcessMonitor.h"
 #import "OrderedDictionary.h"
 
-//TODO: handle multiple cron jobs
 @implementation CronJob
 
 //init
@@ -286,7 +285,7 @@
     if(NSNotFound == index)
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: could not find %@ in %@", watchEvent.itemObject, watchEvent.path]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"could not find %@ in %@", watchEvent.itemObject, watchEvent.path]);
         
         //bail
         goto bail;

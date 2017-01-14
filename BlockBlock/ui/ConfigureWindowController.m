@@ -39,11 +39,18 @@
 // ->make white
 -(void)windowDidLoad
 {
+    //installed state
+    NSUInteger state = INSTALL_STATE_NONE;
+    
     //make white
     [self.window setBackgroundColor: NSColor.whiteColor];
     
-    //disable uninstall button if not installed
-    if(YES != [Install isInstalled])
+    //get state
+    state = [Install installedState];
+    
+    //disable uninstall button if not installed for self
+    if( (INSTALL_STATE_NONE == state) ||
+        (INSTALL_STATE_OTHERS_ONLY == state) )
     {
         //disable
         self.uninstallButton.enabled = NO;
@@ -188,7 +195,7 @@ bail:
     else
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to perform life cycle event");
+        logMsg(LOG_ERR, @"failed to perform life cycle event");
         
         //set flag
         status = NO;

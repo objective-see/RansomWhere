@@ -49,7 +49,7 @@
 }
 
 //uninstall
--(BOOL)uninstall
+-(BOOL)uninstall:(BOOL)viaInstaller
 {
     //return var
     BOOL bRet = NO;
@@ -58,15 +58,18 @@
     // ->since want to try all uninstall steps, but record if any fail
     BOOL bAnyErrors = NO;
     
-    //user home directories
-    NSArray* userHomeDirectories = nil;
+    //installed state
+    NSUInteger installedState = INSTALL_STATE_NONE;
     
-    //current user's home directory
+    //console user
+    NSDictionary* consoleUser = nil;
+    
+    //home directory
     NSString* userHomeDirectory = nil;
-
+    
     //list of installed launch agents
     // ->can be multiple ones if other users have installed
-    NSMutableArray* launchAgentPaths = nil;
+    NSMutableArray* launchAgents = nil;
     
     //destination path to binary
     NSString* appPath = nil;
@@ -78,38 +81,22 @@
     logMsg(LOG_DEBUG, @"beginning uninstall (as r00t)");
     
     //alloc
-    launchAgentPaths = [NSMutableArray array];
+    launchAgents = [NSMutableArray array];
     
-    //check all users
-    // ->do any have the launch agent installed?
-    for(ODRecord* userRecord in getUsers())
-    {
-        //extract home dirs
-        userHomeDirectories = [userRecord valuesForAttribute:kODAttributeTypeNFSHomeDirectory error:NULL];
-        if(0 == [userHomeDirectories count])
-        {
-            //skip
-            continue;
-        }
-        
-        //get path to where launch agent plist would be
-        if(YES != [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist([userHomeDirectories firstObject])])
-        {
-            //skip
-            continue;
-        }
-        
-        //save
-        [launchAgentPaths addObject:launchAgentPlist([userHomeDirectories firstObject])];
-    }
+    //get install state
+    installedState = [Install installedState];
     
-    //when only one user (self) has installed
-    // ->perform a full unstinstall of everything
-    if(0x1 == [launchAgentPaths count])
+    //get installed launch agents
+    launchAgents = [Install existingLaunchAgents];
+    
+    //full uninstall when current user is only one w/ it installed
+    // or when invoked via installer, since want everybody on the same version
+    if( (YES == viaInstaller) ||
+        (INSTALL_STATE_SELF_ONLY == installedState) )
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"performing FULL uninstall");
-        
+
         //init destination path of app
         appPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
         
@@ -124,7 +111,7 @@
                 bAnyErrors = YES;
                 
                 //err msg
-                logMsg(LOG_ERR, @"ERROR: failed to uninstall kext");
+                logMsg(LOG_ERR, @"failed to uninstall kext");
                 
                 //don't bail
                 // ->might as well keep on uninstalling other components
@@ -149,7 +136,7 @@
                 bAnyErrors = YES;
                 
                 //err msg
-                logMsg(LOG_ERR, @"ERROR: failed to uninstall launch daemon");
+                logMsg(LOG_ERR, @"failed to uninstall launch daemon");
                 
                 //don't bail
                 // ->might as well keep on uninstalling other components
@@ -163,15 +150,14 @@
             }
         }
         
-        //uninstall launch agent
-        // ->array will only have one; current user's
-        if(YES != [self uninstallLaunchAgent:launchAgentPaths])
+        //uninstall launch agent(s)
+        if(YES != [self uninstallLaunchAgent:launchAgents])
         {
             //set flag
             bAnyErrors = YES;
             
             //err msg
-            logMsg(LOG_ERR, @"ERROR: failed to uninstall launch agent(s)");
+            logMsg(LOG_ERR, @"failed to uninstall launch agent(s)");
             
             //don't bail
             // ->might as well keep on uninstalling other components
@@ -184,57 +170,65 @@
         }
         
         //uninstall app
+        // ->handle case for both old & new
         if(YES != [self uninstallApp])
         {
             //set flag
             bAnyErrors = YES;
             
             //err msg
-            logMsg(LOG_ERR, @"ERROR: failed to delete application (%@)");
+            logMsg(LOG_ERR, @"failed to delete application (%@)");
             
             //don't bail
             // ->might as well keep on uninstalling other components
         }
-            
+        
         //dbg msg
         logMsg(LOG_DEBUG, @"deleted application");
         
         //remove install directory
-        if(YES != [[NSFileManager defaultManager] removeItemAtPath:INSTALL_DIRECTORY error:&error])
+        if(YES == [[NSFileManager defaultManager] fileExistsAtPath:INSTALL_DIRECTORY])
         {
-            //set flag
-            bAnyErrors = YES;
-            
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete install directory (%@)", error]);
+            //delete
+            if(YES != [[NSFileManager defaultManager] removeItemAtPath:INSTALL_DIRECTORY error:&error])
+            {
+                //set flag
+                bAnyErrors = YES;
+                
+                //err msg
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete install directory (%@)", error]);
+            }
         }
         
     }//full uninstall
     
-    //otherwise other users have it installed
-    // ->just stop/remove launch item for self
+    //partial uninstall
+    // ->just stop/remove launch agent for self
     else
     {
         //dbg msg
         logMsg(LOG_DEBUG, @"performing PARTIAL uninstall logic");
         
+        //get console user
+        consoleUser = getCurrentConsoleUser();
+        
         //grab home directory of current user
-        userHomeDirectory = [getCurrentConsoleUser() objectForKey:@"homeDirectory"];
+        userHomeDirectory = consoleUser[@"homeDirectory"];
         if(nil == userHomeDirectory)
         {
             //try another way
             userHomeDirectory = NSHomeDirectory();
         }
         
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"uninstalling %@", launchAgentPlist(userHomeDirectory)]);
-        
         //if launch agent's plist is present
         // ->stop, then delete it
         if(YES == [[NSFileManager defaultManager] fileExistsAtPath:launchAgentPlist(userHomeDirectory)])
         {
+            //dbg msg
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"uninstalling %@", launchAgentPlist(userHomeDirectory)]);
+        
             //uninstall launch agent
-            if(YES != [self uninstallLaunchAgent:@[userHomeDirectory]])
+            if(YES != [self uninstallLaunchAgent:@[@{@"uid":consoleUser[@"uid"], @"plist":launchAgentPlist(userHomeDirectory)}]])
             {
                 //set flag
                 bAnyErrors = YES;
@@ -256,8 +250,8 @@
         
     }//partial uninstall
     
-    //always delete app support directory
-    // ->for now just has log file
+    //always delete app support dir
+    // ->for now just has log file, etc
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:supportDirectory()])
     {
         //delete it
@@ -267,7 +261,7 @@
             bAnyErrors = YES;
             
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to remove app support (logging) directory, %@", supportDirectory()]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to remove app support (logging) directory, %@", supportDirectory()]);
             
             //don't bail
             // ->might as well keep on uninstalling other components
@@ -312,7 +306,7 @@ bail:
     if(YES != [controlObj stopDaemon])
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to stop launch daemon");
+        logMsg(LOG_ERR, @"failed to stop launch daemon");
         
         //bail
         goto bail;
@@ -325,7 +319,7 @@ bail:
     if(YES != [[NSFileManager defaultManager] removeItemAtPath:launchDaemonPlist() error:&error])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete launch daemon's plist (%@)", error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete launch daemon's plist (%@)", error]);
         
         //bail
         goto bail;
@@ -343,7 +337,7 @@ bail:
     return bRet;
 }
 
-//stop and remove launch agent
+//stop and remove launch agent(s)
 -(BOOL)uninstallLaunchAgent:(NSArray*)installedLaunchAgents;
 {
     //return/status var
@@ -353,16 +347,16 @@ bail:
     NSError* error = nil;
     
     //unload Launch Agent for all users who've got it installed
-    for(NSString* installedLaunchAgent in installedLaunchAgents)
+    for(NSDictionary* installedLaunchAgent in installedLaunchAgents)
     {
         //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"attempting to stop %@", installedLaunchAgent]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"attempting to stop launch agent %@", installedLaunchAgent]);
         
         //stop launch agent
-        if(YES != [controlObj stopAgent:installedLaunchAgent])
+        if(YES != [controlObj stopAgent:installedLaunchAgent[@"plist"] uid:installedLaunchAgent[@"uid"]])
         {
             //err msg
-            logMsg(LOG_ERR, @"ERROR: failed to stop launch agent");
+            logMsg(LOG_ERR, @"failed to stop launch agent");
             
             //bail
             goto bail;
@@ -372,10 +366,10 @@ bail:
         logMsg(LOG_DEBUG, @"stopped launch agent");
         
         //delete launch agent's plist
-        if(YES != [[NSFileManager defaultManager] removeItemAtPath:installedLaunchAgent error:&error])
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:installedLaunchAgent[@"plist"] error:&error])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete launch agent's plist (%@)", error]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete launch agent's plist (%@)", error]);
             
             //bail
             goto bail;
@@ -416,7 +410,7 @@ bail:
     if(YES != [controlObj stopKext])
     {
         //err msg
-        logMsg(LOG_ERR, @"ERROR: failed to stop kext");
+        logMsg(LOG_ERR, @"failed to stop kext");
         
         //don't bail since still want to to try delete...
     }
@@ -432,7 +426,7 @@ bail:
     if(YES != [[NSFileManager defaultManager] removeItemAtPath:path error:&error])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete kext (%@)", error]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete kext (%@)", error]);
         
         //bail
         goto bail;
@@ -467,7 +461,7 @@ bail:
         if(YES != [[NSFileManager defaultManager] removeItemAtPath:[@"/Applications" stringByAppendingPathComponent:APPLICATION_NAME] error:&error])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to application (%@)", error]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete (old) application (%@)", error]);
             
             //bail
             goto bail;
@@ -483,7 +477,7 @@ bail:
         if(YES != [[NSFileManager defaultManager] removeItemAtPath:[INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME] error:&error])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"ERROR: failed to delete application (%@)", error]);
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete application (%@)", error]);
             
             //bail
             goto bail;

@@ -18,11 +18,16 @@
 /* PROPERTIES */
 
 
-/* METHODS */
+/* CLASS METHODS */
 
-//class method
-// ->check if already installed (launch agent)
-+(BOOL)isInstalled;
+//get install state
++(NSUInteger)installedState;
+
+//launch agent can be installed for other users
+// ->so iterate over all users and save any existing launch agent paths
++(NSMutableArray*)existingLaunchAgents;
+
+/* INSTANT METHODS */
 
 //main install method
 -(BOOL)install;
@@ -44,9 +49,6 @@
 //copy binary into install directory
 -(BOOL)installBinary:(NSString*)path;
 
-//launch agent can be installed for other users
-// ->so iterate over all users and save any existing launch agent paths
--(NSMutableArray*)existingLaunchAgents;
 
 //load the template launch item plist
 -(NSMutableDictionary*)loadLaunchItemPlist;

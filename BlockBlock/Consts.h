@@ -146,16 +146,19 @@
 //installed state
 
 //not installed
-#define INSTALL_STATE_NONE    0
+#define INSTALL_STATE_NONE 0
 
-//partially (for other users)
-#define INSTALL_STATE_PARTIAL 1
+//only installed for self
+#define INSTALL_STATE_SELF_ONLY 1
 
-//fully installed (for current user)
-#define INSTALL_STATE_FULL    2
+//only installed for others
+#define INSTALL_STATE_OTHERS_ONLY 2
+
+//installed for self and others
+#define INSTALL_STATE_SELF_AND_OTHERS 3
 
 //max watch events
-#define MAX_WATCH_EVENTS     64
+#define MAX_WATCH_EVENTS  64
 
 //status OK
 #define STATUS_SUCCESS 0

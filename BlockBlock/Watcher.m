@@ -72,8 +72,6 @@
     //start it
     [self.watcherThread start];
     
-    //TODO wait a bit until thread sets OK!?/no error
-    
     //no errors
     bRet = YES;
 

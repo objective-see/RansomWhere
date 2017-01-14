@@ -22,7 +22,9 @@
 
 
 /* METHODS */
--(BOOL)uninstall;
+
+//uninstall
+-(BOOL)uninstall:(BOOL)viaInstaller;
 
 //stop and remove launch agent
 -(BOOL)uninstallLaunchAgent:(NSArray*)installedUsers;
