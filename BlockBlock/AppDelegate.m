@@ -640,15 +640,22 @@ bail:
         currentUser = getCurrentConsoleUser();
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current user: %@", currentUser]);
+        #endif
         
         //wait till target user is logged in
         if( (nil != currentUser) &&
-            (getuid() == [currentUser[@"uid"] unsignedIntegerValue]) )
+            (getuid() == [currentUser[@"uid"] unsignedIntValue]) )
         {
             //yay
             break;
         }
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"waiting for user to log in: %d vs %d", [currentUser[@"uid"] unsignedIntValue], getuid()]);
+        #endif
         
         //nap for 5 seconds
         [NSThread sleepForTimeInterval:5.0f];
