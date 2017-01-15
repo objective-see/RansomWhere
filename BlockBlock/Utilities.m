@@ -712,7 +712,7 @@ BOOL isSupportedOS()
         goto bail;
     }
     
-    //gotta be OS X 10
+    //gotta be OS X 10.9
     if([osVersionInfo[@"minorVersion"] intValue] < 9)
     {
         //err msg

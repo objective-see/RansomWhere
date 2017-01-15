@@ -6,6 +6,7 @@
 //  Copyright © 2017 Objective-See. All rights reserved.
 //
 
+#import <libproc.h>
 #import <Cocoa/Cocoa.h>
 
 @interface CustomNSButton : NSButton

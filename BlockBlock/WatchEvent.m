@@ -17,9 +17,6 @@
 #import "Process.h"
 #import "Utilities.h"
 
-
-
-
 @implementation WatchEvent
 
 @synthesize path;
