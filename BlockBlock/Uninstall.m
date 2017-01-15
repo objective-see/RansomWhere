@@ -29,7 +29,6 @@
  sudo killall BlockBlock
  */
 
-
 @implementation Uninstall
 
 @synthesize controlObj;
@@ -207,9 +206,13 @@
             // ->might as well keep on uninstalling other components
         }
         
-        //dbg msg
+        //just logic for dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"deleted application");
+        else
+        {
+            //dbg msg
+            logMsg(LOG_DEBUG, @"deleted application");
+        }
         #endif
         
         //remove install directory
@@ -224,6 +227,29 @@
                 //err msg
                 logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete install directory (%@)", error]);
             }
+        }
+        
+        //if obj-see's install directory is (now) empty, delete!
+        if(0 == [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:[INSTALL_DIRECTORY stringByDeletingLastPathComponent] error:nil] count])
+        {
+            //delete
+            if(YES != [[NSFileManager defaultManager] removeItemAtPath:[INSTALL_DIRECTORY stringByDeletingLastPathComponent] error:&error])
+            {
+                //set flag
+                bAnyErrors = YES;
+                
+                //err msg
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete Objective-See 'install' directory (%@)", error]);
+            }
+            
+            //just logic for dbg msg
+            #ifdef DEBUG
+            else
+            {
+                //dbg msg
+                logMsg(LOG_DEBUG, @"deleted Objective-See 'install' directory, as it's now empty");
+            }
+            #endif
         }
         
     }//full uninstall

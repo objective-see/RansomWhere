@@ -295,8 +295,17 @@ NSUInteger execTask(NSString* path, NSArray* arguments, BOOL waitUntilExit)
         [task setArguments:arguments];
     }
     
-    //exec task
-    [task launch];
+    //wrap task launch
+    @try
+    {
+        //exec task
+        [task launch];
+    }
+    @catch(NSException* exception)
+    {
+        //bail
+        goto bail;
+    }
     
     //wait for task to exit
     // ->then grab status
@@ -591,37 +600,43 @@ NSString* getVersion(NSUInteger instance)
 //query interwebz to get latest version
 NSString* getLatestVersion()
 {
-    //version data
-    NSData* versionData = nil;
+    //product version(s) data
+    NSData* productsVersionData = nil;
     
     //version dictionary
-    NSDictionary* versionDictionary = nil;
+    NSDictionary* productsVersionDictionary = nil;
     
     //latest version
     NSString* latestVersion = nil;
     
     //get version from remote URL
-    versionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSION_URL]];
-    
-    //sanity check
-    if(nil == versionData)
+    productsVersionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSIONS_URL]];
+    if(nil == productsVersionData)
     {
         //bail
         goto bail;
     }
     
     //convert JSON to dictionary
-    versionDictionary = [NSJSONSerialization JSONObjectWithData:versionData options:0 error:nil];
-    
-    //sanity check
-    if(nil == versionDictionary)
+    // ->wrap as may throw exception
+    @try
+    {
+        //convert
+        productsVersionDictionary = [NSJSONSerialization JSONObjectWithData:productsVersionData options:0 error:nil];
+        if(nil == productsVersionDictionary)
+        {
+            //bail
+            goto bail;
+        }
+    }
+    @catch(NSException* exception)
     {
         //bail
         goto bail;
     }
     
     //extract latest version
-    latestVersion = versionDictionary[@"latestVersion"];
+    latestVersion = [[productsVersionDictionary objectForKey:@"BlockBlock"] objectForKey:@"version"];
     
     //dbg msg
     #ifdef DEBUG

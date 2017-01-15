@@ -31,10 +31,10 @@
     NSMutableArray* launchAgents = nil;
     
     //destination path to binary
-    NSString* destBinaryPath = nil;
+    NSString* appPath = nil;
     
     //init destination path for binary
-    destBinaryPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
+    appPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
 
     //check if already installed for anybody
     // ->if so, uninstall to get a clean slate!
@@ -81,10 +81,10 @@
     }
     
     //install binary
-    if(YES != [self installBinary:destBinaryPath])
+    if(YES != [self installBinary:appPath])
     {
         //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to install binary (%@)", destBinaryPath]);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to install binary (%@)", appPath]);
         
         //bail
         goto bail;

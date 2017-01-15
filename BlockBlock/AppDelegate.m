@@ -256,7 +256,7 @@
             if(YES == [arguments[1] isEqualToString:CMD_INSTALL])
             {
                 //dbg msg
-                printf("installed BLOCKBLOCK\n");
+                printf("BLOCKBLOCK: install ok!\n");
             }
             
             //no errors
@@ -442,7 +442,7 @@
             else if(YES == [arguments[1] isEqualToString:CMD_UNINSTALL])
             {
                 //dmg msg
-                printf("uninstalled BLOCKBLOCK\n");
+                printf("BLOCKBLOCK: uninstall ok!\n");
             }
             
             //no errors

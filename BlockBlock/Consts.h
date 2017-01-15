@@ -13,7 +13,7 @@
 #define PRODUCT_URL @"https://objective-see.com/products/blockblock.html"
 
 //product verison url
-#define PRODUCT_VERSION_URL @"https://objective-see.com/products/blockblockVersion.json"
+#define PRODUCT_VERSIONS_URL @"https://objective-see.com/products.json"
 
 //general error URL
 #define FATAL_ERROR_URL @"https://objective-see.com/errors.html"
@@ -22,7 +22,7 @@
 #define WAIT_INTERVAL 0.1f
 
 //directory for binaries/whitelists, etc
-#define INSTALL_DIRECTORY @"/Library/BlockBlock"
+#define INSTALL_DIRECTORY @"/Library/Objective-See/BlockBlock"
 
 //white list file
 #define WHITE_LIST_FILE @"whiteList.plist"
