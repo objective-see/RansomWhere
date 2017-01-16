@@ -84,7 +84,6 @@
     //allow
     [super mouseDown:event];
     
-
 //bail
 bail:
 

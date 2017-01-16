@@ -289,8 +289,13 @@
             //init dictionary for reported watch events
             reportedWatchEvents = [NSMutableDictionary dictionary];
             
-            //load white-list
-            whiteList = [NSMutableArray arrayWithContentsOfFile:WHITE_LIST_FILE];
+            //load white-list item
+            self.whiteList = [NSMutableArray arrayWithContentsOfFile:[INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE]];
+            if(nil == self.whiteList)
+            {
+                //no items yet
+                whiteList = [NSMutableArray array];
+            }
             
             //init list for 'remembered' watch events
             rememberedWatchEvents = [NSMutableArray array];
@@ -544,14 +549,6 @@ bail:
     
     //init event queue
     eventQueue = [[Queue alloc] init];
-    
-    //load white-list item
-    self.whiteList = [NSMutableArray arrayWithContentsOfFile:[INSTALL_DIRECTORY stringByAppendingPathComponent:WHITE_LIST_FILE]];
-    if(nil == self.whiteList)
-    {
-        //no items yet
-        whiteList = [NSMutableArray array];
-    }
     
     //enable IPC notification for daemon
     [interProcComms enableNotification:RUN_INSTANCE_DAEMON];
