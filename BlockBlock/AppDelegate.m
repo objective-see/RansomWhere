@@ -91,6 +91,7 @@
     [NSApp activateIgnoringOtherApps:YES];
     
     return;
+     
     */
     
     /* END: FOR TESTING ALERT WINDOW */
@@ -146,7 +147,7 @@
     }
     
     //otherwise handle action
-    // ->actions include: finalize (auth'd) install, run as daemon, run as agent (ui)
+    // ->actions include: finalize (auth'd) install, run as daemon, run as agent (ui), uninstall (ui & cmdline), unhide
     else if(0x2 == arguments.count)
     {
         //INSTALL (auth'd)
@@ -446,7 +447,7 @@
             //printf() if cmdline
             else if(YES == [arguments[1] isEqualToString:CMD_UNINSTALL])
             {
-                //dmg msg
+                //dbg msg
                 printf("BLOCKBLOCK: uninstall ok!\n");
             }
             
@@ -454,6 +455,38 @@
             exitStatus = STATUS_SUCCESS;
             
         }//uninstall (r00t)
+        
+        //(re)show menu icon
+        // ->invokes helper method to set pref & relaunch
+        else if(YES == [arguments[1] isEqualToString:CMD_UNHIDE])
+        {
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, @"applicationDidFinishLaunching: unhiding BLOCKBLOCK");
+            #endif
+            
+            //unhide
+            if(YES != [self unhideMenuIcon])
+            {
+                //err msg
+                logMsg(LOG_ERR, @"applicationDidFinishLaunching, failed to unhide menu icon");
+                
+                //err msg
+                printf("ERROR: failed to unhide menu icon for BLOCKBLOCK\n");
+
+                //bail
+                goto bail;
+            }
+            
+            //should always exit
+            shouldExit = YES;
+            
+            //dbg msg
+            printf("BLOCKBLOCK: unhid status bar/menu icon!\n");
+            
+            //no errors
+            exitStatus = STATUS_SUCCESS;
+        }
         
         //invalid args
         else
@@ -566,6 +599,82 @@ bail:
     
     return;
 }
+             
+//method to handle '-unhide' cmdline flag
+// ->just call into preferences obj to do it
+-(BOOL)unhideMenuIcon
+{
+    //ret var
+    BOOL unhid = NO;
+    
+    //console user
+    NSDictionary* consoleUser = nil;
+    
+    //home directory
+    NSString* userHomeDirectory = nil;
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"unhiding menu item");
+    #endif
+    
+    //alloc init control obj
+    controlObj = [[Control alloc] init];
+    
+    //alloc/init prefs obj
+    prefsWindowController = [[PrefsWindowController alloc] initWithWindowNibName:@"PrefsWindow"];
+    
+    //set pref
+    // ->will also update them on disk
+    [self.prefsWindowController setPref:PREF_HEADLESS_MODE value:NO];
+    
+    //get console user
+    consoleUser = getCurrentConsoleUser();
+    
+    //grab home directory of current user
+    userHomeDirectory = consoleUser[@"homeDirectory"];
+    if(nil == userHomeDirectory)
+    {
+        //try another way
+        userHomeDirectory = NSHomeDirectory();
+    }
+    
+    //stop current users's launch agent
+    if(YES != [controlObj stopAgent:launchAgentPlist(userHomeDirectory) uid:consoleUser[@"uid"]])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to stop launch agent %@/%@", launchAgentPlist(userHomeDirectory), consoleUser]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //nap for 1 seconds
+    [NSThread sleepForTimeInterval:1.0f];
+    
+    //(re)start current user's launch agent
+    if(YES != [controlObj startAgent:launchAgentPlist(userHomeDirectory) uid:consoleUser[@"uid"]])
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to (re)start launch agent %@/%@", launchAgentPlist(userHomeDirectory), consoleUser]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //happy
+    unhid = YES;
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"toggled menu icon and restarted launch agent");
+    #endif
+    
+//bail
+bail:
+
+    return unhid;
+}
 
 //AGENT METHOD
 // ->check for update
@@ -667,9 +776,13 @@ bail:
     //enable IPC notification for agent
     [self.interProcComms enableNotification:RUN_INSTANCE_AGENT];
     
-    //setup status bar
-    // ->makes icon appear, etc
-    [self loadStatusBar];
+    //when running in normal mode (i.e. not headless)
+    // -> setup status bar to makes icon appear, etc
+    if(YES != self.prefsWindowController.headlessMode)
+    {
+        //init/show status bar menu
+        [self loadStatusBar];
+    }
     
     //register
     // ->delay to allow daemon to get up and running :)

@@ -232,6 +232,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				INFOPLIST_FILE = BlockBlockKext/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.objectiveSee.BlockBlockKext;
 				MODULE_START = start;
 				MODULE_STOP = stop;
@@ -251,6 +252,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				INFOPLIST_FILE = BlockBlockKext/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.objectiveSee.BlockBlockKext;
 				MODULE_START = start;
 				MODULE_STOP = stop;

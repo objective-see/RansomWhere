@@ -15,8 +15,6 @@
 #import "Utilities.h"
 #import "Uninstall.h"
 
-//TODO: update website with new directory
-
 /* manually:
  sudo kextunload -b com.objectiveSee.kext.BlockBlock
  sudo rm -rf /Library/Extensions/BlockBlock.kext
@@ -24,7 +22,7 @@
  sudo rm -rf /Library/LaunchDaemons/com.objectiveSee.blockblock.plist
  launchctl unload ~/Library/LaunchAgents/com.objectiveSee.blockblock.plist
  rm -rf ~/Library/LaunchAgents/com.objectiveSee.blockblock.plist
- sudo rm -rf /Applications/BlockBlock.app
+ sudo rm -rf /Library/Objective-See/BlockBlock
  rm -rf ~/Library/Application Support/com.objectiveSee.BlockBlock
  sudo killall BlockBlock
  */
@@ -290,7 +288,7 @@
                 bAnyErrors = YES;
                 
                 //err msg
-                logMsg(LOG_ERR, @"ERROR: failed to uninstall launch agent");
+                logMsg(LOG_ERR, @"failed to uninstall launch agent");
                 
                 //don't bail
                 // ->might as well keep on uninstalling other components

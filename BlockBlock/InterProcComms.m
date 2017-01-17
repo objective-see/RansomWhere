@@ -76,7 +76,6 @@
         //register listener to handle agent registration
         // ->will be invoked from launch agent (ui) instance...
         [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleRegistrationViaIPC:) name:SHOULD_HANDLE_AGENT_REGISTRATION_NOTIFICATION object:nil];
-
     }
     
     //launch agent
@@ -390,7 +389,7 @@ bail:
 }
 
 //DAEMON method
-// ->send request to agent to dispaly error popup
+// ->send request to agent to display error popup
 -(void)sendErrorToAgent:(NSDictionary*)errorInfo
 {
     //dbg msg
@@ -906,10 +905,6 @@ bail:
                 //agent shouldn't exit
                 // ->not fatal error
                 errorInfo[KEY_ERROR_SHOULD_EXIT] = [NSNumber numberWithBool:NO];
-                
-                //send error to agent
-                // ->it will display the alert
-                [((AppDelegate*)[[NSApplication sharedApplication] delegate]).interProcComms sendErrorToAgent:errorInfo];
                 
                 //err msg
                 logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to block, will alert agent %@", reportedWatchEvent]);

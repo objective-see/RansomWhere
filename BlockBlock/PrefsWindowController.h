@@ -19,7 +19,10 @@
 //button for enabling passive mode
 @property (weak) IBOutlet NSButton *enablePassiveBtn;
 
-//button for disabling talking to VT
+//button for enabling headless mode
+@property (weak) IBOutlet NSButton *enableHeadlessBtn;
+
+//button for disabling update check
 @property (weak) IBOutlet NSButton* disableUpdateCheckBtn;
 
 //button for ok/close
@@ -36,6 +39,9 @@
 
 //run in passive mode flag
 @property BOOL passiveMode;
+
+//run in headless mode flag
+@property BOOL headlessMode;
 
 //flag indicating logging was enabled via passive mode
 @property BOOL loggingViaPassive;

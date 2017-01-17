@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PrefsWindowController">
             <connections>
                 <outlet property="disableUpdateCheckBtn" destination="d54-mZ-jqy" id="JkZ-GU-apu"/>
+                <outlet property="enableHeadlessBtn" destination="Yhv-s6-XIg" id="MRl-bN-01V"/>
                 <outlet property="enableLoggingBtn" destination="4xV-kQ-iaT" id="PnT-7h-dUK"/>
                 <outlet property="enablePassiveBtn" destination="dBu-8R-AH7" id="Zbi-AW-Xdf"/>
                 <outlet property="okButton" destination="HZZ-Es-mpy" id="GKU-Jc-ENB"/>
@@ -18,38 +20,50 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" texturedBackground="YES" unifiedTitleAndToolbar="YES"/>
-            <rect key="contentRect" x="196" y="240" width="422" height="123"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="contentRect" x="196" y="240" width="422" height="155"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="422" height="123"/>
+                <rect key="frame" x="0.0" y="0.0" width="422" height="155"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button focusRingType="none" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4xV-kQ-iaT">
-                        <rect key="frame" x="101" y="85" width="264" height="18"/>
+                        <rect key="frame" x="101" y="117" width="264" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="enable logging" bezelStyle="regularSquare" imagePosition="left" focusRingType="none" inset="2" id="WN8-cQ-8xh">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" size="13" name="Menlo-Regular"/>
                         </buttonCell>
                     </button>
                     <button focusRingType="none" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dBu-8R-AH7">
-                        <rect key="frame" x="101" y="60" width="264" height="18"/>
+                        <rect key="frame" x="101" y="92" width="264" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="run in passive mode" bezelStyle="regularSquare" imagePosition="left" focusRingType="none" inset="2" id="o2W-fx-6YH">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" size="13" name="Menlo-Regular"/>
                         </buttonCell>
                         <connections>
-                            <action selector="togglePassiveMode:" target="-2" id="QyS-At-cRF"/>
+                            <action selector="togglePassiveMode:" target="-2" id="yeS-HI-1Y2"/>
                         </connections>
                     </button>
                     <button focusRingType="none" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d54-mZ-jqy">
-                        <rect key="frame" x="101" y="36" width="303" height="19"/>
+                        <rect key="frame" x="101" y="42" width="303" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="disable update checks" bezelStyle="regularSquare" imagePosition="left" focusRingType="none" inset="2" id="gXW-vY-Aj1">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" size="13" name="Menlo-Regular"/>
                         </buttonCell>
                     </button>
+                    <button focusRingType="none" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yhv-s6-XIg">
+                        <rect key="frame" x="101" y="67" width="303" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="run in headless mode" bezelStyle="regularSquare" imagePosition="left" focusRingType="none" inset="2" id="NhW-1D-uSY">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" size="13" name="Menlo-Regular"/>
+                        </buttonCell>
+                    </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HZZ-Es-mpy">
-                        <rect key="frame" x="326" y="10" width="82" height="32"/>
+                        <rect key="frame" x="326" y="13" width="82" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J9x-sM-h9S">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" size="13" name="Menlo-Regular"/>
@@ -59,7 +73,8 @@
                         </connections>
                     </button>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lEv-Wj-6S5">
-                        <rect key="frame" x="25" y="45" width="48" height="48"/>
+                        <rect key="frame" x="29" y="62" width="48" height="48"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="settings" id="xKf-GK-m0k"/>
                     </imageView>
                 </subviews>
@@ -67,7 +82,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="318" y="246.5"/>
+            <point key="canvasLocation" x="318" y="262.5"/>
         </window>
     </objects>
     <resources>

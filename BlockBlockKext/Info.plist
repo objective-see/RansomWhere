@@ -15,13 +15,13 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.5</string>
+	<string>0.9.6</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.9.5</string>
+	<string>0.9.6</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2017 Objective-See. All rights reserved.</string>
+	<string>Copyright (c) 2017 Objective-See. All rights reserved.</string>
 	<key>OSBundleLibraries</key>
 	<dict>
 		<key>com.apple.kpi.bsd</key>

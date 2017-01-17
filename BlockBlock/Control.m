@@ -262,41 +262,51 @@ bail:
     // ->agent
     else
     {
-        //make real id r00t
-        if(-1 == setuid(0))
+        //handle launch agent start/stop as root
+        // ->exec launchctl with 'asuser' option
+        if(0 == geteuid())
         {
-            //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"setuid(0) in controlLaunchItem() failed with %d", errno]);
+            //make r00t
+            if(-1 == setuid(0))
+            {
+                //err msg
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"setuid(0) in controlLaunchItem() failed with %d", errno]);
+                
+                //bail
+                goto bail;
+            }
             
-            //bail
-            goto bail;
+            //add 'asuser' as first arg
+            [parameters addObject:@"asuser"];
+            
+            //add console uid as second arg
+            [parameters addObject:[NSString stringWithFormat:@"%d", [uid intValue]]];
+            
+            //add path to launchctl (again) as third arg
+            [parameters addObject:LAUNCHCTL];
+            
+            //add action as fourth arg
+            [parameters addObject:action];
+            
+            //arg 5
+            // ->path to launch agent plist
+            [parameters addObject:plist];
         }
         
-        //add 'asuser' as first arg
-        [parameters addObject:@"asuser"];
-        
-        //add console uid as second arg
-        [parameters addObject:[NSString stringWithFormat:@"%d", [uid intValue]]];
-        
-        //add path to launchctl (again) as third arg
-        [parameters addObject:LAUNCHCTL];
-        
-        //add action as fourth arg
-        [parameters addObject:action];
-        
-        //arg 5
-        // ->path to launch agent plist
-        [parameters addObject:plist];
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"current UID: %d", currentUID]);
-        #endif
+        //normal user
+        else
+        {
+            //add action as first arg
+            [parameters addObject:action];
+            
+            //add launch agent plist as second arg
+            [parameters addObject:plist];
+        }
     }
 
     //dbg msg
     #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"performing %@", parameters]);
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"contoling launch agent with %@", parameters]);
     #endif
     
     //control launch item

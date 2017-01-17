@@ -7,15 +7,17 @@
 //
 
 #import "Consts.h"
+#import "Control.h"
 #import "Logging.h"
+#import "Utilities.h"
 #import "AppDelegate.h"
 #import "PrefsWindowController.h"
-
 
 @implementation PrefsWindowController
 
 @synthesize okButton;
 @synthesize passiveMode;
+@synthesize headlessMode;
 @synthesize enableLogging;
 @synthesize loggingViaPassive;
 @synthesize disableUpdateCheck;
@@ -72,6 +74,13 @@
         self.enableLoggingBtn.enabled = YES;
     }
     
+    //check if 'headless mode' button should be selected
+    if(YES == self.headlessMode)
+    {
+        //set
+        self.enableHeadlessBtn.state = NSOnState;
+    }
+    
     //check if 'disable update checks' button should be selected
     if(YES == self.disableUpdateCheck)
     {
@@ -88,7 +97,7 @@
 {
     //set defaults
     // ->all no (off), except 'show popover' (for first run)
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{PREF_SHOW_POPOVER:@YES, PREF_ENABLE_LOGGING:@NO, PREF_PASSIVE_MODE:@NO, PREF_DISABLE_UPDATE_CHECK:@NO}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{PREF_SHOW_POPOVER:@YES, PREF_ENABLE_LOGGING:@NO, PREF_PASSIVE_MODE:@NO, PREF_HEADLESS_MODE:@NO, PREF_DISABLE_UPDATE_CHECK:@NO}];
     
     return;
 }
@@ -129,6 +138,13 @@
     {
         //save
         self.passiveMode = [defaults boolForKey:PREF_PASSIVE_MODE];
+    }
+    
+    //load 'run in headless mode'
+    if(nil != [defaults objectForKey:PREF_HEADLESS_MODE])
+    {
+        //save
+        self.headlessMode = [defaults boolForKey:PREF_HEADLESS_MODE];
     }
     
     //load 'disable update checks'
@@ -231,6 +247,14 @@ bail:
         }
     }
     
+    //if 'run in headless' mode is on
+    // ->can only have been turned on now, so hide
+    if(NSOnState == self.enableHeadlessBtn.state)
+    {
+        //hide (remove) status item
+        [((AppDelegate*)[[NSApplication sharedApplication] delegate]).statusBarMenuController removeStatusItem];
+    }
+    
     //save prefs
     [self savePrefs];
     
@@ -259,6 +283,16 @@ bail:
         //save pref
         [defaults setBool:self.showPopup forKey:PREF_SHOW_POPOVER];
     }
+    
+    //headless mode
+    else if(YES == [key isEqualToString:PREF_HEADLESS_MODE])
+    {
+        //update iVar
+        self.headlessMode = value;
+        
+        //save pref
+        [defaults setBool:self.headlessMode forKey:PREF_HEADLESS_MODE];
+    }
 
     //flush/save
     [defaults synchronize];
@@ -282,6 +316,9 @@ bail:
     //save 'run in passive mode' flag
     self.passiveMode = self.enablePassiveBtn.state;
     
+    //save 'run in headless mode' flag
+    self.headlessMode = self.enableHeadlessBtn.state;
+    
     //save 'disable update checks' flag
     self.disableUpdateCheck = self.disableUpdateCheckBtn.state;
     
@@ -291,9 +328,12 @@ bail:
     //save 'run in passive mode'
     [defaults setBool:self.passiveMode forKey:PREF_PASSIVE_MODE];
 
+    //save 'run in headless mode'
+    [defaults setBool:self.headlessMode forKey:PREF_HEADLESS_MODE];
+    
     //save 'disable update checks'
     [defaults setBool:self.disableUpdateCheck forKey:PREF_DISABLE_UPDATE_CHECK];
-    
+
     //flush/save
     [defaults synchronize];
     

@@ -47,6 +47,9 @@
 //init a menu item
 -(NSMenuItem*)initializeMenuItem:(NSString*)title action:(SEL)action;
 
+//remove status item
+-(void)removeStatusItem;
+
 //menu handler for 'enable'/'disable'
 // ->toggle blockblock & update menu
 -(void)toggle:(id)sender;

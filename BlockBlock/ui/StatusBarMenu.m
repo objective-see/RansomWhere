@@ -241,7 +241,19 @@ bail:
     return menuItem;
 }
 
-
+//remove status item
+-(void)removeStatusItem
+{
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"removing status menu");
+    #endif
+    
+    //remove
+    [[NSStatusBar systemStatusBar] removeStatusItem:self.statusItem];
+    
+    return;
+}
 
 #pragma mark - Popover actions
 

@@ -95,6 +95,9 @@
 //uninstall flag
 #define CMD_UNINSTALL @"-uninstall"
 
+//unhide (i.e. show menu icon)
+#define CMD_UNHIDE @"-unhide"
+
 //uninstall button
 #define BUTTON_UNINSTALL 100
 
@@ -261,6 +264,10 @@
 //prefs
 // ->run in passive mode
 #define PREF_PASSIVE_MODE @"passiveMode"
+
+//prefs
+// ->run in headless mode
+#define PREF_HEADLESS_MODE @"headlessMode"
 
 //prefs
 // ->disable update check
