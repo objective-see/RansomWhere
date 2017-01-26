@@ -44,7 +44,7 @@
 }
 
 //for testing
-//@property(nonatomic, retain)AlertWindowController* alertWindowController;
+@property(nonatomic, retain)AlertWindowController* alertWindowController;
 
 //preferences window controller
 @property(nonatomic, retain)PrefsWindowController* prefsWindowController;

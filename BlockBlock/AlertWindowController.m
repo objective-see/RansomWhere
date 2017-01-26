@@ -27,11 +27,12 @@
 
 @implementation AlertWindowController
 
-
-@synthesize popover;
+@synthesize vtButton;
+@synthesize vtPopover;
 @synthesize pluginType;
 @synthesize parentsButton;
 @synthesize rememberButton;
+@synthesize ancestryPopover;
 @synthesize processHierarchy;
 
 //automatically called when nib is loaded
@@ -52,11 +53,17 @@
     //tracking area for buttons
     NSTrackingArea* trackingArea = nil;
     
-    //init tracking area for 'show parents' button
-    trackingArea = [[NSTrackingArea alloc] initWithRect:[self.parentsButton bounds] options:(NSTrackingInVisibleRect|NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways) owner:self userInfo:nil];
+    //init tracking area for 'ancestry' button
+    trackingArea = [[NSTrackingArea alloc] initWithRect:[self.parentsButton bounds] options:(NSTrackingInVisibleRect|NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways) owner:self userInfo:@{@"button":[NSNumber numberWithInteger:self.parentsButton.tag]}];
     
-    //add tracking area to 'show parents' button
+    //add tracking area to 'ancestry' button
     [self.parentsButton addTrackingArea:trackingArea];
+    
+    //init tracking area for 'virus total' button
+    trackingArea = [[NSTrackingArea alloc] initWithRect:[self.vtButton bounds] options:(NSTrackingInVisibleRect|NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways) owner:self userInfo:@{@"button":[NSNumber numberWithInteger:self.vtButton.tag]}];
+    
+    //add tracking area to 'virus total' button
+    [self.vtButton addTrackingArea:trackingArea];
     
     return;
 }
@@ -274,14 +281,36 @@
 // ->when button isn't pressed, show mouse over effects
 -(void)mouseEntered:(NSEvent*)theEvent
 {
-    //only process if button hasn't been clicked
-    if(NSOffState == self.parentsButton.state)
+    //user info
+    NSDictionary* userInfo = nil;
+    
+    //grab user data
+    userInfo = theEvent.userData;
+    
+    //virus total button
+    if(self.vtButton.tag == [userInfo[@"button"] intValue])
     {
-        //mouse entered
-        // ->highlight (visual) state
-        [self.parentsButton setImage:[NSImage imageNamed:@"parentsIconOver"]];
+        //only process if button hasn't been clicked
+        if(NSOffState == self.vtButton.state)
+        {
+            //mouse entered
+            // ->highlight (visual) state
+            [self.vtButton setImage:[NSImage imageNamed:@"virusTotalOver"]];
+        }
     }
     
+    //ancestry button
+    else if(self.parentsButton.tag == [userInfo[@"button"] intValue])
+    {
+        //only process if button hasn't been clicked
+        if(NSOffState == self.parentsButton.state)
+        {
+            //mouse entered
+            // ->highlight (visual) state
+            [self.parentsButton setImage:[NSImage imageNamed:@"parentsIconOver"]];
+        }
+    }
+        
     return;
 }
 
@@ -289,14 +318,36 @@
 // ->when button isn't pressed, show mouse exit effects
 -(void)mouseExited:(NSEvent*)theEvent
 {
-    //only process if button hasn't been clicked
-    if(NSOffState == self.parentsButton.state)
+    //user info
+    NSDictionary* userInfo = nil;
+    
+    //grab user data
+    userInfo = theEvent.userData;
+    
+    //virus total button
+    if(self.vtButton.tag == [userInfo[@"button"] intValue])
     {
-        //mouse exited
-        // ->so reset button to original (visual) state
-        [self.parentsButton setImage:[NSImage imageNamed:@"parentsIcon"]];
+        //only process if button hasn't been clicked
+        if(NSOffState == self.vtButton.state)
+        {
+            //mouse exited
+            // ->so reset button to original (visual) state
+            [self.vtButton setImage:[NSImage imageNamed:@"virusTotal"]];
+        }
     }
     
+    //ancestry button
+    else if(self.parentsButton.tag == [userInfo[@"button"] intValue])
+    {
+        //only process if button hasn't been clicked
+        if(NSOffState == self.parentsButton.state)
+        {
+            //mouse exited
+            // ->so reset button to original (visual) state
+            [self.parentsButton setImage:[NSImage imageNamed:@"parentsIcon"]];
+        }
+    }
+
     return;
 }
 
@@ -364,16 +415,45 @@ bail:
 // ->tell OS that we are done with window so it can (now) be freed
 -(void)windowWillClose:(NSNotification *)notification
 {
-    //reset button's state
+    //reset virus total button's state
+    self.vtButton.state = NSOffState;
+    
+    //reset virus total button's image to original (visual) state
+    [self.vtButton setImage:[NSImage imageNamed:@"virusTotal"]];
+
+    //reset ancestry button's state
     self.parentsButton.state = NSOffState;
     
-    //reset button's image to original (visual) state
+    //reset ancestry button's image to original (visual) state
     [self.parentsButton setImage:[NSImage imageNamed:@"parentsIcon"]];
     
     return;
 }
 
 //automatically invoked when user clicks process ancestry button
+// ->depending on state, show/populate the popup, or close it
+-(IBAction)vtButtonHandler:(id)sender
+{
+    //when button is clicked
+    // ->open popover
+    if(NSOnState == self.vtButton.state)
+    {
+        //show popover
+        [self.vtPopover showRelativeToRect:[self.vtButton bounds] ofView:self.vtButton preferredEdge:NSMaxYEdge];
+    }
+    //otherwise
+    // ->close popover
+    else
+    {
+        //hide popover
+        [self.vtPopover close];
+    }
+    
+    return;
+}
+
+//invoked when user clicks process ancestry button
+// ->depending on state, show/populate the popup, or close it
 -(IBAction)ancestryButtonHandler:(id)sender
 {
     //when button is clicked
@@ -390,14 +470,14 @@ bail:
         [self.ancestryOutline expandItem:nil expandChildren:YES];
     
         //show popover
-        [self.popover showRelativeToRect:[self.parentsButton bounds] ofView:self.parentsButton preferredEdge:NSMaxYEdge];
+        [self.ancestryPopover showRelativeToRect:[self.parentsButton bounds] ofView:self.parentsButton preferredEdge:NSMaxYEdge];
     }
     //otherwise
     // ->close popover
     else
     {
         //hide popover
-        [self.popover close];
+        [self.ancestryPopover close];
     }
     
     return;
@@ -483,13 +563,19 @@ bail:
 -(void)deInitPopup
 {
     //close
-    [self.popover close];
-        
+    [self.vtPopover close];
+    
+    //close
+    [self.ancestryPopover close];
+    
     //remove view
     [self.ancestorView removeFromSuperview];
     
     //set to nil
-    self.popover = nil;
+    self.vtPopover = nil;
+    
+    //set to nil
+    self.ancestryPopover = nil;
 
     return;
 }

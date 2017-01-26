@@ -226,6 +226,7 @@
     //add alert msg
     alertInfo[@"alertMsg"] = [self valueForStringItem:self.plugin.alertMsg];
     
+    //TODO: check for nil!!!!
     //get signing info for process
     signingInfo = extractSigningInfo(self.process.path);
     switch([signingInfo[KEY_SIGNATURE_STATUS] intValue])

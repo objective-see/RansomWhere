@@ -47,6 +47,7 @@
         (0 != proc_pidpath((int)processID, processPath, PROC_PIDPATHINFO_MAXSIZE)))
     {
         //grab signing info
+        //TODO: check for nil path!!
         signingInfo = extractSigningInfo([NSString stringWithUTF8String:processPath]);
         
         //dbg msg

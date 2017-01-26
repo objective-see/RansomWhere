@@ -14,11 +14,66 @@
 		7D13FAD51E221370006813BE /* unknown.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD11E221370006813BE /* unknown.png */; };
 		7D13FAD61E221370006813BE /* unsigned.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD21E221370006813BE /* unsigned.png */; };
 		7D13FAD91E2215CA006813BE /* Signing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D13FAD71E2215CA006813BE /* Signing.m */; };
+		7D460E171E39DF0E00A95EE6 /* PopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D460E161E39DF0E00A95EE6 /* PopoverViewController.m */; };
 		7D7361041C293DD7000558BA /* AppLoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D7361021C293DD7000558BA /* AppLoginItem.m */; };
 		7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */; };
 		7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */; };
 		7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F2C1C018DA600A9CCE4 /* settings.png */; };
 		7D902D691E2AE207006124A5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D671E2AE207006124A5 /* MainMenu.xib */; };
+		7D902D7E1E3897EB006124A5 /* virusTotal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D7D1E3897EB006124A5 /* virusTotal.png */; };
+		7D902D811E39CACD006124A5 /* virusTotalBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D7F1E39CACD006124A5 /* virusTotalBG.png */; };
+		7D902D821E39CACD006124A5 /* virusTotalOver.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D801E39CACD006124A5 /* virusTotalOver.png */; };
+		7DF868141E39E3C3008ED0BD /* HyperlinkTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867CF1E39E3C2008ED0BD /* HyperlinkTextField.m */; };
+		7DF868151E39E3C3008ED0BD /* AlertViewBottom.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867D21E39E3C2008ED0BD /* AlertViewBottom.m */; };
+		7DF868161E39E3C3008ED0BD /* AlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867D31E39E3C2008ED0BD /* AlertWindowController.xib */; };
+		7DF868171E39E3C3008ED0BD /* ConfigureWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867D51E39E3C2008ED0BD /* ConfigureWindowController.m */; };
+		7DF868181E39E3C3008ED0BD /* ConfigureWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867D61E39E3C2008ED0BD /* ConfigureWindowController.xib */; };
+		7DF868191E39E3C3008ED0BD /* ErrorWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867D71E39E3C2008ED0BD /* ErrorWindowController.xib */; };
+		7DF8681A1E39E3C3008ED0BD /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867D81E39E3C2008ED0BD /* InfoWindow.xib */; };
+		7DF8681B1E39E3C3008ED0BD /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867DA1E39E3C2008ED0BD /* InfoWindowController.m */; };
+		7DF8681C1E39E3C3008ED0BD /* PopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867DC1E39E3C2008ED0BD /* PopoverViewController.m */; };
+		7DF8681D1E39E3C3008ED0BD /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867DD1E39E3C2008ED0BD /* PrefsWindow.xib */; };
+		7DF8681E1E39E3C3008ED0BD /* StatusBarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867DF1E39E3C2008ED0BD /* StatusBarMenu.m */; };
+		7DF8681F1E39E3C3008ED0BD /* StatusBarPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E01E39E3C2008ED0BD /* StatusBarPopover.xib */; };
+		7DF868201E39E3C3008ED0BD /* bbText.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E21E39E3C2008ED0BD /* bbText.png */; };
+		7DF868211E39E3C3008ED0BD /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E41E39E3C2008ED0BD /* icon.png */; };
+		7DF868221E39E3C3008ED0BD /* statusIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E51E39E3C2008ED0BD /* statusIcon.png */; };
+		7DF868231E39E3C3008ED0BD /* statusIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E61E39E3C2008ED0BD /* statusIcon@2x.png */; };
+		7DF868241E39E3C3008ED0BD /* statusIconOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E71E39E3C2008ED0BD /* statusIconOff.png */; };
+		7DF868251E39E3C3008ED0BD /* statusIconOff@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E81E39E3C2008ED0BD /* statusIconOff@2x.png */; };
+		7DF868261E39E3C3008ED0BD /* statusOFF.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E91E39E3C2008ED0BD /* statusOFF.png */; };
+		7DF868271E39E3C3008ED0BD /* statusOFF@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867EA1E39E3C2008ED0BD /* statusOFF@2x.png */; };
+		7DF868281E39E3C3008ED0BD /* statusOFFWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867EB1E39E3C2008ED0BD /* statusOFFWhite.png */; };
+		7DF868291E39E3C3008ED0BD /* statusOFFWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867EC1E39E3C2008ED0BD /* statusOFFWhite@2x.png */; };
+		7DF8682A1E39E3C3008ED0BD /* statusON.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867ED1E39E3C2008ED0BD /* statusON.png */; };
+		7DF8682B1E39E3C3008ED0BD /* statusON@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867EE1E39E3C2008ED0BD /* statusON@2x.png */; };
+		7DF8682C1E39E3C3008ED0BD /* statusONWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867EF1E39E3C2008ED0BD /* statusONWhite.png */; };
+		7DF8682D1E39E3C3008ED0BD /* statusONWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F01E39E3C2008ED0BD /* statusONWhite@2x.png */; };
+		7DF8682E1E39E3C3008ED0BD /* itemIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F11E39E3C2008ED0BD /* itemIcon.png */; };
+		7DF8682F1E39E3C3008ED0BD /* itemIconBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F21E39E3C2008ED0BD /* itemIconBlack.png */; };
+		7DF868301E39E3C3008ED0BD /* parentsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F31E39E3C2008ED0BD /* parentsIcon.png */; };
+		7DF868311E39E3C3008ED0BD /* parentsIconBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F41E39E3C2008ED0BD /* parentsIconBG.png */; };
+		7DF868321E39E3C3008ED0BD /* parentsIconOver.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F51E39E3C2008ED0BD /* parentsIconOver.png */; };
+		7DF868331E39E3C3008ED0BD /* processIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F61E39E3C2008ED0BD /* processIcon.png */; };
+		7DF868341E39E3C3008ED0BD /* processIconBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F71E39E3C2008ED0BD /* processIconBlack.png */; };
+		7DF868351E39E3C3008ED0BD /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F81E39E3C2008ED0BD /* settings.png */; };
+		7DF868361E39E3C3008ED0BD /* signed.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867F91E39E3C2008ED0BD /* signed.png */; };
+		7DF868371E39E3C3008ED0BD /* signedApple.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867FA1E39E3C2008ED0BD /* signedApple.png */; };
+		7DF868381E39E3C3008ED0BD /* unknown.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867FB1E39E3C2008ED0BD /* unknown.png */; };
+		7DF868391E39E3C3008ED0BD /* unsigned.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867FC1E39E3C2008ED0BD /* unsigned.png */; };
+		7DF8683A1E39E3C3008ED0BD /* upArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867FD1E39E3C2008ED0BD /* upArrow.png */; };
+		7DF8683B1E39E3C3008ED0BD /* upArrowSmall@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867FE1E39E3C2008ED0BD /* upArrowSmall@2x.png */; };
+		7DF8683C1E39E3C3008ED0BD /* upArrowSmall_old.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867FF1E39E3C2008ED0BD /* upArrowSmall_old.png */; };
+		7DF8683D1E39E3C3008ED0BD /* virusTotal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF868001E39E3C2008ED0BD /* virusTotal.png */; };
+		7DF8683E1E39E3C3008ED0BD /* virusTotalBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF868011E39E3C2008ED0BD /* virusTotalBG.png */; };
+		7DF8683F1E39E3C3008ED0BD /* virusTotalOver.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF868021E39E3C2008ED0BD /* virusTotalOver.png */; };
+		7DF868401E39E3C3008ED0BD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DF868041E39E3C2008ED0BD /* MainMenu.xib */; };
+		7DF868411E39E3C3008ED0BD /* AppLoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF868081E39E3C2008ED0BD /* AppLoginItem.m */; };
+		7DF868421E39E3C3008ED0BD /* CronJob.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF8680A1E39E3C2008ED0BD /* CronJob.m */; };
+		7DF868431E39E3C3008ED0BD /* Kext.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF8680C1E39E3C2008ED0BD /* Kext.m */; };
+		7DF868451E39E3C3008ED0BD /* Launchd.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF8680F1E39E3C2008ED0BD /* Launchd.m */; };
+		7DF868461E39E3C3008ED0BD /* LoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF868111E39E3C2008ED0BD /* LoginItem.m */; };
+		7DF868471E39E3C3008ED0BD /* VirusTotal.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF868131E39E3C2008ED0BD /* VirusTotal.m */; };
 		CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CD06BD211A6C5D7C00DE285A /* LoginItem.m */; };
 		CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3CE6881A22C53400B4F940 /* ConfigureWindowController.m */; };
 		CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD3CE68C1A22D2EB00B4F940 /* launchItem.plist */; };
@@ -92,6 +147,8 @@
 		7D13FAD21E221370006813BE /* unsigned.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = unsigned.png; path = BlockBlock/images/unsigned.png; sourceTree = "<group>"; };
 		7D13FAD71E2215CA006813BE /* Signing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Signing.m; path = BlockBlock/Signing.m; sourceTree = "<group>"; };
 		7D13FAD81E2215CA006813BE /* Signing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signing.h; path = BlockBlock/Signing.h; sourceTree = "<group>"; };
+		7D460E151E39DF0E00A95EE6 /* PopoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PopoverViewController.h; path = BlockBlock/ui/PopoverViewController.h; sourceTree = "<group>"; };
+		7D460E161E39DF0E00A95EE6 /* PopoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PopoverViewController.m; path = BlockBlock/ui/PopoverViewController.m; sourceTree = "<group>"; };
 		7D7361021C293DD7000558BA /* AppLoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppLoginItem.m; path = BlockBlock/plugins/AppLoginItem.m; sourceTree = "<group>"; };
 		7D7361031C293DD7000558BA /* AppLoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppLoginItem.h; path = BlockBlock/plugins/AppLoginItem.h; sourceTree = "<group>"; };
 		7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PrefsWindow.xib; path = BlockBlock/ui/PrefsWindow.xib; sourceTree = SOURCE_ROOT; };
@@ -99,6 +156,72 @@
 		7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PrefsWindowController.m; path = BlockBlock/PrefsWindowController.m; sourceTree = "<group>"; };
 		7D774F2C1C018DA600A9CCE4 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = BlockBlock/images/settings.png; sourceTree = "<group>"; };
 		7D902D681E2AE207006124A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
+		7D902D7D1E3897EB006124A5 /* virusTotal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = virusTotal.png; path = BlockBlock/images/virusTotal.png; sourceTree = "<group>"; };
+		7D902D7F1E39CACD006124A5 /* virusTotalBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = virusTotalBG.png; path = BlockBlock/images/virusTotalBG.png; sourceTree = "<group>"; };
+		7D902D801E39CACD006124A5 /* virusTotalOver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = virusTotalOver.png; path = BlockBlock/images/virusTotalOver.png; sourceTree = "<group>"; };
+		7DF867CE1E39E3C2008ED0BD /* HyperlinkTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HyperlinkTextField.h; sourceTree = "<group>"; };
+		7DF867CF1E39E3C2008ED0BD /* HyperlinkTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HyperlinkTextField.m; sourceTree = "<group>"; };
+		7DF867D11E39E3C2008ED0BD /* AlertViewBottom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertViewBottom.h; sourceTree = "<group>"; };
+		7DF867D21E39E3C2008ED0BD /* AlertViewBottom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertViewBottom.m; sourceTree = "<group>"; };
+		7DF867D31E39E3C2008ED0BD /* AlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlertWindowController.xib; sourceTree = "<group>"; };
+		7DF867D41E39E3C2008ED0BD /* ConfigureWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigureWindowController.h; sourceTree = "<group>"; };
+		7DF867D51E39E3C2008ED0BD /* ConfigureWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConfigureWindowController.m; sourceTree = "<group>"; };
+		7DF867D61E39E3C2008ED0BD /* ConfigureWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfigureWindowController.xib; sourceTree = "<group>"; };
+		7DF867D71E39E3C2008ED0BD /* ErrorWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorWindowController.xib; sourceTree = "<group>"; };
+		7DF867D81E39E3C2008ED0BD /* InfoWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoWindow.xib; sourceTree = "<group>"; };
+		7DF867D91E39E3C2008ED0BD /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfoWindowController.h; sourceTree = "<group>"; };
+		7DF867DA1E39E3C2008ED0BD /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfoWindowController.m; sourceTree = "<group>"; };
+		7DF867DB1E39E3C2008ED0BD /* PopoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopoverViewController.h; sourceTree = "<group>"; };
+		7DF867DC1E39E3C2008ED0BD /* PopoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopoverViewController.m; sourceTree = "<group>"; };
+		7DF867DD1E39E3C2008ED0BD /* PrefsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrefsWindow.xib; sourceTree = "<group>"; };
+		7DF867DE1E39E3C2008ED0BD /* StatusBarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusBarMenu.h; sourceTree = "<group>"; };
+		7DF867DF1E39E3C2008ED0BD /* StatusBarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusBarMenu.m; sourceTree = "<group>"; };
+		7DF867E01E39E3C2008ED0BD /* StatusBarPopover.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StatusBarPopover.xib; sourceTree = "<group>"; };
+		7DF867E21E39E3C2008ED0BD /* bbText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bbText.png; sourceTree = "<group>"; };
+		7DF867E41E39E3C2008ED0BD /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		7DF867E51E39E3C2008ED0BD /* statusIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusIcon.png; sourceTree = "<group>"; };
+		7DF867E61E39E3C2008ED0BD /* statusIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "statusIcon@2x.png"; sourceTree = "<group>"; };
+		7DF867E71E39E3C2008ED0BD /* statusIconOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusIconOff.png; sourceTree = "<group>"; };
+		7DF867E81E39E3C2008ED0BD /* statusIconOff@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "statusIconOff@2x.png"; sourceTree = "<group>"; };
+		7DF867E91E39E3C2008ED0BD /* statusOFF.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusOFF.png; sourceTree = "<group>"; };
+		7DF867EA1E39E3C2008ED0BD /* statusOFF@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "statusOFF@2x.png"; sourceTree = "<group>"; };
+		7DF867EB1E39E3C2008ED0BD /* statusOFFWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusOFFWhite.png; sourceTree = "<group>"; };
+		7DF867EC1E39E3C2008ED0BD /* statusOFFWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "statusOFFWhite@2x.png"; sourceTree = "<group>"; };
+		7DF867ED1E39E3C2008ED0BD /* statusON.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusON.png; sourceTree = "<group>"; };
+		7DF867EE1E39E3C2008ED0BD /* statusON@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "statusON@2x.png"; sourceTree = "<group>"; };
+		7DF867EF1E39E3C2008ED0BD /* statusONWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = statusONWhite.png; sourceTree = "<group>"; };
+		7DF867F01E39E3C2008ED0BD /* statusONWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "statusONWhite@2x.png"; sourceTree = "<group>"; };
+		7DF867F11E39E3C2008ED0BD /* itemIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = itemIcon.png; sourceTree = "<group>"; };
+		7DF867F21E39E3C2008ED0BD /* itemIconBlack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = itemIconBlack.png; sourceTree = "<group>"; };
+		7DF867F31E39E3C2008ED0BD /* parentsIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = parentsIcon.png; sourceTree = "<group>"; };
+		7DF867F41E39E3C2008ED0BD /* parentsIconBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = parentsIconBG.png; sourceTree = "<group>"; };
+		7DF867F51E39E3C2008ED0BD /* parentsIconOver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = parentsIconOver.png; sourceTree = "<group>"; };
+		7DF867F61E39E3C2008ED0BD /* processIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = processIcon.png; sourceTree = "<group>"; };
+		7DF867F71E39E3C2008ED0BD /* processIconBlack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = processIconBlack.png; sourceTree = "<group>"; };
+		7DF867F81E39E3C2008ED0BD /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
+		7DF867F91E39E3C2008ED0BD /* signed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = signed.png; sourceTree = "<group>"; };
+		7DF867FA1E39E3C2008ED0BD /* signedApple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = signedApple.png; sourceTree = "<group>"; };
+		7DF867FB1E39E3C2008ED0BD /* unknown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = unknown.png; sourceTree = "<group>"; };
+		7DF867FC1E39E3C2008ED0BD /* unsigned.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = unsigned.png; sourceTree = "<group>"; };
+		7DF867FD1E39E3C2008ED0BD /* upArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upArrow.png; sourceTree = "<group>"; };
+		7DF867FE1E39E3C2008ED0BD /* upArrowSmall@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "upArrowSmall@2x.png"; sourceTree = "<group>"; };
+		7DF867FF1E39E3C2008ED0BD /* upArrowSmall_old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upArrowSmall_old.png; sourceTree = "<group>"; };
+		7DF868001E39E3C2008ED0BD /* virusTotal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = virusTotal.png; sourceTree = "<group>"; };
+		7DF868011E39E3C2008ED0BD /* virusTotalBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = virusTotalBG.png; sourceTree = "<group>"; };
+		7DF868021E39E3C2008ED0BD /* virusTotalOver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = virusTotalOver.png; sourceTree = "<group>"; };
+		7DF868051E39E3C2008ED0BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
+		7DF868071E39E3C2008ED0BD /* AppLoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppLoginItem.h; sourceTree = "<group>"; };
+		7DF868081E39E3C2008ED0BD /* AppLoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppLoginItem.m; sourceTree = "<group>"; };
+		7DF868091E39E3C2008ED0BD /* CronJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CronJob.h; sourceTree = "<group>"; };
+		7DF8680A1E39E3C2008ED0BD /* CronJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CronJob.m; sourceTree = "<group>"; };
+		7DF8680B1E39E3C2008ED0BD /* Kext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Kext.h; sourceTree = "<group>"; };
+		7DF8680C1E39E3C2008ED0BD /* Kext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Kext.m; sourceTree = "<group>"; };
+		7DF8680E1E39E3C2008ED0BD /* Launchd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Launchd.h; sourceTree = "<group>"; };
+		7DF8680F1E39E3C2008ED0BD /* Launchd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Launchd.m; sourceTree = "<group>"; };
+		7DF868101E39E3C2008ED0BD /* LoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginItem.h; sourceTree = "<group>"; };
+		7DF868111E39E3C2008ED0BD /* LoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginItem.m; sourceTree = "<group>"; };
+		7DF868121E39E3C2008ED0BD /* VirusTotal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VirusTotal.h; path = BlockBlock/VirusTotal.h; sourceTree = "<group>"; };
+		7DF868131E39E3C2008ED0BD /* VirusTotal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VirusTotal.m; path = BlockBlock/VirusTotal.m; sourceTree = "<group>"; };
 		CD06BD201A6C5D7C00DE285A /* LoginItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginItem.h; path = BlockBlock/plugins/LoginItem.h; sourceTree = "<group>"; };
 		CD06BD211A6C5D7C00DE285A /* LoginItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginItem.m; path = BlockBlock/plugins/LoginItem.m; sourceTree = "<group>"; };
 		CD3CE6871A22C53400B4F940 /* ConfigureWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigureWindowController.h; path = BlockBlock/ui/ConfigureWindowController.h; sourceTree = "<group>"; };
@@ -213,6 +336,115 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7DF867CD1E39E3C2008ED0BD /* 3rdParty */ = {
+			isa = PBXGroup;
+			children = (
+				7DF867CE1E39E3C2008ED0BD /* HyperlinkTextField.h */,
+				7DF867CF1E39E3C2008ED0BD /* HyperlinkTextField.m */,
+			);
+			name = 3rdParty;
+			path = BlockBlock/3rdParty;
+			sourceTree = "<group>";
+		};
+		7DF867D01E39E3C2008ED0BD /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				7DF867D11E39E3C2008ED0BD /* AlertViewBottom.h */,
+				7DF867D21E39E3C2008ED0BD /* AlertViewBottom.m */,
+				7DF867D31E39E3C2008ED0BD /* AlertWindowController.xib */,
+				7DF867D41E39E3C2008ED0BD /* ConfigureWindowController.h */,
+				7DF867D51E39E3C2008ED0BD /* ConfigureWindowController.m */,
+				7DF867D61E39E3C2008ED0BD /* ConfigureWindowController.xib */,
+				7DF867D71E39E3C2008ED0BD /* ErrorWindowController.xib */,
+				7DF867D81E39E3C2008ED0BD /* InfoWindow.xib */,
+				7DF867D91E39E3C2008ED0BD /* InfoWindowController.h */,
+				7DF867DA1E39E3C2008ED0BD /* InfoWindowController.m */,
+				7DF867DB1E39E3C2008ED0BD /* PopoverViewController.h */,
+				7DF867DC1E39E3C2008ED0BD /* PopoverViewController.m */,
+				7DF867DD1E39E3C2008ED0BD /* PrefsWindow.xib */,
+				7DF867DE1E39E3C2008ED0BD /* StatusBarMenu.h */,
+				7DF867DF1E39E3C2008ED0BD /* StatusBarMenu.m */,
+				7DF867E01E39E3C2008ED0BD /* StatusBarPopover.xib */,
+			);
+			name = ui;
+			path = BlockBlock/ui;
+			sourceTree = "<group>";
+		};
+		7DF867E11E39E3C2008ED0BD /* images */ = {
+			isa = PBXGroup;
+			children = (
+				7DF867E21E39E3C2008ED0BD /* bbText.png */,
+				7DF867E31E39E3C2008ED0BD /* icon */,
+				7DF867F11E39E3C2008ED0BD /* itemIcon.png */,
+				7DF867F21E39E3C2008ED0BD /* itemIconBlack.png */,
+				7DF867F31E39E3C2008ED0BD /* parentsIcon.png */,
+				7DF867F41E39E3C2008ED0BD /* parentsIconBG.png */,
+				7DF867F51E39E3C2008ED0BD /* parentsIconOver.png */,
+				7DF867F61E39E3C2008ED0BD /* processIcon.png */,
+				7DF867F71E39E3C2008ED0BD /* processIconBlack.png */,
+				7DF867F81E39E3C2008ED0BD /* settings.png */,
+				7DF867F91E39E3C2008ED0BD /* signed.png */,
+				7DF867FA1E39E3C2008ED0BD /* signedApple.png */,
+				7DF867FB1E39E3C2008ED0BD /* unknown.png */,
+				7DF867FC1E39E3C2008ED0BD /* unsigned.png */,
+				7DF867FD1E39E3C2008ED0BD /* upArrow.png */,
+				7DF867FE1E39E3C2008ED0BD /* upArrowSmall@2x.png */,
+				7DF867FF1E39E3C2008ED0BD /* upArrowSmall_old.png */,
+				7DF868001E39E3C2008ED0BD /* virusTotal.png */,
+				7DF868011E39E3C2008ED0BD /* virusTotalBG.png */,
+				7DF868021E39E3C2008ED0BD /* virusTotalOver.png */,
+			);
+			name = images;
+			path = BlockBlock/images;
+			sourceTree = "<group>";
+		};
+		7DF867E31E39E3C2008ED0BD /* icon */ = {
+			isa = PBXGroup;
+			children = (
+				7DF867E41E39E3C2008ED0BD /* icon.png */,
+				7DF867E51E39E3C2008ED0BD /* statusIcon.png */,
+				7DF867E61E39E3C2008ED0BD /* statusIcon@2x.png */,
+				7DF867E71E39E3C2008ED0BD /* statusIconOff.png */,
+				7DF867E81E39E3C2008ED0BD /* statusIconOff@2x.png */,
+				7DF867E91E39E3C2008ED0BD /* statusOFF.png */,
+				7DF867EA1E39E3C2008ED0BD /* statusOFF@2x.png */,
+				7DF867EB1E39E3C2008ED0BD /* statusOFFWhite.png */,
+				7DF867EC1E39E3C2008ED0BD /* statusOFFWhite@2x.png */,
+				7DF867ED1E39E3C2008ED0BD /* statusON.png */,
+				7DF867EE1E39E3C2008ED0BD /* statusON@2x.png */,
+				7DF867EF1E39E3C2008ED0BD /* statusONWhite.png */,
+				7DF867F01E39E3C2008ED0BD /* statusONWhite@2x.png */,
+			);
+			path = icon;
+			sourceTree = "<group>";
+		};
+		7DF868031E39E3C2008ED0BD /* Base.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				7DF868041E39E3C2008ED0BD /* MainMenu.xib */,
+			);
+			name = Base.lproj;
+			path = BlockBlock/Base.lproj;
+			sourceTree = "<group>";
+		};
+		7DF868061E39E3C2008ED0BD /* plugins */ = {
+			isa = PBXGroup;
+			children = (
+				7DF868071E39E3C2008ED0BD /* AppLoginItem.h */,
+				7DF868081E39E3C2008ED0BD /* AppLoginItem.m */,
+				7DF868091E39E3C2008ED0BD /* CronJob.h */,
+				7DF8680A1E39E3C2008ED0BD /* CronJob.m */,
+				7DF8680B1E39E3C2008ED0BD /* Kext.h */,
+				7DF8680C1E39E3C2008ED0BD /* Kext.m */,
+				7DF8680E1E39E3C2008ED0BD /* Launchd.h */,
+				7DF8680F1E39E3C2008ED0BD /* Launchd.m */,
+				7DF868101E39E3C2008ED0BD /* LoginItem.h */,
+				7DF868111E39E3C2008ED0BD /* LoginItem.m */,
+			);
+			name = plugins;
+			path = BlockBlock/plugins;
+			sourceTree = "<group>";
+		};
 		CD3CE6921A2300F600B4F940 /* configure */ = {
 			isa = PBXGroup;
 			children = (
@@ -229,12 +461,12 @@
 		CD7C872019D4428100EC7F0A /* ui */ = {
 			isa = PBXGroup;
 			children = (
-				7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */,
-				CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */,
 				CD855A801A773EA700A13C5C /* AlertWindowController.xib */,
-				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
-				CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */,
 				CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */,
+				CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */,
+				CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */,
+				7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */,
+				CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */,
 			);
 			name = ui;
 			sourceTree = "<group>";
@@ -259,6 +491,15 @@
 		CD7F087F19AE6DCA00FF00FC = {
 			isa = PBXGroup;
 			children = (
+				7DF867CD1E39E3C2008ED0BD /* 3rdParty */,
+				7DF867D01E39E3C2008ED0BD /* ui */,
+				7DF867E11E39E3C2008ED0BD /* images */,
+				7DF868031E39E3C2008ED0BD /* Base.lproj */,
+				7DF868061E39E3C2008ED0BD /* plugins */,
+				7DF868121E39E3C2008ED0BD /* VirusTotal.h */,
+				7DF868131E39E3C2008ED0BD /* VirusTotal.m */,
+				7D460E151E39DF0E00A95EE6 /* PopoverViewController.h */,
+				7D460E161E39DF0E00A95EE6 /* PopoverViewController.m */,
 				7D13FAD71E2215CA006813BE /* Signing.m */,
 				7D13FAD81E2215CA006813BE /* Signing.h */,
 				7D774F271C017C9000A9CCE4 /* PrefsWindowController.h */,
@@ -379,6 +620,9 @@
 		CD8381371A7DAA0F00AC0D96 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7D902D7F1E39CACD006124A5 /* virusTotalBG.png */,
+				7D902D801E39CACD006124A5 /* virusTotalOver.png */,
+				7D902D7D1E3897EB006124A5 /* virusTotal.png */,
 				7D13FACF1E221370006813BE /* signed.png */,
 				7D13FAD01E221370006813BE /* signedApple.png */,
 				7D13FAD11E221370006813BE /* unknown.png */,
@@ -493,38 +737,80 @@
 			files = (
 				CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */,
 				7D13FAD51E221370006813BE /* unknown.png in Resources */,
+				7DF868221E39E3C3008ED0BD /* statusIcon.png in Resources */,
 				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
 				7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */,
+				7DF868181E39E3C3008ED0BD /* ConfigureWindowController.xib in Resources */,
+				7DF868291E39E3C3008ED0BD /* statusOFFWhite@2x.png in Resources */,
+				7DF8682E1E39E3C3008ED0BD /* itemIcon.png in Resources */,
+				7DF868261E39E3C3008ED0BD /* statusOFF.png in Resources */,
+				7DF868381E39E3C3008ED0BD /* unknown.png in Resources */,
+				7DF8681A1E39E3C3008ED0BD /* InfoWindow.xib in Resources */,
+				7DF868331E39E3C3008ED0BD /* processIcon.png in Resources */,
 				CD9282E11B0133B8007A5E03 /* parentsIcon.png in Resources */,
+				7DF8683C1E39E3C3008ED0BD /* upArrowSmall_old.png in Resources */,
 				CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */,
 				CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */,
 				7D13FAD61E221370006813BE /* unsigned.png in Resources */,
+				7DF8683A1E39E3C3008ED0BD /* upArrow.png in Resources */,
 				CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */,
+				7DF868281E39E3C3008ED0BD /* statusOFFWhite.png in Resources */,
+				7D902D821E39CACD006124A5 /* virusTotalOver.png in Resources */,
 				CD7620A71AF3629400CFCB68 /* statusONWhite.png in Resources */,
 				CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */,
+				7DF868201E39E3C3008ED0BD /* bbText.png in Resources */,
+				7DF868391E39E3C3008ED0BD /* unsigned.png in Resources */,
+				7DF868361E39E3C3008ED0BD /* signed.png in Resources */,
 				CDE36C921AD3B67B00371F4E /* icon.png in Resources */,
 				CD83814A1A7DB2B200AC0D96 /* upArrowSmall@2x.png in Resources */,
 				CD9282E21B0133B8007A5E03 /* parentsIconBG.png in Resources */,
 				CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */,
+				7DF8683F1E39E3C3008ED0BD /* virusTotalOver.png in Resources */,
+				7DF8682D1E39E3C3008ED0BD /* statusONWhite@2x.png in Resources */,
 				CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */,
 				CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */,
 				7D13FAD31E221370006813BE /* signed.png in Resources */,
+				7DF8683B1E39E3C3008ED0BD /* upArrowSmall@2x.png in Resources */,
+				7DF868251E39E3C3008ED0BD /* statusIconOff@2x.png in Resources */,
+				7DF8682F1E39E3C3008ED0BD /* itemIconBlack.png in Resources */,
+				7DF8683E1E39E3C3008ED0BD /* virusTotalBG.png in Resources */,
 				CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */,
 				CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */,
+				7DF8682B1E39E3C3008ED0BD /* statusON@2x.png in Resources */,
 				CDE36C991AD500EE00371F4E /* bbText.png in Resources */,
 				CD7620A51AF3629400CFCB68 /* statusOFFWhite.png in Resources */,
+				7DF8683D1E39E3C3008ED0BD /* virusTotal.png in Resources */,
+				7DF868351E39E3C3008ED0BD /* settings.png in Resources */,
 				CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */,
+				7DF868401E39E3C3008ED0BD /* MainMenu.xib in Resources */,
+				7DF8681D1E39E3C3008ED0BD /* PrefsWindow.xib in Resources */,
+				7DF868191E39E3C3008ED0BD /* ErrorWindowController.xib in Resources */,
 				CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */,
 				CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */,
 				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
+				7DF868241E39E3C3008ED0BD /* statusIconOff.png in Resources */,
+				7DF868271E39E3C3008ED0BD /* statusOFF@2x.png in Resources */,
 				7D902D691E2AE207006124A5 /* MainMenu.xib in Resources */,
+				7DF868161E39E3C3008ED0BD /* AlertWindowController.xib in Resources */,
+				7DF868321E39E3C3008ED0BD /* parentsIconOver.png in Resources */,
 				7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */,
 				CD9282E31B0133B8007A5E03 /* parentsIconOver.png in Resources */,
+				7DF868341E39E3C3008ED0BD /* processIconBlack.png in Resources */,
+				7DF868211E39E3C3008ED0BD /* icon.png in Resources */,
 				7D13FAD41E221370006813BE /* signedApple.png in Resources */,
+				7DF868311E39E3C3008ED0BD /* parentsIconBG.png in Resources */,
 				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
+				7DF8681F1E39E3C3008ED0BD /* StatusBarPopover.xib in Resources */,
+				7D902D811E39CACD006124A5 /* virusTotalBG.png in Resources */,
 				CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */,
+				7DF868231E39E3C3008ED0BD /* statusIcon@2x.png in Resources */,
+				7DF8682A1E39E3C3008ED0BD /* statusON.png in Resources */,
 				CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */,
+				7DF868371E39E3C3008ED0BD /* signedApple.png in Resources */,
 				CD7620A61AF3629400CFCB68 /* statusOFFWhite@2x.png in Resources */,
+				7DF8682C1E39E3C3008ED0BD /* statusONWhite.png in Resources */,
+				7DF868301E39E3C3008ED0BD /* parentsIcon.png in Resources */,
+				7D902D7E1E3897EB006124A5 /* virusTotal.png in Resources */,
 				CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -544,7 +830,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\ncp -R -f ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
+			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n#cp -R -f ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -556,15 +842,21 @@
 				CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */,
 				CD6BBBF31B52204F00506D0D /* CronJob.m in Sources */,
 				CDB4D9E519FCD9410069BE62 /* Process.m in Sources */,
+				7DF868451E39E3C3008ED0BD /* Launchd.m in Sources */,
 				CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */,
 				CD7C874C19D50F3B00EC7F0A /* Kext.m in Sources */,
 				7D13FACE1E1E2167006813BE /* CustomNSButton.m in Sources */,
+				7DF868411E39E3C3008ED0BD /* AppLoginItem.m in Sources */,
+				7DF8681C1E39E3C3008ED0BD /* PopoverViewController.m in Sources */,
+				7DF8681E1E39E3C3008ED0BD /* StatusBarMenu.m in Sources */,
 				CD3CE68A1A22C53400B4F940 /* ConfigureWindowController.m in Sources */,
 				7D7361041C293DD7000558BA /* AppLoginItem.m in Sources */,
 				7D13FAD91E2215CA006813BE /* Signing.m in Sources */,
 				CDD5681F1A5E37770094BC3A /* Launchd.m in Sources */,
 				CD8401331A044B0B000A1C5A /* Utilities.m in Sources */,
+				7DF868431E39E3C3008ED0BD /* Kext.m in Sources */,
 				CD7C872619D4432C00EC7F0A /* Watcher.m in Sources */,
+				7D460E171E39DF0E00A95EE6 /* PopoverViewController.m in Sources */,
 				CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */,
 				CD5C998C19D73B7D0015232A /* AlertWindow.m in Sources */,
 				CD7C871C19D43F0200EC7F0A /* main.m in Sources */,
@@ -573,13 +865,19 @@
 				CD5C998F19D73C380015232A /* AlertView.m in Sources */,
 				CD3CE6951A23010B00B4F940 /* Uninstall.m in Sources */,
 				CD7C874119D4C58700EC7F0A /* AlertWindowController.m in Sources */,
+				7DF868421E39E3C3008ED0BD /* CronJob.m in Sources */,
 				CD5C998919D6810C0015232A /* WatchEvent.m in Sources */,
 				CD5C999519D8B84B0015232A /* AlertViewBottom.m in Sources */,
 				CDACB9271A2EF3330088CC30 /* InterProcComms.m in Sources */,
+				7DF868461E39E3C3008ED0BD /* LoginItem.m in Sources */,
 				7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */,
 				CDD738BF1A5F7D0500B825BA /* StatusBarPopoverController.m in Sources */,
 				CD06BD221A6C5D7C00DE285A /* LoginItem.m in Sources */,
+				7DF868171E39E3C3008ED0BD /* ConfigureWindowController.m in Sources */,
+				7DF868141E39E3C3008ED0BD /* HyperlinkTextField.m in Sources */,
 				CD7C871519D43EAD00EC7F0A /* AppDelegate.m in Sources */,
+				7DF868151E39E3C3008ED0BD /* AlertViewBottom.m in Sources */,
+				7DF8681B1E39E3C3008ED0BD /* InfoWindowController.m in Sources */,
 				CDB4D9DD19F4CDE90069BE62 /* ProcessMonitor.m in Sources */,
 				CD7C874F19D51F8900EC7F0A /* PluginBase.m in Sources */,
 				CDB4D9E219F61E480069BE62 /* OrderedDictionary.m in Sources */,
@@ -587,6 +885,7 @@
 				CD5C998319D672CC0015232A /* NSMutableArray+QueueAdditions.m in Sources */,
 				CDCA50851A47DA700086B4D3 /* Logging.m in Sources */,
 				CDCA50091A3187D20086B4D3 /* Control.m in Sources */,
+				7DF868471E39E3C3008ED0BD /* VirusTotal.m in Sources */,
 				CD5C998619D6752B0015232A /* Queue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -598,6 +897,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				7D902D681E2AE207006124A5 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		7DF868041E39E3C2008ED0BD /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7DF868051E39E3C2008ED0BD /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";

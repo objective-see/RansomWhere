@@ -21,7 +21,6 @@ NSUInteger cornerRadius = 10;
 
 -(void)drawRect:(NSRect)dirtyRect
 {
-
     //super
     [super drawRect:dirtyRect];
     

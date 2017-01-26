@@ -41,7 +41,18 @@
 @property (weak) IBOutlet NSImageView *processIcon;
 
 //top
-// ->show parents button
+// ->show virus total button
+@property (weak) IBOutlet NSButton *vtButton;
+
+//top
+// ->show virus total button handler
+- (IBAction)vtButtonHandler:(id)sender;
+
+//virus total popover
+@property (strong) IBOutlet NSPopover *vtPopover;
+
+//top
+// ->show process ancestry button
 @property (weak) IBOutlet NSButton *parentsButton;
 
 //top
@@ -113,11 +124,10 @@
 @property (weak) IBOutlet NSView *ancestorView;
 
 //ancestory popover
-@property (weak) IBOutlet NSPopover *popover;
+@property (weak) IBOutlet NSPopover *ancestryPopover;
 
 //instance of single text cell (row)
 @property (weak) IBOutlet NSTextFieldCell *ancestorTextCell;
-
 
 /* METHODS */
 

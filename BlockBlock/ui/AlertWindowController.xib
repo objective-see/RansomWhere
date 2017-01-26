@@ -14,6 +14,7 @@
                 <outlet property="ancestorTextCell" destination="YpH-oJ-hBl" id="JXI-sy-Hgb"/>
                 <outlet property="ancestorView" destination="NRU-Pt-FTk" id="MXK-R2-Utf"/>
                 <outlet property="ancestryOutline" destination="tjO-ag-O49" id="xPL-Mb-Oic"/>
+                <outlet property="ancestryPopover" destination="8ZB-Up-P18" id="V8u-fU-03w"/>
                 <outlet property="ancestryViewController" destination="j1T-Qz-N5N" id="BHc-M0-2D0"/>
                 <outlet property="blockButton" destination="M7j-S9-XG1" id="fvN-CM-vCN"/>
                 <outlet property="bottomView" destination="nAw-rO-OXn" id="X42-ha-28s"/>
@@ -23,7 +24,6 @@
                 <outlet property="itemName" destination="454-RV-c8m" id="DXj-eX-Iqk"/>
                 <outlet property="mainView" destination="se5-gp-TjO" id="hHp-je-mPF"/>
                 <outlet property="parentsButton" destination="ROX-Ie-W4k" id="B66-cJ-pLQ"/>
-                <outlet property="popover" destination="8ZB-Up-P18" id="x3f-eM-s1k"/>
                 <outlet property="processID" destination="cxO-xk-kK9" id="ILG-zY-wh9"/>
                 <outlet property="processIcon" destination="wUf-2S-N1r" id="bg0-u4-aVo"/>
                 <outlet property="processLabel" destination="Bac-hQ-LrL" id="IUD-lL-0Zm"/>
@@ -31,6 +31,8 @@
                 <outlet property="processPath" destination="31G-Q6-fmN" id="dAT-Ey-Ged"/>
                 <outlet property="rememberButton" destination="Iv6-wW-pKy" id="mCJ-aF-HRx"/>
                 <outlet property="signedIcon" destination="pLO-2k-4VW" id="0MD-sW-fbG"/>
+                <outlet property="vtButton" destination="IC4-Ze-kdv" id="z0J-Em-68l"/>
+                <outlet property="vtPopover" destination="Sz9-0a-vWb" id="Coz-xT-2fy"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -38,14 +40,14 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5" customClass="AlertWindow">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="720" height="364"/>
+            <rect key="contentRect" x="196" y="240" width="777" height="382"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
             <view key="contentView" misplaced="YES" id="se5-gp-TjO" customClass="AlertView">
-                <rect key="frame" x="0.0" y="0.0" width="720" height="364"/>
+                <rect key="frame" x="0.0" y="0.0" width="777" height="382"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="Bac-hQ-LrL">
-                        <rect key="frame" x="138" y="276" width="420" height="26"/>
+                        <rect key="frame" x="138" y="294" width="420" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="procces name" id="fTo-9i-H1N">
                             <font key="font" size="17" name="Menlo-Bold"/>
@@ -54,16 +56,16 @@
                         </textFieldCell>
                     </textField>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="wUf-2S-N1r">
-                        <rect key="frame" x="8" y="262" width="100" height="100"/>
+                        <rect key="frame" x="8" y="280" width="100" height="100"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="yg3-qL-WdG"/>
                     </imageView>
                     <customView misplaced="YES" id="nAw-rO-OXn" customClass="AlertViewBottom">
-                        <rect key="frame" x="40" y="20" width="640" height="218"/>
+                        <rect key="frame" x="40" y="38" width="697" height="218"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" id="uyT-k8-mEe">
-                                <rect key="frame" x="131" y="88" width="491" height="17"/>
+                                <rect key="frame" x="131" y="88" width="548" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" sendsActionOnEndEditing="YES" title="path to startup item" id="aLU-sr-aCI">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -81,7 +83,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" id="31G-Q6-fmN">
-                                <rect key="frame" x="131" y="134" width="491" height="34"/>
+                                <rect key="frame" x="131" y="134" width="548" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" truncatesLastVisibleLine="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="path of process" id="D8k-7y-vrx">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -89,8 +91,8 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Lfg-tW-69F">
-                                <rect key="frame" x="18" y="185" width="604" height="19"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="Lfg-tW-69F">
+                                <rect key="frame" x="18" y="185" width="661" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="process name (signing info)" id="Vu7-2E-Xr0">
                                     <font key="font" size="13" name="Menlo-Bold"/>
@@ -108,7 +110,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="cxO-xk-kK9">
-                                <rect key="frame" x="131" y="168" width="491" height="17"/>
+                                <rect key="frame" x="131" y="168" width="548" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="&lt;pid&gt;" id="8me-qj-Ti6">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -135,7 +137,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="454-RV-c8m">
-                                <rect key="frame" x="19" y="105" width="489" height="19"/>
+                                <rect key="frame" x="19" y="105" width="660" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="startup item binary/name (signing info)" id="jl0-JB-5Xi">
                                     <font key="font" size="13" name="Menlo-Bold"/>
@@ -144,7 +146,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" id="kMW-GJ-kvr">
-                                <rect key="frame" x="131" y="54" width="491" height="34"/>
+                                <rect key="frame" x="131" y="54" width="548" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" truncatesLastVisibleLine="YES" allowsUndo="NO" title="path to startup item's binary" id="VXW-LW-EyP">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -153,7 +155,7 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" misplaced="YES" id="M7j-S9-XG1" customClass="CustomNSButton">
-                                <rect key="frame" x="421" y="13" width="82" height="32"/>
+                                <rect key="frame" x="483" y="13" width="82" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Block" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Kj-r6-qBl">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -164,7 +166,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" misplaced="YES" id="uQN-Qh-YaV" customClass="CustomNSButton">
-                                <rect key="frame" x="539" y="13" width="82" height="32"/>
+                                <rect key="frame" x="601" y="13" width="82" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Allow" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wDa-Rh-mcM">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -175,7 +177,7 @@
                                 </connections>
                             </button>
                             <button misplaced="YES" id="Iv6-wW-pKy">
-                                <rect key="frame" x="329" y="21" width="85" height="18"/>
+                                <rect key="frame" x="391" y="21" width="85" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="remember" bezelStyle="regularSquare" imagePosition="left" alignment="center" inset="2" id="WB8-CB-M8N">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -184,8 +186,8 @@
                             </button>
                         </subviews>
                     </customView>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="2Bn-dp-flW">
-                        <rect key="frame" x="117" y="249" width="360" height="30"/>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="2Bn-dp-flW">
+                        <rect key="frame" x="117" y="267" width="441" height="30"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="alert msg" id="cVb-ha-4gh">
                             <font key="font" size="14" name="Menlo-Bold"/>
@@ -193,17 +195,17 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box autoresizesSubviews="NO" boxType="custom" borderType="line" id="2g0-kf-xIa">
-                        <rect key="frame" x="40" y="236" width="640" height="2"/>
+                    <box autoresizesSubviews="NO" misplaced="YES" boxType="custom" borderType="line" id="2g0-kf-xIa">
+                        <rect key="frame" x="40" y="254" width="697" height="2"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="Sbs-k9-6GS">
-                            <rect key="frame" x="1" y="1" width="638" height="0.0"/>
+                            <rect key="frame" x="1" y="1" width="695" height="0.0"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         </view>
                         <color key="borderColor" red="0.44666150090000001" green="0.82829483699999995" blue="0.46594502310000002" alpha="1" colorSpace="calibratedRGB"/>
                     </box>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Udl-dj-WGZ">
-                        <rect key="frame" x="603" y="250" width="57" height="17"/>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="Udl-dj-WGZ">
+                        <rect key="frame" x="661" y="272" width="57" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="ancestry" id="Sfj-l4-El1">
                             <font key="font" size="11" name="Menlo-Regular"/>
@@ -211,8 +213,8 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button tag="1002" id="ROX-Ie-W4k">
-                        <rect key="frame" x="613" y="267" width="29" height="32"/>
+                    <button misplaced="YES" tag="102" id="ROX-Ie-W4k">
+                        <rect key="frame" x="671" y="289" width="29" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="parentsIcon" imagePosition="only" alignment="center" alternateImage="parentsIconBG" imageScaling="axesIndependently" inset="2" id="wo1-dL-YPZ">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -222,27 +224,62 @@
                             <action selector="ancestryButtonHandler:" target="-2" id="CQA-jM-Beu"/>
                         </connections>
                     </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="e0l-4d-BD8">
+                        <rect key="frame" x="572" y="272" width="77" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="virus total" id="mv0-Xb-Mdj">
+                            <font key="font" size="11" name="Menlo-Regular"/>
+                            <color key="textColor" white="0.52269995629999999" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="pLO-2k-4VW">
-                        <rect key="frame" x="119" y="280" width="20" height="20"/>
+                        <rect key="frame" x="119" y="298" width="20" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="unsigned" id="gkz-zl-fRd"/>
                     </imageView>
+                    <button misplaced="YES" tag="101" id="IC4-Ze-kdv">
+                        <rect key="frame" x="594" y="289" width="32" height="31"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="virusTotal" imagePosition="only" alignment="center" alternateImage="virusTotalBG" imageScaling="axesIndependently" inset="2" id="wGf-dJ-Hnx">
+                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="vtButtonHandler:" target="-2" id="k9Q-yx-HBc"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="330" y="108"/>
+            <point key="canvasLocation" x="358.5" y="117"/>
         </window>
-        <viewController id="2cy-ow-KBe" userLabel="Popover View Controller">
+        <viewController id="2cy-ow-KBe" userLabel="Ancestry Popover View Controller">
             <connections>
                 <outlet property="view" destination="NRU-Pt-FTk" id="AjI-uW-luV"/>
+            </connections>
+        </viewController>
+        <viewController id="WGe-f9-Tz7" userLabel="VirusTotal Popover View Controller" customClass="PopoverViewController">
+            <connections>
+                <outlet property="processInfo" destination="X7E-tp-lXY" id="HL1-Si-dmx"/>
+                <outlet property="startupItemInfo" destination="chc-8I-ME7" id="iho-lh-WwS"/>
+                <outlet property="view" destination="mh0-C3-cUK" id="Ule-j5-ek7"/>
+                <outlet property="vtQueryMsg" destination="Lfx-mE-VUT" id="jNg-Sw-L1c"/>
+                <outlet property="vtSpinner" destination="3Rp-Of-jMZ" id="Asu-3f-kYh"/>
             </connections>
         </viewController>
         <popover id="8ZB-Up-P18">
             <connections>
                 <outlet property="contentViewController" destination="2cy-ow-KBe" id="7P7-pR-ldw"/>
                 <outlet property="delegate" destination="-2" id="3iy-Bx-oS0"/>
+            </connections>
+        </popover>
+        <popover id="Sz9-0a-vWb" userLabel="VirusTotal Popover">
+            <connections>
+                <outlet property="contentViewController" destination="WGe-f9-Tz7" id="keS-iI-v01"/>
+                <outlet property="delegate" destination="WGe-f9-Tz7" id="Qzh-Fz-Xa3"/>
             </connections>
         </popover>
         <view id="NRU-Pt-FTk" userLabel="AncestryView">
@@ -254,7 +291,7 @@
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <clipView key="contentView" focusRingType="none" id="Ip0-fE-6HY">
                         <rect key="frame" x="0.0" y="0.0" width="303" height="79"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="18" indentationPerLevel="16" outlineTableColumn="SZa-YU-u66" id="tjO-ag-O49">
                                 <rect key="frame" x="0.0" y="0.0" width="303" height="79"/>
@@ -294,13 +331,58 @@
                     </scroller>
                 </scrollView>
             </subviews>
-            <point key="canvasLocation" x="330.5" y="457.5"/>
+            <point key="canvasLocation" x="404.5" y="435.5"/>
         </view>
         <customObject id="j1T-Qz-N5N" customClass="ParentsWindowController"/>
+        <view misplaced="YES" id="mh0-C3-cUK" userLabel="VirusTotalView">
+            <rect key="frame" x="0.0" y="0.0" width="379" height="102"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="X7E-tp-lXY">
+                    <rect key="frame" x="87" y="64" width="281" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="name/ratio (details)" id="5xn-gs-h3e">
+                        <font key="font" size="12" name="Menlo-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="chc-8I-ME7">
+                    <rect key="frame" x="87" y="27" width="281" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="name/ratio (details)" id="3wg-jf-1Fg">
+                        <font key="font" size="12" name="Menlo-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="Oai-yp-VRC">
+                    <rect key="frame" x="20" y="28" width="48" height="48"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="virusTotal" id="wQm-ZY-Aq0"/>
+                </imageView>
+                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" style="spinning" id="3Rp-Of-jMZ">
+                    <rect key="frame" x="177" y="37" width="32" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                </progressIndicator>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Lfx-mE-VUT">
+                    <rect key="frame" x="53" y="10" width="281" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="querying virus total..." id="JYq-sK-Bn0">
+                        <font key="font" size="12" name="Menlo-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <point key="canvasLocation" x="368.5" y="617"/>
+        </view>
     </objects>
     <resources>
         <image name="parentsIcon" width="128" height="137"/>
         <image name="parentsIconBG" width="128" height="137"/>
         <image name="unsigned" width="512" height="512"/>
+        <image name="virusTotal" width="74" height="80"/>
+        <image name="virusTotalBG" width="74" height="80"/>
     </resources>
 </document>
