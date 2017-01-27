@@ -80,6 +80,7 @@
     #endif
     
     //alloc
+    //TODO: never read/used?
     launchAgents = [NSMutableArray array];
     
     //get install state
@@ -112,6 +113,7 @@
         #endif
 
         //init destination path of app
+        //TODO: never read?
         appPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
         
         //when kext is present

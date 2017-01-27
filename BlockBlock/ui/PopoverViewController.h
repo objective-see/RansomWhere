@@ -18,6 +18,15 @@
 
 /* PROPERTIES */
 
+//auto-run type
+@property(nonatomic, retain) NSString* type;
+
+//process path
+@property(nonatomic, retain) NSString* processPath;
+
+//item path
+@property(nonatomic, retain) NSString* itemPath;
+
 //progress indicator
 @property (weak) IBOutlet NSProgressIndicator *vtSpinner;
 

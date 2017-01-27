@@ -6,14 +6,17 @@
 //  Copyright (c) 2017 Objective-See. All rights reserved.
 //
 
-
+#import "VirusTotal.h"
 #import "PopoverViewController.h"
 
 @implementation PopoverViewController
 
+@synthesize type;
+@synthesize itemPath;
 @synthesize vtSpinner;
 @synthesize vtQueryMsg;
 @synthesize processInfo;
+@synthesize processPath;
 @synthesize startupItemInfo;
 
 //automatically invoked
@@ -28,7 +31,18 @@
     
     //start spinner
     [self.vtSpinner startAnimation:nil];
+    
+    //bg thread for VT
+    [self performSelectorInBackground:@selector(queryVT) withObject:nil];
+    
+    return;
 }
+
+-(void)queryVT
+{
+    return;
+}
+
 
 
 @end

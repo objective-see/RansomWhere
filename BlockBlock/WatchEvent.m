@@ -196,8 +196,6 @@
     return YES;
 }
 
-
-
 //takes a watch event and creates an alert dictionary that's serializable into a plist
 // ->needed since notification framework can only handle dictionaries of this kind
 -(NSMutableDictionary*)createAlertDictionary

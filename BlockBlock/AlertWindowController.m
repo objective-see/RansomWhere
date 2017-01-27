@@ -14,6 +14,7 @@
 #import "WatchEvent.h"
 #import "AppDelegate.h"
 #import "AlertWindowController.h"
+#import "PopoverViewController.h"
 
 
 #import <objc/runtime.h>
@@ -130,7 +131,7 @@
             
             //dbg msg
             #ifdef DEBUG
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process heirarchy: %@", self.processHierarchy]);
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process hierarchy: %@", self.processHierarchy]);
             #endif
             
             //next
@@ -434,10 +435,56 @@ bail:
 // ->depending on state, show/populate the popup, or close it
 -(IBAction)vtButtonHandler:(id)sender
 {
+    //view controller for popover
+    PopoverViewController* popoverVC = nil;
+    
     //when button is clicked
     // ->open popover
     if(NSOnState == self.vtButton.state)
     {
+        //grab
+        popoverVC = (PopoverViewController*)self.vtPopover.delegate;
+        
+        //set type
+        switch(self.pluginType.integerValue)
+        {
+            //kext
+            case PLUGIN_TYPE_KEXT:
+                popoverVC.type = @"kernel extension";
+                
+            //launch item
+            case PLUGIN_TYPE_LAUNCHD:
+                popoverVC.type = @"launch item";
+                
+            //login item
+            case PLUGIN_TYPE_LOGIN_ITEM:
+                popoverVC.type = @"login item";
+                
+            //cron job
+            case PLUGIN_TYPE_CRON_JOB:
+                popoverVC.type = @"cron job";
+                
+            //app login item
+            case PLUGIN_TYPE_APP_LOGIN_ITEM:
+                popoverVC.type = @"app login item";
+                
+            //default
+            default:
+                popoverVC.type = @"unknown";
+        }
+        
+        //set process path
+        popoverVC.processPath = self.processPath.stringValue;
+        
+        //when item is a binary (i.e. not a command)
+        // ->otherwise not set, which is ok, cuz we'll check for nil
+        if( (PLUGIN_TYPE_CRON_JOB != [self.pluginType unsignedIntegerValue]) &&
+            (YES == [[NSFileManager defaultManager] fileExistsAtPath:self.itemBinary.stringValue]) )
+        {
+            //set item path
+            popoverVC.itemPath  = self.itemBinary.stringValue;
+        }
+        
         //show popover
         [self.vtPopover showRelativeToRect:[self.vtButton bounds] ofView:self.vtButton preferredEdge:NSMaxYEdge];
     }
