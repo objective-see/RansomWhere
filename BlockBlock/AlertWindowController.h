@@ -129,6 +129,12 @@
 //instance of single text cell (row)
 @property (weak) IBOutlet NSTextFieldCell *ancestorTextCell;
 
+//process name for vt popover
+@property (nonatomic, retain) NSString* vtProcessName;
+
+//item name for vt popover
+@property (nonatomic, retain) NSString* vtItemName;
+
 /* METHODS */
 
 //configure the alert with the info from the daemon

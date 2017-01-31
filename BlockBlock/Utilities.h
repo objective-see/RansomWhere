@@ -94,15 +94,15 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
 // ->find most recent process that matches
 pid_t mostRecentProc(OrderedDictionary* processList, NSString* path);
 
-//set permissions for file
-//void setFilePermissions(NSString* file, int permissions);
-
 //determine if instance is daemon (background) instance
 BOOL isDaemonInstance();
 
 //wait until a window is non nil
 // ->then make it modal
 void makeModal(NSWindowController* windowController);
+
+//hash a file (sha1)
+NSMutableString* hashFile(NSString* filePath);
 
 
 #endif /* defined(__BlockBlock__Utilities__) */

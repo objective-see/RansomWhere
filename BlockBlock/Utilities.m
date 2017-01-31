@@ -13,6 +13,7 @@
 
 #import <libproc.h>
 #import <sys/sysctl.h>
+#import <CommonCrypto/CommonDigest.h>
 #import <OpenDirectory/OpenDirectory.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
@@ -844,47 +845,6 @@ pid_t mostRecentProc(OrderedDictionary* processList, NSString* path)
     return pID;
 }
 
-/*
-//set permissions for file
-void setFilePermissions(NSString* file, int permissions)
-{
-    //file permissions
-    NSDictionary* filePermissions = nil;
-    
-    //new permissions
-    //newPermissions =
-    
-    //get current file attributes
-    //fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:file error:NULL];
-    
-    int permissions = [[attribs objectForKey:@"NSFilePosixPermissions"] intValue];
-    permissions |= (S_IRSUR | S_IRGRP | S_IROTH);
-    NSDict *newattribs = [NSDict dictionaryWithObject:[NSNumber numberWithInt:permissions]
-                                               forKey:NSFilePosixPermissions];
-    [fm setAttributes:dict ofItemAtPath:[file path] error:&error];
- 
-    
-    
-    //init dictionary
-    filePermissions = @{NSFilePosixPermissions: [NSNumber numberWithInt:permissions]};
-    
-    //set permissions
-    if(YES != [[NSFileManager defaultManager] setAttributes:filePermissions ofItemAtPath:file error:NULL])
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to set permissions for %@ (%@)", file, filePermissions]);
-    }
-    
-    else
-    {
-        //dbg msg
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set permissions for %@ (%@)", file, filePermissions]);
-    }
-    
-    return;
-}
-*/
-
 //get OS version
 NSDictionary* getOSVersion()
 {
@@ -1037,57 +997,6 @@ BOOL isDaemonInstance()
     return isDaemon;
 }
 
-/*
-//determine menu mode
-// ->only in Yosemite!
-BOOL isMenuDark()
-{
-    //flag indicating Yosemite+
-    // ->static, so 'saved'
-    static int isYosemite = -1;
-    
-    //flag
-    BOOL isDark = NO;
-    
-    //OS version info
-    NSDictionary* osVersionInfo = nil;
-    
-    //get version number
-    // ->only once
-    if(-1 == isYosemite)
-    {
-        //get OS version info
-        osVersionInfo = getOSVersion();
-        
-        //gotta be OS X 10.10 to check for dark menu
-        // note: can use 'containsString' API since code will only execute on Yosemite+
-        if([osVersionInfo[@"minorVersion"] intValue] >= 10)
-        {
-            //set flag
-            isYosemite = YES;
-        }
-        //otherwise
-        // ->pre-yosemite, so unset flag
-        else
-        {
-            //unset
-            isYosemite = NO;
-        }
-    }
-    
-    //gotta be OS X 10.10 to check for dark menu
-    // note: can use 'containsString' API since code will only execute on Yosemite+
-    if(YES == isYosemite)
-    {
-        //set flag
-        isDark = [[[NSAppearance currentAppearance] name] containsString:NSAppearanceNameVibrantDark];
-    }
-    
-    return isDark;
-}
- 
-*/
-
 //wait until a window is non nil
 // ->then make it modal
 void makeModal(NSWindowController* windowController)
@@ -1117,6 +1026,58 @@ void makeModal(NSWindowController* windowController)
     }//until 1 second
     
     return;
+}
+
+//hash a file (sha1)
+NSMutableString* hashFile(NSString* filePath)
+{
+    //file's contents
+    NSData* fileContents = nil;
+    
+    //hash digest (sha1)
+    uint8_t digestSHA1[CC_SHA1_DIGEST_LENGTH] = {0};
+    
+    //sha1 hash as string
+    NSMutableString* sha1 = nil;
+    
+    //index var
+    NSUInteger index = 0;
+    
+    //init sha1 hash string
+    sha1 = [NSMutableString string];
+    
+    //sanity check
+    if(nil == filePath)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //load file
+    if(nil == (fileContents = [NSData dataWithContentsOfFile:filePath]))
+    {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to load %@ to hash", filePath]);
+        
+        //bail
+        goto bail;
+    }
+    
+    //sha1 it
+    CC_SHA1(fileContents.bytes, (unsigned int)fileContents.length, digestSHA1);
+    
+    //convert to NSString
+    // ->iterate over each bytes in computed digest and format
+    for(index=0; index < CC_SHA1_DIGEST_LENGTH; index++)
+    {
+        //format/append
+        [sha1 appendFormat:@"%02lX", (unsigned long)digestSHA1[index]];
+    }
+    
+//bail
+bail:
+    
+    return sha1;
 }
 
 

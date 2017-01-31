@@ -330,7 +330,6 @@ bail:
     //restore real id
     if(currentUID != getuid())
     {
-        //TODO: check
         //restore
         setreuid(currentUID, -1);
     }

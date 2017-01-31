@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Objective-See. All rights reserved.
 //
 
-#import "Logging.h"
 #import "ParentsWindowController.h"
 
 @implementation ParentsWindowController

@@ -9,16 +9,12 @@
 #import "Consts.h"
 #import "Watcher.h"
 #import "Logging.h"
+#import "Process.h"
 #import "Utilities.h"
 #import "PluginBase.h"
 #import "WatchEvent.h"
 #import "AppDelegate.h"
 #import "ProcessMonitor.h"
-#import "Process.h"
-
-
-//TODO: need [[NSNotificationCenter defaultCenter] removeObserver
-
 
 @implementation Watcher
 
@@ -581,7 +577,7 @@ bail:
     }//got pid from path
     
     //couldn't get path (process likely already exit'ed)
-    // ->try lookup from process list (contains process objects from dtrace, etc)
+    // ->try lookup from process list (contains process objects from kext, etc)
     else
     {
         //dbg msg
@@ -603,6 +599,11 @@ bail:
             //check if we got one
             if(nil != watchEvent.process)
             {
+                //dbg msg
+                #ifdef DEBUG
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found process: %@", watchEvent.process]);
+                #endif
+                
                 //bail
                 break;
             }

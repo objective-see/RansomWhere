@@ -251,7 +251,7 @@
 #define PROCESS_BEGAN_EVENT	0x1
 
 //max number of items in process list
-#define PROCESS_LIST_MAX_SIZE 64
+#define PROCESS_LIST_MAX_SIZE 256
 
 //prefs
 // ->first time

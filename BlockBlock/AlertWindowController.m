@@ -31,7 +31,9 @@
 @synthesize vtButton;
 @synthesize vtPopover;
 @synthesize pluginType;
+@synthesize vtItemName;
 @synthesize parentsButton;
+@synthesize vtProcessName;
 @synthesize rememberButton;
 @synthesize ancestryPopover;
 @synthesize processHierarchy;
@@ -173,6 +175,9 @@
         // ->combine with process signing info
         else if(YES == [key isEqualToString:@"processName"])
         {
+            //save orginal for vt popover
+            self.vtProcessName = alertInfo[@"processName"];
+            
             //add any signing info
             if(nil != [alertInfo objectForKey:@"processSigning"])
             {
@@ -195,6 +200,9 @@
         // ->combine with item's (binary) signing info
         else if(YES == [key isEqualToString:@"itemName"])
         {
+            //save orginal for vt popover
+            self.vtItemName = alertInfo[@"itemName"];
+
             //add any signing info
             if(nil != [alertInfo objectForKey:@"itemSigning"])
             {
@@ -438,6 +446,22 @@ bail:
     //view controller for popover
     PopoverViewController* popoverVC = nil;
     
+    //sanity check
+    // ->make sure vt process name is set
+    if(nil == self.vtProcessName)
+    {
+        //set based on label
+        self.vtProcessName = self.processLabel.stringValue;
+    }
+    
+    //sanity check
+    // ->make sure vt item name is set
+    if(nil == self.vtItemName)
+    {
+        //set off path
+        self.vtItemName = [[self.itemBinary.stringValue lastPathComponent] stringByDeletingPathExtension];
+    }
+    
     //when button is clicked
     // ->open popover
     if(NSOnState == self.vtButton.state)
@@ -473,16 +497,15 @@ bail:
                 popoverVC.type = @"unknown";
         }
         
-        //set process path
-        popoverVC.processPath = self.processPath.stringValue;
+        //add process path and name
+        [popoverVC.items addObject:[@{@"path":self.processPath.stringValue, @"name":vtProcessName} mutableCopy]];
         
-        //when item is a binary (i.e. not a command)
-        // ->otherwise not set, which is ok, cuz we'll check for nil
+        //when startup item is a binary, add it
         if( (PLUGIN_TYPE_CRON_JOB != [self.pluginType unsignedIntegerValue]) &&
             (YES == [[NSFileManager defaultManager] fileExistsAtPath:self.itemBinary.stringValue]) )
         {
-            //set item path
-            popoverVC.itemPath  = self.itemBinary.stringValue;
+            //add item path
+            [popoverVC.items addObject:[@{@"path":self.itemBinary.stringValue, @"name":vtItemName} mutableCopy]];
         }
         
         //show popover
@@ -604,6 +627,8 @@ bail:
     
     return;
 }
+
+
 
 //logic to close/remove popup from view
 // ->needed, otherwise random memory issues occur :/

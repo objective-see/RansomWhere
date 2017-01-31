@@ -7,6 +7,7 @@
 //
 
 @import Cocoa;
+@class HyperlinkTextField;
 
 @interface PopoverViewController : NSViewController <NSPopoverDelegate>
 {
@@ -21,11 +22,8 @@
 //auto-run type
 @property(nonatomic, retain) NSString* type;
 
-//process path
-@property(nonatomic, retain) NSString* processPath;
-
-//item path
-@property(nonatomic, retain) NSString* itemPath;
+//items
+@property(nonatomic, retain) NSMutableArray* items;
 
 //progress indicator
 @property (weak) IBOutlet NSProgressIndicator *vtSpinner;
@@ -34,10 +32,10 @@
 @property (weak) IBOutlet NSTextField *vtQueryMsg;
 
 //process vt info
-@property (weak) IBOutlet NSTextField *processInfo;
+@property (weak) IBOutlet HyperlinkTextField *firstItem;
 
 //start up item info
-@property (weak) IBOutlet NSTextField *startupItemInfo;
+@property (weak) IBOutlet HyperlinkTextField *secondItem;
 
 
 @end

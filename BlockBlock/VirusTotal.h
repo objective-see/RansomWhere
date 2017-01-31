@@ -61,14 +61,9 @@
 
 //thread function
 // ->runs in the background to get virus total info about a plugin's items
--(void)queryVT:(NSString*)type items:(NSMutableArray*)items;
+-(BOOL)queryVT:(NSString*)type items:(NSMutableArray*)items;
 
 //make the (POST)query to VT
 -(NSDictionary*)postRequest:(NSURL*)url parameters:(id)params;
-
-//process results
-// ->updates items (found, detection ratio, etc)
--(void)processResults:(NSArray*)items results:(NSDictionary*)results;
-
 
 @end

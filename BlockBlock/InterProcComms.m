@@ -366,6 +366,16 @@ bail:
 // ->send the alert request to agent
 -(void)sendAlertToAgent:(WatchEvent*)watchEvent userInfo:(NSMutableDictionary*)userInfo
 {
+    //log msg
+    NSString* logMessage = nil;
+    
+    //init log message
+    logMessage = [NSString stringWithFormat:@"BLOCKBLOCK(%d) alert: %@ %@ (%@ -> %@)", getpid(), userInfo[@"processPath"], userInfo[@"alertMsg"], userInfo[@"itemFile"], userInfo[@"itemBinary"]];
+    
+    //always log message
+    // ->to syslog, since 'LOG_TO_FILE' is user-specific location
+    syslog(LOG_ERR, "%s", logMessage.UTF8String);
+    
     //add session id to dictionary that is sent to agents
     // ->allows correct one to display alert
     userInfo[KEY_TARGET_UID] = [NSNumber numberWithInt:[self uidForAlert:watchEvent]];
@@ -377,7 +387,7 @@ bail:
     #ifdef DEBUG
     logMsg(LOG_DEBUG, @"broadcasting request to UI agent(s) to display alert");
     #endif
-    
+
     //send notification to UI (agent) to display alert to user
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:SHOULD_DISPLAY_ALERT_NOTIFICATION
       object:nil userInfo:userInfo options:NSNotificationDeliverImmediately | NSNotificationPostToAllSessions];

@@ -263,8 +263,8 @@
         </viewController>
         <viewController id="WGe-f9-Tz7" userLabel="VirusTotal Popover View Controller" customClass="PopoverViewController">
             <connections>
-                <outlet property="processInfo" destination="X7E-tp-lXY" id="HL1-Si-dmx"/>
-                <outlet property="startupItemInfo" destination="chc-8I-ME7" id="iho-lh-WwS"/>
+                <outlet property="firstItem" destination="X7E-tp-lXY" id="ed5-9e-79n"/>
+                <outlet property="secondItem" destination="chc-8I-ME7" id="0X4-Sy-Wt6"/>
                 <outlet property="view" destination="mh0-C3-cUK" id="Ule-j5-ek7"/>
                 <outlet property="vtQueryMsg" destination="Lfx-mE-VUT" id="jNg-Sw-L1c"/>
                 <outlet property="vtSpinner" destination="3Rp-Of-jMZ" id="Asu-3f-kYh"/>
@@ -291,7 +291,7 @@
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <clipView key="contentView" focusRingType="none" id="Ip0-fE-6HY">
                         <rect key="frame" x="0.0" y="0.0" width="303" height="79"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="18" indentationPerLevel="16" outlineTableColumn="SZa-YU-u66" id="tjO-ag-O49">
                                 <rect key="frame" x="0.0" y="0.0" width="303" height="79"/>
@@ -335,11 +335,11 @@
         </view>
         <customObject id="j1T-Qz-N5N" customClass="ParentsWindowController"/>
         <view misplaced="YES" id="mh0-C3-cUK" userLabel="VirusTotalView">
-            <rect key="frame" x="0.0" y="0.0" width="379" height="102"/>
+            <rect key="frame" x="0.0" y="0.0" width="412" height="102"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="X7E-tp-lXY">
-                    <rect key="frame" x="87" y="64" width="281" height="18"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="X7E-tp-lXY" customClass="HyperlinkTextField">
+                    <rect key="frame" x="74" y="59" width="320" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="name/ratio (details)" id="5xn-gs-h3e">
                         <font key="font" size="12" name="Menlo-Regular"/>
@@ -347,8 +347,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="chc-8I-ME7">
-                    <rect key="frame" x="87" y="27" width="281" height="18"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="chc-8I-ME7" customClass="HyperlinkTextField">
+                    <rect key="frame" x="74" y="32" width="320" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="name/ratio (details)" id="3wg-jf-1Fg">
                         <font key="font" size="12" name="Menlo-Regular"/>
@@ -356,26 +356,26 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="Oai-yp-VRC">
-                    <rect key="frame" x="20" y="28" width="48" height="48"/>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="Oai-yp-VRC">
+                    <rect key="frame" x="20" y="27" width="48" height="48"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="virusTotal" id="wQm-ZY-Aq0"/>
                 </imageView>
-                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" style="spinning" id="3Rp-Of-jMZ">
-                    <rect key="frame" x="177" y="37" width="32" height="32"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="Lfx-mE-VUT">
+                    <rect key="frame" x="74" y="42" width="234" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                </progressIndicator>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Lfx-mE-VUT">
-                    <rect key="frame" x="53" y="10" width="281" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="querying virus total..." id="JYq-sK-Bn0">
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="querying virus total..." id="JYq-sK-Bn0">
                         <font key="font" size="12" name="Menlo-Regular"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="3Rp-Of-jMZ">
+                    <rect key="frame" x="256" y="42" width="16" height="16"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                </progressIndicator>
             </subviews>
-            <point key="canvasLocation" x="368.5" y="617"/>
+            <point key="canvasLocation" x="385" y="617"/>
         </view>
     </objects>
     <resources>

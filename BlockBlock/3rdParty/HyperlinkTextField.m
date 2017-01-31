@@ -29,7 +29,7 @@
 
 @interface HyperlinkTextField ()
 @property (nonatomic, readonly) NSArray *hyperlinkInfos;
-@property (nonatomic, readonly) NSTextView *textView;
+
 
 - (void)_resetHyperlinkCursorRects;
 @end
@@ -39,6 +39,8 @@
 #define kHyperlinkInfoRectKey           @"rect"
 
 @implementation HyperlinkTextField
+
+@synthesize textView;
 
 - (void)_hyperlinkTextFieldInit
 {
@@ -92,13 +94,13 @@
 {
     NSMutableArray *hyperlinkInfos = [[NSMutableArray alloc] init];
     NSRange stringRange = NSMakeRange(0, [self.attributedStringValue length]);
-    __block NSTextView *textView = self.textView;
+    __block NSTextView *tView = self.textView;
     [self.attributedStringValue enumerateAttribute:NSLinkAttributeName inRange:stringRange options:0 usingBlock:^(id value, NSRange range, BOOL *stop)
     {
         if (value)
         {
             NSUInteger rectCount = 0;
-            NSRectArray rectArray = [textView.layoutManager rectArrayForCharacterRange:range withinSelectedCharacterRange:range inTextContainer:textView.textContainer rectCount:&rectCount];
+            NSRectArray rectArray = [tView.layoutManager rectArrayForCharacterRange:range withinSelectedCharacterRange:range inTextContainer:tView.textContainer rectCount:&rectCount];
             for (NSUInteger i = 0; i < rectCount; i++)
             {
                 [hyperlinkInfos addObject:@{kHyperlinkInfoCharacterRangeKey : [NSValue valueWithRange:range], kHyperlinkInfoURLKey : value, kHyperlinkInfoRectKey : [NSValue valueWithRect:rectArray[i]]}];
@@ -120,10 +122,10 @@
         [attributedString addAttribute:NSFontAttributeName value:self.font range:NSMakeRange(0, [attributedString length])];
     
     NSRect textViewFrame = [self.cell titleRectForBounds:self.bounds];
-    NSTextView *textView = [[NSTextView alloc] initWithFrame:textViewFrame];
-    [textView.textStorage setAttributedString:attributedString];
+    NSTextView *tView = [[NSTextView alloc] initWithFrame:textViewFrame];
+    [tView.textStorage setAttributedString:attributedString];
 
-    return textView;
+    return tView;
 }
 
 
@@ -132,9 +134,9 @@
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    NSTextView *textView = self.textView;
+    NSTextView *tView = self.textView;
     NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    NSUInteger index = [textView.layoutManager characterIndexForPoint:localPoint inTextContainer:textView.textContainer fractionOfDistanceBetweenInsertionPoints:NULL];
+    NSUInteger index = [tView.layoutManager characterIndexForPoint:localPoint inTextContainer:tView.textContainer fractionOfDistanceBetweenInsertionPoints:NULL];
     
     if (index != NSNotFound)
     {

@@ -68,9 +68,6 @@
     // ->can be multiple ones if other users have installed
     NSMutableArray* launchAgents = nil;
     
-    //destination path to binary
-    NSString* appPath = nil;
-    
     //error
     NSError* error = nil;
 
@@ -78,10 +75,6 @@
     #ifdef DEBUG
     logMsg(LOG_DEBUG, @"beginning uninstall (as r00t)");
     #endif
-    
-    //alloc
-    //TODO: never read/used?
-    launchAgents = [NSMutableArray array];
     
     //get install state
     installedState = [Install installedState];
@@ -112,10 +105,6 @@
         logMsg(LOG_DEBUG, @"performing FULL uninstall");
         #endif
 
-        //init destination path of app
-        //TODO: never read?
-        appPath = [INSTALL_DIRECTORY stringByAppendingPathComponent:APPLICATION_NAME];
-        
         //when kext is present
         // ->stop, then delete it
         if(YES == [[NSFileManager defaultManager] fileExistsAtPath:kextPath()])

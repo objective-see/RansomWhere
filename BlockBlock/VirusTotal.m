@@ -6,6 +6,7 @@
 //  Copyright (c) 2017 Objective-See. All rights reserved.
 //
 
+#import "Logging.h"
 #import "VirusTotal.h"
 #import "AppDelegate.h"
 
@@ -13,23 +14,29 @@
 
 //thread function
 // ->runs in the background to get virus total info about items
--(void)queryVT:(NSString*)type items:(NSMutableArray*)items
+-(BOOL)queryVT:(NSString*)type items:(NSMutableArray*)items
 {
+    //flag
+    BOOL gotResponse = NO;
+    
     //file attributes
     NSDictionary* attributes = nil;
     
     //item data
     NSMutableDictionary* itemData = nil;
     
+    //list of vt items
+    NSMutableArray* vtItems = nil;
+    
     //VT query URL
     NSURL* queryURL = nil;
     
-    //results
-    NSDictionary* results = nil;
-
-    //alloc list for items
-    items = [NSMutableArray array];
+    //vt response
+    NSDictionary* response = nil;
     
+    //alloc
+    vtItems = [NSMutableArray array];
+
     //init query URL
     queryURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", VT_QUERY_URL, VT_API_KEY]];
     
@@ -40,6 +47,15 @@
         //alloc item data
         itemData = [NSMutableDictionary dictionary];
         
+        //sanity check
+        if( (nil == item[@"path"]) ||
+            (nil == item[@"name"]) ||
+            (nil == item[@"hash"]) )
+        {
+            //ignore
+            continue;
+        }
+        
         //get file attributes
         attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:item[@"path"] error:nil];
         
@@ -47,7 +63,7 @@
         itemData[@"autostart_location"] = type;
         
         //set item name
-        itemData[@"autostart_entry"] = [[item[@"path"] lastPathComponent] stringByDeletingPathExtension];
+        itemData[@"autostart_entry"] = item[@"name"];
         
         //set item path
         itemData[@"image_path"] = item[@"path"];
@@ -59,29 +75,54 @@
         if(nil != attributes)
         {
             //set
-            itemData[@"creation_datetime"] = [attributes objectForKey:NSFileCreationDate];
+            itemData[@"creation_datetime"] = attributes.fileCreationDate.description;
         }
         //set unknown
         else
         {
+            //set
             itemData[@"creation_datetime"] = @"unknown";
         }
         
         //add item info to list
-        [items addObject:itemData];
+        [vtItems addObject:itemData];
     }
     
     //make query to VT
-    results = [self postRequest:queryURL parameters:items];
-    if(nil != results)
+    response = [self postRequest:queryURL parameters:vtItems];
+    if(nil == response)
     {
-        //process results
-        [self processResults:items results:results];
+        //bail
+        goto bail;
     }
     
-    return;
+    //got response
+    gotResponse = YES;
+    
+    //process all results
+    // ->save VT result dictionary into item
+    for(NSDictionary* result in response[VT_RESULTS])
+    {
+        //find all items that match
+        for(NSMutableDictionary* item in items)
+        {
+            //for matches, save vt info
+            if(YES == [result[@"hash"] isEqualToString:item[@"hash"]])
+            {
+                //save
+                item[@"vtInfo"] = result;
+                
+                //next
+                break;
+            }
+        }
+    }
+    
+//bail:
+bail:
+    
+    return gotResponse;
 }
-
 
 //make the (POST)query to VT
 -(NSDictionary*)postRequest:(NSURL*)url parameters:(id)params
@@ -119,11 +160,11 @@
         @try
         {
             //convert items
-            postData = [NSJSONSerialization dataWithJSONObject:params options:kNilOptions error:nil];
+            postData = [NSJSONSerialization dataWithJSONObject:params options:kNilOptions error:&error];
             if(nil == postData)
             {
                 //err msg
-                NSLog(@"OBJECTIVE-SEE ERROR: failed to convert request %@ to JSON", postData);
+                logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to convert paramters %@, to JSON (%@)", params, error]);
                 
                 //bail
                 goto bail;
@@ -133,6 +174,9 @@
         //bail on exceptions
         @catch(NSException *exception)
         {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to convert paramters %@, to JSON (%@)", params, exception]);
+            
             //bail
             goto bail;
         }
@@ -160,8 +204,8 @@
         (200 != (long)[(NSHTTPURLResponse *)httpResponse statusCode]) )
     {
         //err msg
-        NSLog(@"OBJECTIVE-SEE ERROR: failed to query VirusTotal (%@, %@)", error, httpResponse);
-        
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to query VirusTotal (%@, %@)", error, httpResponse]);
+    
         //bail
         goto bail;
     }
@@ -177,7 +221,7 @@
     @catch (NSException *exception)
     {
         //err msg
-        NSLog(@"OBJECTIVE-SEE ERROR: converting response %@ to JSON threw %@", vtData, exception);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"converting response %@ to JSON threw %@", vtData, exception]);
         
         //bail
         goto bail;
@@ -187,7 +231,7 @@
     if(nil == results)
     {
         //err msg
-        NSLog(@"OBJECTIVE-SEE ERROR: failed to convert response %@ to JSON", vtData);
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to convert response %@ to JSON", vtData]);
         
         //bail
         goto bail;
@@ -197,35 +241,6 @@
 bail:
     
     return results;
-}
-
-
-
-//process results
-// ->save VT info into each File obj and all flagged files
--(void)processResults:(NSArray*)items results:(NSDictionary*)results
-{
-    //process all results
-    // ->save VT result dictionary into File obj
-    for(NSDictionary* result in results[VT_RESULTS])
-    {
-        //find all items that match
-        // ->might be dupes, which is fine
-        for(NSMutableDictionary* item in items)
-        {
-            
-            //for matches, save vt info
-            if(YES == [result[@"hash"] isEqualToString:item[@"hash"]])
-            {
-                //save
-                item[@"vtInfo"] = result;
-                
-            }
-        }
-        
-    }
-    
-    return;
 }
 
 @end

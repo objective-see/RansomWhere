@@ -28,4 +28,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface HyperlinkTextField : NSTextField
+
+@property (nonatomic, readonly) NSTextView *textView;
+
 @end

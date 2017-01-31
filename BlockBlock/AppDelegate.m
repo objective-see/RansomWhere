@@ -69,6 +69,8 @@
     
     /* BEGIN: FOR TESTING ALERT WINDOW */
     
+    /*
+
     
     //alloc/init
     alertWindowController = [[AlertWindowController alloc] initWithWindowNibName:@"AlertWindowController"];
@@ -92,7 +94,7 @@
     
     return;
      
-
+    */
     
     /* END: FOR TESTING ALERT WINDOW */
 

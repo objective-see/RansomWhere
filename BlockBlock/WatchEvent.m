@@ -224,64 +224,68 @@
     //add alert msg
     alertInfo[@"alertMsg"] = [self valueForStringItem:self.plugin.alertMsg];
     
-    //TODO: check for nil!!!!
     //get signing info for process
-    signingInfo = extractSigningInfo(self.process.path);
-    switch([signingInfo[KEY_SIGNATURE_STATUS] intValue])
+    if(nil != self.process.path)
     {
-        //happily signed
-        case noErr:
-            
-            //item signed by apple
-            if(YES == [signingInfo[KEY_SIGNING_IS_APPLE] boolValue])
-            {
-                //set icon
-                alertInfo[@"signingIcon"] = @"signedApple";
+        //get signing info
+        signingInfo = extractSigningInfo(self.process.path);
+        switch([signingInfo[KEY_SIGNATURE_STATUS] intValue])
+        {
+            //happily signed
+            case noErr:
                 
-                //set details
-                alertInfo[@"processSigning"] = @"Apple Code Signing Cert Auth";
-            }
-            //signed by dev id/ad hoc, etc
-            else
-            {
-                //set icon
-                alertInfo[@"signingIcon"] = @"signed";
-                
-                //set signing auth
-                if(0 != [signingInfo[KEY_SIGNING_AUTHORITIES] count])
+                //item signed by apple
+                if(YES == [signingInfo[KEY_SIGNING_IS_APPLE] boolValue])
                 {
-                    //add code-signing auth
-                    alertInfo[@"processSigning"] = [signingInfo[KEY_SIGNING_AUTHORITIES] firstObject];
+                    //set icon
+                    alertInfo[@"signingIcon"] = @"signedApple";
+                    
+                    //set details
+                    alertInfo[@"processSigning"] = @"Apple Code Signing Cert Auth";
                 }
-                //no auths
+                //signed by dev id/ad hoc, etc
                 else
                 {
+                    //set icon
+                    alertInfo[@"signingIcon"] = @"signed";
+                    
+                    //set signing auth
+                    if(0 != [signingInfo[KEY_SIGNING_AUTHORITIES] count])
+                    {
+                        //add code-signing auth
+                        alertInfo[@"processSigning"] = [signingInfo[KEY_SIGNING_AUTHORITIES] firstObject];
+                    }
                     //no auths
-                    alertInfo[@"processSigning"] = @"no signing authorities (ad hoc?)";
+                    else
+                    {
+                        //no auths
+                        alertInfo[@"processSigning"] = @"no signing authorities (ad hoc?)";
+                    }
                 }
-            }
-            
-            break;
-            
-        //unsigned
-        case errSecCSUnsigned:
-            
-            //set icon
-            alertInfo[@"signingIcon"] = @"unsigned";
-            
-            //set details
-            alertInfo[@"processSigning"] = @"unsigned";
-            
-            break;
-            
-        default:
-            
-            //set icon
-            alertInfo[@"signingIcon"] = @"unknown";
-            
-            //set details
-            alertInfo[@"processSigning"] = [NSString stringWithFormat:@"unknown (status/error: %ld)", (long)[signingInfo[KEY_SIGNATURE_STATUS] integerValue]];
-    }
+                
+                break;
+                
+            //unsigned
+            case errSecCSUnsigned:
+                
+                //set icon
+                alertInfo[@"signingIcon"] = @"unsigned";
+                
+                //set details
+                alertInfo[@"processSigning"] = @"unsigned";
+                
+                break;
+                
+            default:
+                
+                //set icon
+                alertInfo[@"signingIcon"] = @"unknown";
+                
+                //set details
+                alertInfo[@"processSigning"] = [NSString stringWithFormat:@"unknown (status/error: %ld)", (long)[signingInfo[KEY_SIGNATURE_STATUS] integerValue]];
+        }
+        
+    }//path not nil
 
     /* for bottom of alert window */
     

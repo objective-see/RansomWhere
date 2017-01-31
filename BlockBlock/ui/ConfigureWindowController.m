@@ -39,9 +39,23 @@
     //installed state
     NSUInteger state = INSTALL_STATE_NONE;
     
+    //args
+    NSArray* arguments = nil;
+    
+    //grab args
+    arguments = NSProcessInfo.processInfo.arguments;
+    
     //make white
     [self.window setBackgroundColor: NSColor.whiteColor];
     
+    //disable 'install' button if exec'd with 'ACTION_UNINSTALL_UI' (from drop-down)
+    if( (arguments.count >= 2) &&
+        (YES == [arguments[1] isEqualToString:ACTION_UNINSTALL_UI]) )
+    {
+        //disable
+        self.installButton.enabled = NO;
+    }
+
     //get state
     state = [Install installedState];
     

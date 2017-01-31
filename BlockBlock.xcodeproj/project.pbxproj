@@ -9,19 +9,11 @@
 /* Begin PBXBuildFile section */
 		7D0215131BF1D27D0005CF0F /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D0215121BF1D27D0005CF0F /* libbsm.tbd */; };
 		7D13FACE1E1E2167006813BE /* CustomNSButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D13FACD1E1E2167006813BE /* CustomNSButton.m */; };
-		7D13FAD31E221370006813BE /* signed.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FACF1E221370006813BE /* signed.png */; };
-		7D13FAD41E221370006813BE /* signedApple.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD01E221370006813BE /* signedApple.png */; };
-		7D13FAD51E221370006813BE /* unknown.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD11E221370006813BE /* unknown.png */; };
-		7D13FAD61E221370006813BE /* unsigned.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D13FAD21E221370006813BE /* unsigned.png */; };
 		7D13FAD91E2215CA006813BE /* Signing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D13FAD71E2215CA006813BE /* Signing.m */; };
 		7D460E171E39DF0E00A95EE6 /* PopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D460E161E39DF0E00A95EE6 /* PopoverViewController.m */; };
 		7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */; };
 		7D774F291C017C9000A9CCE4 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */; };
-		7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D774F2C1C018DA600A9CCE4 /* settings.png */; };
 		7D902D691E2AE207006124A5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D671E2AE207006124A5 /* MainMenu.xib */; };
-		7D902D7E1E3897EB006124A5 /* virusTotal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D7D1E3897EB006124A5 /* virusTotal.png */; };
-		7D902D811E39CACD006124A5 /* virusTotalBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D7F1E39CACD006124A5 /* virusTotalBG.png */; };
-		7D902D821E39CACD006124A5 /* virusTotalOver.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D902D801E39CACD006124A5 /* virusTotalOver.png */; };
 		7DF868141E39E3C3008ED0BD /* HyperlinkTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF867CF1E39E3C2008ED0BD /* HyperlinkTextField.m */; };
 		7DF868201E39E3C3008ED0BD /* bbText.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E21E39E3C2008ED0BD /* bbText.png */; };
 		7DF868211E39E3C3008ED0BD /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DF867E41E39E3C2008ED0BD /* icon.png */; };
@@ -72,13 +64,7 @@
 		CD5C998C19D73B7D0015232A /* AlertWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998B19D73B7D0015232A /* AlertWindow.m */; };
 		CD5C998F19D73C380015232A /* AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C998E19D73C380015232A /* AlertView.m */; };
 		CD5C999519D8B84B0015232A /* AlertViewBottom.m in Sources */ = {isa = PBXBuildFile; fileRef = CD5C999419D8B84B0015232A /* AlertViewBottom.m */; };
-		CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD6090C51A7DBDA300E091CD /* itemIcon.png */; };
-		CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD6090C61A7DBDA300E091CD /* processIcon.png */; };
 		CD6974FB1B013AB600CE819B /* ParentsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD6974F91B013AB600CE819B /* ParentsWindowController.m */; };
-		CD7620A51AF3629400CFCB68 /* statusOFFWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A11AF3629400CFCB68 /* statusOFFWhite.png */; };
-		CD7620A61AF3629400CFCB68 /* statusOFFWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A21AF3629400CFCB68 /* statusOFFWhite@2x.png */; };
-		CD7620A71AF3629400CFCB68 /* statusONWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A31AF3629400CFCB68 /* statusONWhite.png */; };
-		CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD7620A41AF3629400CFCB68 /* statusONWhite@2x.png */; };
 		CD7C871519D43EAD00EC7F0A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C871419D43EAD00EC7F0A /* AppDelegate.m */; };
 		CD7C871C19D43F0200EC7F0A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C871A19D43F0200EC7F0A /* main.m */; };
 		CD7C872619D4432C00EC7F0A /* Watcher.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C872519D4432C00EC7F0A /* Watcher.m */; };
@@ -87,19 +73,10 @@
 		CD7C874F19D51F8900EC7F0A /* PluginBase.m in Sources */ = {isa = PBXBuildFile; fileRef = CD7C874E19D51F8900EC7F0A /* PluginBase.m */; };
 		CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */; };
 		CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD8381291A7D94FA00AC0D96 /* Images.xcassets */; };
-		CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */ = {isa = PBXBuildFile; fileRef = CD83813F1A7DAEE700AC0D96 /* statusOFF.png */; };
-		CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */; };
-		CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381411A7DAEE700AC0D96 /* statusON.png */; };
-		CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381421A7DAEE700AC0D96 /* statusON@2x.png */; };
-		CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381471A7DB29800AC0D96 /* upArrow.png */; };
-		CD83814A1A7DB2B200AC0D96 /* upArrowSmall@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */; };
 		CD8401331A044B0B000A1C5A /* Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8401311A044B0B000A1C5A /* Utilities.m */; };
 		CD855A7C1A773D7F00A13C5C /* ErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD855A7A1A773D7F00A13C5C /* ErrorWindowController.m */; };
 		CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */; };
 		CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD855A801A773EA700A13C5C /* AlertWindowController.xib */; };
-		CD9282E11B0133B8007A5E03 /* parentsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD9282DE1B0133B8007A5E03 /* parentsIcon.png */; };
-		CD9282E21B0133B8007A5E03 /* parentsIconBG.png in Resources */ = {isa = PBXBuildFile; fileRef = CD9282DF1B0133B8007A5E03 /* parentsIconBG.png */; };
-		CD9282E31B0133B8007A5E03 /* parentsIconOver.png in Resources */ = {isa = PBXBuildFile; fileRef = CD9282E01B0133B8007A5E03 /* parentsIconOver.png */; };
 		CDACB9271A2EF3330088CC30 /* InterProcComms.m in Sources */ = {isa = PBXBuildFile; fileRef = CDACB9261A2EF3330088CC30 /* InterProcComms.m */; };
 		CDB4D9DD19F4CDE90069BE62 /* ProcessMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = CDB4D9DC19F4CDE90069BE62 /* ProcessMonitor.m */; };
 		CDB4D9DF19F4D44F0069BE62 /* libdtrace.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB4D9DE19F4D44F0069BE62 /* libdtrace.dylib */; };
@@ -113,10 +90,8 @@
 		CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */ = {isa = PBXBuildFile; fileRef = CDD738D41A5F7FE800B825BA /* launchAgent.plist */; };
 		CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */; };
 		CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */; };
-		CDE36C921AD3B67B00371F4E /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C911AD3B67B00371F4E /* icon.png */; };
 		CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */; };
 		CDE36C971AD4FEFB00371F4E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */; };
-		CDE36C991AD500EE00371F4E /* bbText.png in Resources */ = {isa = PBXBuildFile; fileRef = CDE36C981AD500EE00371F4E /* bbText.png */; };
 		CDE36CCD1ADAEDE500371F4E /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = CDE36CCC1ADAEDE500371F4E /* Exception.m */; };
 		CDF8B0AD1A5A37D1000D8AD3 /* StatusBarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF8B0AB1A5A37D1000D8AD3 /* StatusBarMenu.m */; };
 /* End PBXBuildFile section */
@@ -125,10 +100,6 @@
 		7D0215121BF1D27D0005CF0F /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
 		7D13FACC1E1E2167006813BE /* CustomNSButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomNSButton.h; path = BlockBlock/CustomNSButton.h; sourceTree = "<group>"; };
 		7D13FACD1E1E2167006813BE /* CustomNSButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomNSButton.m; path = BlockBlock/CustomNSButton.m; sourceTree = "<group>"; };
-		7D13FACF1E221370006813BE /* signed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = signed.png; path = BlockBlock/images/signed.png; sourceTree = "<group>"; };
-		7D13FAD01E221370006813BE /* signedApple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = signedApple.png; path = BlockBlock/images/signedApple.png; sourceTree = "<group>"; };
-		7D13FAD11E221370006813BE /* unknown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = unknown.png; path = BlockBlock/images/unknown.png; sourceTree = "<group>"; };
-		7D13FAD21E221370006813BE /* unsigned.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = unsigned.png; path = BlockBlock/images/unsigned.png; sourceTree = "<group>"; };
 		7D13FAD71E2215CA006813BE /* Signing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Signing.m; path = BlockBlock/Signing.m; sourceTree = "<group>"; };
 		7D13FAD81E2215CA006813BE /* Signing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signing.h; path = BlockBlock/Signing.h; sourceTree = "<group>"; };
 		7D460E151E39DF0E00A95EE6 /* PopoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PopoverViewController.h; path = BlockBlock/ui/PopoverViewController.h; sourceTree = "<group>"; };
@@ -136,11 +107,7 @@
 		7D774F251C017C7400A9CCE4 /* PrefsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PrefsWindow.xib; path = BlockBlock/ui/PrefsWindow.xib; sourceTree = SOURCE_ROOT; };
 		7D774F271C017C9000A9CCE4 /* PrefsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrefsWindowController.h; path = BlockBlock/PrefsWindowController.h; sourceTree = "<group>"; };
 		7D774F281C017C9000A9CCE4 /* PrefsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PrefsWindowController.m; path = BlockBlock/PrefsWindowController.m; sourceTree = "<group>"; };
-		7D774F2C1C018DA600A9CCE4 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = BlockBlock/images/settings.png; sourceTree = "<group>"; };
 		7D902D681E2AE207006124A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
-		7D902D7D1E3897EB006124A5 /* virusTotal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = virusTotal.png; path = BlockBlock/images/virusTotal.png; sourceTree = "<group>"; };
-		7D902D7F1E39CACD006124A5 /* virusTotalBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = virusTotalBG.png; path = BlockBlock/images/virusTotalBG.png; sourceTree = "<group>"; };
-		7D902D801E39CACD006124A5 /* virusTotalOver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = virusTotalOver.png; path = BlockBlock/images/virusTotalOver.png; sourceTree = "<group>"; };
 		7DF867CE1E39E3C2008ED0BD /* HyperlinkTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HyperlinkTextField.h; sourceTree = "<group>"; };
 		7DF867CF1E39E3C2008ED0BD /* HyperlinkTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HyperlinkTextField.m; sourceTree = "<group>"; };
 		7DF867E21E39E3C2008ED0BD /* bbText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bbText.png; sourceTree = "<group>"; };
@@ -209,14 +176,8 @@
 		CD5C998E19D73C380015232A /* AlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AlertView.m; path = BlockBlock/AlertView.m; sourceTree = "<group>"; };
 		CD5C999319D8B84B0015232A /* AlertViewBottom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlertViewBottom.h; path = BlockBlock/ui/AlertViewBottom.h; sourceTree = "<group>"; };
 		CD5C999419D8B84B0015232A /* AlertViewBottom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AlertViewBottom.m; path = BlockBlock/ui/AlertViewBottom.m; sourceTree = "<group>"; };
-		CD6090C51A7DBDA300E091CD /* itemIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = itemIcon.png; path = BlockBlock/images/itemIcon.png; sourceTree = "<group>"; };
-		CD6090C61A7DBDA300E091CD /* processIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = processIcon.png; path = BlockBlock/images/processIcon.png; sourceTree = "<group>"; };
 		CD6974F81B013AB600CE819B /* ParentsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParentsWindowController.h; path = BlockBlock/ParentsWindowController.h; sourceTree = "<group>"; };
 		CD6974F91B013AB600CE819B /* ParentsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ParentsWindowController.m; path = BlockBlock/ParentsWindowController.m; sourceTree = "<group>"; };
-		CD7620A11AF3629400CFCB68 /* statusOFFWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusOFFWhite.png; path = BlockBlock/images/icon/statusOFFWhite.png; sourceTree = "<group>"; };
-		CD7620A21AF3629400CFCB68 /* statusOFFWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusOFFWhite@2x.png"; path = "BlockBlock/images/icon/statusOFFWhite@2x.png"; sourceTree = "<group>"; };
-		CD7620A31AF3629400CFCB68 /* statusONWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusONWhite.png; path = BlockBlock/images/icon/statusONWhite.png; sourceTree = "<group>"; };
-		CD7620A41AF3629400CFCB68 /* statusONWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusONWhite@2x.png"; path = "BlockBlock/images/icon/statusONWhite@2x.png"; sourceTree = "<group>"; };
 		CD7C871319D43EAD00EC7F0A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = BlockBlock/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		CD7C871419D43EAD00EC7F0A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = BlockBlock/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		CD7C871819D43F0200EC7F0A /* BlockBlock-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "BlockBlock-Info.plist"; path = "BlockBlock/BlockBlock-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -234,21 +195,12 @@
 		CD7F088E19AE6DCA00FF00FC /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		CD7F089019AE6DCA00FF00FC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		CD8381291A7D94FA00AC0D96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BlockBlock/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		CD83813F1A7DAEE700AC0D96 /* statusOFF.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusOFF.png; path = BlockBlock/images/icon/statusOFF.png; sourceTree = "<group>"; };
-		CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusOFF@2x.png"; path = "BlockBlock/images/icon/statusOFF@2x.png"; sourceTree = "<group>"; };
-		CD8381411A7DAEE700AC0D96 /* statusON.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusON.png; path = BlockBlock/images/icon/statusON.png; sourceTree = "<group>"; };
-		CD8381421A7DAEE700AC0D96 /* statusON@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusON@2x.png"; path = "BlockBlock/images/icon/statusON@2x.png"; sourceTree = "<group>"; };
-		CD8381471A7DB29800AC0D96 /* upArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = upArrow.png; path = BlockBlock/images/upArrow.png; sourceTree = "<group>"; };
-		CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "upArrowSmall@2x.png"; path = "BlockBlock/images/upArrowSmall@2x.png"; sourceTree = "<group>"; };
 		CD8401311A044B0B000A1C5A /* Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utilities.m; path = BlockBlock/Utilities.m; sourceTree = "<group>"; };
 		CD8401321A044B0B000A1C5A /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utilities.h; path = BlockBlock/Utilities.h; sourceTree = "<group>"; };
 		CD855A791A773D7F00A13C5C /* ErrorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ErrorWindowController.h; path = BlockBlock/ErrorWindowController.h; sourceTree = "<group>"; };
 		CD855A7A1A773D7F00A13C5C /* ErrorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ErrorWindowController.m; path = BlockBlock/ErrorWindowController.m; sourceTree = "<group>"; };
 		CD855A7E1A773E8300A13C5C /* ErrorWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ErrorWindowController.xib; path = BlockBlock/ui/ErrorWindowController.xib; sourceTree = SOURCE_ROOT; };
 		CD855A801A773EA700A13C5C /* AlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AlertWindowController.xib; path = BlockBlock/ui/AlertWindowController.xib; sourceTree = SOURCE_ROOT; };
-		CD9282DE1B0133B8007A5E03 /* parentsIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = parentsIcon.png; path = BlockBlock/images/parentsIcon.png; sourceTree = "<group>"; };
-		CD9282DF1B0133B8007A5E03 /* parentsIconBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = parentsIconBG.png; path = BlockBlock/images/parentsIconBG.png; sourceTree = "<group>"; };
-		CD9282E01B0133B8007A5E03 /* parentsIconOver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = parentsIconOver.png; path = BlockBlock/images/parentsIconOver.png; sourceTree = "<group>"; };
 		CDACB9261A2EF3330088CC30 /* InterProcComms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InterProcComms.m; path = BlockBlock/InterProcComms.m; sourceTree = "<group>"; };
 		CDACB9281A2EF3460088CC30 /* InterProcComms.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InterProcComms.h; path = BlockBlock/InterProcComms.h; sourceTree = "<group>"; };
 		CDB4D9DB19F4CDE90069BE62 /* ProcessMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessMonitor.h; path = BlockBlock/ProcessMonitor.h; sourceTree = "<group>"; };
@@ -269,11 +221,9 @@
 		CDD738D41A5F7FE800B825BA /* launchAgent.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = launchAgent.plist; path = BlockBlock/launchAgent.plist; sourceTree = "<group>"; };
 		CDDE6B4B1A63A7CC00AC9BF7 /* ConfigureWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ConfigureWindowController.xib; path = BlockBlock/ui/ConfigureWindowController.xib; sourceTree = SOURCE_ROOT; };
 		CDDE6B4D1A63A7F300AC9BF7 /* StatusBarPopover.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = StatusBarPopover.xib; path = BlockBlock/ui/StatusBarPopover.xib; sourceTree = SOURCE_ROOT; };
-		CDE36C911AD3B67B00371F4E /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = BlockBlock/images/icon/icon.png; sourceTree = "<group>"; };
 		CDE36C931AD4FEFB00371F4E /* InfoWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = InfoWindow.xib; path = BlockBlock/ui/InfoWindow.xib; sourceTree = SOURCE_ROOT; };
 		CDE36C941AD4FEFB00371F4E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = BlockBlock/ui/InfoWindowController.h; sourceTree = SOURCE_ROOT; };
 		CDE36C951AD4FEFB00371F4E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = BlockBlock/ui/InfoWindowController.m; sourceTree = SOURCE_ROOT; };
-		CDE36C981AD500EE00371F4E /* bbText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bbText.png; path = BlockBlock/images/bbText.png; sourceTree = "<group>"; };
 		CDE36CCB1ADAEDE500371F4E /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = BlockBlock/Exception.h; sourceTree = "<group>"; };
 		CDE36CCC1ADAEDE500371F4E /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = BlockBlock/Exception.m; sourceTree = "<group>"; };
 		CDF8B0AA1A5A37D1000D8AD3 /* StatusBarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarMenu.h; path = BlockBlock/ui/StatusBarMenu.h; sourceTree = "<group>"; };
@@ -424,7 +374,6 @@
 				CD6974F91B013AB600CE819B /* ParentsWindowController.m */,
 				CDE36CCB1ADAEDE500371F4E /* Exception.h */,
 				CDE36CCC1ADAEDE500371F4E /* Exception.m */,
-				CD8381371A7DAA0F00AC0D96 /* images */,
 				CDD738D41A5F7FE800B825BA /* launchAgent.plist */,
 				CDD738BA1A5F7D0500B825BA /* StatusBarPopoverController.h */,
 				CDD738BB1A5F7D0500B825BA /* StatusBarPopoverController.m */,
@@ -532,46 +481,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		CD8381371A7DAA0F00AC0D96 /* images */ = {
-			isa = PBXGroup;
-			children = (
-				7D902D7F1E39CACD006124A5 /* virusTotalBG.png */,
-				7D902D801E39CACD006124A5 /* virusTotalOver.png */,
-				7D902D7D1E3897EB006124A5 /* virusTotal.png */,
-				7D13FACF1E221370006813BE /* signed.png */,
-				7D13FAD01E221370006813BE /* signedApple.png */,
-				7D13FAD11E221370006813BE /* unknown.png */,
-				7D13FAD21E221370006813BE /* unsigned.png */,
-				7D774F2C1C018DA600A9CCE4 /* settings.png */,
-				CD9282DE1B0133B8007A5E03 /* parentsIcon.png */,
-				CD9282DF1B0133B8007A5E03 /* parentsIconBG.png */,
-				CD9282E01B0133B8007A5E03 /* parentsIconOver.png */,
-				CDE36C981AD500EE00371F4E /* bbText.png */,
-				CD6090C51A7DBDA300E091CD /* itemIcon.png */,
-				CD6090C61A7DBDA300E091CD /* processIcon.png */,
-				CD8381491A7DB2B200AC0D96 /* upArrowSmall@2x.png */,
-				CD8381471A7DB29800AC0D96 /* upArrow.png */,
-				CD8381381A7DAA1300AC0D96 /* icons */,
-			);
-			name = images;
-			sourceTree = "<group>";
-		};
-		CD8381381A7DAA1300AC0D96 /* icons */ = {
-			isa = PBXGroup;
-			children = (
-				CD7620A11AF3629400CFCB68 /* statusOFFWhite.png */,
-				CD7620A21AF3629400CFCB68 /* statusOFFWhite@2x.png */,
-				CD7620A31AF3629400CFCB68 /* statusONWhite.png */,
-				CD7620A41AF3629400CFCB68 /* statusONWhite@2x.png */,
-				CDE36C911AD3B67B00371F4E /* icon.png */,
-				CD83813F1A7DAEE700AC0D96 /* statusOFF.png */,
-				CD8381401A7DAEE700AC0D96 /* statusOFF@2x.png */,
-				CD8381411A7DAEE700AC0D96 /* statusON.png */,
-				CD8381421A7DAEE700AC0D96 /* statusON@2x.png */,
-			);
-			name = icons;
-			sourceTree = "<group>";
-		};
 		CDD738C31A5F7FE800B825BA /* Base.lproj */ = {
 			isa = PBXGroup;
 			children = (
@@ -651,38 +560,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				CDD738E21A5F7FE800B825BA /* launchAgent.plist in Resources */,
-				7D13FAD51E221370006813BE /* unknown.png in Resources */,
 				7DF868221E39E3C3008ED0BD /* statusIcon.png in Resources */,
 				CDD738D91A5F7FE800B825BA /* InfoPlist.strings in Resources */,
-				7D774F2D1C018DA600A9CCE4 /* settings.png in Resources */,
 				7DF868291E39E3C3008ED0BD /* statusOFFWhite@2x.png in Resources */,
 				7DF8682E1E39E3C3008ED0BD /* itemIcon.png in Resources */,
 				7DF868261E39E3C3008ED0BD /* statusOFF.png in Resources */,
 				7DF868381E39E3C3008ED0BD /* unknown.png in Resources */,
 				7DF868331E39E3C3008ED0BD /* processIcon.png in Resources */,
-				CD9282E11B0133B8007A5E03 /* parentsIcon.png in Resources */,
 				7DF8683C1E39E3C3008ED0BD /* upArrowSmall_old.png in Resources */,
 				CD83812A1A7D94FA00AC0D96 /* Images.xcassets in Resources */,
 				CDD738D81A5F7FE800B825BA /* Credits.rtf in Resources */,
-				7D13FAD61E221370006813BE /* unsigned.png in Resources */,
 				7DF8683A1E39E3C3008ED0BD /* upArrow.png in Resources */,
 				CDE36C961AD4FEFB00371F4E /* InfoWindow.xib in Resources */,
 				7DF868281E39E3C3008ED0BD /* statusOFFWhite.png in Resources */,
-				7D902D821E39CACD006124A5 /* virusTotalOver.png in Resources */,
-				CD7620A71AF3629400CFCB68 /* statusONWhite.png in Resources */,
-				CD8381461A7DAEE700AC0D96 /* statusON@2x.png in Resources */,
 				7DF868201E39E3C3008ED0BD /* bbText.png in Resources */,
 				7DF868391E39E3C3008ED0BD /* unsigned.png in Resources */,
 				7DF868361E39E3C3008ED0BD /* signed.png in Resources */,
-				CDE36C921AD3B67B00371F4E /* icon.png in Resources */,
-				CD83814A1A7DB2B200AC0D96 /* upArrowSmall@2x.png in Resources */,
-				CD9282E21B0133B8007A5E03 /* parentsIconBG.png in Resources */,
-				CD8381481A7DB29800AC0D96 /* upArrow.png in Resources */,
 				7DF8683F1E39E3C3008ED0BD /* virusTotalOver.png in Resources */,
 				7DF8682D1E39E3C3008ED0BD /* statusONWhite@2x.png in Resources */,
 				CDDE6B4C1A63A7CC00AC9BF7 /* ConfigureWindowController.xib in Resources */,
 				CDDE6B4E1A63A7F300AC9BF7 /* StatusBarPopover.xib in Resources */,
-				7D13FAD31E221370006813BE /* signed.png in Resources */,
 				7DF8683B1E39E3C3008ED0BD /* upArrowSmall@2x.png in Resources */,
 				7DF868251E39E3C3008ED0BD /* statusIconOff@2x.png in Resources */,
 				7DF8682F1E39E3C3008ED0BD /* itemIconBlack.png in Resources */,
@@ -690,37 +587,24 @@
 				CD3CE68D1A22D2EB00B4F940 /* launchItem.plist in Resources */,
 				CD7C872819D4459A00EC7F0A /* watchList.plist in Resources */,
 				7DF8682B1E39E3C3008ED0BD /* statusON@2x.png in Resources */,
-				CDE36C991AD500EE00371F4E /* bbText.png in Resources */,
-				CD7620A51AF3629400CFCB68 /* statusOFFWhite.png in Resources */,
 				7DF8683D1E39E3C3008ED0BD /* virusTotal.png in Resources */,
 				7DF868351E39E3C3008ED0BD /* settings.png in Resources */,
 				CD855A7F1A773E8300A13C5C /* ErrorWindowController.xib in Resources */,
 				7DF868401E39E3C3008ED0BD /* MainMenu.xib in Resources */,
-				CD6090C71A7DBDA300E091CD /* itemIcon.png in Resources */,
-				CD8381451A7DAEE700AC0D96 /* statusON.png in Resources */,
 				CD855A811A773EA700A13C5C /* AlertWindowController.xib in Resources */,
 				7DF868241E39E3C3008ED0BD /* statusIconOff.png in Resources */,
 				7DF868271E39E3C3008ED0BD /* statusOFF@2x.png in Resources */,
 				7D902D691E2AE207006124A5 /* MainMenu.xib in Resources */,
 				7DF868321E39E3C3008ED0BD /* parentsIconOver.png in Resources */,
 				7D774F261C017C7400A9CCE4 /* PrefsWindow.xib in Resources */,
-				CD9282E31B0133B8007A5E03 /* parentsIconOver.png in Resources */,
 				7DF868341E39E3C3008ED0BD /* processIconBlack.png in Resources */,
 				7DF868211E39E3C3008ED0BD /* icon.png in Resources */,
-				7D13FAD41E221370006813BE /* signedApple.png in Resources */,
 				7DF868311E39E3C3008ED0BD /* parentsIconBG.png in Resources */,
-				CD8381441A7DAEE700AC0D96 /* statusOFF@2x.png in Resources */,
-				7D902D811E39CACD006124A5 /* virusTotalBG.png in Resources */,
-				CD7620A81AF3629400CFCB68 /* statusONWhite@2x.png in Resources */,
 				7DF868231E39E3C3008ED0BD /* statusIcon@2x.png in Resources */,
 				7DF8682A1E39E3C3008ED0BD /* statusON.png in Resources */,
-				CD6090C81A7DBDA300E091CD /* processIcon.png in Resources */,
 				7DF868371E39E3C3008ED0BD /* signedApple.png in Resources */,
-				CD7620A61AF3629400CFCB68 /* statusOFFWhite@2x.png in Resources */,
 				7DF8682C1E39E3C3008ED0BD /* statusONWhite.png in Resources */,
 				7DF868301E39E3C3008ED0BD /* parentsIcon.png in Resources */,
-				7D902D7E1E3897EB006124A5 /* virusTotal.png in Resources */,
-				CD8381431A7DAEE700AC0D96 /* statusOFF.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -739,7 +623,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\n#cp -R -f ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
+			shellScript = "#cp -R -f $BUILT_PRODUCTS_DIR/BlockBlock.kext $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/\ncp -R -f ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Products/Release/BlockBlock.kext ~/objective-see/BlockBlock/DerivedData/BlockBlock/Build/Intermediates/ArchiveIntermediates/BlockBlock/InstallationBuildProductsLocation/Applications/BlockBlock.app/Contents/Resources\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
