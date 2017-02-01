@@ -278,7 +278,7 @@
         
         //make ratio red if there are positives
         if( (nil != item[@"vtInfo"][@"positives"]) &&
-            (0 != item[@"vtInfo"][@"positives"]) )
+            (0 != [item[@"vtInfo"][@"positives"] intValue]) )
         {
             //red
             attributes = @{NSFontAttributeName: [NSFont fontWithName:@"Menlo" size:13], NSForegroundColorAttributeName:[NSColor redColor]};
