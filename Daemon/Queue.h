@@ -29,13 +29,13 @@
 @property(nonatomic, retain)NSCondition* queueCondition;
 
 //processes explicity disallowed by the user
-@property(nonatomic, retain)NSMutableDictionary* disallowedProcs;
+//@property(nonatomic, retain)NSMutableDictionary* disallowedProcs;
 
 //process that were reported to the user
 @property(nonatomic, retain)NSMutableSet* reportedProcs;
 
 //pid -> last encrypted file timestamp
-@property(nonatomic, retain)NSMutableDictionary* lastEncryptedFiles;
+//@property(nonatomic, retain)NSMutableDictionary* lastEncryptedFiles;
 
 
 
@@ -50,6 +50,6 @@
 
 //show alert to the user
 // ->block until response, which is returned from this method
--(CFOptionFlags)alertUser:(Event*)event prevEncryptedFile:(NSString*)prevEncryptedFile;
+-(CFOptionFlags)alertUser:(Event*)event;
 
 @end

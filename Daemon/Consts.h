@@ -11,7 +11,7 @@
 
 //version
 // TODO: update with each new release!
-#define DAEMON_VERSION @"1.1.0"
+#define DAEMON_VERSION @"1.2.0"
 
 //OS version x
 #define OS_MAJOR_VERSION_X 10
@@ -23,7 +23,7 @@
 #define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
 
 //product version url
-#define PRODUCT_VERSION_URL @"https://objective-see.com/products/versions/ransomwhere.json"
+#define PRODUCT_VERSIONS_URL @"https://objective-see.com/products.json"
 
 //install update flag
 #define UPDATE_INSTALL 0
@@ -38,7 +38,7 @@
 #define DEVICE_FSEVENTS "/dev/fsevents"
 
 //path to file command
-#define FILE @"/usr/bin/file"
+#define FILE_CMD @"/usr/bin/file"
 
 //path to system profiler
 #define SYSTEM_PROFILER @"/usr/sbin/system_profiler"
@@ -50,13 +50,13 @@
 #define PROCESS_RESUME 1
 
 //installed apps
-#define INSTALLED_APPS @"installedApps.plist"
+#define BASELINED_FILE @"installedApps.plist"
 
 //user approved binaries
-#define USER_APPROVED_BINARIES @"approvedBinaries.plist"
+#define USER_APPROVED_FILE @"approvedBinaries.plist"
 
 //whitelist
-#define WHITE_LIST_FILE @"whiteList.plist"
+#define WHITE_LISTED_FILE @"whiteList.plist"
 
 //graylist
 #define GRAY_LIST_FILE @"grayList.plist"
@@ -95,6 +95,9 @@
 
 //jpg
 #define MAGIC_JPG  0xE0FFD8FF
+
+//jpeg
+#define MAGIC_JPEG 0xDBFFD8FF
 
 //tiff
 #define MAGIC_TIFF 0x2A004D4D

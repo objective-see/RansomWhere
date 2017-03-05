@@ -159,6 +159,7 @@ BOOL isNewVersion(NSMutableString* versionString)
     //get installed version
     installedVersion = getDaemonVersion();
     
+    //TODO: update to query main JSON file
     //get latest version
     // ->will query internet (bb's website)
     latestVersion = getLatestVersion();
@@ -185,65 +186,50 @@ bail:
 //query interwebz to get latest version
 NSString* getLatestVersion()
 {
-    //version data
-    NSData* versionData = nil;
+    //product version(s) data
+    NSData* productsVersionData = nil;
     
     //version dictionary
-    NSDictionary* versionDictionary = nil;
+    NSDictionary* productsVersionDictionary = nil;
     
     //latest version
     NSString* latestVersion = nil;
     
     //get version from remote URL
-    versionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSION_URL]];
-    if(nil == versionData)
+    productsVersionData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:PRODUCT_VERSIONS_URL]];
+    if(nil == productsVersionData)
     {
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to load version data from %@", PRODUCT_VERSION_URL]);
-        #endif
-        
         //bail
         goto bail;
     }
     
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"downloaded version info: %@",  [[NSString alloc] initWithData:versionData encoding:NSUTF8StringEncoding]]);
-    #endif
-    
     //convert JSON to dictionary
-    versionDictionary = [NSJSONSerialization JSONObjectWithData:versionData options:0 error:nil];
-    if(nil == versionDictionary)
+    // ->wrap as may throw exception
+    @try
     {
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"failed serialized downloaded version data (into JSON)");
-        #endif
-        
+        //convert
+        productsVersionDictionary = [NSJSONSerialization JSONObjectWithData:productsVersionData options:0 error:nil];
+        if(nil == productsVersionDictionary)
+        {
+            //bail
+            goto bail;
+        }
+    }
+    @catch(NSException* exception)
+    {
         //bail
         goto bail;
     }
     
     //extract latest version
-    latestVersion = versionDictionary[@"latestVersion"];
-    if(nil == latestVersion)
-    {
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"failed to extract 'latestVersion' from downloaded version data");
-        #endif
-        
-        //bail
-        goto bail;
-    }
+    latestVersion = [[productsVersionDictionary objectForKey:@"RansomWhere?"] objectForKey:@"version"];
     
     //dbg msg
     #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"latest version: %@", latestVersion]);
     #endif
     
-//bail
+    //bail
 bail:
     
     return latestVersion;
@@ -1414,7 +1400,7 @@ NSString* determineFileType(NSString* path)
     NSArray* parsedResults = nil;
     
     //exec 'file' to get file type
-    results = [[NSString alloc] initWithData:execTask(FILE, @[path]) encoding:NSUTF8StringEncoding];
+    results = [[NSString alloc] initWithData:execTask(FILE_CMD, @[path]) encoding:NSUTF8StringEncoding];
     if(nil == results)
     {
         //bail
@@ -1545,6 +1531,7 @@ BOOL isImage(NSData* header)
     //check for magic (4-byte) header values
     if( (MAGIC_PNG == magic) ||
         (MAGIC_JPG == magic) ||
+        (MAGIC_JPEG == magic) ||
         (MAGIC_GIF == magic) ||
         (MAGIC_ICNS == magic) ||
         (MAGIC_TIFF == magic) )
@@ -1880,6 +1867,76 @@ bail:
 }
 
 
+//given a pid, get its parent (ppid)
+pid_t getParentID(int pid)
+{
+    //parent id
+    pid_t parentID = -1;
+    
+    //kinfo_proc struct
+    struct kinfo_proc processStruct = {0};
+    
+    //size
+    size_t procBufferSize = sizeof(processStruct);
+    
+    //mib
+    const u_int mibLength = 4;
+    
+    //syscall result
+    int sysctlResult = -1;
+    
+    //init mib
+    int mib[mibLength] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, pid};
+    
+    //make syscall
+    sysctlResult = sysctl(mib, mibLength, &processStruct, &procBufferSize, NULL, 0);
+    
+    //check if got ppid
+    if( (STATUS_SUCCESS == sysctlResult) &&
+       (0 != procBufferSize) )
+    {
+        //save ppid
+        parentID = processStruct.kp_eproc.e_ppid;
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"extracted parent ID %d for process: %d", parentID, pid]);
+        #endif
+    }
+    
+    return parentID;
+}
+
+//check if process is alive
+BOOL isProcessAlive(pid_t processID)
+{
+    //ret var
+    BOOL bIsAlive = NO;
+    
+    //signal status
+    int signalStatus = -1;
+    
+    //send kill with 0 to determine if alive
+    // -> see: http://stackoverflow.com/questions/9152979/check-if-process-exists-given-its-pid
+    signalStatus = kill(processID, 0);
+    
+    //is alive?
+    if( (0 == signalStatus) ||
+       ( (0 != signalStatus) && (errno != ESRCH) ) )
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"agent (%d) is ALIVE", processID]);
+        #endif
+        
+        //alive!
+        bIsAlive = YES;
+    }
+    
+    return bIsAlive;
+}
+
+
 //given a parent
 // ->finds (first) child that matches specified class name
 io_service_t findChild(io_service_t parent, const char* name)
@@ -1951,4 +2008,50 @@ bail:
     
     return child;
 }
+
+//sha256 a file
+NSString* hashFile(NSString* filePath)
+{
+    //file's contents
+    NSData* fileContents = nil;
+
+    //hash digest
+    uint8_t digestSHA256[CC_SHA256_DIGEST_LENGTH] = {0};
+    
+    //hash as string
+    NSMutableString* sha256 = nil;
+    
+    //index var
+    NSUInteger index = 0;
+    
+    //init
+    sha256 = [NSMutableString string];
+    
+    //load file
+    if(nil == (fileContents = [NSData dataWithContentsOfFile:filePath]))
+    {
+        //err msg
+        NSLog(@"OBJECTIVE-SEE ERROR: couldn't load %@ to hash", filePath);
+        
+        //bail
+        goto bail;
+    }
+
+    //sha1 it
+    CC_SHA256(fileContents.bytes, (unsigned int)fileContents.length, digestSHA256);
+    
+    //convert to NSString
+    // ->iterate over each bytes in computed digest and format
+    for(index=0; index < CC_SHA256_DIGEST_LENGTH; index++)
+    {
+        //format/append
+        [sha256 appendFormat:@"%02lX", (unsigned long)digestSHA256[index]];
+    }
+    
+//bail
+bail:
+    
+    return sha256;
+}
+
 

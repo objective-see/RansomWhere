@@ -3,7 +3,7 @@
 //  Daemon
 //
 //  Created by Patrick Wardle on 5/22/16.
-//  Copyright © 2016 Objective-See. All rights reserved.
+//  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
 #import "Consts.h"
@@ -336,6 +336,8 @@ bail:
     return wereProcessed;
 }
 
+
+/*
 //enumerate all currently running processes
 -(BOOL)enumRunningProcs
 {
@@ -388,4 +390,6 @@ bail:
     return wereProcessed;
 }
 
+*/
+ 
 @end

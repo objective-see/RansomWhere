@@ -14,12 +14,15 @@
 #import "Utilities.h"
 #import "FSMonitor.h"
 
+#import <Cocoa/Cocoa.h> //TODO: remove?
+
+
 #import <Foundation/Foundation.h>
+
 
 @implementation FSMonitor
 
 @synthesize eventQueue;
-@synthesize pidPathMappings;
 
 //init function
 // ->load watch paths, alloc queue, etc
@@ -31,10 +34,6 @@
     {
         //alloc/init event queue
         eventQueue = [[Queue alloc] init];
-        
-        //alloc/init pid -> path mappings
-        pidPathMappings = [NSMutableDictionary dictionary];
-    
     }
     
     return self;
@@ -177,12 +176,17 @@
             lastPath = path;
             
             //dbg msg
-            //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new file system event: %@ (type: %x/ pid: %d)", path, fse->type, fse->pid]);
+            #endif
             
             //skip any non-watched paths
             //->e.g. window_<digits>.data files
             if(YES == [self shouldIgnore:path])
             {
+                //TODO: remove
+                logMsg(LOG_DEBUG, @"ignoring A");
+                
                 //skip
                 continue;
             }
@@ -192,6 +196,16 @@
             binary = [self getBinaryObject:fse->pid];
             if(nil == binary)
             {
+                //did it die?
+                if(YES != isProcessAlive(fse->pid))
+                {
+                    //TODO: remove
+                    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process %d is dead (parent is/was: %d)", fse->pid, getParentID(fse->pid)]);
+                }
+                
+                //TODO: remove
+                logMsg(LOG_DEBUG, @"ignoring B");
+                
                 //err creating obj
                 // ->so skip/ignore
                 continue;
@@ -201,6 +215,9 @@
             // ->could have this check earlier, but want binary objects to be gen'd
             if(NULL == consoleUserName)
             {
+                //TODO: remove
+                logMsg(LOG_DEBUG, @"ignoring C");
+                
                 //skip
                 continue;
             }
@@ -209,6 +226,9 @@
             event = [[Event alloc] init:path binary:binary fsEvent:fse];
             if(nil == event)
             {
+                //TODO: remove
+                logMsg(LOG_DEBUG, @"ignoring D");
+                
                 //skip
                 continue;
             }
@@ -258,41 +278,27 @@ bail:
     Binary* binary = nil;
     
     //pid->path mapping dictionary
-    NSMutableDictionary* pidProcMapping = nil;
+    //NSMutableDictionary* pidProcMapping = nil;
     
     //process path
     NSString* processPath = nil;
     
-    //TODO: remove? is proc_pidpath that slow?
-    //check if there is a valid ('cached') pid->path mapping
-    // ->will be for recent existing procs (for now, 60 seconds)
-    pidProcMapping = [self.pidPathMappings objectForKey:[NSNumber numberWithUnsignedInt:pid]];
-    if( (nil != pidProcMapping) &&
-        ([pidProcMapping[@"timestamp"] timeIntervalSinceNow] < 60) )
+    ////TODO: grab from process monitor
+    
+    //get path from pid
+    processPath = getProcessPath(pid);
+    if(nil == processPath)
     {
-        //extract path
-        processPath = pidProcMapping[@"path"];
-    }
-    //otherwise, new binary, or time interval too long
-    // ->lookup process path & save it into pid->path mapping
-    else
-    {
-        //get path from pid
-        processPath = getProcessPath(pid);
-        if(nil == processPath)
-        {
-            //ignore
-            goto bail;
-        }
+        //TODO: grab from process monitor
         
-        //save ('cache') pid->path mapping
-        [self.pidPathMappings setObject:@{@"timestamp": [NSDate date], @"path": processPath} forKey:[NSNumber numberWithUnsignedInt:pid]];
+        //ignore
+        goto bail;
     }
     
     //sync to check
     @synchronized(enumerator.binaryList)
     {
-        //see if there's an existing process object
+        //see if there's an existing binary object
         // ->if so, all set, so can bail to return binary to caller
         binary = enumerator.binaryList[processPath];
         if(nil != binary)
@@ -322,11 +328,13 @@ bail:
         }
     }
     
+    
 //bail
 bail:
     
     return binary;
 }
+
 
 //determine if a path should be ignored
 // ->for now, just window_<digits>.data files

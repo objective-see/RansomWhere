@@ -22,7 +22,10 @@
 @property (nonatomic, retain)NSString* name;
 
 //signing info
-@property(nonatomic, retain)NSDictionary* signingInfo;
+@property (nonatomic, retain)NSDictionary* signingInfo;
+
+//sha256 hash
+@property (nonatomic, retain)NSString* sha256Hash;
 
 //flag indicating binary belongs to Apple OS
 @property BOOL isApple;
@@ -46,5 +49,8 @@
 
 //init w/ an info dictionary
 -(id)init:(NSString*)path attributes:(NSDictionary*)attributes;
+
+//format signing info
+-(NSString*)formatSigningInfo;
 
 @end

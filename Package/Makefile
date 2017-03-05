@@ -1,17 +1,16 @@
 # Makefile for RansomWhere related tasks
 
+# to use:
 # make path=/path/2/ransomware.app target
-# $(path)
 
-#pkgutil --check-signature RansomWhere?-1.1.0.pkg 
+# to check signatures
+#pkgutil --check-signature /path/to/.pkg 
+#codesign -dvvv /path/to/.dmg
 
-#TODO: add white/gray list anything else?
-
-
-PKGTITLE="RansomWhere?"
+PKGTITLE="RansomWhere"
 PKGVERSION="1.1.0"
 PKGID=com.objective-see.ransomwhere
-PROJECT="RansomWhere?"
+PROJECT="RansomWhere"
 PB_EXTRA_ARGS+= --sign "Developer ID Installer: Objective-See, LLC (VBG97UB4TA)"
 
 #################################################
@@ -37,14 +36,14 @@ copy:
 
 ##  pkg - Create a package using pkgbuild
 pkg: clean copy
-	pkgbuild --root pkgroot --scripts scripts --identifier ${PKGID} ${PB_EXTRA_ARGS} --version ${PKGVERSION} --ownership recommended ./${PKGTITLE}-${PKGVERSION}.pkg
+	pkgbuild --root pkgroot --scripts scripts --identifier ${PKGID} ${PB_EXTRA_ARGS} --version ${PKGVERSION} --ownership recommended ./${PKGTITLE}_${PKGVERSION}.pkg
 
 ##  dmg - Wrap the package inside a dmg
 dmg: pkg
 	rm -f ./${PROJECT}*.dmg
 	rm -rf /tmp/${PROJECT}-build
 	mkdir -p /tmp/${PROJECT}-build/
-	cp -R ./${PKGTITLE}-${PKGVERSION}.pkg /tmp/${PROJECT}-build
-	hdiutil create -srcfolder /tmp/${PROJECT}-build -volname "${PROJECT}" -format UDZO -o ${PROJECT}-${PKGVERSION}.dmg
-	codesign -s "Developer ID Application: Objective-See, LLC (VBG97UB4TA)" -v ${PROJECT}-${PKGVERSION}.dmg
+	cp -R ./${PKGTITLE}_${PKGVERSION}.pkg /tmp/${PROJECT}-build
+	hdiutil create -srcfolder /tmp/${PROJECT}-build -volname "${PROJECT}" -format UDZO -o ${PROJECT}_${PKGVERSION}.dmg
+	codesign -s "Developer ID Application: Objective-See, LLC (VBG97UB4TA)" -v ${PROJECT}_${PKGVERSION}.dmg
 	rm -rf /tmp/${PROJECT}-build

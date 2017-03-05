@@ -114,9 +114,17 @@ BOOL isInWhiteList(NSArray* signingAuths);
 // ->find the orginal disk image (dmg) that was mounted at this location
 NSString* findDMG(char* mountFrom);
 
+//given a pid, get its parent (ppid)
+pid_t getParentID(int pid);
+
+//check if process is alive
+BOOL isProcessAlive(pid_t processID);
+
 //given a parent
 // ->finds (first) child that matches specified class name
 io_service_t findChild(io_service_t parent, const char* name);
 
+//sha256 a file
+NSString* hashFile(NSString* filePath);
 
 #endif /* defined(__BlockBlock__Utilities__) */

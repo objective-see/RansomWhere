@@ -104,7 +104,7 @@ int main(int argc, const char * argv[])
         logMsg(LOG_DEBUG, @"enumerating all baselined/approved/running binaries");
         #endif
 
-        //enumerate all baselined/approved/running binaries
+        //enumerate all baselined/approved binaries
         // ->adds/classfies them into bins2Process dictionary
         [enumerator enumerateBinaries];
         
@@ -564,5 +564,4 @@ bail:
         
     //bye-bye
     pthread_exit(NULL);
-    
 }

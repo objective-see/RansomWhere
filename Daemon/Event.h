@@ -6,10 +6,11 @@
 //  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
+#import "Process.h"
 #import "fsEvents.h"
 #import <Foundation/Foundation.h>
 
-@class Binary;
+//@class Binary;
 
 @interface Event : NSObject
 {
@@ -25,16 +26,11 @@
 @property (nonatomic, retain)NSString* filePath;
 
 //process id
-@property (nonatomic, retain)NSNumber* processID;
-
-//binary object
-@property (nonatomic, retain)Binary* binary;
-
-
+@property (nonatomic, retain)Process* process;
 
 /* METHODS */
 
 //init
--(id)init:(NSString*)path binary:(Binary*)bin fsEvent:(kfs_event_a *)fsEvent;
+-(id)init:(NSString*)path fsProcess:(Process*)fsProcess fsEvent:(kfs_event_a *)fsEvent;
 
 @end

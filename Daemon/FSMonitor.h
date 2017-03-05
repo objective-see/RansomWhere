@@ -1,5 +1,5 @@
 //
-//  Watcher.h
+//  FSMonitor.h
 //  RansomWhere
 //
 //  Created by Patrick Wardle on 9/25/14.
@@ -33,9 +33,5 @@
 
 //file-system event queue
 @property (nonatomic, retain)Queue* eventQueue;
-
-//pid -> path mappings
-// ->timestamp ensures its still timely, cuz at this point can't detect when procs exit, so this is kinda of a hack...
-@property (nonatomic, retain)NSMutableDictionary* pidPathMappings;
 
 @end

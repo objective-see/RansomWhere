@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		7D3E408D1CDAF76F002B0997 /* AppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3E408C1CDAF76F002B0997 /* AppReceipt.m */; };
 		7D4701141CF25CEB009B65D5 /* Enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4701131CF25CEB009B65D5 /* Enumerator.m */; };
+		7D4F2C4D1E5EAD35006BBC6D /* ProcMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4F2C4B1E5EAD35006BBC6D /* ProcMonitor.m */; };
+		7D4F2C501E5EAF00006BBC6D /* Process.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4F2C4E1E5EAF00006BBC6D /* Process.m */; };
+		7D4F2C531E5EB0E5006BBC6D /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D4F2C521E5EB0E5006BBC6D /* libbsm.tbd */; };
+		7D66CF7E1E6BB317004C58C4 /* Whitelist.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66CF7D1E6BB317004C58C4 /* Whitelist.m */; };
 		7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD90BCC1CB38B66001D68BB /* Exception.m */; };
 		7DF707EA1CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707E91CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m */; };
 		7DF707F21CAE5B1A00FF79D8 /* chisq.c in Sources */ = {isa = PBXBuildFile; fileRef = 7DF707EC1CAE5B1A00FF79D8 /* chisq.c */; };
@@ -41,6 +45,13 @@
 		7D3E408C1CDAF76F002B0997 /* AppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppReceipt.m; path = Daemon/AppReceipt.m; sourceTree = "<group>"; };
 		7D4701121CF25CEB009B65D5 /* Enumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Enumerator.h; path = Daemon/Enumerator.h; sourceTree = "<group>"; };
 		7D4701131CF25CEB009B65D5 /* Enumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Enumerator.m; path = Daemon/Enumerator.m; sourceTree = "<group>"; };
+		7D4F2C4B1E5EAD35006BBC6D /* ProcMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcMonitor.m; path = Daemon/ProcMonitor.m; sourceTree = "<group>"; };
+		7D4F2C4C1E5EAD35006BBC6D /* ProcMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcMonitor.h; path = Daemon/ProcMonitor.h; sourceTree = "<group>"; };
+		7D4F2C4E1E5EAF00006BBC6D /* Process.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Process.m; path = Daemon/Process.m; sourceTree = "<group>"; };
+		7D4F2C4F1E5EAF00006BBC6D /* Process.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Process.h; path = Daemon/Process.h; sourceTree = "<group>"; };
+		7D4F2C521E5EB0E5006BBC6D /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
+		7D66CF7D1E6BB317004C58C4 /* Whitelist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Whitelist.m; path = Daemon/Whitelist.m; sourceTree = "<group>"; };
+		7D66CF7F1E6BB337004C58C4 /* Whitelist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Whitelist.h; path = Daemon/Whitelist.h; sourceTree = "<group>"; };
 		7DD90BCC1CB38B66001D68BB /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = Shared/Exception.m; sourceTree = "<group>"; };
 		7DD90BCD1CB38B66001D68BB /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = Shared/Exception.h; sourceTree = "<group>"; };
 		7DF707E81CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+QueueAdditions.h"; path = "Daemon/3rdParty/NSMutableArray+QueueAdditions.h"; sourceTree = "<group>"; };
@@ -76,12 +87,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D4F2C531E5EB0E5006BBC6D /* libbsm.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7D4F2C511E5EB0E5006BBC6D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7D4F2C521E5EB0E5006BBC6D /* libbsm.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		7DE29CDF1CAA11B100DFA6A6 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +139,10 @@
 		CDBC2B3B1C9EEF5300853C8A = {
 			isa = PBXGroup;
 			children = (
+				7D66CF7F1E6BB337004C58C4 /* Whitelist.h */,
+				7D66CF7D1E6BB317004C58C4 /* Whitelist.m */,
+				7D4F2C4E1E5EAF00006BBC6D /* Process.m */,
+				7D4F2C4F1E5EAF00006BBC6D /* Process.h */,
 				7D4701121CF25CEB009B65D5 /* Enumerator.h */,
 				7D4701131CF25CEB009B65D5 /* Enumerator.m */,
 				7D3E408B1CDAF76F002B0997 /* AppReceipt.h */,
@@ -128,6 +152,8 @@
 				7DF708101CB094A100FF79D8 /* Shared */,
 				7DF708061CAE5EA700FF79D8 /* ent.h */,
 				7DF707F61CAE5B7500FF79D8 /* Consts.h */,
+				7D4F2C4B1E5EAD35006BBC6D /* ProcMonitor.m */,
+				7D4F2C4C1E5EAD35006BBC6D /* ProcMonitor.h */,
 				7DF707F71CAE5B7500FF79D8 /* Event.h */,
 				7DF707F81CAE5B7500FF79D8 /* Event.m */,
 				7DF707F91CAE5B7500FF79D8 /* fsEvents.h */,
@@ -141,6 +167,7 @@
 				7DF708001CAE5B7500FF79D8 /* FSMonitor.m */,
 				7DE29CDF1CAA11B100DFA6A6 /* 3rdParty */,
 				CDBC2B451C9EEF5300853C8A /* Products */,
+				7D4F2C511E5EB0E5006BBC6D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -178,7 +205,7 @@
 		CDBC2B3C1C9EEF5300853C8A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Objective-See";
 				TargetAttributes = {
 					CDBC2B431C9EEF5300853C8A = {
@@ -212,6 +239,7 @@
 				7DF708151CB094AC00FF79D8 /* Logging.m in Sources */,
 				7DF707EA1CAE5B0800FF79D8 /* NSMutableArray+QueueAdditions.m in Sources */,
 				7DF7081B1CB0BBE700FF79D8 /* Binary.m in Sources */,
+				7D4F2C4D1E5EAD35006BBC6D /* ProcMonitor.m in Sources */,
 				7DF707F51CAE5B1A00FF79D8 /* randtest.c in Sources */,
 				7DF707F21CAE5B1A00FF79D8 /* chisq.c in Sources */,
 				7DF708031CAE5B7500FF79D8 /* Queue.m in Sources */,
@@ -219,10 +247,12 @@
 				7DF708051CAE5B7500FF79D8 /* FSMonitor.m in Sources */,
 				7DF708021CAE5B7500FF79D8 /* main.m in Sources */,
 				7DF708041CAE5B7500FF79D8 /* Utilities.m in Sources */,
+				7D4F2C501E5EAF00006BBC6D /* Process.m in Sources */,
 				7DF707F41CAE5B1A00FF79D8 /* iso8859.c in Sources */,
 				7D4701141CF25CEB009B65D5 /* Enumerator.m in Sources */,
 				7D3E408D1CDAF76F002B0997 /* AppReceipt.m in Sources */,
 				7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */,
+				7D66CF7E1E6BB317004C58C4 /* Whitelist.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,8 +272,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -265,7 +297,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -285,8 +317,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -302,7 +336,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -313,7 +347,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Developer ID Application: Objective-See, LLC (VBG97UB4TA)";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = Daemon;
 			};
 			name = Debug;
@@ -323,7 +357,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Developer ID Application: Objective-See, LLC (VBG97UB4TA)";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = Daemon;
 			};
 			name = Release;
