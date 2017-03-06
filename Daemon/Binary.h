@@ -24,8 +24,9 @@
 //signing info
 @property (nonatomic, retain)NSDictionary* signingInfo;
 
-//sha256 hash
-@property (nonatomic, retain)NSString* sha256Hash;
+//signing ID
+// ->either signing id or sha256 hash
+@property (nonatomic, retain)NSString* identifier;
 
 //flag indicating binary belongs to Apple OS
 @property BOOL isApple;
@@ -45,12 +46,18 @@
 //graylisted (via signing id)
 @property BOOL isGrayListed;
 
+
 /* METHODS */
 
 //init w/ an info dictionary
--(id)init:(NSString*)path attributes:(NSDictionary*)attributes;
+-(id)init:(NSString*)path;
+
+//generate id
+// ->either (validated) signing id, or sha256 hash
+-(void)generateIdentifier;
 
 //format signing info
 -(NSString*)formatSigningInfo;
+
 
 @end

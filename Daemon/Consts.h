@@ -19,6 +19,9 @@
 //OS version lion
 #define OS_MINOR_VERSION_LION 8
 
+//OS version sierra
+#define OS_MINOR_VERSION_SIERRA 12
+
 //product url
 #define PRODUCT_URL @"https://objective-see.com/products/ransomwhere.html"
 

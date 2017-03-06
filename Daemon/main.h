@@ -9,7 +9,8 @@
 #ifndef main_h
 #define main_h
 
-#import "Enumerator.h"
+#import "Whitelist.h"
+#import "ProcMonitor.h"
 
 #import <Foundation/Foundation.h>
 
@@ -18,8 +19,17 @@
 //global current user
 extern CFStringRef consoleUserName;
 
+//global white list
+extern Whitelist* whitelist;
+
+//global process monitor
+extern ProcMonitor* processMonitor;
+
+
 //global enumerator object
-extern Enumerator* enumerator;
+//extern Enumerator* enumerator;
+
+
 
 /* FUNCTIONS */
 

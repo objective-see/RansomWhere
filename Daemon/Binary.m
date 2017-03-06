@@ -12,26 +12,23 @@
 #import "Logging.h"
 #import "FSMonitor.h"
 #import "Utilities.h"
-#import "Enumerator.h"
 
 @implementation Binary
 
 @synthesize name;
 @synthesize path;
 @synthesize isApple;
+@synthesize identifier;
 @synthesize isApproved;
 @synthesize isAppStore;
 @synthesize isBaseline;
-@synthesize sha256Hash;
 @synthesize signingInfo;
 @synthesize isGrayListed;
 @synthesize isWhiteListed;
 
-//init w/ an info dictionary
-//TODO: don't need attributes?
-//TODO: isApproved/isBaseline logic should call into whitelist logic/method
-//TODO: not signed, generate a hash
--(id)init:(NSString*)binaryPath attributes:(NSDictionary*)attributes
+//init binary object
+// ->generates signing info, classifies binary, etc
+-(id)init:(NSString*)binaryPath
 {
     //init super
     self = [super init];
@@ -40,35 +37,7 @@
         //save path
         // ->note: always called with path
         self.path = binaryPath;
-        
-        //TODO: remove this check!
-        
-        //binaries from FS monitor have nil attributes
-        // ->but process might be baselined/approved, just not processed yet
-        if( (nil == attributes) &&
-            (YES != enumerator.processingComplete) )
-        {
-            //TODO: only base line first time (i.e. on install!!!)
-            //      but make sure to also save hash! or check if they have changed
-            
-            //save 'baseline' flag
-            self.isBaseline = [enumerator.bins2Process[KEY_BASELINED_BINARY] containsObject:binaryPath];
-            
-            //save 'approved' flag
-            self.isApproved = [enumerator.bins2Process[KEY_APPROVED_BINARY] containsObject:binaryPath];
-        }
-        
-        //grab values
-        // ->if not specified, will just get set to 'NO'
-        else
-        {
-            //save 'baseline' flag
-            self.isBaseline = [[attributes objectForKey:KEY_BASELINED_BINARY] boolValue];
-            
-            //save 'approved' flag
-            self.isApproved = [[attributes objectForKey:KEY_APPROVED_BINARY] boolValue];
-        }
-        
+    
         //extract signing info (do this first!)
         // ->from Apple, App Store, signing authorities, etc
         self.signingInfo = extractSigningInfo(self.path);
@@ -86,39 +55,46 @@
             {
                 //set flag
                 self.isAppStore = [self.signingInfo[KEY_SIGNING_IS_APP_STORE] boolValue];
-                
-                //set flag if its whitelisted (via signing auths)
-                // ->apple's bins aren't in whitelist.plist)
-                //TODO: move isInWhiteList into WhiteList.m!
-                self.isWhiteListed = isInWhiteList(self.signingInfo[KEY_SIGNING_AUTHORITIES]);
-            }
-        
-            //only can be gray, if not white!
-            if(YES != self.isWhiteListed)
-            {
-                //set flag if its graylisted
-                self.isGrayListed = isInGrayList(self.signingInfo[KEY_SIGNATURE_IDENTIFIER]);
             }
         }
         
-        //generate sha256 hash unsigned, etc binaries
-        else
-        {
-            //dbg msg
-            #ifdef DEBUG
-            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"binary %@ isn't signed, so hashing", self.path]);
-            #endif
-            
-            //hash
-            self.sha256Hash = hashFile(self.path);
-        }
+        //generate id
+        // ->either (validated) signing id, or sha256 hash
+        [self generateIdentifier];
+        
+        //call into whitelisting logic
+        // ->will set flags such as 'isBaselined', 'isAllowed', 'isWhitelisted', etc
+        [whitelist classify:self];
+    
         
     }//init self
 
     return self;
 }
 
-//format signing info 
+//generate id
+// ->either (validated) signing id, or sha256 hash
+-(void)generateIdentifier
+{
+    //if binary signed, use signing id
+    if( (noErr == [self.signingInfo[KEY_SIGNATURE_STATUS] intValue]) &&
+        (0 != [self.signingInfo[KEY_SIGNING_AUTHORITIES] count]) &&
+        (nil != self.signingInfo[KEY_SIGNATURE_IDENTIFIER]) )
+    {
+        //user signing id
+        self.identifier  = self.signingInfo[KEY_SIGNATURE_IDENTIFIER];
+    }
+    //generate sha256 hash unsigned, etc binaries
+    else
+    {
+        //hash
+        self.identifier = hashFile(self.path);
+    }
+
+    return;
+}
+
+//format signing info
 -(NSString*)formatSigningInfo
 {
     //signing info

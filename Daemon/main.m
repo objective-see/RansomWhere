@@ -19,11 +19,18 @@
 #import "Exception.h"
 #import "Utilities.h"
 #import "FSMonitor.h"
-#import "Enumerator.h"
+#import "Whitelist.h"
+#import "ProcMonitor.h"
 #import "3rdParty/ent/ent.h"
 
+//global process monitor
+ProcMonitor* processMonitor = nil;
+
+//global white list
+Whitelist* whitelist = nil;
+
 //global enumerator object
-Enumerator* enumerator = nil;
+//Enumerator* enumerator = nil;
 
 //global current user
 CFStringRef consoleUserName = NULL;
@@ -73,11 +80,21 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"OS version is supported");
+        #endif
+        
         //handle '-reset'
         // ->delete list of installed/approved apps, etc
         if( (2 == argc) &&
             (0 == strcmp(argv[1], RESET_FLAG)) )
         {
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, @"resetting");
+            #endif
+            
             //do it
             reset();
             
@@ -96,26 +113,20 @@ int main(int argc, const char * argv[])
             goto bail;
         }
         
-        //init enumerator
-        enumerator = [[Enumerator alloc] init];
+        //init white list
+        whitelist = [[Whitelist alloc] init];
+        
+        //baseline
+        // ->only will execute logic first time, but we should always wait
+        [whitelist baseline];
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"enumerating all baselined/approved/running binaries");
-        #endif
-
-        //enumerate all baselined/approved binaries
-        // ->adds/classfies them into bins2Process dictionary
-        [enumerator enumerateBinaries];
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"starting thread to process all enumerated binaries");
+        logMsg(LOG_DEBUG, @"loading whitelisted/approved/baseline'd items");
         #endif
         
-        //process all enumerated binaries/apps and stuff in background
-        // ->takes time and is CPU intensive, but want to start monitoring ASAP
-        [NSThread detachNewThreadSelector:@selector(processBinaries) toTarget:enumerator withObject:nil];
+        //load whitelisted dev IDs, baselined & allowed apps
+        [whitelist loadItems];
         
         //grab user name
         // ->also register callback for user changes
@@ -130,7 +141,19 @@ int main(int argc, const char * argv[])
     
         //msg
         // ->always print
-        syslog(LOG_ERR, "OBJECTIVE-SEE RANSOMWHERE?: completed initializations; monitoring engaged!\n");
+        syslog(LOG_ERR, "OBJECTIVE-SEE RANSOMWHERE?: completed initializations; monitoring engaging\n");
+        
+        //init process monitor
+        processMonitor = [[ProcMonitor alloc] init];
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, @"kicking off process monitoring logic");
+        #endif
+        
+        //start process monitoring
+        // ->will start bg threads to enum running procs & monitor for new ones
+        [processMonitor start];
         
         //start file system monitoring
         [NSThread detachNewThreadSelector:@selector(monitor) toTarget:[[FSMonitor alloc] init] withObject:nil];
@@ -192,8 +215,8 @@ BOOL reset()
     //path to daemon's plist
     NSString* daemonPlist =  nil;
     
-    //init path to save list of installed apps
-    installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:INSTALLED_APPS];
+    //init path to save list of baselined apps
+    installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:BASELINED_FILE];
     
     //when found
     // ->delete list of installed apps
@@ -211,7 +234,7 @@ BOOL reset()
     }
     
     //init path for where to save user approved binaries
-    approvedBinsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_BINARIES];
+    approvedBinsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_FILE];
     
     //when found
     // ->delete list of 'user approved' apps
@@ -546,7 +569,7 @@ void* checkForUpdate(void *threadParam)
         [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:PRODUCT_URL]];
     }
     //user selected 'Ignore'
-    // ->just log this, but nothing else needed
+    // ->just dbg print this, but nothing else needed
     else
     {
         //dbg msg

@@ -14,9 +14,6 @@
 #import "Utilities.h"
 #import "FSMonitor.h"
 
-#import <Cocoa/Cocoa.h> //TODO: remove?
-
-
 #import <Foundation/Foundation.h>
 
 
@@ -71,8 +68,8 @@
     //event object
     Event* event = nil;
     
-    //binary object
-    Binary* binary = nil;
+    //process object
+    Process* process = nil;
     
     //pool
     @autoreleasepool
@@ -184,8 +181,9 @@
             //->e.g. window_<digits>.data files
             if(YES == [self shouldIgnore:path])
             {
-                //TODO: remove
-                logMsg(LOG_DEBUG, @"ignoring A");
+                #ifdef DEBUG
+                logMsg(LOG_DEBUG, @"path matched 'ignore' file name format, so ignoring");
+                #endif
                 
                 //skip
                 continue;
@@ -193,19 +191,14 @@
             
             //check process
             // ->make new process object if needed
-            binary = [self getBinaryObject:fse->pid];
-            if(nil == binary)
+            process = [self getProcessObject:fse->pid];
+            if(nil == process)
             {
-                //did it die?
-                if(YES != isProcessAlive(fse->pid))
-                {
-                    //TODO: remove
-                    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process %d is dead (parent is/was: %d)", fse->pid, getParentID(fse->pid)]);
-                }
-                
-                //TODO: remove
-                logMsg(LOG_DEBUG, @"ignoring B");
-                
+                //dbg msg
+                #ifdef DEBUG
+                logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find/create process object for %d", fse->pid]);
+                #endif
+
                 //err creating obj
                 // ->so skip/ignore
                 continue;
@@ -215,19 +208,23 @@
             // ->could have this check earlier, but want binary objects to be gen'd
             if(NULL == consoleUserName)
             {
-                //TODO: remove
-                logMsg(LOG_DEBUG, @"ignoring C");
+                //dbg msg
+                #ifdef DEBUG
+                logMsg(LOG_DEBUG, @"no user logged in, so ignoring");
+                #endif
                 
                 //skip
                 continue;
             }
 
             //create event object
-            event = [[Event alloc] init:path binary:binary fsEvent:fse];
+            event = [[Event alloc] init:path fsProcess:process fsEvent:fse];
             if(nil == event)
             {
-                //TODO: remove
-                logMsg(LOG_DEBUG, @"ignoring D");
+                //dbg msg
+                #ifdef DEBUG
+                logMsg(LOG_DEBUG, @"failed to create event object, so ignoring");
+                #endif
                 
                 //skip
                 continue;
@@ -270,69 +267,64 @@ bail:
     return;
 }
 
-//try find existing binary obj
-// ->makes new one if that's needed
--(Binary*)getBinaryObject:(pid_t)pid
+//try find existing process obj
+// ->makes new one if one is needed
+-(Process*)getProcessObject:(pid_t)pid
 {
-    //binary object
-    Binary* binary = nil;
-    
-    //pid->path mapping dictionary
-    //NSMutableDictionary* pidProcMapping = nil;
+    //process object
+    Process* process = nil;
     
     //process path
-    NSString* processPath = nil;
+    NSString* path = nil;
     
-    ////TODO: grab from process monitor
+    //try grab process from process monitor
+    @synchronized(processMonitor.processes)
+    {
+        //lookup by pid
+        process = processMonitor.processes[[NSNumber numberWithInt:pid]];
+    }
+    
+    //all set if we got one
+    if(nil != process)
+    {
+        //all set
+        goto bail;
+    }
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%d is new process, will create", pid]);
+    #endif
     
     //get path from pid
-    processPath = getProcessPath(pid);
-    if(nil == processPath)
+    // ->need this to create process object
+    path = getProcessPath(pid);
+    if(nil == path)
     {
-        //TODO: grab from process monitor
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find process path for %d, so ignoring", pid]);
+        #endif
         
         //ignore
         goto bail;
     }
-    
-    //sync to check
-    @synchronized(enumerator.binaryList)
-    {
-        //see if there's an existing binary object
-        // ->if so, all set, so can bail to return binary to caller
-        binary = enumerator.binaryList[processPath];
-        if(nil != binary)
-        {
-            //all set
-            goto bail;
-        }
-    }
 
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ (%d) is new binary, will create", processPath, pid]);
-    #endif
+    //create process object
+    process = [[Process alloc] init];
     
-    //create binary object
-    // ->this is kinda slow so don't do in a @sync
-    binary = [[Binary alloc] init:processPath attributes:nil];
+    //set pid
+    process.pid = pid;
     
-    //sync to add
-    @synchronized(enumerator.binaryList)
-    {
-        //still nil?
-        if(nil == enumerator.binaryList[processPath])
-        {
-            //add
-            enumerator.binaryList[processPath] = binary;
-        }
-    }
+    //set path
+    process.path = path;
     
+    //save/add to list
+    [processMonitor handleNewProcess:process];
     
 //bail
 bail:
     
-    return binary;
+    return process;
 }
 
 
@@ -370,9 +362,13 @@ bail:
             // ->good enough match for now, so ignore
             ignore = YES;
             
-            //TODO: add bail if more checks are added below
+            //all set
+            goto bail;
         }
     }
+    
+//bail
+bail:
     
     return ignore;
 }

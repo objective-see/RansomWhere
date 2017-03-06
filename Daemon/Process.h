@@ -16,28 +16,28 @@
 
 /* PROPERTIES */
 
-//type
-// TODO: needed?
-@property u_int16_t type;
-
 //pid
 @property pid_t pid;
 
 //ppid
 @property pid_t ppid;
 
+//type
+// used by process mon
+@property u_int16_t type;
+
 //path
-@property(nonatomic, retain) NSString* path;
+@property (nonatomic, retain) NSString* path;
 
 //args
 @property (nonatomic, retain)NSMutableArray* arguments;
 
 //ancestors
-@property(nonatomic, retain)NSMutableArray* ancestors;
+@property (nonatomic, retain)NSMutableArray* ancestors;
 
-//TODO: set!
+
 //untrusted ancestor
-@property pid_t untrustedAncestor;
+@property (nonatomic, retain)Process* untrustedAncestor;
 
 //binary object
 // ->has path, hash, etc
@@ -46,16 +46,24 @@
 //encrypted files
 @property(nonatomic, retain)NSMutableDictionary* encryptedFiles;
 
-//is allowed
-@property BOOL isAllowed;
+//timestamp
+@property(nonatomic, retain)NSDate* timestamp;
 
 //was disallowed
+// ->allows us to ignore other queued events
 @property BOOL wasDisallowed;
+
+//was reported
+// ->ensures process isn't reported on twice
+@property BOOL wasReported;
 
 /* METHODS */
 
 //generate list of ancestors
 -(void)enumerateAncestors;
+
+//check if any of the ancestors aren't Apple
+-(void)validateAncestors;
 
 //check if process has created enough encrypted files, fast enough
 -(BOOL)hitEncryptedTheshold;

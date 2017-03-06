@@ -6,6 +6,7 @@
 //  Copyright (c) Objective-See. All rights reserved.
 //
 
+#import "Process.h"
 #import <Foundation/Foundation.h>
 
 //audit pipe
@@ -29,11 +30,20 @@
 
 /* METHODS */
 
-//monitor file-system events
-//-(void)monitor;
+//create threads to:
+// a) invoke method to enumerate procs
+// b) invoke method to monitor for new procs
+-(void)start;
 
 //check if event is one we care about
 -(BOOL)shouldProcessRecord:(u_int16_t)eventType;
+
+//create binary object
+// ->enum/process ancestors, etc
+-(void)handleNewProcess:(Process*)newProcess;
+
+//remove any processes that dead & old
+-(void)refreshProcessList;
 
 
 @end

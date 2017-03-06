@@ -6,6 +6,9 @@
 //  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
+//TODO: inc version #
+//TODO: close button when done?
+
 #import "Consts.h"
 #import "Logging.h"
 #import "Configure.h"

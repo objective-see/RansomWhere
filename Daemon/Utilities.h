@@ -104,25 +104,11 @@ NSString* findAppBinary(NSString* appPath);
 //load a file into an NSSet
 NSSet* loadSet(NSString* filePath);
 
-//check if binary has been graylisted
-BOOL isInGrayList(NSString* path);
-
-//check if binary's signing auth has been whitelisted
-BOOL isInWhiteList(NSArray* signingAuths);
-
-//given a 'BSD name' for a mounted filesystem (ex: '/dev/disk1s2')
-// ->find the orginal disk image (dmg) that was mounted at this location
-NSString* findDMG(char* mountFrom);
-
 //given a pid, get its parent (ppid)
 pid_t getParentID(int pid);
 
 //check if process is alive
 BOOL isProcessAlive(pid_t processID);
-
-//given a parent
-// ->finds (first) child that matches specified class name
-io_service_t findChild(io_service_t parent, const char* name);
 
 //sha256 a file
 NSString* hashFile(NSString* filePath);

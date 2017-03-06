@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7D3E408D1CDAF76F002B0997 /* AppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3E408C1CDAF76F002B0997 /* AppReceipt.m */; };
-		7D4701141CF25CEB009B65D5 /* Enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4701131CF25CEB009B65D5 /* Enumerator.m */; };
 		7D4F2C4D1E5EAD35006BBC6D /* ProcMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4F2C4B1E5EAD35006BBC6D /* ProcMonitor.m */; };
 		7D4F2C501E5EAF00006BBC6D /* Process.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D4F2C4E1E5EAF00006BBC6D /* Process.m */; };
 		7D4F2C531E5EB0E5006BBC6D /* libbsm.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D4F2C521E5EB0E5006BBC6D /* libbsm.tbd */; };
@@ -43,8 +42,6 @@
 /* Begin PBXFileReference section */
 		7D3E408B1CDAF76F002B0997 /* AppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppReceipt.h; path = Daemon/AppReceipt.h; sourceTree = "<group>"; };
 		7D3E408C1CDAF76F002B0997 /* AppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppReceipt.m; path = Daemon/AppReceipt.m; sourceTree = "<group>"; };
-		7D4701121CF25CEB009B65D5 /* Enumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Enumerator.h; path = Daemon/Enumerator.h; sourceTree = "<group>"; };
-		7D4701131CF25CEB009B65D5 /* Enumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Enumerator.m; path = Daemon/Enumerator.m; sourceTree = "<group>"; };
 		7D4F2C4B1E5EAD35006BBC6D /* ProcMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcMonitor.m; path = Daemon/ProcMonitor.m; sourceTree = "<group>"; };
 		7D4F2C4C1E5EAD35006BBC6D /* ProcMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcMonitor.h; path = Daemon/ProcMonitor.h; sourceTree = "<group>"; };
 		7D4F2C4E1E5EAF00006BBC6D /* Process.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Process.m; path = Daemon/Process.m; sourceTree = "<group>"; };
@@ -143,8 +140,6 @@
 				7D66CF7D1E6BB317004C58C4 /* Whitelist.m */,
 				7D4F2C4E1E5EAF00006BBC6D /* Process.m */,
 				7D4F2C4F1E5EAF00006BBC6D /* Process.h */,
-				7D4701121CF25CEB009B65D5 /* Enumerator.h */,
-				7D4701131CF25CEB009B65D5 /* Enumerator.m */,
 				7D3E408B1CDAF76F002B0997 /* AppReceipt.h */,
 				7D3E408C1CDAF76F002B0997 /* AppReceipt.m */,
 				7DF708171CB0BBE700FF79D8 /* Binary.m */,
@@ -249,7 +244,6 @@
 				7DF708041CAE5B7500FF79D8 /* Utilities.m in Sources */,
 				7D4F2C501E5EAF00006BBC6D /* Process.m in Sources */,
 				7DF707F41CAE5B1A00FF79D8 /* iso8859.c in Sources */,
-				7D4701141CF25CEB009B65D5 /* Enumerator.m in Sources */,
 				7D3E408D1CDAF76F002B0997 /* AppReceipt.m in Sources */,
 				7DD90BCE1CB38B66001D68BB /* Exception.m in Sources */,
 				7D66CF7E1E6BB317004C58C4 /* Whitelist.m in Sources */,

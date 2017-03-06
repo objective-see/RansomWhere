@@ -21,10 +21,13 @@
 //white-listed (hardcoded) developer IDs
 @property(nonatomic, retain)NSMutableArray* whitelistedDevIDs;
 
+//gray-listed (hardcoded) binaries
+@property(nonatomic, retain)NSMutableArray* graylistedBinaries;
+
 //baselined binaries
 @property(nonatomic, retain)NSMutableDictionary* baselinedBinaries;
 
-//user approved binaries
+//user-approved binaries
 @property(nonatomic, retain)NSMutableDictionary* userApprovedBinaries;
 
 /* METHODS */
@@ -40,9 +43,9 @@
 // ->when user 'allows'/apporoves app
 -(void)updateApproved:(Binary*)binary;
 
-//determine if binary is allowed
-// ->either baselined or approved based on path *and* hash
--(BOOL)isWhitelisted:(Binary*)binary;
+//classify binary
+// ->either baselined, approved, whitelisted, or graylisted
+-(void)classify:(Binary*)binary;
 
 @end
 

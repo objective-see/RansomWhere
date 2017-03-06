@@ -42,6 +42,52 @@
     return self;
 }
 
+//create threads to:
+// a) invoke method to enumerate procs
+// b) invoke method to monitor for new procs
+-(void)start
+{
+    //OS version info
+    NSDictionary* osVersionInfo = nil;
+    
+    //get OS version info
+    osVersionInfo = getOSVersion();
+    
+    //start enumerating running processes
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self enumerateRunningProcesses];
+    });
+    
+    //OS X 10.12.4 (fixed kernel crash)
+    // ->start process monitoring via openBSM
+    if( ([osVersionInfo[@"minorVersion"] intValue] >= OS_MINOR_VERSION_SIERRA) &&
+        ([osVersionInfo[@"bugfixVersion"] intValue] >= 4) )
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is ok for openBSM monitoring!", osVersionInfo]);
+        #endif
+        
+        //start monitoring
+        // ->run this at highest priority!
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            [self monitor];
+        });
+    }
+    
+    //otherwise, just do app monitoring
+    else
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is *not* ok for openBSM monitoring :(", osVersionInfo]);
+        #endif
+        
+        //setup callback for app monitoring
+        [self setupAppMonitoring];
+    }
+}
+
 //generate process objects for all runnings procs
 -(void)enumerateRunningProcesses
 {
@@ -147,9 +193,8 @@ bail:
     auditFile = fopen(AUDIT_PIPE, "r");
     if(auditFile == NULL)
     {
-        //TODO: errors, here and below!
-        
         //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to open audit pipe %s\n", AUDIT_PIPE]);
         
         //bail
         goto bail;
@@ -165,24 +210,34 @@ bail:
     status = ioctl(auditFileDescriptor, AUDITPIPE_SET_PRESELECT_MODE, &mode);
     if(-1 == status)
     {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ioctl('AUDITPIPE_SET_PRESELECT_MODE') failed with %d\n", status]);
+        
         //bail
-        //goto bail;
+        goto bail;
     }
     
     //grab max queue length
     status = ioctl(auditFileDescriptor, AUDITPIPE_GET_QLIMIT_MAX, &maxQueueLength);
     if(-1 == status)
     {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ioctl('AUDITPIPE_GET_QLIMIT_MAX') failed with %d\n", status]);
+        
         //bail
-        //goto bail;
+        goto bail;
     }
     
     //set queue length to max
     status = ioctl(auditFileDescriptor, AUDITPIPE_SET_QLIMIT, &maxQueueLength);
     if(-1 == status)
     {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ioctl('AUDITPIPE_SET_QLIMIT') failed with %d\n", status]);
+        
         //bail
-        //goto bail;
+        goto bail;
+
     }
     
     //set preselect flags
@@ -190,8 +245,11 @@ bail:
     status = ioctl(auditFileDescriptor, AUDITPIPE_SET_PRESELECT_FLAGS, &eventClasses);
     if(-1 == status)
     {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ioctl('AUDITPIPE_SET_PRESELECT_FLAGS') failed with %d\n", status]);
+        
         //bail
-        //goto bail;
+        goto bail;
     }
     
     //set non-attributable flags
@@ -199,12 +257,17 @@ bail:
     status = ioctl(auditFileDescriptor, AUDITPIPE_SET_PRESELECT_NAFLAGS, &eventClasses);
     if(-1 == status)
     {
+        //err msg
+        logMsg(LOG_ERR, [NSString stringWithFormat:@"ioctl('AUDITPIPE_SET_PRESELECT_NAFLAGS') failed with %d\n", status]);
+        
         //bail
-        //goto bail;
+        goto bail;
     }
     
     //forever
     // ->read/parse/process audit records
+    
+    // TODO: track ancestry here!?
     while(YES)
     {
         //reset process record object
@@ -260,7 +323,6 @@ bail:
                 break;
             }
             
-            
             //process token(s)
             // ->create Process object, etc
             switch(tokenStruct.id)
@@ -305,7 +367,7 @@ bail:
                     {
                         //no AUT_ARG32?
                         // ->set as pid, and try manually to get ppid
-                        if(0 == process.pid)
+                        if(-1 == process.pid)
                         {
                             //set pid
                             process.pid = tokenStruct.tt.subj32.pid;
@@ -339,12 +401,10 @@ bail:
                         
                         //manually get parent
                         process.ppid = getParentID(process.pid);
-                        
                     }
                     
                     break;
                 }
-                    
                     
                 //args
                 // ->SPAWN/FORK this is pid
@@ -353,7 +413,7 @@ bail:
                 {
                     //save pid
                     if( (AUE_POSIX_SPAWN == process.type) ||
-                       (AUE_FORK == process.type) )
+                        (AUE_FORK == process.type) )
                     {
                         //32bit
                         if(AUT_ARG32 == tokenStruct.id)
@@ -403,24 +463,27 @@ bail:
                         (YES == [self shouldProcessRecord:process.type]) )
                     {
                         //try get process path
-                        // ->this is the most 'trusted way' (since exec_args can change)
+                        // ->this is the most 'trusted way' (since exec_args can change
                         processPath = getProcessPath(process.pid);
                         if(nil != processPath)
                         {
                             //save
-                            process.path = getProcessPath(process.pid);
+                            process.path = processPath;
                         }
                         
                         //failed to get path at runtime
                         // ->if 'AUT_PATH' was something like '/dev/null' or '/dev/console' use arg[0]...yes this can be spoofed :/
-                        else if( (nil == processPath) &&
-                                 (0 != process.arguments.count) &&
-                                 (YES != [process.arguments.firstObject hasPrefix:@"/dev/"]))
+                        else
                         {
-                            //use arg[0]
-                            process.path = process.arguments.firstObject;
+                            if( ((nil == process.path) || (YES == [process.path hasPrefix:@"/dev/"])) &&
+                                (0 != process.arguments.count) )
+                            {
+                                //use arg[0]
+                                process.path = process.arguments.firstObject;
+                                
+                            }
                         }
-                        
+
                         //save fork events
                         // ->this will have ppid that can be used for child events (exec/spawn, etc)
                         if(AUE_FORK == process.type)
@@ -438,12 +501,15 @@ bail:
                             process.ppid = lastFork.ppid;
                         }
                         
-                        //dbg msg
-                        //NSLog(@"NEW PROCESS EVENT: %@", process);
-                        //NSLog(@"parents: %@", generateProcessHierarchy(processRecord.ppid));
+                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
+                        ^{
+                            //handle new process
+                            [self handleNewProcess:process];
+                        });
                         
-                        //handle new process
-                        [self handleNewProcess:process];
+                        #ifdef DEBUG
+                        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created new process: %@", process]);
+                        #endif
                     }
                     
                     //unset
@@ -507,9 +573,6 @@ bail:
     return shouldProcess;
 }
 
-
-//TODO only do on macOS 10.12.4 <
-
 //register for app launchings
 -(void)setupAppMonitoring
 {
@@ -553,7 +616,10 @@ bail:
     //no path?
     if(nil == process.path)
     {
-        //TODO: err msg
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to find path for app %@", notification.userInfo[@"NSApplicationProcessIdentifier"]]);
+        #endif
         
         //bail
         goto bail;
@@ -568,13 +634,25 @@ bail:
     return;
 }
 
-//TODO: removed exit'd procs - but only if dead for maybe more than 1 min?
-// (add timestamp to process obj?)
-
 //create binary object
 // ->enum/process ancestors, etc
 -(void)handleNewProcess:(Process*)newProcess
 {
+    //sanity check
+    if( (-1 == newProcess.pid) ||
+        (nil == newProcess.path) )
+    {
+        //TODO: check this elsewhere?
+        
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process object isn't valid %d/%@", newProcess.pid, newProcess.path]);
+        #endif
+        
+        //bail
+        goto bail;
+    }
+    
     //get parent
     if(-1 == newProcess.ppid)
     {
@@ -582,22 +660,31 @@ bail:
         newProcess.ppid =  getParentID(newProcess.pid);
     }
     
+    //TODO: call sooner
+
+    //generate process ancestry
+    [newProcess enumerateAncestors];
+    
     //create binary obj
-    newProcess.binary = [[Binary alloc] init:newProcess.path attributes:nil];
+    newProcess.binary = [[Binary alloc] init:newProcess.path];
     if(nil == newProcess.binary)
     {
-        //TODO: error msg
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to create binary object for %d/%@", newProcess.pid, newProcess.path]);
+        #endif
         
         //bail
         goto bail;
         
     }
     //generate ancestors for apple bins
+    // ->also check if any ancestory is untrusted
     if(YES == newProcess.binary.isApple)
     {
-        //generate
-        // ->also ID's if there's an untrusted ancestor
-        [newProcess enumerateAncestors];
+        //check if any ancestors are untrusted
+        // ->sets iVar on process object that checked later
+        [newProcess validateAncestors];
     }
     
     //add to list
@@ -607,11 +694,60 @@ bail:
         self.processes[[NSNumber numberWithUnsignedInteger:newProcess.pid]] = newProcess;
     }
 
+    
 //bail
 bail:
     
     return;
+}
+
+//remove any processes that dead & old
+-(void)refreshProcessList
+{
+    //process obj
+    Process* process = nil;
     
+    //bail if process list isn't that big
+    if(self.processes.count < 1028)
+    {
+        //bail
+        goto bail;
+    }
+    
+    //sync to process
+    @synchronized(self.processes)
+    {
+        //iterate over all
+        // ->remove proces that are dead & old
+        for(NSNumber* processID in self.processes.allKeys)
+        {
+            //grab
+            process = self.processes[processID];
+            
+            //ignore any process that were created less than 1 min ago
+            if([process.timestamp timeIntervalSinceNow] < 60)
+            {
+                //skip
+                continue;
+            }
+            
+            //ignore any procs that are still alive
+            if(YES == isProcessAlive(processID.intValue))
+            {
+                //skip
+                continue;
+            }
+            
+            //remove old & dead process
+            [self.processes removeObjectForKey:processID];
+        }
+        
+    }//sync
+
+//bail
+bail:
+    
+    return;
 }
 
 

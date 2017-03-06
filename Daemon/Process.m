@@ -19,7 +19,7 @@
 @synthesize ppid;
 @synthesize ancestors;
 @synthesize arguments;
-@synthesize isAllowed;
+@synthesize timestamp;
 @synthesize wasDisallowed;
 @synthesize encryptedFiles;
 @synthesize untrustedAncestor;
@@ -40,14 +40,15 @@
         //alloc encrypted file
         encryptedFiles = [NSMutableDictionary dictionary];
         
+        //set start time
+        timestamp = [NSDate date];
+        
         //init pid
         self.pid = -1;
         
         //init ppid
         self.ppid = -1;
         
-        //init untrusted ancestor
-        self.untrustedAncestor = -1;
     }
     
     return self;
@@ -86,6 +87,56 @@
         [self.ancestors addObject:[NSNumber numberWithInt:parentPID]];
     }
     
+    //also set flag
+    
+    return;
+}
+
+//check if any of the ancestors aren't Apple/trusted
+-(void)validateAncestors
+{
+    //ancestor
+    Process* ancestor = nil;
+    
+    //scan all
+    for(NSNumber* ancestorPID in self.ancestors)
+    {
+        //get process object for parent
+        ancestor = processMonitor.processes[ancestorPID];
+        
+        //skip any that don't have a process obj
+        // ->shouldn't happen on 'version' with full proc monitor
+        if(nil == ancestor)
+        {
+            //skip
+            continue;
+        }
+        
+        //skip if apple, but not graylisted
+        if( (YES == ancestor.binary.isApple) &&
+            (YES != ancestor.binary.isGrayListed))
+        {
+            //skip
+            continue;
+        }
+        
+        //skip if whitelisted / baseline / allowed
+        if( (YES == ancestor.binary.isWhiteListed) ||
+            (YES == ancestor.binary.isBaseline) ||
+            (YES == ancestor.binary.isApproved) )
+        {
+            //skip
+            continue;
+        }
+        
+        //ok, it's basically unknown/untrusted
+        self.untrustedAncestor = ancestor;
+        
+        //found one
+        // ->no need to keep searching
+        break;
+    }
+    
     return;
 }
 
@@ -93,18 +144,13 @@
 // ->remove ones that are too old (5 seconds)
 -(void)refreshEncrytedFiles
 {
-    //time stamps
-    NSDate* timestamp = nil;
-    
     //check each
     // ->removing any that are too old
     for(NSString* encryptedFile in self.encryptedFiles.allKeys)
     {
-        //get timestamp
-        timestamp = self.encryptedFiles[encryptedFile];
-        
         //remove if older than 5 seconds
-        if([timestamp timeIntervalSinceNow] > 5)
+        // value for 'encryptedFiles' is timestamp
+        if([self.encryptedFiles[encryptedFile] timeIntervalSinceNow] > 5)
         {
             //remove
             [self.encryptedFiles removeObjectForKey:encryptedFile];
@@ -113,7 +159,6 @@
     
     return;
 }
-
 
 //check if process has created enough encrypted files, fast enough
 -(BOOL)hitEncryptedTheshold
@@ -126,5 +171,13 @@
     // ->just check the count of encrypted files
     return (self.encryptedFiles.count <= 3);
 }
+
+//for pretty printing
+-(NSString *)description
+{
+    //pretty print
+    return [NSString stringWithFormat: @"pid=%d, path=%@, ancestors=%@, untrusted ancestor=%@ ", self.pid, self.path, self.ancestors, self.untrustedAncestor];
+}
+
 
 @end

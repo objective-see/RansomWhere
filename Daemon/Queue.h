@@ -28,16 +28,6 @@
 //condition for queue's status
 @property(nonatomic, retain)NSCondition* queueCondition;
 
-//processes explicity disallowed by the user
-//@property(nonatomic, retain)NSMutableDictionary* disallowedProcs;
-
-//process that were reported to the user
-@property(nonatomic, retain)NSMutableSet* reportedProcs;
-
-//pid -> last encrypted file timestamp
-//@property(nonatomic, retain)NSMutableDictionary* lastEncryptedFiles;
-
-
 
 /* METHODS */
 

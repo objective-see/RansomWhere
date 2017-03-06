@@ -13,25 +13,11 @@
 
 #import <Foundation/Foundation.h>
 
-//TODO: whitelist these all
-/*
- 
- <string>/Volumes/Citrix Online Launcher/Citrix Online Launcher.app/Contents/MacOS/Citrix Online Launcher</string>
- <string>/Users/patrickw/Library/Application Support/CitrixOnline/GoToMeeting/G2MUpdate</string>
- <string>/Users/patrickw/Downloads/AVRecorder/DerivedData/AVRecorder/Build/Products/Debug/AVRecorder copy.app/Contents/MacOS/AVRecorder</string>
- <string>/Users/patrickw/Downloads/AVRecorder/DerivedData/AVRecorder/Build/Products/Debug/AVRecorder.app/Contents/MacOS/AVRecorder</string>
- <string>/Applications/Utilities/Adobe Creative Cloud/CCXProcess/CCXProcess.app/Contents/libs/node</string>
- <string>/Users/patrickw/Projects/H.264/ffmpeg</string>
- <string>/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/MacOS/GoogleSoftwareUpdateDaemon</string>
- <string>/Applications/BitTorrent.app/Contents/MacOS/BitTorrent</string>
- <string>/private/var/folders/r3/9nbl60856zn82n6wdtwrxw8w0000gn/T/AppTranslocation/FEEA1D0A-449E-485C-8A9A-E0F366303965/d/Install Dashlane 2.app/Contents/MacOS/Install Dashlane</string>
- */
-
-
 @implementation Whitelist
 
 @synthesize baselinedBinaries;
 @synthesize whitelistedDevIDs;
+@synthesize graylistedBinaries;
 @synthesize userApprovedBinaries;
 
 //init
@@ -73,7 +59,7 @@
     //init path to save list of installed apps
     installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:BASELINED_FILE];
     
-    //bail if already have baselined
+    //bail if we've already baselined
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
     {
         //dbg msg
@@ -84,6 +70,11 @@
         //bail
         goto bail;
     }
+    
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, @"execing 'system_profiler' to enumerate all installed apps");
+    #endif
     
     //enumerate via 'system_profiler'
     installedApps = enumerateInstalledApps();
@@ -101,32 +92,14 @@
     for(NSString* appBinary in installedApps)
     {
         //create binary object
-        binary = [[Binary alloc] init:appBinary attributes:nil];
-        if(nil == binary)
+        binary = [[Binary alloc] init:appBinary];
+        if( (nil == binary) ||
+            (nil == binary.identifier) )
         {
             //skip
             continue;
         }
-        
-        //try grab developer id
-        if(nil != binary.signingInfo[KEY_SIGNING_AUTHORITIES])
-        {
-            //last auth is developer id
-            binaryIdentifier = [binary.signingInfo[KEY_SIGNING_AUTHORITIES] lastObject];
-        }
-        //otherwise use sha256 hash
-        else
-        {
-            //use hash
-            binaryIdentifier = binary.sha256Hash;
-        }
-        
-        //skip any ones that couldn't be id'd
-        if(nil == binaryIdentifier)
-        {
-            //skip
-            continue;
-        }
+
         
         //add to list
         baselinedApps[binary.path] = binaryIdentifier;
@@ -159,6 +132,9 @@ bail:
     //load whitelisted developers
     self.whitelistedDevIDs = [NSMutableArray arrayWithContentsOfFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:WHITE_LISTED_FILE]];
     
+    //load graylisted apps
+    self.graylistedBinaries = [NSMutableArray arrayWithContentsOfFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:GRAY_LIST_FILE]];
+    
     //load baseline'd binaries
     self.baselinedBinaries = [NSMutableDictionary dictionaryWithContentsOfFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:BASELINED_FILE]];
     
@@ -172,36 +148,34 @@ bail:
 // ->when user 'allows'/approves app
 -(void)updateApproved:(Binary*)binary
 {
-    //approved binary id
-    NSString* binaryID = nil;
-    
-    //first try use binary dev ID
-    if( (0 == [binary.signingInfo[KEY_SIGNATURE_STATUS] intValue]) &&
-        (nil != [binary.signingInfo[KEY_SIGNING_AUTHORITIES] lastObject]) )
-    {
-        binaryID = [binary.signingInfo[KEY_SIGNING_AUTHORITIES] lastObject];
-    }
-    //otherwise use hash
-    else
-    {
-        //hash
-        binaryID = binary.sha256Hash;
-    }
-    
     //sanity check
-    if(nil == binaryID)
+    if(nil == binary.identifier)
     {
-        //TODO:err msg
+        //err msg
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ doesn't have an identifier, so can't permanently approve", binary.path]);
         
         //bail
         goto bail;
     }
     
+    //sync
+    @synchronized (self.userApprovedBinaries)
+    {
+    
     //add to list of user-approved binaries
-    self.userApprovedBinaries[binary.path] = binaryID;
+    self.userApprovedBinaries[binary.path] = binary.identifier;
     
     //write out
     [self.userApprovedBinaries writeToFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_FILE] atomically:YES];
+    
+    }//sync
+        
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updated persistent list of user approved apps (%@)", USER_APPROVED_FILE]);
+    #endif
+        
+    
 
 //bail
 bail:
@@ -209,18 +183,15 @@ bail:
     return;
 }
 
-//determine if binary is allowed
-// ->either baselined or approved based on path *and* hash
--(BOOL)isWhitelisted:(Binary*)binary
+//classify binary
+// ->either baselined, approved, whitelisted, or graylisted
+-(void)classify:(Binary*)binary
 {
-    //flag
-    BOOL whiteListed = NO;
-    
     //approved binary
     NSString* approvedBinaryID = nil;
     
     //CHECK 1: binary signed with a whitelisted developer ID?
-    if(0 == [binary.signingInfo[KEY_SIGNATURE_STATUS] intValue])
+    if(noErr == [binary.signingInfo[KEY_SIGNATURE_STATUS] intValue])
     {
         //check each
         for(NSString* signingAuth in binary.signingInfo[KEY_SIGNING_AUTHORITIES])
@@ -228,11 +199,11 @@ bail:
             //check
             if(YES == [self.whitelistedDevIDs containsObject:signingAuth])
             {
-                //found!
-                whiteListed = YES;
-            
-                //bail
-                goto bail;
+                //set flag
+                binary.isWhiteListed = YES;
+                
+                //done with this check
+                break;
             }
         }
     }
@@ -241,70 +212,62 @@ bail:
     approvedBinaryID = self.baselinedBinaries[binary.path];
     if(nil != approvedBinaryID)
     {
-        //match base on dev id
-        if( (0 == [binary.signingInfo[KEY_SIGNATURE_STATUS] intValue]) &&
-            (YES == [approvedBinaryID isEqualToString:[binary.signingInfo[KEY_SIGNING_AUTHORITIES] lastObject]]) )
+        //match?
+        if(YES == [approvedBinaryID isEqualToString:binary.identifier])
         {
-            //found!
-            whiteListed = YES;
-            
-            //bail
-            goto bail;
+            //set flag
+            binary.isBaseline = YES;
         }
-        //match on hash
-        else if(YES == [approvedBinaryID isEqualToString:binary.sha256Hash])
-        {
-            //found!
-            whiteListed = YES;
-            
-            //bail
-            goto bail;
-        }
-        //path matched, but not id
-        // ->maybe app was infected, or unsigned & updated
-        //   either way, remove it from list as its not verifiable anymore
-        [self.baselinedBinaries removeObjectForKey:binary.path];
         
-        //write out
-        [self.baselinedBinaries writeToFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:BASELINED_FILE] atomically:YES];
+        //found a path match, in list of baseline'd binary, but not an id match
+        // ->that's odd (something changed), so remove as it's not verifable anymore
+        else
+        {
+            //remove
+            [self.baselinedBinaries removeObjectForKey:binary.path];
+    
+            //write out
+            [self.baselinedBinaries writeToFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:BASELINED_FILE] atomically:YES];
+        }
     }
     
     //CHECK 3: binary a user-approved one?
     approvedBinaryID = self.userApprovedBinaries[binary.path];
     if(nil != approvedBinaryID)
     {
-        //match base on dev id
-        if( (0 == [binary.signingInfo[KEY_SIGNATURE_STATUS] intValue]) &&
-            (YES == [approvedBinaryID isEqualToString:[binary.signingInfo[KEY_SIGNING_AUTHORITIES] lastObject]]) )
+        //match?
+        if(YES == [approvedBinaryID isEqualToString:binary.identifier])
         {
-            //found!
-            whiteListed = YES;
-            
-            //bail
-            goto bail;
+            //set flag
+            binary.isApproved = YES;
         }
-        //match on hash
-        else if(YES == [approvedBinaryID isEqualToString:binary.sha256Hash])
-        {
-            //found!
-            whiteListed = YES;
-            
-            //bail
-            goto bail;
-        }
-        //path matched, but not id
-        // ->maybe app was infected, or unsigned & updated
-        //   either way, remove it from list as its not verifiable anymore
-        [self.userApprovedBinaries removeObjectForKey:binary.path];
         
-        //write out
-        [self.userApprovedBinaries writeToFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_FILE] atomically:YES];
+        //found a path match, in list of baseline'd binary, but not an id match
+        // ->that's odd (something changed), so remove as it's not verifable anymore
+        else
+        {
+            //sync
+            @synchronized (self.userApprovedBinaries)
+            {
+                
+            //remove
+            [self.userApprovedBinaries removeObjectForKey:binary.path];
+            
+            //write out
+            [self.userApprovedBinaries writeToFile:[DAEMON_DEST_FOLDER stringByAppendingPathComponent:USER_APPROVED_FILE] atomically:YES];
+                
+            }//sync
+        }
     }
-
-//bail
-bail:
     
-    return whiteListed;
+    //CHECK 4: binary in hardcoded gray list?
+    if(noErr == [binary.signingInfo[KEY_SIGNATURE_STATUS] intValue])
+    {
+        //set flag
+        binary.isGrayListed = [self.graylistedBinaries containsObject:binary.signingInfo[KEY_SIGNATURE_IDENTIFIER]];
+    }
+    
+    return;
 }
 
 @end
