@@ -20,7 +20,6 @@
 @synthesize ancestors;
 @synthesize arguments;
 @synthesize timestamp;
-@synthesize wasDisallowed;
 @synthesize encryptedFiles;
 @synthesize untrustedAncestor;
 
@@ -156,18 +155,24 @@
 // ->remove ones that are too old (5 seconds)
 -(void)refreshEncrytedFiles
 {
-    //check each
-    // ->removing any that are too old
-    for(NSString* encryptedFile in self.encryptedFiles.allKeys)
+    //sync
+    @synchronized (self.encryptedFiles)
     {
-        //remove if older than 5 seconds
-        // value for 'encryptedFiles' is timestamp
-        if([self.encryptedFiles[encryptedFile] timeIntervalSinceNow] > 5)
+        //check each
+        // ->removing any that are too old
+        for(NSString* encryptedFile in self.encryptedFiles.allKeys)
         {
-            //remove
-            [self.encryptedFiles removeObjectForKey:encryptedFile];
+            //remove if older than 5 seconds
+            // value for 'encryptedFiles' is timestamp
+            if([self.encryptedFiles[encryptedFile] timeIntervalSinceNow] > 5)
+            {
+                //remove
+                [self.encryptedFiles removeObjectForKey:encryptedFile];
+            }
         }
-    }
+        
+    }//sync
+    
     
     return;
 }
@@ -175,13 +180,21 @@
 //check if process has created enough encrypted files, fast enough
 -(BOOL)hitEncryptedTheshold
 {
+    //flag
+    BOOL hitTheshold = NO;
+    
     //first refresh list
     // ->removes any stale files
     [self refreshEncrytedFiles];
     
-    //now, we know they are recent enough
-    // ->just check the count of encrypted files
-    return (self.encryptedFiles.count >= 3);
+    @synchronized (self.encryptedFiles)
+    {
+        //now, we know they are recent enough
+        // ->just check the count of encrypted files
+        hitTheshold = (self.encryptedFiles.count >= 3);
+    }
+    
+    return hitTheshold;
 }
 
 //for pretty printing

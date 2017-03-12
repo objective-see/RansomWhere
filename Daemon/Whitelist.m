@@ -49,10 +49,6 @@
     //list of baseline app binaries/signing info
     NSMutableDictionary* baselinedApps = nil;
     
-    //binary identifier
-    // ->sha256 hash or developer id
-    NSString* binaryIdentifier = nil;
-    
     //alloc
     baselinedApps = [NSMutableDictionary dictionary];
     
@@ -157,6 +153,13 @@ bail:
         goto bail;
     }
     
+    //first one?
+    if(nil == self.userApprovedBinaries)
+    {
+        //init
+        userApprovedBinaries = [NSMutableDictionary dictionary];
+    }
+    
     //sync
     @synchronized (self.userApprovedBinaries)
     {
@@ -173,7 +176,6 @@ bail:
     #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updated persistent list of user approved apps (%@)", USER_APPROVED_FILE]);
     #endif
-        
     
 
 //bail

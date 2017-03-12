@@ -49,10 +49,6 @@
 //timestamp
 @property(nonatomic, retain)NSDate* timestamp;
 
-//was disallowed
-// ->allows us to ignore other queued events
-@property BOOL wasDisallowed;
-
 //was reported
 // ->ensures process isn't reported on twice
 @property BOOL wasReported;

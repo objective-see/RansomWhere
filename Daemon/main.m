@@ -33,9 +33,6 @@ ProcMonitor* processMonitor = nil;
 //global white list
 Whitelist* whitelist = nil;
 
-//global enumerator object
-//Enumerator* enumerator = nil;
-
 //global current user
 CFStringRef consoleUserName = NULL;
 

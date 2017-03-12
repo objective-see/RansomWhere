@@ -694,9 +694,9 @@ bail:
             goto bail;
         }
         
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created new process: %@", newProcess]);
-        #endif
+        //#ifdef DEBUG
+        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created new process: %@", newProcess]);
+        //#endif
         
         //save
         self.binaries[newProcess.path] = newProcess.binary;

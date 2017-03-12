@@ -65,7 +65,6 @@
         //call into whitelisting logic
         // ->will set flags such as 'isBaselined', 'isAllowed', 'isWhitelisted', etc
         [whitelist classify:self];
-    
         
     }//init self
 
@@ -110,13 +109,13 @@
         case noErr:
             
             //append to summary
-            [csSummary appendFormat:@" is validly signed"];
+            [csSummary appendFormat:@" validly signed"];
             
             //item signed by apple
             if(YES == [self.signingInfo[KEY_SIGNING_IS_APPLE] boolValue])
             {
                 //append to summary
-                [csSummary appendFormat:@" (Apple)"];
+                [csSummary appendFormat:@" by Apple"];
             }
             //item signed, third party/ad hoc, etc
             else
@@ -125,14 +124,14 @@
                 if(YES == [self.signingInfo[KEY_SIGNING_IS_APP_STORE] boolValue])
                 {
                     //append to summary
-                    [csSummary appendFormat:@" (Mac App Store)"];
+                    [csSummary appendFormat:@" from the App Store"];
                 }
                 //something else
                 // ->dev id/ad hoc? 3rd-party?
                 else
                 {
                     //append to summary
-                    [csSummary appendFormat:@" (Apple Dev-ID/3rd-party)"];
+                    [csSummary appendFormat:@" with a Apple Dev-ID || ad-hoc"];
                 }
             }
             
@@ -142,7 +141,7 @@
         case errSecCSUnsigned:
             
             //append to summary
-            [csSummary appendFormat:@" is not signed"];
+            [csSummary appendFormat:@" unsigned"];
     
             break;
             
