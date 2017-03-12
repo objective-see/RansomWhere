@@ -17,6 +17,7 @@
 @synthesize flags;
 @synthesize process;
 @synthesize filePath;
+@synthesize ancestorTriggered;
 
 //init
 -(id)init:(NSString*)fsPath fsProcess:(Process*)fsProcess fsEvent:(kfs_event_a *)fsEvent;
@@ -40,7 +41,6 @@ bail:
     
     return self;
 }
-
 
 //description
 -(NSString*)description

@@ -36,7 +36,11 @@
 
 //dequeue
 // ->forever, process events from queue
--(void)dequeue:(id)threadParam;
+-(void)dequeue;
+
+//determine if process is a known encryption utility
+// that is creating encrypted file (can check arguments)
+-(BOOL) isEncryptionUtility:(Event*)event;
 
 //show alert to the user
 // ->block until response, which is returned from this method

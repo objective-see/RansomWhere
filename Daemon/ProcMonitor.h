@@ -25,8 +25,11 @@
 
 /* iVARS / PROPERTIES */
 
-//dictioanary of processes
+//dictionary of processes
 @property(nonatomic, retain)NSMutableDictionary* processes;
+
+//dictioanary of binary objects
+@property(nonatomic, retain)NSMutableDictionary* binaries;
 
 /* METHODS */
 

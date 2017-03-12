@@ -7,7 +7,6 @@
 //
 
 //TODO: inc version #
-//TODO: close button when done?
 
 #import "Consts.h"
 #import "Logging.h"

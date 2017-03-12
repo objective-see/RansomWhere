@@ -25,6 +25,7 @@
 
 @implementation ProcMonitor
 
+@synthesize binaries;
 @synthesize processes;
 
 //init function
@@ -35,8 +36,11 @@
     self = [super init];
     if(nil != self)
     {
-        //alloc/init dictionary for all procs
+        //init dictionary for all procs
         processes = [NSMutableDictionary dictionary];
+        
+        //init dictionary for all binaries
+        binaries = [NSMutableDictionary dictionary];
     }
     
     return self;
@@ -55,13 +59,16 @@
     
     //start enumerating running processes
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        //enum
         [self enumerateRunningProcesses];
+        
     });
     
     //OS X 10.12.4 (fixed kernel crash)
     // ->start process monitoring via openBSM
     if( ([osVersionInfo[@"minorVersion"] intValue] >= OS_MINOR_VERSION_SIERRA) &&
-        ([osVersionInfo[@"bugfixVersion"] intValue] >= 4) )
+        ([osVersionInfo[@"bugfixVersion"] intValue] >= 4))
     {
         //dbg msg
         #ifdef DEBUG
@@ -69,13 +76,16 @@
         #endif
         
         //start monitoring
-        // ->run this at highest priority!
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            
+            //monitor
             [self monitor];
+            
         });
     }
     
     //otherwise, just do app monitoring
+    // ->yes, this will miss commandline utils, but fs-events can create those
     else
     {
         //dbg msg
@@ -266,8 +276,6 @@ bail:
     
     //forever
     // ->read/parse/process audit records
-    
-    // TODO: track ancestry here!?
     while(YES)
     {
         //reset process record object
@@ -441,7 +449,7 @@ bail:
                 }
                     
                 //exec args
-                // ->just save into args (processed later, well args[0], if path wasn't found)
+                // ->just save into args
                 case AUT_EXEC_ARGS:
                 {
                     //save args
@@ -501,15 +509,8 @@ bail:
                             process.ppid = lastFork.ppid;
                         }
                         
-                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
-                        ^{
-                            //handle new process
-                            [self handleNewProcess:process];
-                        });
-                        
-                        #ifdef DEBUG
-                        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created new process: %@", process]);
-                        #endif
+                        //handle new process
+                        [self handleNewProcess:process];
                     }
                     
                     //unset
@@ -602,6 +603,11 @@ bail:
     //create a new process
     process = [[Process alloc] init];
     
+    //dbg msg
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"new app launched %@", notification.userInfo]);
+    #endif
+
     //set pid
     process.pid = [notification.userInfo[@"NSApplicationProcessIdentifier"] intValue];
     
@@ -639,14 +645,18 @@ bail:
 -(void)handleNewProcess:(Process*)newProcess
 {
     //sanity check
+    // ->should only occur for fork() events, which normal get superceeded by an exec(), etc
     if( (-1 == newProcess.pid) ||
         (nil == newProcess.path) )
     {
-        //TODO: check this elsewhere?
         
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process object isn't valid %d/%@", newProcess.pid, newProcess.path]);
+        if(AUE_FORK != newProcess.type)
+        {
+            //dbg msg, for non-fork events
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"process object isn't valid %d/%@", newProcess.pid, newProcess.path]);
+        }
         #endif
         
         //bail
@@ -656,28 +666,42 @@ bail:
     //get parent
     if(-1 == newProcess.ppid)
     {
-        //set ppid
+        //get ppid
         newProcess.ppid =  getParentID(newProcess.pid);
     }
     
-    //TODO: call sooner
-
     //generate process ancestry
     [newProcess enumerateAncestors];
     
-    //create binary obj
-    newProcess.binary = [[Binary alloc] init:newProcess.path];
+    //first try grab cache'd binary object
+    // ->yes, this will be a problem if ransomware modifies a trusted/whitelisted binary after it's been cache'd :/
+    newProcess.binary = [self.binaries objectForKey:newProcess.path];
+    
+    //not found?
+    // ->generate it
     if(nil == newProcess.binary)
     {
-        //dbg msg
+        //generate
+        newProcess.binary = [[Binary alloc] init:newProcess.path];
+        if(nil == newProcess.binary)
+        {
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to create binary object for %d/%@", newProcess.pid, newProcess.path]);
+            #endif
+            
+            //bail
+            goto bail;
+        }
+        
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"failed to create binary object for %d/%@", newProcess.pid, newProcess.path]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created new process: %@", newProcess]);
         #endif
         
-        //bail
-        goto bail;
-        
+        //save
+        self.binaries[newProcess.path] = newProcess.binary;
     }
+    
     //generate ancestors for apple bins
     // ->also check if any ancestory is untrusted
     if(YES == newProcess.binary.isApple)
@@ -687,14 +711,13 @@ bail:
         [newProcess validateAncestors];
     }
     
-    //add to list
+    //add to list all procs
     @synchronized(self.processes)
     {
         //add
         self.processes[[NSNumber numberWithUnsignedInteger:newProcess.pid]] = newProcess;
     }
 
-    
 //bail
 bail:
     

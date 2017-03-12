@@ -1476,6 +1476,8 @@ BOOL isEncrypted(NSString* path)
         goto bail;
     }
     
+    /*
+    
     //ignore gzip'd files
     if( (nil != results[@"header"]) &&
         (YES == isGzip(results[@"header"])) )
@@ -1488,6 +1490,8 @@ BOOL isEncrypted(NSString* path)
         goto bail;
         
     }
+     
+    */
     
     //encrypted files have super high entropy
     // ->so ignore files that have 'low' entropy
@@ -1556,6 +1560,7 @@ bail:
     
     return anImage;
 }
+
 
 //examines header for gzip signature
 // ->for gzip, this is 0x1f 0x8b 0x08

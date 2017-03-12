@@ -31,6 +31,9 @@
 
 /* PROPERTIES */
 
+//use process monitor (on newer versions of macOS)
+@property BOOL waitForProcessMonitor;
+
 //file-system event queue
 @property (nonatomic, retain)Queue* eventQueue;
 

@@ -28,6 +28,9 @@
 //process id
 @property (nonatomic, retain)Process* process;
 
+//triggered due to ancestor
+@property BOOL ancestorTriggered;
+
 /* METHODS */
 
 //init

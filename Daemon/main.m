@@ -23,6 +23,10 @@
 #import "ProcMonitor.h"
 #import "3rdParty/ent/ent.h"
 
+//TODO: trust SIP'd binaries?
+// OS X 10.11+
+// https://support.apple.com/en-us/HT204899 for SIP protected /directories
+
 //global process monitor
 ProcMonitor* processMonitor = nil;
 
@@ -116,7 +120,7 @@ int main(int argc, const char * argv[])
         //init white list
         whitelist = [[Whitelist alloc] init];
         
-        //baseline
+        //baseline installed apps
         // ->only will execute logic first time, but we should always wait
         [whitelist baseline];
         

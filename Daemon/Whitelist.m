@@ -73,7 +73,7 @@
     
     //dbg msg
     #ifdef DEBUG
-    logMsg(LOG_DEBUG, @"execing 'system_profiler' to enumerate all installed apps");
+    logMsg(LOG_DEBUG, @"execing 'system_profiler' to enumerate all installed apps (please wait!)");
     #endif
     
     //enumerate via 'system_profiler'
@@ -99,10 +99,9 @@
             //skip
             continue;
         }
-
         
         //add to list
-        baselinedApps[binary.path] = binaryIdentifier;
+        baselinedApps[binary.path] = binary.identifier;
     }
         
     //save them all to disk

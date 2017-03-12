@@ -105,6 +105,12 @@
 //tiff
 #define MAGIC_TIFF 0x2A004D4D
 
+//zip identifier
+#define ZIP_IDENTIFIER @"com.apple.zip"
+
+//openssl identifier
+#define OPENSSL_IDENTIFIER @"com.apple.openssl"
+
 //signing status
 #define KEY_SIGNATURE_STATUS @"signatureStatus"
 

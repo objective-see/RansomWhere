@@ -25,12 +25,26 @@
 // ->load watch paths, alloc queue, etc
 -(id)init
 {
+    //OS version info
+    NSDictionary* osVersionInfo = nil;
+    
     //init super
     self = [super init];
     if(nil != self)
     {
         //alloc/init event queue
         eventQueue = [[Queue alloc] init];
+        
+        //get OS version info
+        osVersionInfo = getOSVersion();
+        
+        //check if new enough to use full process monitor
+        if( ([osVersionInfo[@"minorVersion"] intValue] >= OS_MINOR_VERSION_SIERRA) &&
+            ([osVersionInfo[@"bugfixVersion"] intValue] >= 4) )
+        {
+            //yups
+            self.waitForProcessMonitor = YES;
+        }
     }
     
     return self;
@@ -277,18 +291,47 @@ bail:
     //process path
     NSString* path = nil;
     
-    //try grab process from process monitor
-    @synchronized(processMonitor.processes)
+    //on newer versions of macOS we should have process
+    // ->but it lags a touch, so try grab it/wait a few times
+    if(YES == self.waitForProcessMonitor)
     {
-        //lookup by pid
-        process = processMonitor.processes[[NSNumber numberWithInt:pid]];
+        //
+        for(int i =0; i<100; i++)
+        {
+            //try grab process from process monitor
+            @synchronized(processMonitor.processes)
+            {
+                //lookup by pid
+                process = processMonitor.processes[[NSNumber numberWithInt:pid]];
+            }
+            
+            //all set if we got one
+            if(nil != process)
+            {
+                //all set
+                goto bail;
+            }
+            
+            //nap very shortly!!
+            [NSThread sleepForTimeInterval:0.01f];
+        }
     }
-    
-    //all set if we got one
-    if(nil != process)
+    //just try grab straight away
+    else
     {
-        //all set
-        goto bail;
+        //try grab process from process monitor
+        @synchronized(processMonitor.processes)
+        {
+            //lookup by pid
+            process = processMonitor.processes[[NSNumber numberWithInt:pid]];
+        }
+        
+        //all set if we got one
+        if(nil != process)
+        {
+            //all set
+            goto bail;
+        }
     }
     
     //dbg msg

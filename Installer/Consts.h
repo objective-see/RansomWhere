@@ -86,6 +86,10 @@
 // ->also button title
 #define ACTION_UNINSTALL @"Uninstall"
 
+//button title
+// ->Close
+#define ACTION_CLOSE @"Close"
+
 //action to kick off UI installer
 #define ACTION_UNINSTALL_UI @"Uninstall_UI"
 

@@ -63,8 +63,22 @@
     //parent pid
     pid_t parentPID = -1;
     
-    //start with current process
-    currentPID = self.pid;
+    //add parent
+    if(-1 != self.ppid)
+    {
+        //add
+        [self.ancestors addObject:[NSNumber numberWithInt:self.ppid]];
+        
+        //set current to parent
+        currentPID = self.ppid;
+    }
+    //don't know parent
+    // ->just start with self
+    else
+    {
+        //start w/ self
+        currentPID = self.pid;
+    }
     
     //add until we get to to end (pid 0)
     // ->or error out during the traversal
@@ -86,8 +100,6 @@
         //add
         [self.ancestors addObject:[NSNumber numberWithInt:parentPID]];
     }
-    
-    //also set flag
     
     return;
 }
@@ -169,7 +181,7 @@
     
     //now, we know they are recent enough
     // ->just check the count of encrypted files
-    return (self.encryptedFiles.count <= 3);
+    return (self.encryptedFiles.count >= 3);
 }
 
 //for pretty printing
