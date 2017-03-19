@@ -6,8 +6,6 @@
 //  Copyright (c) 2016 Objective-See. All rights reserved.
 //
 
-//TODO: inc version #
-
 #import "Consts.h"
 #import "Logging.h"
 #import "Configure.h"
@@ -53,7 +51,6 @@ bail:
     
     return;
 }
-
 
 //automatically invoked when user clicks 'About/Info'
 // ->show about window

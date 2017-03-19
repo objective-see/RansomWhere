@@ -23,10 +23,6 @@
 #import "ProcMonitor.h"
 #import "3rdParty/ent/ent.h"
 
-//TODO: trust SIP'd binaries?
-// OS X 10.11+
-// https://support.apple.com/en-us/HT204899 for SIP protected /directories
-
 //global process monitor
 ProcMonitor* processMonitor = nil;
 
@@ -220,7 +216,7 @@ BOOL reset()
     installedAppsFile = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:BASELINED_FILE];
     
     //when found
-    // ->delete list of installed apps
+    // ->delete list of installed/baselined apps
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:installedAppsFile])
     {
         //delete
@@ -269,7 +265,7 @@ BOOL reset()
         
         //dbg msg(s)
         printf("\nRANSOMWHERE: reset\n");
-        printf("\t      a) removed list of installed/approved binaries\n");
+        printf("\t      a) removed list of installed & user-approved binaries\n");
         printf("\t      b) stopped, then (re)started the launch daemon\n\n");
     }
 
@@ -323,7 +319,6 @@ bail:
     
     return pathsInitd;
 }
-
 
 //grab current user
 // ->note: NULL is returned if none, or user is 'loginwindow'
@@ -516,7 +511,7 @@ void* checkForUpdate(void *threadParam)
         sleep(10);
     
     //user yet?
-    }while(NULL == consoleUserName);
+    } while(NULL == consoleUserName);
     
     //nap a bit more
     // ->just in case user is logging in
@@ -581,7 +576,7 @@ void* checkForUpdate(void *threadParam)
     
 //bail
 bail:
-        
+
     ;
     
     }//pool
