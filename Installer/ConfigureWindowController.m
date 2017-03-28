@@ -304,21 +304,25 @@
     {
         //set msg
         action = @"install";
+        
+        //set result msg
+        resultMsg = @"RansomWhere? installed\r\n(automatic protection enabled)";
+
     }
     //set action msg for uninstall
     else
     {
         //set msg
         action = @"uninstall";
+        
+        //set result msg
+        resultMsg = @"RansomWhere? uninstalled";
     }
     
     //success
     if(YES == success)
     {
-        //set result msg
-        resultMsg = [NSString stringWithFormat:@"RansomWhere? %@ed", action];
-        
-        //set font to black
+        //(re)set font to black
         resultMsgColor = [NSColor blackColor];
     }
     //failure
@@ -358,8 +362,8 @@
     //set status msg
     [self.statusMsg setStringValue:resultMsg];
     
-    //toggle buttons
-    // ->after install turn on 'uninstall' and off 'install'
+    //update button
+    // ->after install change butter to 'close'
     if(ACTION_INSTALL_FLAG == event)
     {
         //set button title to 'close'
@@ -371,8 +375,8 @@
         //make it active
         [self.window makeFirstResponder:self.installButton];
     }
-    //toggle buttons
-    // ->after uninstall turn off 'uninstall' and on 'install'
+    //update button
+    // ->after uninstall change butter to 'close'
     else
     {
         //set button title to 'close'

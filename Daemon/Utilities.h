@@ -31,16 +31,9 @@ NSBundle* findAppBundle(NSString* binaryPath);
 //get the signing info of a file
 NSDictionary* extractSigningInfo(NSString* path);
 
-//given a path to an application
-// ->gets app's info dictionary
-NSDictionary* getAppInfo(NSString* appPath);
-
 //determine if a file is from the app store
 // ->gotta be signed w/ Apple Dev ID & have valid app receipt
 BOOL fromAppStore(NSString* path);
-
-//given a pid and process name, try to find full path
-NSString* getFullPath(NSNumber* processID, NSString* processName, BOOL tryWhich);
 
 //exec a process and grab it's output
 NSData* execTask(NSString* binaryPath, NSArray* arguments);

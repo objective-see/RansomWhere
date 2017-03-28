@@ -191,7 +191,7 @@
     {
         //now, we know they are recent enough
         // ->just check the count of encrypted files
-        hitTheshold = (self.encryptedFiles.count >= 3);
+        hitTheshold = (self.encryptedFiles.count >= 2);
     }
     
     return hitTheshold;

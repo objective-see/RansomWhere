@@ -361,7 +361,7 @@ bail:
     #endif
     
     //sync to prevent multiple report on same process
-    @synchronized (event.process)
+    @synchronized(self)
     {
         
     //suspend process that hit the limit
@@ -426,10 +426,20 @@ bail:
     //alert user
     // ->note: call will *block* until user respondes
     response = [self alertUser:event];
-        
-    //set flag
-    event.process.wasReported = YES;
     
+    //set process reported flag
+    if(YES != event.ancestorTriggered)
+    {
+        //set flag
+        event.process.wasReported  = YES;
+    }
+    //set ancestor reported flag
+    else
+    {
+        //set flag
+        event.process.untrustedAncestor.wasReported = YES;
+    }
+        
     //handle response
     // ->either resume or terminate process
     [self processResponse:event response:response];
@@ -541,7 +551,7 @@ bail:
     signingInfo = [process.binary formatSigningInfo];
     
     //start body
-    body = [NSMutableString stringWithFormat:@"%@ (pid: %d, %@)\r\n", process.binary.path, process.pid, signingInfo];
+    body = [NSMutableString stringWithFormat:@"proc: (%d) %@\r\nsign: %@\r\n", process.pid, process.binary.path, signingInfo];
     
     //spacing
     [body appendFormat:@"\r\n"];
@@ -553,7 +563,7 @@ bail:
     [body appendFormat:@"files:\r\n › %@", encryptedFiles[0]];
     
     //add next if it's there
-    if(encryptedFiles.count > 2)
+    if(encryptedFiles.count >= 2)
     {
         //append
         [body appendFormat:@"\r\n › %@", encryptedFiles[1]];

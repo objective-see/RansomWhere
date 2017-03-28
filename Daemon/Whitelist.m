@@ -139,6 +139,9 @@ bail:
     return;
 }
 
+//TODO: change paths to /Library/Objective-See/
+//TODO: change installer name to _installer.app
+
 //update list of approved apps
 // ->when user 'allows'/approves app
 -(void)updateApproved:(Binary*)binary
