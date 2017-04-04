@@ -15,18 +15,13 @@
 
 /* PROPERTIES */
 
-//title for window
-//@property (nonatomic, retain)NSString* windowTitle;
-
-//action
-//@property NSUInteger action;
-
 @property (weak) IBOutlet NSProgressIndicator *activityIndicator;
 @property (weak) IBOutlet NSTextField *statusMsg;
 @property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *uninstallButton;
 @property (weak) IBOutlet NSButton *moreInfoButton;
-
+@property (weak) IBOutlet NSButton *supportButton;
+@property (strong) IBOutlet NSView *supportView;
 
 
 /* METHODS */

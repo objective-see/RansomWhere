@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "Logging.h"
+
 #import "Consts.h"
 #import "Configure.h"
 #import "Utilities.h"
+#import "../Shared/Logging.h"
 
 @implementation Configure
 
@@ -28,8 +29,9 @@
     //get info about daemon's paths
     daemonInfo = [self daemonInfo];
     
-    //check if daemon's plist or destination folder (which will contain daemon) exists
+    //check if daemon's plist or destination folders (which will contain daemon) exists
     if( (YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_PLIST_KEY]]) ||
+        (YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER_OLD]]) ||
         (YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER]]) )
     {
         //set flag
@@ -53,12 +55,15 @@
     // ->done for completeness of dictionary
     paths[DAEMON_DEST_FOLDER] = DAEMON_DEST_FOLDER;
     
+    //set daemon's old location
+    paths[DAEMON_DEST_FOLDER_OLD] = DAEMON_DEST_FOLDER_OLD;
+    
     //set daemon src path
     // ->orginally stored in installer app's /Resource bundle
     paths[DAEMON_SRC_PATH_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:DAEMON_NAME];
 
     //set daemon dest path
-    // ->'/Library/RansomWhere/' + daemon name
+    // ->'/Library/Objective-See/RansomWhere/' + daemon name
     paths[DAEMON_DEST_PATH_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:DAEMON_NAME];
     
     //set daemon src plist
@@ -74,7 +79,7 @@
     paths[DAEMON_SRC_ICON_KEY] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:ALERT_ICON];
 
     //set daemon icon dest path
-    // ->'/Library/RansomWhere/' + icon name
+    // ->'/Library/Objective-See/RansomWhere/' + icon name
     paths[DAEMON_DEST_ICON_KEY] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:ALERT_ICON];
     
     //set daemon whitelist src path
@@ -82,7 +87,7 @@
     paths[DAEMON_SRC_WHITE_LIST] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:WHITE_LIST_FILE];
     
     //set daemon whitelist dest path
-    // ->'/Library/RansomWhere/' + whitelist.plist
+    // ->'/Library/Objective-See/RansomWhere/' + whitelist.plist
     paths[DAEMON_DEST_WHITE_LIST] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:WHITE_LIST_FILE];
     
     //set daemon graylist src path
@@ -90,7 +95,7 @@
     paths[DAEMON_SRC_GRAY_LIST] = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:GRAY_LIST_FILE];
     
     //set daemon graylist dest path
-    // ->'/Library/RansomWhere/' + graylist.plist
+    // ->'/Library/Objective-See/RansomWhere/' + graylist.plist
     paths[DAEMON_DEST_GRAY_LIST] = [DAEMON_DEST_FOLDER stringByAppendingPathComponent:GRAY_LIST_FILE];
     
 //bail
@@ -119,14 +124,18 @@ bail:
     if(ACTION_INSTALL_FLAG == parameter)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"installing...");
+        #endif
         
         //if already installed though
         // ->uninstall everything first, except user's pref
         if(YES == [self isInstalled])
         {
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"already installed, so partially uninstalling...");
+            #endif
             
             //uninstall (and stop)
             if(YES != [self uninstall:PARTIAL_UNINSTALL])
@@ -136,7 +145,9 @@ bail:
             }
             
             //dbg msg
+            #ifdef DEBUG
             logMsg(LOG_DEBUG, @"uninstalled & stopped daemon");
+            #endif
         }
         
         //install daemon (and start)
@@ -147,13 +158,17 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"installed & started daemon");
+        #endif
     }
     //uninstall & stop daemon
     else if(ACTION_UNINSTALL_FLAG == parameter)
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"uninstalling...");
+        #endif
         
         //uninstall (and stop)
         // ->also delete user's prefs
@@ -164,7 +179,9 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"uninstalled & stopped daemon");
+        #endif
     }
 
     //no errors
@@ -180,7 +197,7 @@ bail:
 
 //install daemon
 // a) copy plist to /Library/LauchDaemons
-// b) copy daemon binary /Library/RansomWhere
+// b) copy daemon binary /Library/Objective-See/RansomWhere
 // c) start it
 -(BOOL)install
 {
@@ -223,10 +240,12 @@ bail:
         }
         
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, [NSString stringWithFormat:@"created %@", daemonInfo[DAEMON_DEST_FOLDER]]);
+        #endif
     }
     
-    //check daemon was found in installer
+    //check that daemon was found in installer
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_PATH_KEY]])
     {
         //err msg
@@ -237,7 +256,7 @@ bail:
     }
 
     //move daemon binary into persistent location
-    // ->'/Library/RansomWhere/' + daemon name
+    // ->'/Library/RansomWhere/Objective-See/' + daemon name
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_PATH_KEY] toPath:daemonInfo[DAEMON_DEST_PATH_KEY] error:&error])
     {
         //err msg
@@ -268,7 +287,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_PLIST_KEY], daemonInfo[DAEMON_DEST_PLIST_KEY]]);
+    #endif
     
     //set plist's group/owner to root/wheel
     if(YES != setFileOwner(daemonInfo[DAEMON_DEST_PLIST_KEY], @0, @0, YES))
@@ -292,7 +313,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set daemon's plist %@, to be 'rw-r-r'", daemonInfo[DAEMON_DEST_PLIST_KEY]]);
+    #endif
     
     //check daemon alert icon was found in installer
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_ICON_KEY]])
@@ -305,7 +328,7 @@ bail:
     }
 
     //move icon for user alert into persistent location
-    // ->'/Library/RansomWhere/' + icon name
+    // ->'/Library/RansomWhere/Objective-See/' + icon name
     if(YES != [[NSFileManager defaultManager] copyItemAtPath:daemonInfo[DAEMON_SRC_ICON_KEY] toPath:daemonInfo[DAEMON_DEST_ICON_KEY] error:&error])
     {
         //err msg
@@ -316,7 +339,9 @@ bail:
     }
 
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_PATH_KEY], daemonInfo[DAEMON_DEST_PATH_KEY]]);
+    #endif
     
     //check daemon whitelist was found in installer
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_WHITE_LIST]])
@@ -339,7 +364,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_WHITE_LIST], daemonInfo[DAEMON_DEST_WHITE_LIST]]);
+    #endif
     
     //check daemon graylist was found in installer
     if(YES != [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_SRC_GRAY_LIST]])
@@ -362,7 +389,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"copied %@ -> %@", daemonInfo[DAEMON_SRC_GRAY_LIST], daemonInfo[DAEMON_DEST_GRAY_LIST]]);
+    #endif
     
     //get all files
     files = [[NSFileManager defaultManager] directoryContentsAtPath:daemonInfo[DAEMON_DEST_FOLDER]];
@@ -403,7 +432,7 @@ bail:
 //uninstall daemon
 // a) stop it
 // b) delete plist from to /Library/LauchDaemons
-// c) delete daemon binary & folder; /Library/RansomWhere
+// c) delete daemon binary & folder; /Library/Objective-See/RansomWhere
 -(BOOL)uninstall:(NSUInteger)type
 {
     //return/status var
@@ -429,11 +458,16 @@ bail:
     // ->stop daemom
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_PLIST_KEY]])
     {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found %@, so will stop daemon & delete plist", DAEMON_DEST_PLIST_KEY]);
+        #endif
+        
         //stop daemon
         if(YES != [self controlLaunchItem:DAEMON_UNLOAD plist:daemonInfo[DAEMON_DEST_PLIST_KEY]])
         {
             //err msg
-            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to stop daemon"]);
+            logMsg(LOG_ERR, @"failed to stop daemon");
             
             //set flag
             bAnyErrors = YES;
@@ -454,10 +488,36 @@ bail:
         }
     }
     
+    //always try delete old folder
+    if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER_OLD]])
+    {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found %@, so will delete", DAEMON_DEST_FOLDER_OLD]);
+        #endif
+        
+        //delete
+        if(YES != [[NSFileManager defaultManager] removeItemAtPath:daemonInfo[DAEMON_DEST_FOLDER_OLD] error:&error])
+        {
+            //err msg
+            logMsg(LOG_ERR, [NSString stringWithFormat:@"failed to delete daemon's (old) folder %@ (%@)", daemonInfo[DAEMON_DEST_FOLDER_OLD], error]);
+            
+            //set flag
+            bAnyErrors = YES;
+            
+            //keep uninstalling...
+        }
+    }
+    
     //when daemon's folder exists
     // ->delete it all (when not saving user prefs), or everything, but
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_FOLDER]])
     {
+        //dbg msg
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"found %@, so will delete", DAEMON_DEST_FOLDER]);
+        #endif
+        
         //delete entire folder & contents
         if(FULL_UNINSTALL == type)
         {
@@ -545,7 +605,9 @@ bail:
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"invoking %@ with %@ %@ ", LAUNCHCTL, actionString, plist]);
+    #endif
 
     //control launch item
     // ->and check

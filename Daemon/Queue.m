@@ -158,7 +158,7 @@
     
     //dbg msg
     #ifdef DEBUG
-    //logMsg(LOG_DEBUG, @"PASSED  CHECK 0: binary is not whitelisted binary");
+    logMsg(LOG_DEBUG, @"PASSED  CHECK 0: binary is not whitelisted binary");
     #endif
     
     //SKIP:

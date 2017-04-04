@@ -67,8 +67,11 @@
 //icon for user alert
 #define ALERT_ICON @"alertIcon.png"
 
+//old daemon destination folder
+#define DAEMON_DEST_FOLDER_OLD @"/Library/RansomWhere"
+
 //daemon destination folder
-#define DAEMON_DEST_FOLDER @"/Library/RansomWhere"
+#define DAEMON_DEST_FOLDER @"/Library/Objective-See/RansomWhere"
 
 //uninstall flag
 #define DAEMON_UNLOAD 0

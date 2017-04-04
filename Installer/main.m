@@ -89,7 +89,9 @@ int main(int argc, char *argv[])
     if(0 != geteuid())
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"non-root installer instance");
+        #endif
         
         //spawn as root
         if(YES != spawnAsRoot(argv[0]))
@@ -110,7 +112,9 @@ int main(int argc, char *argv[])
     else
     {
         //dbg msg
+        #ifdef DEBUG
         logMsg(LOG_DEBUG, @"root installer instance");
+        #endif
         
         //app away
         retVar = NSApplicationMain(argc, (const char **)argv);

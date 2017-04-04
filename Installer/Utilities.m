@@ -48,7 +48,9 @@ NSUInteger execTask(NSString* path, NSArray* arguments)
     [task launch];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, @"waiting for task to exit");
+    #endif
     
     //wait
     [task waitUntilExit];
@@ -57,7 +59,9 @@ NSUInteger execTask(NSString* path, NSArray* arguments)
     taskStatus = [task terminationStatus];
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"task (%@) exited with %lu", path, (unsigned long)taskStatus]);
+    #endif
 
 //bail
 bail:
@@ -108,7 +112,9 @@ BOOL isSupportedOS()
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
+    #endif
     
     //gotta be OS X
     if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
@@ -232,7 +238,9 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
     }
     
     //dbg msg
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set ownership for %@ (%@)", path, fileOwner]);
+    #ifdef DEBUG
+    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"set ownership for %@ (%@)", path, fileOwner]);
+    #endif
     
     //do it recursively
     if(YES == recursive)

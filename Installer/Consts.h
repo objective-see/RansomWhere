@@ -18,8 +18,14 @@
 //general error URL
 #define FATAL_ERROR_URL @"https://objective-see.com/errors.html"
 
+//patreon url
+#define PATREON_URL @"https://www.patreon.com/objective_see"
+
+//old daemon destination folder
+#define DAEMON_DEST_FOLDER_OLD @"/Library/RansomWhere"
+
 //daemon destination folder
-#define DAEMON_DEST_FOLDER @"/Library/RansomWhere"
+#define DAEMON_DEST_FOLDER @"/Library/Objective-See/RansomWhere"
 
 //daemon source path key
 #define DAEMON_SRC_PATH_KEY @"srcPath"
@@ -89,6 +95,18 @@
 //button title
 // ->Close
 #define ACTION_CLOSE @"Close"
+
+//button title
+// ->next
+#define ACTION_NEXT @"Next »"
+
+//button title
+// ->no
+#define ACTION_NO @"No"
+
+//button title
+// ->yes
+#define ACTION_YES @"Yes!"
 
 //action to kick off UI installer
 #define ACTION_UNINSTALL_UI @"Uninstall_UI"

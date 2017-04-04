@@ -27,6 +27,7 @@
 		7DE29D191CABB78600DFA6A6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29D171CABB78600DFA6A6 /* MainMenu.xib */; };
 		7DE29D1C1CAD0BBD00DFA6A6 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29D1A1CAD0BBD00DFA6A6 /* icon.png */; };
 		7DE29D1D1CAD0BBD00DFA6A6 /* ransomwhere.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29D1B1CAD0BBD00DFA6A6 /* ransomwhere.png */; };
+		7DEABC4A1E934C050024C6AB /* objectiveSee.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DEABC491E934C050024C6AB /* objectiveSee.png */; };
 		7DF7080E1CB0942400FF79D8 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF7080A1CB0942400FF79D8 /* Logging.m */; };
 		7DF7080F1CB0942400FF79D8 /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF7080D1CB0942400FF79D8 /* Exception.m */; };
 		CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */; };
@@ -63,6 +64,7 @@
 		7DE29D181CABB78600DFA6A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		7DE29D1A1CAD0BBD00DFA6A6 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = Installer/images/icon.png; sourceTree = "<group>"; };
 		7DE29D1B1CAD0BBD00DFA6A6 /* ransomwhere.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ransomwhere.png; path = Installer/images/ransomwhere.png; sourceTree = "<group>"; };
+		7DEABC491E934C050024C6AB /* objectiveSee.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = objectiveSee.png; path = Installer/images/objectiveSee.png; sourceTree = "<group>"; };
 		7DF7080A1CB0942400FF79D8 /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logging.m; path = Shared/Logging.m; sourceTree = "<group>"; };
 		7DF7080B1CB0942400FF79D8 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = Shared/Logging.h; sourceTree = "<group>"; };
 		7DF7080C1CB0942400FF79D8 /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = Shared/Exception.h; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 		7DE29D1E1CAD0BD300DFA6A6 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7DEABC491E934C050024C6AB /* objectiveSee.png */,
 				7DCF017E1CB996E70051C574 /* alertIcon.png */,
 				7DE29D1A1CAD0BBD00DFA6A6 /* icon.png */,
 				7DE29D1B1CAD0BBD00DFA6A6 /* ransomwhere.png */,
@@ -246,6 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7DE29D141CABB67A00DFA6A6 /* ErrorWindowController.xib in Resources */,
+				7DEABC4A1E934C050024C6AB /* objectiveSee.png in Resources */,
 				7DE29D1C1CAD0BBD00DFA6A6 /* icon.png in Resources */,
 				7DCF017F1CB996E70051C574 /* alertIcon.png in Resources */,
 				7D3E409C1CDEF40C002B0997 /* graylist.plist in Resources */,
@@ -406,7 +410,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Installer/Installer-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = RansomWhere;
+				PRODUCT_NAME = RansomWhere_Installer;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -424,7 +428,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Installer/Installer-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = RansomWhere;
+				PRODUCT_NAME = RansomWhere_Installer;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};

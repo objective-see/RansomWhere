@@ -6,7 +6,7 @@
 	<string>com.objective-see.ransomwhere</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Library/RansomWhere/RansomWhere</string>
+		<string>/Library/Objective-See/RansomWhere/RansomWhere</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

@@ -112,7 +112,9 @@ BOOL isSupportedOS()
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
+    #endif
     
     //gotta be OS X
     if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
@@ -616,7 +618,9 @@ void controlLaunchItem(NSUInteger action, NSString* plist)
     }
     
     //dbg msg
+    #ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"invoking %@ with %@ %@ ", LAUNCHCTL, actionString, plist]);
+    #endif
     
     //control launch item
     // ->and check
@@ -1476,23 +1480,6 @@ BOOL isEncrypted(NSString* path)
         goto bail;
     }
     
-    /*
-    
-    //ignore gzip'd files
-    if( (nil != results[@"header"]) &&
-        (YES == isGzip(results[@"header"])) )
-    {
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file gzip'd; %x", *(unsigned int*)[results[@"header"] bytes]]);
-        #endif
-        
-        //ignore
-        goto bail;
-        
-    }
-     
-    */
-    
     //encrypted files have super high entropy
     // ->so ignore files that have 'low' entropy
     if([results[@"entropy"] doubleValue] < 7.95)
@@ -1673,7 +1660,7 @@ BOOL isProcessAlive(pid_t processID)
     
     //is alive?
     if( (0 == signalStatus) ||
-       ( (0 != signalStatus) && (errno != ESRCH) ) )
+        ( (0 != signalStatus) && (errno != ESRCH) ) )
     {
         //dbg msg
         #ifdef DEBUG
