@@ -34,10 +34,21 @@
     self = [super init];
     if(nil != self)
     {
-        //save path
-        // ->note: always called with path
-        self.path = binaryPath;
-    
+        //not a full path?
+        if(YES != [binaryPath hasPrefix:@"/"])
+        {
+            //try find via 'which'
+            self.path = which(binaryPath);
+        }
+        //full path
+        // use as is
+        else
+        {
+            //save path
+            // ->note: always called with path
+            self.path = binaryPath;
+        }
+
         //extract signing info (do this first!)
         // ->from Apple, App Store, signing authorities, etc
         self.signingInfo = extractSigningInfo(self.path);

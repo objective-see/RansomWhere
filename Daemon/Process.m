@@ -173,7 +173,6 @@
         
     }//sync
     
-    
     return;
 }
 
@@ -191,7 +190,7 @@
     {
         //now, we know they are recent enough
         // ->just check the count of encrypted files
-        hitTheshold = (self.encryptedFiles.count >= 2);
+        hitTheshold = (self.encryptedFiles.count >= 3);
     }
     
     return hitTheshold;

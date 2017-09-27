@@ -69,6 +69,9 @@
 // ->center, make front, set bg to white, etc
 -(void)display
 {
+    //indicate title bar is transparent (too)
+    self.window.titlebarAppearsTransparent = YES;
+    
     //center window
     [[self window] center];
     

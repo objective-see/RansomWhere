@@ -11,20 +11,20 @@
 
 //check if kext is installed
 // ->just checks permenant location of kext
-BOOL isInstalled();
+BOOL isInstalled(void);
 
 //start an NSTask
 NSUInteger execTask(NSString* path, NSArray* arguments);
 
 //get app's version
 // ->extracted from Info.plist
-NSString* getAppVersion();
+NSString* getAppVersion(void);
 
 //is current OS version supported?
-BOOL isSupportedOS();
+BOOL isSupportedOS(void);
 
 //get OS version
-NSDictionary* getOSVersion();
+NSDictionary* getOSVersion(void);
 
 //get app's version
 // ->either self, or installed version

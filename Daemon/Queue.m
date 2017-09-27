@@ -573,7 +573,6 @@ bail:
     // ->will *block* until user interaction, then response saved in 'response' variable
     CFUserNotificationDisplayAlert(0.0f, kCFUserNotificationStopAlertLevel, (CFURLRef)self.icon, NULL, NULL, (__bridge CFStringRef)title, (__bridge CFStringRef)body, (__bridge CFStringRef)@"Terminate", (__bridge CFStringRef)@"Allow", NULL, &response);
     
-//bail
 bail:
     
     return response;

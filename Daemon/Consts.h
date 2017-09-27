@@ -11,7 +11,7 @@
 
 //version
 // TODO: update with each new release!
-#define DAEMON_VERSION @"1.2.0"
+#define DAEMON_VERSION @"1.2.1"
 
 //OS version x
 #define OS_MAJOR_VERSION_X 10
@@ -137,6 +137,5 @@
 
 //key for running binaries
 #define KEY_RUNNING_BINARY @"running"
-
 
 #endif /* Consts_h */

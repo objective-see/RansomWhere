@@ -20,18 +20,6 @@
 @synthesize graylistedBinaries;
 @synthesize userApprovedBinaries;
 
-//init
--(id)init
-{
-    //init super
-    self = [super init];
-    if(nil != self)
-    {
-        
-    }
-    
-    return self;
-}
 
 //enumerate all installed apps
 // ->only done once, unless -reset
@@ -115,7 +103,6 @@
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"saved list of installed/baseline apps to %@", installedAppsFile]);
     #endif
     
-//bail
 bail:
     
     return;
@@ -177,8 +164,6 @@ bail:
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"updated persistent list of user approved apps (%@)", USER_APPROVED_FILE]);
     #endif
     
-
-//bail
 bail:
 
     return;

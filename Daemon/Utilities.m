@@ -1696,7 +1696,7 @@ NSString* hashFile(NSString* filePath)
     if(nil == (fileContents = [NSData dataWithContentsOfFile:filePath]))
     {
         //err msg
-        NSLog(@"OBJECTIVE-SEE ERROR: couldn't load %@ to hash", filePath);
+        //NSLog(@"OBJECTIVE-SEE ERROR: couldn't load %@ to hash", filePath);
         
         //bail
         goto bail;
@@ -1713,10 +1713,58 @@ NSString* hashFile(NSString* filePath)
         [sha256 appendFormat:@"%02lX", (unsigned long)digestSHA256[index]];
     }
     
-//bail
 bail:
     
     return sha256;
 }
+
+//given a 'short' path or process name
+// ->find the full path by scanning $PATH
+NSString* which(NSString* processName)
+{
+    //full path
+    NSString* fullPath = nil;
+    
+    //get path
+    NSString* path = nil;
+    
+    //tokenized paths
+    NSArray* pathComponents = nil;
+    
+    //candidate file
+    NSString* candidateBinary = nil;
+    
+    //get path
+    path = [[[NSProcessInfo processInfo]environment]objectForKey:@"PATH"];
+    
+    //split on ':'
+    pathComponents = [path componentsSeparatedByString:@":"];
+    
+    //iterate over all path components
+    // ->build candidate path and check if it exists
+    for(NSString* pathComponent in pathComponents)
+    {
+        //build candidate path
+        // ->current path component + process name
+        candidateBinary = [pathComponent stringByAppendingPathComponent:processName];
+        
+        //check if it exists
+        if(YES == [[NSFileManager defaultManager] fileExistsAtPath:candidateBinary])
+        {
+            //check its executable
+            if(YES == [[NSFileManager defaultManager] isExecutableFileAtPath:candidateBinary])
+            {
+                //ok, happy now
+                fullPath = candidateBinary;
+                
+                //stop processing
+                break;
+            }
+        }
+    }//for path components
+    
+    return fullPath;
+}
+
 
 

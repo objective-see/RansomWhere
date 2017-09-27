@@ -77,7 +77,7 @@ void rt_combo(void *buf, int bufl, double *r_ent, double *r_chisq, double *r_mon
     totalc = 0;
     
     //rt_init()
-    while (bean = 0, (bufl-- > 0))
+    while ((void)(bean = 0), (bufl-- > 0))
     {
         oc = *bp++;
         c = oc;

@@ -24,6 +24,8 @@
 #import "3rdParty/ent/ent.h"
 
 //global process monitor
+// note: we don't use the proc info library, since here, we need a bunch of
+//       customizations, such as caching, and tracking per process encrypted file counts
 ProcMonitor* processMonitor = nil;
 
 //global white list
@@ -167,7 +169,6 @@ int main(int argc, const char * argv[])
     
     }//pool
     
-//bail
 bail:
     
     //release user name

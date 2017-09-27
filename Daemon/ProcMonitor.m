@@ -6,6 +6,10 @@
 //  Copyright (c) Objective-See. All rights reserved.
 //
 
+//disable incomplete/umbrella warnings
+// ->otherwise complains about 'audit_kevents.h'
+#pragma clang diagnostic ignored "-Wincomplete-umbrella"
+
 #import "main.h"
 #import "Event.h"
 #import "Consts.h"
@@ -65,18 +69,31 @@
         
     });
     
-    //OS X 10.12.4 (fixed kernel crash)
-    // ->start process monitoring via openBSM
-    if( ([osVersionInfo[@"minorVersion"] intValue] >= OS_MINOR_VERSION_SIERRA) &&
-        ([osVersionInfo[@"bugfixVersion"] intValue] >= 4))
+    //do basic (app) monitoring
+    // if OS version is < 10.12.4 (due to kernel bug)
+    if( ([osVersionInfo[@"minorVersion"] intValue] < OS_MINOR_VERSION_SIERRA) ||
+       (([osVersionInfo[@"minorVersion"] intValue] == OS_MINOR_VERSION_SIERRA) && ([osVersionInfo[@"bugfixVersion"] intValue] < 4)) )
     {
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is ok for openBSM monitoring!", osVersionInfo]);
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is *not* ok for openBSM monitoring :(", osVersionInfo]);
         #endif
         
-        //start monitoring
+        //setup app monitoring
+        [self appMonitor];
+    }
+    
+    //otherwise, enable full monitoring
+    else
+    {
+        //start process monitoring via openBSM to get apps & procs
+        // ->sits in while(YES) loop, so we invoke call in a background thread
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            
+            //dbg msg
+            #ifdef DEBUG
+            logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is ok for openBSM monitoring!", osVersionInfo]);
+            #endif
             
             //monitor
             [self monitor];
@@ -84,18 +101,7 @@
         });
     }
     
-    //otherwise, just do app monitoring
-    // ->yes, this will miss commandline utils, but fs-events can create those
-    else
-    {
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"%@ is *not* ok for openBSM monitoring :(", osVersionInfo]);
-        #endif
-        
-        //setup callback for app monitoring
-        [self setupAppMonitoring];
-    }
+    return;
 }
 
 //generate process objects for all runnings procs
@@ -488,7 +494,7 @@ bail:
                             {
                                 //use arg[0]
                                 process.path = process.arguments.firstObject;
-                                
+                        
                             }
                         }
 
@@ -575,7 +581,7 @@ bail:
 }
 
 //register for app launchings
--(void)setupAppMonitoring
+-(void)appMonitor
 {
     //notification center
     NSNotificationCenter* center = nil;
@@ -717,6 +723,10 @@ bail:
         //add
         self.processes[[NSNumber numberWithUnsignedInteger:newProcess.pid]] = newProcess;
     }
+    
+    //good time to refresh
+    // note: only does refresh if count > 1024
+    [self refreshProcessList];
 
 //bail
 bail:
@@ -731,7 +741,7 @@ bail:
     Process* process = nil;
     
     //bail if process list isn't that big
-    if(self.processes.count < 1028)
+    if(self.processes.count < 1024)
     {
         //bail
         goto bail;

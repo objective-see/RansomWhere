@@ -25,24 +25,18 @@ extern Whitelist* whitelist;
 //global process monitor
 extern ProcMonitor* processMonitor;
 
-
-//global enumerator object
-//extern Enumerator* enumerator;
-
-
-
 /* FUNCTIONS */
 
 //delete list of installed/approved apps, etc
-BOOL reset();
+BOOL reset(void);
 
 //init paths
 // ->this logic will only be needed if daemon is executed from non-standard location
-BOOL initPaths();
+BOOL initPaths(void);
 
 //get current user
 // ->then, setup callback for changes
-BOOL initUserName();
+BOOL initUserName(void);
 
 //check for update
 // ->query website for json file w/ version info

@@ -12,17 +12,17 @@
 #import <Foundation/Foundation.h>
 
 //query interwebz to get latest version
-NSString* getLatestVersion();
+NSString* getLatestVersion(void);
 
 //enumerate all running processes
-NSMutableArray* enumerateProcesses();
+NSMutableArray* enumerateProcesses(void);
 
 //return path to launch daemon's plist
-NSString* launchDaemonPlist();
+NSString* launchDaemonPlist(void);
 
 //return path to app support directory
 // ->~/Library/Application Support/<app bundle id>
-NSString* supportDirectory();
+NSString* supportDirectory(void);
 
 //given a path to binary
 // parse it back up to find app's bundle
@@ -39,35 +39,35 @@ BOOL fromAppStore(NSString* path);
 NSData* execTask(NSString* binaryPath, NSArray* arguments);
 
 //get info about current logged in/active user
-NSDictionary* getCurrentConsoleUser();
+NSDictionary* getCurrentConsoleUser(void);
 
 //generate list of all installed applications
 // ->done via system_profiler, w/ 'SPApplicationsDataType' flag
-NSMutableArray* enumerateInstalledApps();
+NSMutableArray* enumerateInstalledApps(void);
 
 //get all internal apps of an app
 // ->login items, helper apps in frameworks, etc
 NSMutableArray* enumerateInternalApps(NSString* parentApp);
 
 //get version of self
-NSString* getDaemonVersion();
+NSString* getDaemonVersion(void);
 
 //determine if there is a new version
 BOOL isNewVersion(NSMutableString* versionString);
 
 //get GUID (really just computer's MAC address)
 // ->from Apple's 'Get the GUID in OS X' (see: 'Validating Receipts Locally')
-NSData* getGUID();
+NSData* getGUID(void);
 
 //check if current OS version is supported
 // ->for now, just...?
-BOOL isSupportedOS();
+BOOL isSupportedOS(void);
 
 //get OS version
-NSDictionary* getOSVersion();
+NSDictionary* getOSVersion(void);
 
 //get path to app's (self) 'Info.plist' file
-NSString* infoPlistFile();
+NSString* infoPlistFile(void);
 
 //load or unload the launch daemon via '/bin/launchctl'
 void controlLaunchItem(NSUInteger action, NSString* plist);
@@ -105,5 +105,9 @@ BOOL isProcessAlive(pid_t processID);
 
 //sha256 a file
 NSString* hashFile(NSString* filePath);
+
+//given a 'short' path or process name
+// ->find the full path by scanning $PATH
+NSString* which(NSString* processName);
 
 #endif /* defined(__BlockBlock__Utilities__) */
