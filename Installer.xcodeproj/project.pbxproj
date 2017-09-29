@@ -280,7 +280,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\n\n#cp -R -f ~/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/Daemon ~/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/BuildProductsPath/Release/RansomWhere_Installer.app/Contents/Resources/RansomWhere\n";
+			shellScript = "#cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\n\n#cp -R -f ~/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Products/Release/Daemon ~/objective-see/RansomWhere/DerivedData/RansomWhere/Build/Intermediates/ArchiveIntermediates/Installer/BuildProductsPath/Release/RansomWhere_Installer.app/Contents/Resources/RansomWhere\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

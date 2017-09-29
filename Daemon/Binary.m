@@ -39,6 +39,11 @@
         {
             //try find via 'which'
             self.path = which(binaryPath);
+            if(nil == self.path)
+            {
+                //stuck with short path
+                self.path = binaryPath;
+            }
         }
         //full path
         // use as is
