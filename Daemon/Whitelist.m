@@ -75,6 +75,10 @@
     //process each path
     for(NSString* appBinary in installedApps)
     {
+        //pool
+        @autoreleasepool
+        {
+        
         //create binary object
         binary = [[Binary alloc] init:appBinary];
         if( (nil == binary) ||
@@ -86,6 +90,8 @@
         
         //add to list
         baselinedApps[binary.path] = binary.identifier;
+            
+        }//pool
     }
         
     //save them all to disk

@@ -253,7 +253,6 @@ bail:
         
         //bail
         goto bail;
-
     }
     
     //set preselect flags
@@ -284,6 +283,9 @@ bail:
     // ->read/parse/process audit records
     while(YES)
     {
+        @autoreleasepool
+        {
+        
         //reset process record object
         process = nil;
         
@@ -538,7 +540,10 @@ bail:
             //subtract lenght of current token
             recordBalance -= tokenStruct.len;
         }
-    }
+    
+        }//autorelease
+            
+    }//while(YES)
     
 //bail
 bail:
@@ -741,7 +746,7 @@ bail:
     Process* process = nil;
     
     //bail if process list isn't that big
-    if(self.processes.count < 1024)
+    if(self.processes.count < 256)
     {
         //bail
         goto bail;
@@ -757,13 +762,6 @@ bail:
             //grab
             process = self.processes[processID];
             
-            //ignore any process that were created less than 1 min ago
-            if([process.timestamp timeIntervalSinceNow] < 60)
-            {
-                //skip
-                continue;
-            }
-            
             //ignore any procs that are still alive
             if(YES == isProcessAlive(processID.intValue))
             {
@@ -771,10 +769,14 @@ bail:
                 continue;
             }
             
-            //remove old & dead process
-            [self.processes removeObjectForKey:processID];
+            //dead for more than a minute?
+            // note: 'timeIntervalSinceNow' return -negative for past events
+            if([process.timestamp timeIntervalSinceNow] <- 60)
+            {
+                //remove old & dead process
+                [self.processes removeObjectForKey:processID];
+            }
         }
-        
     }//sync
 
 //bail
