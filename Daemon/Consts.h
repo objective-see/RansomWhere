@@ -11,7 +11,7 @@
 
 //version
 // TODO: update with each new release!
-#define DAEMON_VERSION @"1.2.3"
+#define DAEMON_VERSION @"1.2.4"
 
 //OS version x
 #define OS_MAJOR_VERSION_X 10

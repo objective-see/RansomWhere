@@ -6,9 +6,11 @@
 	<string>Developer ID Application: Adobe Systems, Inc. (JQ525L2MZD)</string>
 	<string>Developer ID Application: Agilebits Inc.</string>
 	<string>Developer ID Application: AVAST Software a.s. (6H4HRTU5E3)</string>
+	<string>Developer ID Application: AVG Technologies CZ, s.r.o. (XSJ59WMJBM)</string>
 	<string>Developer ID Application: Bitdefender SRL (GUNFMW623Y)</string>
 	<string>Developer ID Application: BitTorrent, Inc (SNBT6M4A7T)</string>
 	<string>Developer ID Application: Bombich Software, Inc.</string>
+	<string>Developer ID Application: Bombich Software, Inc. (L4F2DED5Q7)</string>
 	<string>Developer ID Application: Brave Software, Inc. (KL8N8XSYF4)</string>
 	<string>Developer ID Application: Citrix Online LLC</string>
 	<string>Developer ID Application: Dashlane</string>
@@ -21,6 +23,8 @@
 	<string>Developer ID Application: Malwarebytes Corporation (GVZRY6KDKR)</string>
 	<string>Developer ID Application: Microsoft Corporation</string>
 	<string>Developer ID Application: Mozilla Corporation</string>
+	<string>Developer ID Application: Mozilla Corporation (43AQ936H96)</string>
+	<string>Developer ID Application: Sophos (2H5GFH3774)</string>
 	<string>Developer ID Application: Valve Corporation</string>
 </array>
 </plist>

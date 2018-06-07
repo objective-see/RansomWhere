@@ -136,7 +136,7 @@
     {
         //dbg msg
         #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"IGNORING: not user logged in, sorry!");
+        logMsg(LOG_DEBUG, @"IGNORING: no user logged in, sorry!");
         #endif
         
         //skip

@@ -133,5 +133,15 @@ NSMutableDictionary* testFile(NSString* file)
 //bail
 bail:
     
+    //close handle
+    if(nil != handle)
+    {
+        //close
+        [handle closeFile];
+        
+        //unset
+        handle = nil;
+    }
+    
 	return results;
 }

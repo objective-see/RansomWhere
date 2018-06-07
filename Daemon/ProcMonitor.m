@@ -746,7 +746,7 @@ bail:
     Process* process = nil;
     
     //bail if process list isn't that big
-    if(self.processes.count < 256)
+    if(self.processes.count < 1024)
     {
         //bail
         goto bail;
@@ -771,7 +771,7 @@ bail:
             
             //dead for more than a minute?
             // note: 'timeIntervalSinceNow' return -negative for past events
-            if([process.timestamp timeIntervalSinceNow] <- 60)
+            if([process.timestamp timeIntervalSinceNow] < -60)
             {
                 //remove old & dead process
                 [self.processes removeObjectForKey:processID];

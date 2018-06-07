@@ -1480,6 +1480,19 @@ BOOL isEncrypted(NSString* path)
         goto bail;
     }
     
+    //ignore gzipped files
+    // tar/gz doesn't support password protect, so can't be abused
+    if( (nil != results[@"header"]) &&
+        (YES == isGzip(results[@"header"])) )
+    {
+        #ifdef DEBUG
+        logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file is an gz; %#x", *(unsigned int*)[results[@"header"] bytes]]);
+        #endif
+        
+        //ignore
+        goto bail;
+    }
+    
     //encrypted files have super high entropy
     // ->so ignore files that have 'low' entropy
     if([results[@"entropy"] doubleValue] < 7.95)
