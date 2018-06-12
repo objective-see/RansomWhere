@@ -455,7 +455,7 @@ bail:
     daemonInfo = [self daemonInfo];
     
     //when daemon's plist exists
-    // ->stop daemom
+    // ->stop daemon and delete plist
     if(YES == [[NSFileManager defaultManager] fileExistsAtPath:daemonInfo[DAEMON_DEST_PLIST_KEY]])
     {
         //dbg msg
@@ -533,17 +533,24 @@ bail:
                 //keep uninstalling...
             }
         }
-        //otherwise delete everything but user prefs
+        //otherwise delete everything but user prefs/baselined apps
         else
         {
             //init directory enumerator
             fileEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:daemonInfo[DAEMON_DEST_FOLDER]];
             
-            //delete all, but user files
+            //delete most
             for(NSString* file in fileEnumerator)
             {
                 //skip user files
                 if(YES == [file isEqualToString:USER_APPROVED_BINARIES])
+                {
+                    //skip
+                    continue;
+                }
+                
+                //skip pre-installed files list
+                if(YES == [file isEqualToString:BASELINED_FILE])
                 {
                     //skip
                     continue;

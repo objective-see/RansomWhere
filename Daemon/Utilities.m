@@ -670,7 +670,7 @@ BOOL isAppleBinary(NSString* path)
     
     //check if file is signed by apple by checking if it conforms to req string
     // note: ignore 'errSecCSBadResource' as lots of signed apple files return this issue :/
-    status = SecStaticCodeCheckValidity(staticCode, kSecCSDefaultFlags, requirementRef);
+    status = SecStaticCodeCheckValidity(staticCode, kSecCSCheckAllArchitectures|kSecCSDoNotValidateResources, requirementRef);
     if( (STATUS_SUCCESS != status) &&
         (errSecCSBadResource != status) )
     {
@@ -918,7 +918,7 @@ BOOL isSignedDevID(NSString* binary)
     }
     
     //check if file is signed w/ apple dev id by checking if it conforms to req string
-    status = SecStaticCodeCheckValidity(staticCode, kSecCSDefaultFlags, requirementRef);
+    status = SecStaticCodeCheckValidity(staticCode, kSecCSCheckAllArchitectures|kSecCSDoNotValidateResources, requirementRef);
     if(noErr != status)
     {
         //bail
@@ -977,9 +977,6 @@ NSDictionary* extractSigningInfo(NSString* path)
     //common name on chert
     CFStringRef commonName = NULL;
     
-    //flags
-    SecCSFlags csFlags = kSecCSDefaultFlags;
-    
     //init signing status
     signingStatus = [NSMutableDictionary dictionary];
     
@@ -1006,7 +1003,7 @@ NSDictionary* extractSigningInfo(NSString* path)
     }
     
     //check signature
-    status = SecStaticCodeCheckValidity(staticCode, csFlags, NULL);
+    status = SecStaticCodeCheckValidity(staticCode, kSecCSDoNotValidateResources, NULL);
     
     //(re)save signature status
     signingStatus[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
@@ -1117,7 +1114,7 @@ bail:
 }
 
 //determine if a file is from the app store
-// ->gotta be signed w/ Apple Dev ID & have valid app receipt
+// gotta be signed w/ Apple Dev ID & have valid app receipt
 BOOL fromAppStore(NSString* path)
 {
     //flag
@@ -1147,7 +1144,6 @@ BOOL fromAppStore(NSString* path)
         //bail
         goto bail;
     }
-    
     
     //first make sure its signed with an Apple Dev ID
     if(YES != isSignedDevID(path))

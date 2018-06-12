@@ -81,6 +81,9 @@
 //user approved binaries
 #define USER_APPROVED_BINARIES @"approvedBinaries.plist"
 
+//installed apps
+#define BASELINED_FILE @"installedApps.plist"
+
 //path to launchctl
 #define LAUNCHCTL @"/bin/launchctl"
 

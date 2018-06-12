@@ -5,6 +5,6 @@
       location = "group:Installer.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:/Users/patrickw/objective-see/RansomWhere/Daemon.xcodeproj">
+      location = "group:Daemon.xcodeproj">
    </FileRef>
 </Workspace>
