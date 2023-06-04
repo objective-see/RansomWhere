@@ -116,6 +116,12 @@ BOOL isSupportedOS()
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
     #endif
     
+    //support newer OS versions
+    if([osVersionInfo[@"majorVersion"] intValue] > OS_MAJOR_VERSION_X) {
+        isSupported= YES;
+        goto bail;
+    }
+    
     //gotta be OS X
     if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
     {

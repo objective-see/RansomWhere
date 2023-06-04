@@ -85,7 +85,7 @@
     [NSApp activateIgnoringOtherApps:YES];
     
     //make white
-    [self.window setBackgroundColor: NSColor.whiteColor];
+    //[self.window setBackgroundColor: NSColor.whiteColor];
 
     return;
 }
@@ -148,7 +148,7 @@
         self.supportView.frame = frame;
         
         //set overlay's view color to white
-        self.supportView.layer.backgroundColor = [NSColor whiteColor].CGColor;
+        //self.supportView.layer.backgroundColor = [NSColor whiteColor].CGColor;
         
         //nap for UI purposes
         [NSThread sleepForTimeInterval:0.10f];

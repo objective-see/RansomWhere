@@ -166,8 +166,17 @@ void signalHandler(int signal, siginfo_t *info, void *context)
 	uContext = (ucontext_t *)context;
 
     //create error msg
+
+#if TARGET_CPU_ARM64
+  // Code meant for the arm64 architecture here.
     errorMessage = [NSString stringWithFormat:@"unhandled exception caught, si_signo: %d  /si_code: %s  /si_addr: %p /rip: %p",
-              info->si_signo, (info->si_code == SEGV_MAPERR) ? "SEGV_MAPERR" : "SEGV_ACCERR", info->si_addr, (unsigned long*)uContext->uc_mcontext->__ss.__rip];
+                    info->si_signo, (info->si_code == SEGV_MAPERR) ? "SEGV_MAPERR" : "SEGV_ACCERR", info->si_addr, (unsigned long*)uContext->uc_mcontext->__ss.__pc];
+#elif TARGET_CPU_X86_64
+  // Code meant for the x86_64 architecture here.
+    errorMessage = [NSString stringWithFormat:@"unhandled exception caught, si_signo: %d  /si_code: %s  /si_addr: %p /rip: %p",
+    info->si_signo, (info->si_code == SEGV_MAPERR) ? "SEGV_MAPERR" : "SEGV_ACCERR", info->si_addr, (unsigned long*)uContext->uc_mcontext->__ss.__rip];
+#endif
+
     
     //err msg
     logMsg(LOG_ERR, [NSString stringWithFormat:@"OBJECTIVE-SEE ERROR: %@", errorMessage]);
@@ -191,7 +200,14 @@ void signalHandler(int signal, siginfo_t *info, void *context)
     errorInfo[KEY_ERROR_MSG] = @"ERROR: unrecoverable fault";
     
     //add sub msg
+#if TARGET_CPU_ARM64
+  // Code meant for the arm64 architecture here.
+    errorInfo[KEY_ERROR_SUB_MSG] = [NSString stringWithFormat:@"si_signo: %d / rip: %p", info->si_signo, (unsigned long*)uContext->uc_mcontext->__ss.__pc];
+#elif TARGET_CPU_X86_64
+  // Code meant for the x86_64 architecture here.
     errorInfo[KEY_ERROR_SUB_MSG] = [NSString stringWithFormat:@"si_signo: %d / rip: %p", info->si_signo, (unsigned long*)uContext->uc_mcontext->__ss.__rip];
+#endif
+
     
     //set error URL
     errorInfo[KEY_ERROR_URL] = FATAL_ERROR_URL;

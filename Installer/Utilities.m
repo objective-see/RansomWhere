@@ -112,9 +112,16 @@ BOOL isSupportedOS()
     }
     
     //dbg msg
-    #ifdef DEBUG
+#ifdef DEBUG
     logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
-    #endif
+#endif
+    
+    //Support OS versions newer than X
+    if([osVersionInfo[@"majorVersion"] intValue] > OS_MAJOR_VERSION_X)
+    {
+        isSupported = YES;
+        goto bail;
+    }
     
     //gotta be OS X
     if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
@@ -168,27 +175,27 @@ NSDictionary* getOSVersion()
     {
         //reset
         osVersionInfo = nil;
-        
+
         //bail
         goto bail;
     }
-    
+
     //get minor version
     if(STATUS_SUCCESS != Gestalt(gestaltSystemVersionMinor, &minorVersion))
     {
         //reset
         osVersionInfo = nil;
-        
+
         //bail
         goto bail;
     }
-    
+
     //get bug fix version
     if(STATUS_SUCCESS != Gestalt(gestaltSystemVersionBugFix, &fixVersion))
     {
         //reset
         osVersionInfo = nil;
-        
+
         //bail
         goto bail;
     }
