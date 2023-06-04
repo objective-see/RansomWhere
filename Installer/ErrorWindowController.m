@@ -87,7 +87,7 @@
     [self.window makeFirstResponder:closeButton];
     
     //make white
-    [self.window setBackgroundColor: NSColor.whiteColor];
+    //[self.window setBackgroundColor: NSColor.whiteColor];
     
     return;
 }
