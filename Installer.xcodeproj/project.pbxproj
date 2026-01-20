@@ -29,7 +29,6 @@
 		7DE29D1D1CAD0BBD00DFA6A6 /* ransomwhere.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DE29D1B1CAD0BBD00DFA6A6 /* ransomwhere.png */; };
 		7DEABC4A1E934C050024C6AB /* objectiveSee.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DEABC491E934C050024C6AB /* objectiveSee.png */; };
 		7DF7080E1CB0942400FF79D8 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF7080A1CB0942400FF79D8 /* Logging.m */; };
-		7DF7080F1CB0942400FF79D8 /* Exception.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF7080D1CB0942400FF79D8 /* Exception.m */; };
 		CD7F088C19AE6DCA00FF00FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -69,7 +68,7 @@
 		7DF7080B1CB0942400FF79D8 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logging.h; path = Shared/Logging.h; sourceTree = "<group>"; };
 		7DF7080C1CB0942400FF79D8 /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = Shared/Exception.h; sourceTree = "<group>"; };
 		7DF7080D1CB0942400FF79D8 /* Exception.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Exception.m; path = Shared/Exception.m; sourceTree = "<group>"; };
-		CD7F088819AE6DCA00FF00FC /* RansomWhere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = RansomWhere.app; path = RansomWhere_Installer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD7F088819AE6DCA00FF00FC /* RansomWhere_Installer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RansomWhere_Installer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F088B19AE6DCA00FF00FC /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		CD7F088E19AE6DCA00FF00FC /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		CD7F089019AE6DCA00FF00FC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -163,7 +162,7 @@
 		CD7F088919AE6DCA00FF00FC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CD7F088819AE6DCA00FF00FC /* RansomWhere.app */,
+				CD7F088819AE6DCA00FF00FC /* RansomWhere_Installer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,7 +199,7 @@
 				CD7F088419AE6DCA00FF00FC /* Sources */,
 				CD7F088519AE6DCA00FF00FC /* Frameworks */,
 				CD7F088619AE6DCA00FF00FC /* Resources */,
-				7D774F241C015DBD00A9CCE4 /* Run Script */,
+				CD807E952F2029CC00CE12B7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -208,7 +207,7 @@
 			);
 			name = Installer;
 			productName = Installer;
-			productReference = CD7F088819AE6DCA00FF00FC /* RansomWhere.app */;
+			productReference = CD7F088819AE6DCA00FF00FC /* RansomWhere_Installer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -230,6 +229,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -268,19 +268,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		7D774F241C015DBD00A9CCE4 /* Run Script */ = {
+		CD807E952F2029CC00CE12B7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
+			inputFileListPaths = (
+			);
 			inputPaths = (
 			);
-			name = "Run Script";
+			outputFileListPaths = (
+			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#cp -R -f $BUILT_PRODUCTS_DIR/Daemon $BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere\ncp -R -f $PROJECT_DIR/DerivedData/RansomWhere/Build/Products/Release/Daemon $PROJECT_DIR/DerivedData/RansomWhere/Build/Intermediates.noindex/ArchiveIntermediates/Installer/BuildProductsPath/Release/RansomWhere_Installer.app/Contents/Resources/RansomWhere\n";
+			shellScript = "if [ -f \"${BUILT_PRODUCTS_DIR}/Daemon\" ]; then\n    cp -f \"${BUILT_PRODUCTS_DIR}/Daemon\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/RansomWhere\"\nelif [ -f \"${BUILD_DIR}/Release/Daemon\" ]; then\n    cp -f \"${BUILD_DIR}/Release/Daemon\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/RansomWhere\"\nelse\n    echo \"ERROR: Daemon not found\"\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -295,7 +298,6 @@
 				7DE29CFC1CABB59600DFA6A6 /* AppDelegate.m in Sources */,
 				7DE29D011CABB59600DFA6A6 /* ErrorWindowController.m in Sources */,
 				7DE29CFE1CABB59600DFA6A6 /* Configure.m in Sources */,
-				7DF7080F1CB0942400FF79D8 /* Exception.m in Sources */,
 				7DE29D121CABB5FE00DFA6A6 /* main.m in Sources */,
 				7D3E40921CDB2F77002B0997 /* AboutWindowController.m in Sources */,
 			);
@@ -424,7 +426,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Installer/Installer-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Installer/Installer-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = RansomWhere_Installer;
 				PROVISIONING_PROFILE = "";
@@ -442,7 +444,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Installer/Installer-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Installer/Installer-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objectiveSee.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = RansomWhere_Installer;
 				PROVISIONING_PROFILE = "";

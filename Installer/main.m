@@ -195,14 +195,14 @@ bail:
 }
 
 //install
-BOOL cmdlineInstall()
+BOOL cmdlineInstall(void)
 {
     //do it!
     return [[[Configure alloc] init] configure:ACTION_INSTALL_FLAG];
 }
 
 //uninstall
-BOOL cmdlineUninstall()
+BOOL cmdlineUninstall(void)
 {
     //do it!
     return [[[Configure alloc] init] configure:ACTION_UNINSTALL_FLAG];

@@ -24,13 +24,13 @@
 #define STATUS_SUCCESS 0
 
 //get version of self
-NSString* getDaemonVersion()
+NSString* getDaemonVersion(void)
 {
     return DAEMON_VERSION;
 }
 
 //get OS version
-NSDictionary* getOSVersion()
+NSDictionary* getOSVersion(void)
 {
     //os version info
     NSMutableDictionary* osVersionInfo = nil;
@@ -93,57 +93,6 @@ bail:
 }
 
 
-//is current OS version supported?
-// ->for now, just OS X 10.10+
-BOOL isSupportedOS()
-{
-    //support flag
-    BOOL isSupported = NO;
-    
-    //OS version info
-    NSDictionary* osVersionInfo = nil;
-    
-    //get OS version info
-    osVersionInfo = getOSVersion();
-    if(nil == osVersionInfo)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
-    #endif
-    
-    //gotta be OS X
-    if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"OS major version %@ not supported", osVersionInfo[@"majorVersion"]]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //gotta be OS X at least lion (10.8)
-    if([osVersionInfo[@"minorVersion"] intValue] < OS_MINOR_VERSION_LION)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"OS minor version %@ not supported", osVersionInfo[@"minor"]]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //OS version is supported
-    isSupported = YES;
-    
-//bail
-bail:
-    
-    return isSupported;
-}
 
 //determine if there is a new version
 // -1, YES or NO
@@ -184,7 +133,7 @@ bail:
 }
 
 //query interwebz to get latest version
-NSString* getLatestVersion()
+NSString* getLatestVersion(void)
 {
     //product version(s) data
     NSData* productsVersionData = nil;
@@ -237,7 +186,7 @@ bail:
 
 
 //enumerate all running processes
-NSMutableArray* enumerateProcesses()
+NSMutableArray* enumerateProcesses(void)
 {
     //status
     int status = -1;
@@ -303,7 +252,7 @@ bail:
 
 //generate list of all installed applications
 // ->done via system_profiler, w/ 'SPApplicationsDataType' flag
-NSMutableArray* enumerateInstalledApps()
+NSMutableArray* enumerateInstalledApps(void)
 {
     //installed apps
     NSMutableArray* installedApplications = nil;
@@ -779,7 +728,7 @@ bail:
 
 //get GUID (really just computer's MAC address)
 // ->from Apple's 'Get the GUID in OS X' (see: 'Validating Receipts Locally')
-NSData* getGUID()
+NSData* getGUID(void)
 {
     //status var
     __block kern_return_t kernResult = -1;
@@ -1589,36 +1538,6 @@ bail:
     return isGzipped;
 }
 
-/*
-//load a file into an NSSet
-NSSet* loadSet(NSString* filePath)
-{
-    //array
-    NSArray* array = nil;
-    
-    //set
-    NSSet* set = nil;
-    
-    //load file into array
-    array = [NSArray arrayWithContentsOfFile:filePath];
-    if(nil == array)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //convert to set
-    set = [NSSet setWithArray:array];
-    
-//bail
-bail:
-    
-    return set;
-}
-*/
-
-
-
 //given a pid, get its parent (ppid)
 pid_t getParentID(int pid)
 {
@@ -1631,17 +1550,14 @@ pid_t getParentID(int pid)
     //size
     size_t procBufferSize = sizeof(processStruct);
     
-    //mib
-    const u_int mibLength = 4;
-    
     //syscall result
     int sysctlResult = -1;
     
     //init mib
-    int mib[mibLength] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, pid};
+    int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, pid};
     
     //make syscall
-    sysctlResult = sysctl(mib, mibLength, &processStruct, &procBufferSize, NULL, 0);
+    sysctlResult = sysctl(mib, sizeof(mib)/sizeof(mib[0]), &processStruct, &procBufferSize, NULL, 0);
     
     //check if got ppid
     if( (STATUS_SUCCESS == sysctlResult) &&

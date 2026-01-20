@@ -59,10 +59,6 @@ BOOL isNewVersion(NSMutableString* versionString);
 // ->from Apple's 'Get the GUID in OS X' (see: 'Validating Receipts Locally')
 NSData* getGUID(void);
 
-//check if current OS version is supported
-// ->for now, just...?
-BOOL isSupportedOS(void);
-
 //get OS version
 NSDictionary* getOSVersion(void);
 

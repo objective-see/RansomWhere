@@ -20,9 +20,6 @@ NSUInteger execTask(NSString* path, NSArray* arguments);
 // ->extracted from Info.plist
 NSString* getAppVersion(void);
 
-//is current OS version supported?
-BOOL isSupportedOS(void);
-
 //get OS version
 NSDictionary* getOSVersion(void);
 

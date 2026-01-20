@@ -93,60 +93,8 @@ NSString* getVersion(int instanceFlag)
     return currentVersion;
 }
 
-//is current OS version supported?
-// ->for now, just OS X 10.10+
-BOOL isSupportedOS()
-{
-    //support flag
-    BOOL isSupported = NO;
-    
-    //OS version info
-    NSDictionary* osVersionInfo = nil;
-    
-    //get OS version info
-    osVersionInfo = getOSVersion();
-    if(nil == osVersionInfo)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //dbg msg
-    #ifdef DEBUG
-    logMsg(LOG_DEBUG, [NSString stringWithFormat:@"OS version: %@", osVersionInfo]);
-    #endif
-    
-    //gotta be OS X
-    if(OS_MAJOR_VERSION_X != [osVersionInfo[@"majorVersion"] intValue])
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"OS major version %@ not supported", osVersionInfo[@"majorVersion"]]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //gotta be OS X at least lion (10.8)
-    if([osVersionInfo[@"minorVersion"] intValue] < OS_MINOR_VERSION_LION)
-    {
-        //err msg
-        logMsg(LOG_ERR, [NSString stringWithFormat:@"OS minor version %@ not supported", osVersionInfo[@"minor"]]);
-        
-        //bail
-        goto bail;
-    }
-    
-    //OS version is supported
-    isSupported = YES;
-    
-//bail
-bail:
-    
-    return isSupported;
-}
-
 //get OS version
-NSDictionary* getOSVersion()
+NSDictionary* getOSVersion(void)
 {
     //os version info
     NSMutableDictionary* osVersionInfo = nil;
@@ -318,7 +266,7 @@ bail:
 
 //get app's version
 // ->extracted from Info.plist
-NSString* getAppVersion()
+NSString* getAppVersion(void)
 {
     //read and return 'CFBundleVersion' from bundle
     return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];

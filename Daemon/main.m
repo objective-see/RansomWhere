@@ -16,7 +16,6 @@
 #import "Consts.h"
 #import "Binary.h"
 #import "Logging.h"
-#import "Exception.h"
 #import "Utilities.h"
 #import "FSMonitor.h"
 #import "Whitelist.h"
@@ -41,9 +40,6 @@ int main(int argc, const char * argv[])
     //pool
     @autoreleasepool
     {
-        //NSLog(@"%d", isEncrypted([NSString stringWithUTF8String:argv[1]]));
-        //return 0;
-        
         //update thread
         pthread_t updateThread = NULL;
         
@@ -64,25 +60,6 @@ int main(int argc, const char * argv[])
             //bail
             goto bail;
         }
-        
-        //first thing...
-        // ->install exception handlers
-        installExceptionHandlers();
-        
-        //check OS version
-        if(YES != isSupportedOS())
-        {
-            //err msg
-            logMsg(LOG_ERR, @"unsupported OS (requires OS X 10.8+)");
-            
-            //bail
-            goto bail;
-        }
-        
-        //dbg msg
-        #ifdef DEBUG
-        logMsg(LOG_DEBUG, @"OS version is supported");
-        #endif
         
         //handle '-reset'
         // ->delete list of installed/approved apps, etc
@@ -192,7 +169,7 @@ bail:
 
 //delete list of installed/approved apps & restart daemon
 // ->note: as invoked via cmdline, use printf()'s for output
-BOOL reset()
+BOOL reset(void)
 {
     //flag
     BOOL fullReset = NO;
@@ -275,7 +252,7 @@ BOOL reset()
 
 //init paths
 // ->this logic will only be needed if daemon is executed from non-standard location
-BOOL initPaths()
+BOOL initPaths(void)
 {
     //flag
     BOOL pathsInitd = NO;
@@ -386,7 +363,7 @@ static void userChangedCallback(SCDynamicStoreRef store, CFArrayRef changedKeys,
 
 //get current user
 // ->then, setup callback for changes
-BOOL initUserName()
+BOOL initUserName(void)
 {
     //flag
     BOOL wasInitialize = NO;

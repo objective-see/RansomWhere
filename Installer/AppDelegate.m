@@ -9,7 +9,6 @@
 #import "Consts.h"
 #import "Logging.h"
 #import "Configure.h"
-#import "Exception.h"
 #import "Utilities.h"
 #import "AppDelegate.h"
 
@@ -26,22 +25,8 @@
     //config object
     Configure* configureObj = nil;
     
-    //first thing...
-    // ->install exception handlers
-    installExceptionHandlers();
-    
     //alloc/init Config obj
     configureObj = [[Configure alloc] init];
-    
-    //check if OS is supported
-    if(YES != isSupportedOS())
-    {
-        //show error popup
-        [self displayErrorWindow: @{KEY_ERROR_MSG:@"ERROR: unsupported OS", KEY_ERROR_SUB_MSG: [NSString stringWithFormat:@"OS X %@ is not supported", [[NSProcessInfo processInfo] operatingSystemVersionString]], KEY_ERROR_SHOULD_EXIT:@YES}];
-        
-        //bail
-        goto bail;
-    }
     
     //show window
     [self displayConfigureWindow:[configureObj isInstalled]];
