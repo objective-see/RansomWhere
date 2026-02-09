@@ -51,7 +51,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
     self = [super init];
     if(nil != self)
     {
-        
         //init
         self.rule = RULE_NOT_FOUND;
         
@@ -79,7 +78,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         self.name = [self getName];
         
         //generate signing info
-        self.signingInfo = generateSigningInfo(self, csDynamic, kSecCSDefaultFlags);
+        self.signingInfo = generateSigningInfo(self, kSecCSDefaultFlags);
         
         if(noErr == [self.signingInfo[KEY_SIGNATURE_STATUS] intValue]) {
          
@@ -88,6 +87,12 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
             
             if(Apple == [self.signingInfo[KEY_SIGNATURE_SIGNER] intValue]) {
                 self.isPlatformBinary = @(YES);
+            }
+            
+            //3rd-party
+            // set notarization
+            else {
+                self.isNotarized = [self.signingInfo[KEY_SIGNING_IS_NOTARIZED] boolValue];
             }
         }
        
@@ -99,7 +104,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
     return self;
     
 }
-
 
 //init w/ ES message
 -(id)initWithES:(const es_message_t *)message {
@@ -152,7 +156,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         switch (message->event_type) {
             
             //exec
-            case ES_EVENT_TYPE_AUTH_EXEC:
             case ES_EVENT_TYPE_NOTIFY_EXEC:
                 
                 //set process (target)
@@ -160,14 +163,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
                 
                 //extract/format args
                 [self extractArgs:&message->event];
-                
-                break;
-                
-            //fork
-            case ES_EVENT_TYPE_NOTIFY_FORK:
-                
-                //set process (child)
-                process = message->event.fork.child;
                 
                 break;
                 
@@ -221,8 +216,30 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         //team ID
         self.teamID = convertStringToken(&process->team_id);
         
+        //cs_validation_category (macOS 26 / es version 10+)
+        #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        if(message->version >= 10) {
+            self.signingCategory = @(process->cs_validation_category);
+        }
+        
+        #endif
+        
         //add platform binary
         self.isPlatformBinary = [NSNumber numberWithBool:process->is_platform_binary];
+        
+        //3rd-party
+        // check if notarized
+        if(!self.isPlatformBinary) {
+            
+            SecCodeRef codeRef = NULL;
+            //obtain dynamic code ref from (audit) token
+            if(errSecSuccess == SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:self.auditToken}), kSecCSDefaultFlags, &codeRef)) {
+                
+                self.isNotarized = [NSNumber numberWithBool:isNotarized(codeRef)];
+                
+                CFRelease(codeRef);
+            }
+        }
         
         //script
         if( (message->version >= 2) &&
@@ -259,16 +276,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
     }
   
     return iNode;
-}
-
-//generate code signing info
-// sets 'signingInfo' iVar
--(void)generateCSInfo:(NSUInteger)csOption
-{
-    //generate via helper function
-    self.signingInfo = generateSigningInfo(self, csOption, kSecCSDefaultFlags);
-    
-    return;
 }
 
 //get process' name
@@ -658,21 +665,6 @@ bail:
         //append
         [description appendFormat:@"\"teamID\":\"%@\",", self.teamID];
     }
-    
-    //alloc string for cd hash
-    cdHash = [NSMutableString string];
-    
-    //format cd hash
-    [self.cdHash enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *stop)
-    {
-        //To print raw byte values as hex
-        for (NSUInteger i = 0; i < byteRange.length; ++i) {
-            [cdHash appendFormat:@"%02X", ((uint8_t*)bytes)[i]];
-        }
-    }];
-    
-    //add cs hash
-    [description appendFormat:@"\"cdHash\":\"%@\"", cdHash];
     
     //terminate dictionary
     [description appendString:@"},"];

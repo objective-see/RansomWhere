@@ -11,18 +11,14 @@
 //#import "procInfo.h"
 
 #import "ParentsWindowController.h"
-#import "VirusTotalViewController.h"
 #import "SigningInfoViewController.h"
 
-@interface AlertWindowController : NSWindowController <NSTouchBarProvider, NSTouchBarDelegate>
+@interface AlertWindowController : NSWindowController
 
 /* PROPERTIES */
 
 //event
 @property(nonatomic, retain)NSDictionary* alert;
-
-//touch bar
-@property(nonatomic, retain)NSTouchBar* touchBar;
 
 /* TOP */
 

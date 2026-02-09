@@ -273,6 +273,15 @@ es_client_t* esClient = nil;
             return;
         }
         
+        //ignore if notarized and that preference is set
+        if([preferences.preferences[PREF_NOTARIZATION_MODE] boolValue]) {
+            
+            if(process.isNotarized) {
+                os_log_debug(logHandle, "notarization mode set, and process is notarized ...so allowing!");
+                return;
+            }
+        }
+        
         //ignore if alert was shown
         if(process.alertShown) {
             return;
@@ -514,7 +523,7 @@ es_client_t* esClient = nil;
 // kill or resume process, create rule, etc
 -(void)handleResponse:(NSDictionary*)alert {
     
-    NSInteger action = [alert[ALERT_ACTION] integerValue];
+    NSNumber* action = alert[ALERT_ACTION];
     NSString* processPath = alert[ALERT_PROCESS_PATH];
     
     //get process
@@ -532,10 +541,10 @@ es_client_t* esClient = nil;
     }
     
     //update process's rule
-    process.rule = action;
+    process.rule = action.integerValue;
     
     //block?
-    if(RULE_BLOCK == action) {
+    if(RULE_BLOCK == action.integerValue) {
         
         //dbg/log msg
         os_log(logHandle, "user says, 'block', so blocking %{public}@", processPath);

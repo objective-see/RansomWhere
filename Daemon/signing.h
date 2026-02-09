@@ -20,13 +20,10 @@
 //get the signing info of a item
 // pid specified: extract dynamic code signing info
 // path specified: generate static code signing info
-NSMutableDictionary* generateSigningInfo(Process* process, NSUInteger options, SecCSFlags flags);
+NSMutableDictionary* generateSigningInfo(Process* process, SecCSFlags flags);
 
 //extract signing info/check via dynamic code ref (process pid)
 CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDictionary* signingInfo);
-
-//extact signing info/check via static code ref (process path)
-CFDictionaryRef staticCodeCheck(Process* process, SecCSFlags flags, NSMutableDictionary* signingInfo);
 
 //determine who signed item
 NSNumber* extractSigner(SecStaticCodeRef code, SecCSFlags flags, BOOL isDynamic);
@@ -36,5 +33,9 @@ OSStatus validateRequirement(SecStaticCodeRef code, SecRequirementRef requiremen
 
 //extract (names) of signing auths
 NSMutableArray* extractSigningAuths(NSDictionary* signingDetails);
+
+//check if notarized
+// call this after other code checks
+BOOL isNotarized(SecCodeRef dynamicCode);
 
 #endif

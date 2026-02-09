@@ -77,14 +77,17 @@ enum Architectures{ArchUnknown, ArchAppleSilicon, ArchIntel};
 //csflags
 @property(nonatomic, retain)NSNumber* _Nonnull csFlags;
 
-//cd hash
-@property(nonatomic, retain)NSData* _Nonnull cdHash;
-
 //signing ID
 @property(nonatomic, retain)NSString* _Nonnull signingID;
 
 //team ID
 @property(nonatomic, retain)NSString* _Nonnull teamID;
+
+//signing category
+@property(nonatomic, retain)NSNumber* _Nullable signingCategory;
+
+//notarized
+@property BOOL isNotarized;
 
 //signing info
 // manually generated via CS APIs if `codesign:TRUE` is set

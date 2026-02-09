@@ -245,18 +245,48 @@
                             <action selector="refresh:" target="-2" id="b3e-RO-mVQ"/>
                         </connections>
                     </button>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U1E-Sb-z8p">
+                        <rect key="frame" x="908" y="17" width="149" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="15" id="FTN-jJ-iSY"/>
+                            <constraint firstAttribute="width" constant="145" id="tRf-Gs-FRg"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Add Rule" id="hnj-xh-QCk">
+                            <font key="font" size="13" name="Menlo-Bold"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MWR-Ox-ot1">
+                        <rect key="frame" x="1063" y="14" width="21" height="21"/>
+                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSAddTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QEO-gW-kxU">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="19" id="1qw-pc-oWu"/>
+                            <constraint firstAttribute="width" constant="21" id="4wg-Dc-mLp"/>
+                        </constraints>
+                        <connections>
+                            <action selector="addRule:" target="-2" id="jlN-3W-gGh"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="hpe-dB-Ek8" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" constant="33" id="4t0-zq-Fwu"/>
                     <constraint firstItem="hpe-dB-Ek8" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="GL9-r8-MyB"/>
+                    <constraint firstAttribute="trailing" secondItem="MWR-Ox-ot1" secondAttribute="trailing" constant="20" symbolic="YES" id="KrR-dQ-7vA"/>
                     <constraint firstItem="hmR-9d-tQz" firstAttribute="leading" secondItem="dch-dH-0L1" secondAttribute="trailing" constant="7" id="RGS-dF-ba9"/>
                     <constraint firstItem="cbu-EU-t72" firstAttribute="leading" secondItem="hmR-9d-tQz" secondAttribute="trailing" constant="9" id="SBi-Uv-GsN"/>
                     <constraint firstItem="dch-dH-0L1" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="SXv-L4-Lmp"/>
                     <constraint firstAttribute="bottom" secondItem="qQ9-BU-evn" secondAttribute="bottom" constant="9" id="YY0-6B-uFM"/>
+                    <constraint firstItem="MWR-Ox-ot1" firstAttribute="centerY" secondItem="U1E-Sb-z8p" secondAttribute="centerY" id="Z4O-fA-8B8"/>
                     <constraint firstAttribute="bottom" secondItem="hmR-9d-tQz" secondAttribute="bottom" constant="18" id="egW-Hf-Duh"/>
                     <constraint firstItem="qQ9-BU-evn" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="hBm-km-4XJ"/>
                     <constraint firstAttribute="bottom" secondItem="cbu-EU-t72" secondAttribute="bottom" constant="20" id="hg5-dk-XbS"/>
+                    <constraint firstItem="MWR-Ox-ot1" firstAttribute="leading" secondItem="U1E-Sb-z8p" secondAttribute="trailing" constant="8" id="uMd-qJ-9gn"/>
                     <constraint firstAttribute="bottom" secondItem="dch-dH-0L1" secondAttribute="bottom" constant="5" id="w87-xq-oXG"/>
+                    <constraint firstItem="MWR-Ox-ot1" firstAttribute="firstBaseline" secondItem="cbu-EU-t72" secondAttribute="baseline" id="wep-RV-1Qf"/>
                 </constraints>
             </view>
             <connections>
@@ -277,6 +307,7 @@
         </window>
     </objects>
     <resources>
+        <image name="NSAddTemplate" width="18" height="16"/>
         <image name="NSColorPanel" width="32" height="32"/>
         <image name="NSStopProgressFreestandingTemplate" width="19" height="19"/>
         <image name="RansomWhere" width="578" height="102"/>

@@ -31,7 +31,7 @@
 -(void)deleteRule:(NSString*)path;
 
 //add rule
-//-(void)addRule:(NSString*)processPath action:(NSUInteger)action;
+-(void)addRule:(NSString*)path action:(NSNumber*)action;
 
 //respond to alert
 -(void)alertReply:(NSDictionary*)alert;

@@ -79,12 +79,12 @@ extern os_log_t logHandle;
 
 //add (+save) a rule
 // note: key is process path
--(BOOL)add:(NSString*)key action:(NSInteger)action {
+-(BOOL)add:(NSString*)path action:(NSNumber*)action {
     
-    os_log_debug(logHandle, "adding rule: %{public}@ -> %{public}@", key, (RULE_ALLOW == action) ? @"allow" : @"block");
+    os_log_debug(logHandle, "adding rule: %{public}@ -> %{public}@", path, (RULE_ALLOW == action) ? @"allow" : @"block");
     
     @synchronized(self.rules){
-        self.rules[key] = @(RULE_ALLOW == action);
+        self.rules[path] = action;
     }
     
     return [self save];
@@ -98,7 +98,6 @@ extern os_log_t logHandle;
     
     NSInteger action;
     @synchronized(self.rules) {
-       
         action = [self.rules[path] integerValue];
         [self.rules removeObjectForKey:path];
     }

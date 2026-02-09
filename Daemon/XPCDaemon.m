@@ -68,13 +68,24 @@ extern Preferences* preferences;
 }
 
 //delete rule
--(void)deleteRule:(NSString*)key {
+-(void)addRule:(NSString*)path action:(NSNumber*)action {
     
-    os_log_debug(logHandle, "XPC request: '%s' (rule: %{public}@)", __PRETTY_FUNCTION__, key);
+    os_log_debug(logHandle, "XPC request: '%s' (path: %{public}@, action: %@)", __PRETTY_FUNCTION__, path, action);
     
-    //remove row
-    if(YES != [rules delete:key]) {
-        os_log_error(logHandle, "ERROR: failed to delete rule, %{public}@", key);
+    //add
+    if(![rules add:path action:action]) {
+        os_log_error(logHandle, "ERROR: failed to add rule (path: %{public}@, action: %@)", path, action);
+    }
+}
+
+//delete rule
+-(void)deleteRule:(NSString*)path {
+    
+    os_log_debug(logHandle, "XPC request: '%s' (path: %{public}@)", __PRETTY_FUNCTION__, path);
+    
+    //delete
+    if(![rules delete:path]) {
+        os_log_error(logHandle, "ERROR: failed to delete rule (path: %{public}@)", path);
     }
 }
 

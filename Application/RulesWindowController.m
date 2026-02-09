@@ -78,6 +78,7 @@ extern XPCDaemonClient* xpcDaemonClient;
     });
 }
 
+//load
 -(void)loadRules
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -162,6 +163,35 @@ extern XPCDaemonClient* xpcDaemonClient;
     }
     
     return;
+}
+- (IBAction)addRule:(id)sender {
+    
+    //dbg msg
+    os_log_debug(logHandle, "method '%s' invoked with %{public}@", __PRETTY_FUNCTION__, sender);
+    
+    //alloc sheet
+    self.addRuleWindowController = [[AddRuleWindowController alloc] initWithWindowNibName:@"AddRule"];
+    
+    //show it
+    // on close/OK, invoke XPC to add rule, then reload
+    [self.window beginSheet:self.addRuleWindowController.window completionHandler:^(NSModalResponse response) {
+
+            //dbg msg
+            os_log_debug(logHandle, "add/edit rule window closed...");
+            
+            //on OK, add rule via XPC
+            if(response == NSModalResponseOK)
+            {
+                //add
+                [xpcDaemonClient addRule:self.addRuleWindowController.rulePath action:self.addRuleWindowController.ruleAction];
+                
+                //reload rules
+                [self loadRules];
+            }
+            
+            //unset add rule window controller
+            self.addRuleWindowController = nil;
+    }];
 }
 
 #pragma mark -

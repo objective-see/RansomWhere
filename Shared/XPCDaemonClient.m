@@ -120,6 +120,20 @@ extern NSMutableDictionary* alerts;
     return rules;
 }
 
+//add rule
+-(void)addRule:(NSString *)path action:(NSNumber*)action {
+    
+    os_log_debug(logHandle, "invoking daemon XPC method, '%s'", __PRETTY_FUNCTION__);
+    
+    //delete rule
+    [[self.daemon synchronousRemoteObjectProxyWithErrorHandler:^(NSError * proxyError)
+    {
+        //err msg
+        os_log_error(logHandle, "ERROR: failed to execute daemon XPC method '%s' (error: %{public}@)", __PRETTY_FUNCTION__, proxyError);
+        
+    }] addRule:path action:action];
+}
+
 //delete rule
 -(void)deleteRule:(NSString*)path {
     

@@ -11,6 +11,7 @@
 @import OSLog;
 
 #import "XPCDaemonClient.h"
+#import "AddRuleWindowController.h"
 
 /* CONSTS */
 
@@ -61,14 +62,8 @@
 // filtered rules
 @property(nonatomic, retain)NSMutableArray* rulesFiltered;
 
-//search box
-//@property (weak) IBOutlet NSSearchField *searchBox;
-
 //top level view
 @property (weak) IBOutlet NSView *view;
-
-//window toolbar
-//@property (weak) IBOutlet NSToolbar *toolbar;
 
 //table view
 @property (weak) IBOutlet NSTableView *tableView;
@@ -81,6 +76,9 @@
 
 //message for refresh
 @property (weak) IBOutlet NSTextField *refreshing;
+
+//add rules popup controller
+@property (strong) AddRuleWindowController *addRuleWindowController;
 
 /* METHODS */
 

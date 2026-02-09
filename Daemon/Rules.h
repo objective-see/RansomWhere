@@ -31,9 +31,9 @@
 
 -(BOOL)load;
 -(BOOL)save;
--(BOOL)delete:(NSString*)key;
--(NSInteger)find:(NSString*)key;
--(BOOL)add:(NSString*)key action:(NSInteger)action;
+-(BOOL)delete:(NSString*)path;
+-(NSInteger)find:(NSString*)path;
+-(BOOL)add:(NSString*)key action:(NSNumber*)action;
 
 @end
 

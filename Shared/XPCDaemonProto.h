@@ -25,6 +25,9 @@
 //delete rule
 -(void)deleteRule:(NSString*)path;
 
+//add rule
+-(void)addRule:(NSString*)path action:(NSNumber*)action;
+
 //respond to an alert
 -(void)alertReply:(NSDictionary*)alert;
 

@@ -30,9 +30,6 @@ extern XPCDaemonClient* xpcDaemonClient;
 @synthesize updateView;
 @synthesize updateWindowController;
 
-//'passive mode' button
-#define BUTTON_PASSIVE_MODE 1
-
 //'no-icon mode' button
 #define BUTTON_NO_ICON_MODE 2
 
@@ -79,6 +76,7 @@ extern XPCDaemonClient* xpcDaemonClient;
             
             view = self.modesView;
             ((NSButton*)[view viewWithTag:BUTTON_NO_ICON_MODE]).state = [self.preferences[PREF_NO_ICON_MODE] boolValue];
+            ((NSButton*)[view viewWithTag:BUTTON_NOTARIZATION_MODE]).state = [self.preferences[PREF_NOTARIZATION_MODE] boolValue];
             break;
             
         //update
@@ -132,13 +130,11 @@ bail:
             updatedPreferences[PREF_NO_ICON_MODE] = state;
             break;
         
-        /*
         //notarization mode
         case BUTTON_NOTARIZATION_MODE:
             updatedPreferences[PREF_NOTARIZATION_MODE] = state;
             break;
-        */
-            
+        
         //no update mode
         case BUTTON_NO_UPDATE_MODE:
             updatedPreferences[PREF_NO_UPDATE_MODE] = state;

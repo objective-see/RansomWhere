@@ -34,6 +34,8 @@
 		CD8FD5FA23C05AD900EFE0FB /* Rules.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD8FD5F523C05AD900EFE0FB /* Rules.xib */; };
 		CDF2D3982F392CC300FF45A4 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */; };
 		CDF2D3992F392CC300FF45A4 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */; };
+		CDF433632F3A84CA00C147DA /* AddRuleWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */; };
+		CDF433652F3A878900C147DA /* AddRule.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF433642F3A878900C147DA /* AddRule.xib */; };
 		CDFA08E1214900BF0089758C /* XPCUser.m in Sources */ = {isa = PBXBuildFile; fileRef = CDFA08DF214900BF0089758C /* XPCUser.m */; };
 /* End PBXBuildFile section */
 
@@ -98,6 +100,9 @@
 		CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = ../Shared/AboutWindow.xib; sourceTree = SOURCE_ROOT; };
 		CDF2D3962F392CC300FF45A4 /* AboutWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = ../Shared/AboutWindowController.h; sourceTree = SOURCE_ROOT; };
 		CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = ../Shared/AboutWindowController.m; sourceTree = SOURCE_ROOT; };
+		CDF433612F3A84CA00C147DA /* AddRuleWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AddRuleWindowController.h; sourceTree = "<group>"; };
+		CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddRuleWindowController.m; sourceTree = "<group>"; };
+		CDF433642F3A878900C147DA /* AddRule.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddRule.xib; sourceTree = "<group>"; };
 		CDFA08D7214606DB0089758C /* XPCDaemonProto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XPCDaemonProto.h; path = ../Shared/XPCDaemonProto.h; sourceTree = "<group>"; };
 		CDFA08DB21460A400089758C /* XPCUserProto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XPCUserProto.h; path = ../Shared/XPCUserProto.h; sourceTree = "<group>"; };
 		CDFA08DF214900BF0089758C /* XPCUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XPCUser.m; path = ../Shared/XPCUser.m; sourceTree = "<group>"; };
@@ -171,6 +176,9 @@
 		7D7755E51F02E05B00D0017D /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				CDF433642F3A878900C147DA /* AddRule.xib */,
+				CDF433612F3A84CA00C147DA /* AddRuleWindowController.h */,
+				CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */,
 				7DD2BF941F1FF64300B33214 /* AlertWindow.xib */,
 				7DD2BF951F1FF64300B33214 /* AlertWindowController.h */,
 				7DD2BF961F1FF64300B33214 /* AlertWindowController.m */,
@@ -319,6 +327,7 @@
 				CDF2D3992F392CC300FF45A4 /* AboutWindow.xib in Resources */,
 				7D7755F01F02E05B00D0017D /* MainMenu.xib in Resources */,
 				7DD25FF01F23B73C00277EC4 /* Assets.xcassets in Resources */,
+				CDF433652F3A878900C147DA /* AddRule.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,6 +341,7 @@
 				7D16D6961F64E43300DB3161 /* UpdateWindowController.m in Sources */,
 				7D3B75141F13354900568828 /* StatusBarItem.m in Sources */,
 				7D7755EB1F02E05B00D0017D /* main.m in Sources */,
+				CDF433632F3A84CA00C147DA /* AddRuleWindowController.m in Sources */,
 				CD2F8008244551AC009C3D77 /* NSApplicationKeyEvents.m in Sources */,
 				CD32C2352094062D009CADF6 /* SigningInfoViewController.m in Sources */,
 				7D5C5F521F200B9200C0E94A /* utilities.m in Sources */,

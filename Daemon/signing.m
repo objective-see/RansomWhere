@@ -1,10 +1,9 @@
 //
 //  File: Signing.m
-//  Project: FileMonitor
+//  Project: RansomWhere
 //
 //  Created by: Patrick Wardle
-//  Copyright:  2017 Objective-See
-//  License:    Creative Commons Attribution-NonCommercial 4.0 International License
+//  Copyright:  2026 Objective-See
 //
 
 #import "signing.h"
@@ -13,10 +12,8 @@
 #import <Security/Security.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
-//get the signing info of a item
-// pid specified: extract dynamic code signing info
-// path specified: generate static code signing info
-NSMutableDictionary* generateSigningInfo(Process* process, NSUInteger options, SecCSFlags flags)
+//get the signing info of a process (dynamic)
+NSMutableDictionary* generateSigningInfo(Process* process, SecCSFlags flags)
 {
     //status
     OSStatus status = !errSecSuccess;
@@ -39,25 +36,6 @@ NSMutableDictionary* generateSigningInfo(Process* process, NSUInteger options, S
     //extract status
     status = [signingInfo[KEY_SIGNATURE_STATUS] intValue];
     
-    //on (certain) errors
-    // do static, if option is set
-    if( (csStatic == options) &&
-        ( (kPOSIXErrorESRCH == status)  ||
-          (errSecCSNoSuchCode == status) ||
-          (errSecCSStaticCodeChanged == status) ) )
-    {
-        //free (invalid) details
-        if(NULL != signingDetails)
-        {
-            //free / unset
-            CFRelease(signingDetails);
-            signingDetails = NULL;
-        }
-    
-        //static code sign check
-        signingDetails = staticCodeCheck(process, flags, signingInfo);
-    }
-
     //bail on any signing error(s)
     if(errSecSuccess != [signingInfo[KEY_SIGNATURE_STATUS] intValue])
     {
@@ -114,21 +92,6 @@ CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDi
     //signing details
     CFDictionaryRef signingDetails = NULL;
     
-    //token
-    static dispatch_once_t onceToken = 0;
-    
-    //is notarized requirement
-    static SecRequirementRef isNotarized = nil;
-    
-    //only once
-    // init notarization requirements
-    dispatch_once(&onceToken, ^{
-        
-        //init
-        SecRequirementCreateWithString(CFSTR("notarized"), kSecCSDefaultFlags, &isNotarized);
-        
-    });
-    
     //obtain dynamic code ref from (audit) token
     status = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:process.auditToken}), kSecCSDefaultFlags, &dynamicCode);
     if(errSecSuccess != status)
@@ -175,7 +138,7 @@ CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDi
         
         //set notarization status
         // note: SecStaticCodeCheckValidity returns 0 on success, hence the `!`
-        signingInfo[KEY_SIGNING_IS_NOTARIZED] = [NSNumber numberWithInt:!SecStaticCodeCheckValidity(dynamicCode, kSecCSDefaultFlags, isNotarized)];
+        signingInfo[KEY_SIGNING_IS_NOTARIZED] = [NSNumber numberWithBool:isNotarized(dynamicCode)];
     }
     
     //extract signing info
@@ -193,106 +156,36 @@ bail:
     {
         //free
         CFRelease(dynamicCode);
-        
-        //unset
         dynamicCode = NULL;
     }
     
     return signingDetails;
 }
 
-//extact signing info/check via static code ref (process path)
-CFDictionaryRef staticCodeCheck(Process* process, SecCSFlags flags, NSMutableDictionary* signingInfo)
-{
-    //status
-    OSStatus status = !errSecSuccess;
-    
-    //static code ref
-    SecStaticCodeRef staticCode = NULL;
-    
-    //signing details
-    CFDictionaryRef signingDetails = NULL;
+//check if notarized
+// call this after other code checks
+BOOL isNotarized(SecCodeRef dynamicCode) {
     
     //token
     static dispatch_once_t onceToken = 0;
     
-    //is notarized requirement
-    static SecRequirementRef isNotarized = nil;
+    //notarization requirement
+    static SecRequirementRef notarizedReq = nil;
     
     //only once
-    // init notarization requirements
     dispatch_once(&onceToken, ^{
-        
-        //init
-        SecRequirementCreateWithString(CFSTR("notarized"), kSecCSDefaultFlags, &isNotarized);
-        
+        SecRequirementCreateWithString(CFSTR("notarized"), kSecCSDefaultFlags, &notarizedReq);
     });
     
     //sanity check
-    if(nil == process.path)
-    {
-        //set error
-        signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:kPOSIXErrorESRCH];
-        
-        //bail
-        goto bail;
+    if(!notarizedReq) {
+        return NO;
     }
     
-    //create static code ref via path
-    status = SecStaticCodeCreateWithPath((__bridge CFURLRef)([NSURL fileURLWithPath:process.path]), kSecCSDefaultFlags, &staticCode);
-    if(errSecSuccess != status)
-    {
-        //set error
-        signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
-        
-        //bail
-        goto bail;
-    }
-    
-    //check signature
-    status = SecStaticCodeCheckValidity(staticCode, flags, NULL);
-    if(errSecSuccess != status)
-    {
-        //set error
-        signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
-        
-        //bail
-        goto bail;
-    }
-    
-    //happily signed
-    signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:errSecSuccess];
-    
-    //determine signer
-    // apple, app store, dev id, adhoc, etc...
-    signingInfo[KEY_SIGNATURE_SIGNER] = extractSigner(staticCode, flags, NO);
-    
-    //set notarization status
-    // note: SecStaticCodeCheckValidity returns 0 on success, hence the `!`
-    signingInfo[KEY_SIGNING_IS_NOTARIZED] = [NSNumber numberWithInt:!SecStaticCodeCheckValidity(staticCode, kSecCSDefaultFlags, isNotarized)];
-    
-    //extract signing info
-    status = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation, &signingDetails);
-    if(errSecSuccess != status)
-    {
-        //bail
-        goto bail;
-    }
-    
-bail:
-
-    //free static code
-    if(NULL != staticCode)
-    {
-        //free
-        CFRelease(staticCode);
-        
-        //unset
-        staticCode = NULL;
-    }
-    
-    return signingDetails;
+    return (errSecSuccess == SecCodeCheckValidity(dynamicCode, kSecCSDefaultFlags, notarizedReq));
 }
+
+
 
 //determine who signed item
 NSNumber* extractSigner(SecStaticCodeRef code, SecCSFlags flags, BOOL isDynamic)
