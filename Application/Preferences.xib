@@ -114,6 +114,9 @@
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="menu" size="14"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="togglePreference:" target="-2" id="HuZ-rG-oTj"/>
+                    </connections>
                 </button>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6O1-eb-lIz">
                     <rect key="frame" x="72" y="128" width="266" height="19"/>
