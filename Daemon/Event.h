@@ -1,16 +1,20 @@
 //
 //  Event.h
-//  RansomWhere (Daemon)
+//  RansomWhere?
 //
-//  Created by Patrick Wardle on 3/28/16.
-//  Copyright (c) 2016 Objective-See. All rights reserved.
+//  Created by Patrick Wardle on 9/26/14.
+//  Copyright (c) 2026 Objective-See. All rights reserved.
 //
+
+@class Item;
+@class Event;
+@class PluginBase;
+
+@import Foundation;
 
 #import "Process.h"
-#import "fsEvents.h"
-#import <Foundation/Foundation.h>
-
-//@class Binary;
+#import <Security/AuthSession.h>
+#import <EndpointSecurity/EndpointSecurity.h>
 
 @interface Event : NSObject
 {
@@ -19,21 +23,29 @@
 
 /* PROPERTIES */
 
-//flags
-@property (nonatomic, retain)NSNumber* flags;
+//process object
+@property(nonatomic, retain)Process* process;
 
-//file path
-@property (nonatomic, retain)NSString* filePath;
+//(startup) item
+@property(nonatomic, retain)Item* item;
 
-//process id
-@property (nonatomic, retain)Process* process;
-
-//triggered due to ancestor
-@property BOOL ancestorTriggered;
+//(user) action
+@property NSUInteger action;
 
 /* METHODS */
 
 //init
--(id)init:(NSString*)path fsProcess:(Process*)fsProcess fsEvent:(kfs_event_a *)fsEvent;
+-(id)init:(Process*)process;
+
+//create an (deliverable) obj
+-(NSMutableDictionary*)toAlert;
+
+/* PROPERTIES */
+
+//uuid
+@property (nonatomic, retain)NSString* uuid;
+
+//time stamp
+@property (nonatomic, retain)NSDate *timestamp;
 
 @end

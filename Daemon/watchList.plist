@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>description</key>
+		<string>Kernel Extension</string>
+		<key>paths</key>
+		<array>
+			<string>^(\/System|)\/Library\/Extensions\/[^\/]+\.(?i)kext$</string>
+		</array>
+		<key>class</key>
+		<string>Kext</string>
+		<key>alert</key>
+		<string>installed a kernel extension</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Launch D &amp; A</string>
+		<key>paths</key>
+		<array>
+			<string>^(\/System|\/Users\/[^\/]+|)\/Library\/(LaunchDaemons|LaunchAgents)\/.+\.(?i)plist$</string>
+		</array>
+		<key>class</key>
+		<string>Launchd</string>
+		<key>alert</key>
+		<string>installed a launch daemon or agent</string>
+		<key>ignoreKids</key>
+		<true/>
+		<key>maxOSVersion</key>
+		<integer>13</integer>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Login Item</string>
+		<key>paths</key>
+		<array>
+			<string>^(\/Users\/[^\/]+|)\/Library\/Application Support\/com.apple.backgroundtaskmanagementagent\/backgrounditems.btm$</string>
+		</array>
+		<key>class</key>
+		<string>LoginItem</string>
+		<key>alert</key>
+		<string>installed a login item</string>
+		<key>ignoreKids</key>
+		<true/>
+		<key>maxOSVersion</key>
+		<integer>13</integer>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Cron Job</string>
+		<key>paths</key>
+		<array>
+			<string>/private/var/at/tabs/</string>
+		</array>
+		<key>class</key>
+		<string>CronJob</string>
+		<key>alert</key>
+		<string>created a cron job</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>App Login Items</string>
+		<key>paths</key>
+		<array>
+			<string>/Applications</string>
+		</array>
+		<key>class</key>
+		<string>AppLoginItem</string>
+		<key>alert</key>
+		<string>created an application helper login item</string>
+		<key>ignoreKids</key>
+		<false/>
+		<key>maxOSVersion</key>
+		<integer>13</integer>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Background Task Management</string>
+		<key>paths</key>
+		<array/>
+		<key>class</key>
+		<string>Btm</string>
+		<key>alert</key>
+		<string>created an background task item</string>
+		<key>ignoreKids</key>
+		<true/>
+		<key>minOSVersion</key>
+		<integer>14</integer>
+	</dict>
+	<dict>
+		<key>description</key>
+		<string>Process Monitor</string>
+		<key>class</key>
+		<string>Processes</string>
+		<key>alert</key>
+		<string>is a non-notarized process</string>
+		<key>ignoreKids</key>
+		<true/>
+	</dict>
+</array>
+</plist>

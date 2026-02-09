@@ -1,45 +1,50 @@
 //
-//  main.h
-//  Daemon
+//  file: main.h
+//  project: RansomWhere? (daemon)
+//  description: main (header)
 //
-//  Created by Patrick Wardle on 4/2/16.
-//  Copyright (c) 2016 Objective-See. All rights reserved.
+//  created by Patrick Wardle
+//  copyright (c) 2018 Objective-See. All rights reserved.
 //
+
+#import "Rules.h"
+#import "Events.h"
+#import "consts.h"
+#import "utilities.h"
+#import "Preferences.h"
+#import "XPCListener.h"
 
 #ifndef main_h
 #define main_h
 
-#import "Whitelist.h"
-#import "ProcMonitor.h"
+//GLOBALS
 
-#import <Foundation/Foundation.h>
+//prefs obj
+Preferences* preferences = nil;
 
-/* GLOBALS */
+//rules obj
+Rules* rules = nil;
 
-//global current user
-extern CFStringRef consoleUserName;
+//alerts obj
+Events* events = nil;
 
-//global white list
-extern Whitelist* whitelist;
+//XPC listener obj
+XPCListener* xpcListener = nil;
 
-//global process monitor
-extern ProcMonitor* processMonitor;
+//dispatch source for SIGTERM
+dispatch_source_t dispatchSource = nil;
 
 /* FUNCTIONS */
 
-//delete list of installed/approved apps, etc
-BOOL reset(void);
+//check for full disk access
+int fdaCheck(void);
 
-//init paths
-// ->this logic will only be needed if daemon is executed from non-standard location
-BOOL initPaths(void);
+//init a handler for SIGTERM
+// can perform actions such as disabling firewall and closing logging
+void register4Shutdown(void);
 
-//get current user
-// ->then, setup callback for changes
-BOOL initUserName(void);
-
-//check for update
-// ->query website for json file w/ version info
-void* checkForUpdate(void *threadParam);
+//daemon should only be unloaded if box is shutting down
+// so handle things de-init logging, etc
+void goodbye(void);
 
 #endif /* main_h */

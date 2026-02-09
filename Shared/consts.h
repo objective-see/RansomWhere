@@ -1,0 +1,326 @@
+//
+//  file: consts.h
+//  project: RansomWhere? (shared)
+//  description: #defines and what not
+//
+//  created by Patrick Wardle
+//  copyright (c) 2026 Objective-See. All rights reserved.
+//
+
+//TODO: cleanup
+
+#ifndef consts_h
+#define consts_h
+
+//cs consts
+// from: cs_blobs.h
+#define CS_VALID 0x00000001
+#define CS_ADHOC 0x0000002
+#define CS_RUNTIME 0x00010000
+
+//patreon url
+#define PATREON_URL @"https://www.patreon.com/join/objective_see"
+
+//bundle ID
+#define BUNDLE_ID "com.objective-see.ransomwhere"
+
+//main app bundle id
+#define MAIN_APP_ID @"com.objective-see.ransomwhere"
+
+//helper (login item) ID
+#define HELPER_ID @"com.objective-see.ransomwhere.helper"
+
+//installer (app) ID
+#define INSTALLER_ID @"com.objective-see.ransomwhere.installer"
+
+//installer (helper) ID
+#define CONFIG_HELPER_ID @"com.objective-see.ransomwhere.installerHelper"
+
+//signing auth
+#define SIGNING_AUTH @"Developer ID Application: Objective-See, LLC (VBG97UB4TA)"
+
+//log to file flag
+#define LOG_TO_FILE 0x10
+
+//install directory
+#define INSTALL_DIRECTORY @"/Library/Objective-See/RansomWhere"
+
+//preferences file
+#define PREFS_FILE @"preferences.plist"
+
+//rules file
+#define RULES_FILE @"rules.plist"
+
+//client no status
+#define STATUS_CLIENT_UNKNOWN -1
+
+//client disabled
+#define STATUS_CLIENT_DISABLED 0
+
+//client enabled
+#define STATUS_CLIENT_ENABLED 1
+
+//daemon mach name
+#define DAEMON_MACH_SERVICE @"com.objective-see.ransomwhere"
+
+//product version url
+#define PRODUCT_VERSIONS_URL @"https://objective-see.org/products.json"
+
+//product url
+#define PRODUCT_URL @"https://objective-see.org/products/ransomwhere.html"
+
+//error(s) url
+#define ERRORS_URL @"https://objective-see.org/errors.html"
+
+//support us button tag
+#define BUTTON_SUPPORT_US 100
+
+//more info button tag
+#define BUTTON_MORE_INFO 101
+
+//install cmd
+#define CMD_INSTALL @"-install"
+
+//uninstall cmd
+#define CMD_UNINSTALL @"-uninstall"
+
+//uninstall via UI
+#define CMD_UNINSTALL_VIA_UI @"-uninstallViaUI"
+
+//flag to uninstall
+#define ACTION_UNINSTALL_FLAG 0
+
+//flag to install
+#define ACTION_INSTALL_FLAG 1
+
+//flag for partial uninstall
+// leave preferences file, etc.
+#define UNINSTALL_PARTIAL 0
+
+//flag for full uninstall
+#define UNINSTALL_FULL 1
+
+//add rule, block
+#define BUTTON_BLOCK 0
+
+//add rule, allow
+#define BUTTON_ALLOW 1
+
+//prefs
+// got FDA
+#define PREF_GOT_FDA @"gotFullDiskAccess"
+
+//prefs
+// disabled status
+#define PREF_IS_DISABLED @"disabled"
+
+//prefs
+// passive mode
+#define PREF_PASSIVE_MODE @"passiveMode"
+
+//prefs
+// icon mode
+#define PREF_NO_ICON_MODE @"noIconMode"
+
+//prefs
+// notarizaion mode
+#define PREF_NOTARIZATION_MODE @"notarizationMode"
+
+//prefs
+// update mode
+#define PREF_NO_UPDATE_MODE @"noupdateMode"
+
+//general error URL
+#define FATAL_ERROR_URL @"https://objective-see.org/errors.html"
+
+//key for exit code
+#define EXIT_CODE @"exitCode"
+
+//new user/client notification
+#define USER_NOTIFICATION @"com.objective-see.ransomwhere.userNotification"
+
+//rules changed
+#define RULES_CHANGED @"com.objective-see.ransomwhere.rulesChanged"
+
+//first time flag
+#define INITIAL_LAUNCH @"-initialLaunch"
+
+/* INSTALLER */
+
+//menu: 'about'
+#define MENU_ITEM_ABOUT 0
+
+//menu: 'quit'
+#define MENU_ITEM_QUIT 1
+
+//menu: 'quit'
+#define MENU_ITEM_SETTINGS 2
+
+//product name
+#define PRODUCT_NAME @"RansomWhere"
+
+//app name
+#define APP_NAME @"RansomWhere Helper.app"
+
+//launch daemon
+#define LAUNCH_DAEMON @"RansomWhere.app"
+
+//launch daemon plist
+#define LAUNCH_DAEMON_PLIST @"com.objective-see.ransomwhere.plist"
+
+//frame shift
+// for status msg to avoid activity indicator
+#define FRAME_SHIFT 45
+
+//flag to close
+#define ACTION_CLOSE_FLAG -1
+
+//cmdline flag to uninstall
+#define ACTION_UNINSTALL @"-uninstall"
+
+//flag to uninstall
+#define ACTION_UNINSTALL_FLAG 0
+
+//cmdline flag to uninstall
+#define ACTION_INSTALL @"-install"
+
+//flag to install
+#define ACTION_INSTALL_FLAG 1
+
+//button title: upgrade
+#define ACTION_UPGRADE @"Upgrade"
+
+//button title: close
+#define ACTION_CLOSE @"Close"
+
+//button title: next
+#define ACTION_NEXT @"Next »"
+
+//flag to show full disk access
+#define ACTION_SHOW_FDA 3
+
+//show friends
+#define ACTION_SHOW_SUPPORT 4
+
+//support us
+#define ACTION_SUPPORT 5
+
+//register
+#define LSREGISTER @"/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister"
+
+/* (HELPER) APP */
+
+//path to osascript
+#define OSASCRIPT @"/usr/bin/osascript"
+
+//path to open
+#define OPEN @"/usr/bin/open"
+
+//log activity button
+#define PREF_LOG_ACTIVITY @"logActivity"
+
+//keys for rule dictionary
+#define RULE_PROCESS_PATH @"processPath"
+#define RULE_PROCESS_NAME @"processName"
+#define RULE_PROCESS_SIGNINGID @"processSigningID"
+#define RULE_ITEM_FILE @"itemFile"
+#define RULE_ITEM_OBJECT @"itemObject"
+#define RULE_ACTION @"action"
+
+//scope for action
+// from dropdown in alert window
+#define ACTION_SCOPE_UNSELECTED -1
+#define ACTION_SCOPE_ALL 0
+#define ACTION_SCOPE_FILE 1
+#define ACTION_SCOPE_PROCESS 2
+
+//keys for alert dictionary
+#define ALERT_UUID @"uuid"
+#define ALERT_MESSAGE @"message"
+#define ALERT_TIMESTAMP @"timestamp"
+#define ALERT_ENCRYPTED_FILES @"encryptedFiles"
+
+#define ALERT_AUDIT_TOKEN @"auditToken"
+#define ALERT_PROCESS_PID_VERSION @"pidVersion"
+#define ALERT_PROCESS_ID @"pid"
+#define ALERT_PROCESS_PATH @"path"
+#define ALERT_PROCESS_ARGS @"args"
+#define ALERT_PROCESS_NAME @"processName"
+#define ALERT_PROCESS_ANCESTORS @"processAncestors"
+#define ALERT_PROCESS_SIGNING_INFO @"signingInfo"
+
+//signing info (from ESF)
+#define CS_FLAGS @"csFlags"
+#define PLATFORM_BINARY @"platformBinary"
+#define TEAM_ID @"teamID"
+#define SIGNING_ID @"signingID"
+
+#define ALERT_TYPE @"alertType"
+#define ALERT_TYPE_FILE 1
+#define ALERT_TYPE_PROCESS 2
+
+#define ALERT_ITEM_NAME @"itemName"
+#define ALERT_ITEM_FILE @"itemFile"
+#define ALERT_ITEM_OBJECT @"itemObject"
+#define ALERT_ITEM_FILE_RESTRICTED @"isRestricted"
+
+#define ALERT_USER @"user"
+#define ALERT_IPADDR @"ipAddr"
+#define ALERT_HOSTNAME @"hostName"
+#define ALERT_PORT @"port"
+#define ALERT_PROTOCOL @"protocol"
+#define ALERT_ACTION @"action"
+#define ALERT_ACTION_SCOPE @"actionScope"
+#define ALERT_CREATE_RULE @"createRule"
+
+#define ALERT_PIDS @"pids"
+#define ALERT_HASH @"hash"
+
+//keys for rules
+#define KEY_RULES @"rules"
+#define KEY_CS_FLAGS @"csFlags"
+
+//rules window
+#define WINDOW_RULES 0
+
+//preferences window
+#define WINDOW_PREFERENCES 1
+
+//key for stdout output
+#define STDOUT @"stdOutput"
+
+//key for stderr output
+#define STDERR @"stdError"
+
+//key for exit code
+#define EXIT_CODE @"exitCode"
+
+//plugin types
+typedef enum {
+    PLUGIN_TYPE_KEXT = 1,
+    PLUGIN_TYPE_LAUNCHD,
+    PLUGIN_TYPE_LOGIN_ITEM,
+    PLUGIN_TYPE_CRON_JOB,
+    PLUGIN_TYPE_APP_LOGIN_ITEM,
+    PLUGIN_TYPE_EVENT_MONITOR,
+    PLUGIN_TYPE_PROCESS_MONITOR,
+    PLUGIN_TYPE_BACKGROUND_TASK
+} PluginType;
+
+
+//path to launchctl
+#define LAUNCHCTL @"/bin/launchctl"
+
+//path to killall
+#define KILL_ALL @"/usr/bin/killall"
+
+//path to log
+#define UNIVERSAL_LOG "/usr/bin/log"
+
+enum {
+    RULE_NOT_FOUND = -1,
+    RULE_BLOCK     =  0,
+    RULE_ALLOW     =  1,
+};
+
+#endif

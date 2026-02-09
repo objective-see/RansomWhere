@@ -26,3 +26,5 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+Application/Uninstaller/
+RansomWhere.xcworkspace/xcuserdata

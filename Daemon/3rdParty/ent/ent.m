@@ -51,6 +51,10 @@ extern double pochisq(const double ax, const int df);
 //3 MB
 #define READ_CHUNK 1024*1024*3
 
+//header size
+// just # of bytes to grab from start of file for image detections, etc
+#define HEADER_SIZE 0x10
+
 //test a file
 // ->return a dictionary w/ entropy, chi square, and monte carlo pi 'error'
 NSMutableDictionary* testFile(NSString* file)
