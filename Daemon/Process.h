@@ -12,6 +12,7 @@
 /* CONSTS */
 
 //code signing keys
+#define KEY_SIGNING_FLAGS @"csFlags"
 #define KEY_SIGNING_IS_NOTARIZED @"notarized"
 #define KEY_SIGNATURE_STATUS @"signatureStatus"
 #define KEY_SIGNATURE_SIGNER @"signatureSigner"
@@ -19,17 +20,6 @@
 #define KEY_SIGNATURE_TEAM_IDENTIFIER @"teamID"
 #define KEY_SIGNATURE_AUTHORITIES @"signatureAuthorities"
 
-//code sign options
-enum csOptions{csNone, csStatic, csDynamic};
-
-//signers
-enum Signer{None, Apple, AppStore, DevID, AdHoc};
-
-//architectures
-enum Architectures{ArchUnknown, ArchAppleSilicon, ArchIntel};
-
-//cs options
-#define CS_STATIC_CHECK YES
 
 /* OBJECT: PROCESS */
 
@@ -50,9 +40,6 @@ enum Architectures{ArchUnknown, ArchAppleSilicon, ArchIntel};
 // exec, fork, exit
 @property u_int32_t event;
 
-//cpu type
-@property NSUInteger architecture;
-
 //exit code
 @property int exit;
 
@@ -70,10 +57,6 @@ enum Architectures{ArchUnknown, ArchAppleSilicon, ArchIntel};
 
 //ancestors
 @property(nonatomic, retain)NSMutableArray* _Nonnull ancestors;
-
-//platform binary
-@property(nonatomic, retain)NSNumber* _Nonnull isPlatformBinary;
-
 //csflags
 @property(nonatomic, retain)NSNumber* _Nonnull csFlags;
 
@@ -86,8 +69,9 @@ enum Architectures{ArchUnknown, ArchAppleSilicon, ArchIntel};
 //signing category
 @property(nonatomic, retain)NSNumber* _Nullable signingCategory;
 
-//notarized
+//flags
 @property BOOL isNotarized;
+@property BOOL isPlatformBinary;
 
 //signing info
 // manually generated via CS APIs if `codesign:TRUE` is set

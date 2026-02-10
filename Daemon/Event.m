@@ -82,7 +82,7 @@ extern os_log_t logHandle;
     signingInfo[CS_FLAGS] = self.process.csFlags;
     
     //add platform binary
-    signingInfo[PLATFORM_BINARY] = self.process.isPlatformBinary;
+    signingInfo[PLATFORM_BINARY] = @(self.process.isPlatformBinary);
     
     //add team id
     if(nil != self.process.teamID)

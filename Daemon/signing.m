@@ -6,6 +6,7 @@
 //  Copyright:  2026 Objective-See
 //
 
+#import "consts.h"
 #import "signing.h"
 #import "utilities.h"
 
@@ -13,7 +14,7 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 
 //get the signing info of a process (dynamic)
-NSMutableDictionary* generateSigningInfo(Process* process, SecCSFlags flags)
+NSMutableDictionary* generateSigningInfo(Process* process)
 {
     //status
     OSStatus status = !errSecSuccess;
@@ -31,7 +32,7 @@ NSMutableDictionary* generateSigningInfo(Process* process, SecCSFlags flags)
     signingInfo = [NSMutableDictionary dictionary];
     
     //start with dynamic cs check
-    signingDetails = dynamicCodeCheck(process, flags, signingInfo);
+    signingDetails = dynamicCodeCheck(process.auditToken, signingInfo);
         
     //extract status
     status = [signingInfo[KEY_SIGNATURE_STATUS] intValue];
@@ -81,7 +82,7 @@ bail:
 }
 
 //extract signing info/check via dynamic code ref (process auth token)
-CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDictionary* signingInfo)
+CFDictionaryRef dynamicCodeCheck(NSData* auditToken, NSMutableDictionary* signingInfo)
 {
     //status
     OSStatus status = !errSecSuccess;
@@ -93,7 +94,7 @@ CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDi
     CFDictionaryRef signingDetails = NULL;
     
     //obtain dynamic code ref from (audit) token
-    status = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:process.auditToken}), kSecCSDefaultFlags, &dynamicCode);
+    status = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:auditToken}), kSecCSDefaultFlags, &dynamicCode);
     if(errSecSuccess != status)
     {
         //set error
@@ -104,7 +105,7 @@ CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDi
     }
     
     //validate code
-    status = SecCodeCheckValidity(dynamicCode, flags, NULL);
+    status = SecCodeCheckValidity(dynamicCode, kSecCSDefaultFlags, NULL);
     if(errSecSuccess != status)
     {
         //set error
@@ -117,29 +118,23 @@ CFDictionaryRef dynamicCodeCheck(Process* process, SecCSFlags flags, NSMutableDi
     //happily signed
     signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:errSecSuccess];
     
-    //platform binaries
-    // never are notarized
-    // always signed by apple
-    if(YES == [process.isPlatformBinary boolValue])
+    //extract signing info
+    status = SecCodeCopySigningInformation(dynamicCode, kSecCSSigningInformation, &signingDetails);
+    if(errSecSuccess != status)
     {
-        //signer: apple
-        signingInfo[KEY_SIGNATURE_SIGNER] = [NSNumber numberWithInt:Apple];
-        
-        //not notarized
-        signingInfo[KEY_SIGNING_IS_NOTARIZED] = @"0";
+        //bail
+        goto bail;
     }
     
-    //check all others
-    else
-    {
-        //determine signer
-        // apple, app store, dev id, adhoc, etc...
-        signingInfo[KEY_SIGNATURE_SIGNER] = extractSigner(dynamicCode, flags, YES);
+    //cs flags
+    signingInfo[KEY_SIGNING_FLAGS] = [(__bridge NSDictionary*)signingDetails objectForKey:(__bridge NSString*)kSecCodeInfoStatus];
+    
+    //determine signer
+    // apple, app store, dev id, adhoc, etc...
+    signingInfo[KEY_SIGNATURE_SIGNER] = extractSigner(dynamicCode, signingInfo[KEY_SIGNING_FLAGS]);
         
-        //set notarization status
-        // note: SecStaticCodeCheckValidity returns 0 on success, hence the `!`
-        signingInfo[KEY_SIGNING_IS_NOTARIZED] = [NSNumber numberWithBool:isNotarized(dynamicCode)];
-    }
+    //set notarization status
+    signingInfo[KEY_SIGNING_IS_NOTARIZED] = [NSNumber numberWithBool:isNotarized(dynamicCode, [signingInfo[KEY_SIGNING_FLAGS] intValue])];
     
     //extract signing info
     status = SecCodeCopySigningInformation(dynamicCode, kSecCSSigningInformation, &signingDetails);
@@ -164,7 +159,7 @@ bail:
 
 //check if notarized
 // call this after other code checks
-BOOL isNotarized(SecCodeRef dynamicCode) {
+BOOL isNotarized(SecCodeRef dynamicCode, uint32_t csFlags) {
     
     //token
     static dispatch_once_t onceToken = 0;
@@ -182,16 +177,21 @@ BOOL isNotarized(SecCodeRef dynamicCode) {
         return NO;
     }
     
+    //ad hoc binaries aren't notarized
+    if(CS_ADHOC & csFlags) {
+        return NO;
+    }
+    
+    //gotta have hardened runtime to get notarized
+    if(!(CS_RUNTIME & csFlags)){
+        return NO;
+    }
+    
     return (errSecSuccess == SecCodeCheckValidity(dynamicCode, kSecCSDefaultFlags, notarizedReq));
 }
 
-
-
 //determine who signed item
-NSNumber* extractSigner(SecStaticCodeRef code, SecCSFlags flags, BOOL isDynamic)
-{
-    //result
-    NSNumber* signer = nil;
+NSNumber* extractSigner(SecCodeRef code, NSNumber* csFlags) {
     
     //"anchor apple"
     static SecRequirementRef isApple = nil;
@@ -223,67 +223,35 @@ NSNumber* extractSigner(SecStaticCodeRef code, SecCSFlags flags, BOOL isDynamic)
         SecRequirementCreateWithString(CFSTR("anchor apple generic and certificate leaf [subject.CN] = \"Apple iPhone OS Application Signing\""), kSecCSDefaultFlags, &isiOSAppStore);
     });
     
-    //check 1: "is apple" (proper)
-    if(errSecSuccess == validateRequirement(code, isApple, flags, isDynamic))
-    {
+    //ad hoc
+    if(CS_ADHOC & csFlags.unsignedIntValue) {
+        return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_LOCAL_SIGNING];
+    }
+    
+    //"is apple" (proper)
+    if(errSecSuccess == validateRequirement(code, isApple)) {
         //set signer to apple
-        signer = [NSNumber numberWithInt:Apple];
+        return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_PLATFORM];
     }
     
-    //check 2: "is app store"
+    //"is app store"
     // note: this is more specific than dev id, so do it first
-    else if(errSecSuccess == validateRequirement(code, isAppStore, flags, isDynamic))
-    {
-        //set signer to app store
-        signer = [NSNumber numberWithInt:AppStore];
+    if(errSecSuccess == validateRequirement(code, isAppStore)) {
+        return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_APP_STORE];
+    }
+
+    //"is dev id"
+    if(errSecSuccess == validateRequirement(code, isDevID)) {
+        return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_DEVELOPER_ID];
     }
     
-    //check 3: "is (iOS) app store"
-    // note: this is more specific than dev id, so also do it first
-    else if(errSecSuccess == validateRequirement(code, isiOSAppStore, flags, isDynamic))
-    {
-        //set signer to app store
-        signer = [NSNumber numberWithInt:AppStore];
-    }
-    
-    //check 4: "is dev id"
-    else if(errSecSuccess == validateRequirement(code, isDevID, flags, isDynamic))
-    {
-        //set signer to dev id
-        signer = [NSNumber numberWithInt:DevID];
-    }
-    
-    //otherwise
-    // has to be adhoc?
-    else
-    {
-        //set signer to ad hoc
-        signer = [NSNumber numberWithInt:AdHoc];
-    }
-    
-    return signer;
+    //invalid(?)
+    return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_INVALID];
 }
 
 //validate a requirement
-OSStatus validateRequirement(SecStaticCodeRef code, SecRequirementRef requirement, SecCSFlags flags, BOOL isDynamic)
-{
-    //result
-    OSStatus result = -1;
-    
-    //dynamic check?
-    if(YES == isDynamic)
-    {
-        //validate dynamically
-        result = SecCodeCheckValidity((SecCodeRef)code, flags, requirement);
-    }
-    //static check
-    else
-    {
-        //validate statically
-        result = SecStaticCodeCheckValidity(code, flags, requirement);
-    }
-    
-    return result;
+OSStatus validateRequirement(SecCodeRef code, SecRequirementRef requirement) {
+    return SecCodeCheckValidity((SecCodeRef)code, kSecCSDefaultFlags, requirement);
 }
 
 //extract (names) of signing auths

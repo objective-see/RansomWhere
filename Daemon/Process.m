@@ -17,15 +17,10 @@
 #import "signing.h"
 #import "utilities.h"
 
-//hash length
-// from: cs_blobs.h
-#define CS_CDHASH_LEN 20
 
 //pointer to function
 // responsibility_get_pid_responsible_for_pid
 pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
-
-/* GLOBALS */
 
 
 /* FUNCTIONS */
@@ -42,7 +37,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
 @synthesize arguments;
 @synthesize auditToken;
 @synthesize signingInfo;
-@synthesize architecture;
 
 //init with audit token
 -(id)initWithToken:(audit_token_t)token {
@@ -78,15 +72,18 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         self.name = [self getName];
         
         //generate signing info
-        self.signingInfo = generateSigningInfo(self, kSecCSDefaultFlags);
+        self.signingInfo = generateSigningInfo(self);
         
         if(noErr == [self.signingInfo[KEY_SIGNATURE_STATUS] intValue]) {
          
             self.signingID = self.signingInfo[KEY_SIGNATURE_IDENTIFIER];
             self.teamID = self.signingInfo[KEY_SIGNATURE_TEAM_IDENTIFIER];
             
-            if(Apple == [self.signingInfo[KEY_SIGNATURE_SIGNER] intValue]) {
-                self.isPlatformBinary = @(YES);
+            self.signingCategory = self.signingInfo[KEY_SIGNATURE_SIGNER];
+
+            //apple?
+            if(ES_CS_VALIDATION_CATEGORY_PLATFORM == [self.signingCategory intValue]) {
+                self.isPlatformBinary = YES;
             }
             
             //3rd-party
@@ -107,14 +104,22 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
 
 //init w/ ES message
 -(id)initWithES:(const es_message_t *)message {
-
-    //process from msg
-    es_process_t* process = NULL;
+    
+    //sanity check
+    if(ES_EVENT_TYPE_NOTIFY_EXEC != message->event_type) {
+        return nil;
+    }
     
     //init super
     self = [super init];
     if(nil != self)
     {
+        //code ref
+        SecCodeRef codeRef = NULL;
+        
+        //process from msg
+        es_process_t* process = NULL;
+        
         //init
         self.rule = RULE_NOT_FOUND;
         
@@ -130,15 +135,11 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         //alloc dictionary encrypted file
         self.encryptedFiles = [NSMutableDictionary dictionary];
         
+        //set process (target)
+        process = message->event.exec.target;
+        
         //pid version
-        if(message->event_type == ES_EVENT_TYPE_NOTIFY_EXEC) {
-            //new process
-            self.pidVersion = @(audit_token_to_pidversion(message->event.exec.target->audit_token));
-        }
-        else {
-            //responsible process
-            self.pidVersion = @(audit_token_to_pidversion(message->process->audit_token));
-        }
+        self.pidVersion = @(audit_token_to_pidversion(process->audit_token));
         
         //init exit
         self.exit = -1;
@@ -149,45 +150,14 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         //set type
         self.event = message->event_type;
         
-        //event specific logic
-        
-        // set type
-        // extract (relevant) process object, etc
-        switch (message->event_type) {
-            
-            //exec
-            case ES_EVENT_TYPE_NOTIFY_EXEC:
+        //extract/format args
+        [self extractArgs:&message->event];
                 
-                //set process (target)
-                process = message->event.exec.target;
-                
-                //extract/format args
-                [self extractArgs:&message->event];
-                
-                break;
-                
-            //exit
-            case ES_EVENT_TYPE_NOTIFY_EXIT:
-                
-                //set process
-                process = message->process;
-                
-                //set exit code
-                self.exit = message->event.exit.stat;
-                
-                break;
-            
-            //default
-            default:
-                
-                //set process
-                process = message->process;
-                
-                break;
-        }
-        
         //init audit token
         self.auditToken = [NSData dataWithBytes:&process->audit_token length:sizeof(audit_token_t)];
+        
+        //now get code ref
+        SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:self.auditToken}), kSecCSDefaultFlags, &codeRef);
         
         //init pid
         self.pid = audit_token_to_pid(process->audit_token);
@@ -196,8 +166,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         self.ppid = process->ppid;
         
         //init rpid
-        if(message->version >= 4) 
-        {
+        if(message->version >= 4) {
             self.rpid = audit_token_to_pid(process->responsible_audit_token);
         }
         
@@ -217,27 +186,25 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         self.teamID = convertStringToken(&process->team_id);
         
         //cs_validation_category (macOS 26 / es version 10+)
-        #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         if(message->version >= 10) {
             self.signingCategory = @(process->cs_validation_category);
         }
-        
-        #endif
+        //set signer manaually
+        else {
+            if(codeRef) {
+                self.signingCategory = extractSigner(codeRef, self.csFlags);
+            }
+        }
         
         //add platform binary
-        self.isPlatformBinary = [NSNumber numberWithBool:process->is_platform_binary];
+        self.isPlatformBinary = process->is_platform_binary;
         
         //3rd-party
         // check if notarized
         if(!self.isPlatformBinary) {
-            
-            SecCodeRef codeRef = NULL;
             //obtain dynamic code ref from (audit) token
-            if(errSecSuccess == SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:self.auditToken}), kSecCSDefaultFlags, &codeRef)) {
-                
-                self.isNotarized = [NSNumber numberWithBool:isNotarized(codeRef)];
-                
-                CFRelease(codeRef);
+            if(codeRef) {
+                self.isNotarized = isNotarized(codeRef, self.csFlags.intValue);
             }
         }
         
@@ -253,30 +220,15 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
     
         //enumerate ancestors
         [self enumerateAncestors];
+        
+        if(codeRef) {
+            CFRelease(codeRef);
+        }
     }
-    
+
     return self;
 }
 
-//get's process' path
-// note: path must be set
--(unsigned long)inode
-{
-    //stat
-    struct stat fileStat = {0};
-    
-    //inode
-    unsigned long iNode = 0;
-    
-    //stat
-    if(0 == stat(self.path.fileSystemRepresentation, &fileStat))
-    {
-        //save
-        iNode = fileStat.st_ino;
-    }
-  
-    return iNode;
-}
 
 //get process' name
 // either via app bundle, or path
@@ -321,102 +273,6 @@ bail:
     }
     
     return name;
-}
-
-//get process' architecture
--(NSUInteger)getArchitecture
-{
-    //architecuture
-    NSUInteger architecture = ArchUnknown;
-    
-    //type
-    cpu_type_t type = -1;
-    
-    //size
-    size_t size = 0;
-    
-    //mib
-    int mib[CTL_MAXNAME] = {0};
-    
-    //length
-    size_t length = CTL_MAXNAME;
-    
-    //proc info
-    struct kinfo_proc procInfo = {0};
-    
-    //get mib for 'proc_cputype'
-    if(noErr != sysctlnametomib("sysctl.proc_cputype", mib, &length))
-    {
-        //bail
-        goto bail;
-    }
-    
-    //add pid
-    mib[length] = self.pid;
-    
-    //inc length
-    length++;
-    
-    //init size
-    size = sizeof(cpu_type_t);
-    
-    //get CPU type
-    if(noErr != sysctl(mib, (u_int)length, &type, &size, 0, 0))
-    {
-        //bail
-        goto bail;
-    }
-    
-    //reversing Activity Monitor
-    // if CPU type is CPU_TYPE_X86_64, Apple sets architecture to 'Intel'
-    if(CPU_TYPE_X86_64 == type)
-    {
-        //intel
-        architecture = ArchIntel;
-        
-        //done
-        goto bail;
-    }
-    
-    //reversing Activity Monitor
-    // if CPU type is CPU_TYPE_ARM64, Apple checks proc's p_flags
-    // if P_TRANSLATED is set, then they set architecture to 'Intel'
-    if(CPU_TYPE_ARM64 == type)
-    {
-        //default to apple
-        architecture = ArchAppleSilicon;
-        
-        //(re)init mib
-        mib[0] = CTL_KERN;
-        mib[1] = KERN_PROC;
-        mib[2] = KERN_PROC_PID;
-        mib[3] = pid;
-        
-        //(re)set length
-        length = 4;
-        
-        //(re)set size
-        size = sizeof(procInfo);
-        
-        //get proc info
-        if(noErr != sysctl(mib, (u_int)length, &procInfo, &size, NULL, 0))
-        {
-            //bail
-            goto bail;
-        }
-        
-        //'P_TRANSLATED' set?
-        // set architecture to 'Intel'
-        if(P_TRANSLATED == (P_TRANSLATED & procInfo.kp_proc.p_flag))
-        {
-            //intel
-            architecture = ArchIntel;
-        }
-    }
-    
-bail:
-    
-    return architecture;
 }
 
 //extract/format args
@@ -536,247 +392,4 @@ bail:
     return;
 }
 
-//for pretty printing
-// though we convert to JSON
--(NSString *)description
-{
-    //description
-    NSMutableString* description = nil;
-    
-    //cd hash
-    // requires formatting
-    NSMutableString* cdHash = nil;
-
-    //init output string
-    description = [NSMutableString string];
-
-    //start process
-    [description appendString:@"\"process\":{"];
-       
-    //add pid, path, etc
-    [description appendFormat: @"\"pid\":%d,\"name\":\"%@\",\"path\":\"%@\"",self.pid, self.name, self.path];
-   
-    //add cpu type
-    switch(self.architecture)
-    {
-        //intel
-        case ArchIntel:
-            [description appendFormat: @"\"architecture\":\"Intel\","];
-            break;
-        
-        //apple
-        case ArchAppleSilicon:
-            [description appendFormat: @"\"architecture\":\"Apple Silicon\","];
-            break;
-
-        //unknown
-        default:
-            [description appendString:@"\"architecture\":\"unknown\","];
-            break;
-    }
-    
-    //arguments
-    if(0 != self.arguments.count)
-    {
-       //start list
-       [description appendFormat:@"\"arguments\":["];
-       
-       //add all arguments
-       for(NSString* argument in self.arguments)
-       {
-           //skip blank args
-           if(0 == argument.length) continue;
-           
-           //add
-           [description appendFormat:@"\"%@\",", [argument stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]];
-       }
-       
-       //remove last ','
-       if(YES == [description hasSuffix:@","])
-       {
-           //remove
-           [description deleteCharactersInRange:NSMakeRange([description length]-1, 1)];
-       }
-       
-       //terminate list
-       [description appendString:@"],"];
-    }
-    //no args
-    else
-    {
-       //add empty list
-       [description appendFormat:@"\"arguments\":[],"];
-    }
-
-    //add ppid
-    [description appendFormat: @"\"ppid\":%d,", self.ppid];
-    
-    //add rpdi
-    [description appendFormat: @"\"rpid\":%d,", self.rpid];
-
-    //add ancestors
-    [description appendFormat:@"\"ancestors\":["];
-
-    //add each ancestor
-    for(NSNumber* ancestor in self.ancestors)
-    {
-       //add
-       [description appendFormat:@"%d,", ancestor.unsignedIntValue];
-    }
-
-    //remove last ','
-    if(YES == [description hasSuffix:@","])
-    {
-       //remove
-       [description deleteCharactersInRange:NSMakeRange([description length]-1, 1)];
-    }
-
-    //terminate list
-    [description appendString:@"],"];
-
-    //signing info (reported)
-    [description appendString:@"\"signing info (reported)\":{"];
-    
-    //add cs flags, platform binary
-    [description appendFormat: @"\"csFlags\":%d,\"platformBinary\":%d,", self.csFlags.intValue, self.isPlatformBinary.intValue];
-    
-    //add signing id
-    if(0 == self.signingID.length)
-    {
-        //blank
-        [description appendString:@"\"signingID\":\"\","];
-    }
-    //not blank
-    else
-    {
-        //append
-        [description appendFormat:@"\"signingID\":\"%@\",", self.signingID];
-    }
-    
-    //add team id
-    if(0 == self.teamID.length)
-    {
-        //blank
-        [description appendString:@"\"teamID\":\"\","];
-    }
-    //not blank
-    else
-    {
-        //append
-        [description appendFormat:@"\"teamID\":\"%@\",", self.teamID];
-    }
-    
-    //terminate dictionary
-    [description appendString:@"},"];
-
-    //signing info
-    [description appendString:@"\"signing info (computed)\":{"];
-
-    //add all key/value pairs from signing info
-    for(NSString* key in self.signingInfo)
-    {
-       //value
-       id value = self.signingInfo[key];
-       
-       //handle `KEY_SIGNATURE_SIGNER`
-       if(YES == [key isEqualToString:KEY_SIGNATURE_SIGNER])
-       {
-           //convert to pritable
-           switch ([value intValue]) {
-           
-               //'None'
-               case None:
-                   [description appendFormat:@"\"%@\":\"%@\",", key, @"none"];
-                   break;
-                   
-               //'Apple'
-               case Apple:
-                   [description appendFormat:@"\"%@\":\"%@\",", key, @"Apple"];
-                   break;
-               
-               //'App Store'
-               case AppStore:
-                   [description appendFormat:@"\"%@\":\"%@\",", key, @"App Store"];
-                   break;
-                   
-               //'Developer ID'
-               case DevID:
-                   [description appendFormat:@"\"%@\":\"%@\",", key, @"Developer ID"];
-                   break;
-
-               //'AdHoc'
-               case AdHoc:
-                  [description appendFormat:@"\"%@\":\"%@\",", key, @"AdHoc"];
-                  break;
-                   
-               default:
-                   break;
-           }
-       }
-       
-       //number?
-       // add as is
-       else if(YES == [value isKindOfClass:[NSNumber class]])
-       {
-           //add
-           [description appendFormat:@"\"%@\":%@,", key, value];
-       }
-       //array
-       else if(YES == [value isKindOfClass:[NSArray class]])
-       {
-           //start
-           [description appendFormat:@"\"%@\":[", key];
-           
-           //add each item
-           [value enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL * _Nonnull stop) {
-               
-               //add
-               [description appendFormat:@"\"%@\"", obj];
-               
-               //add ','
-               if(index != ((NSArray*)value).count-1)
-               {
-                   //add
-                   [description appendString:@","];
-               }
-               
-           }];
-           
-           //terminate
-           [description appendString:@"],"];
-       }
-       //otherwise
-       // just escape it
-       else
-       {
-           //add
-           [description appendFormat:@"\"%@\":\"%@\",", key, value];
-       }
-    }
-
-    //remove last ','
-    if(YES == [description hasSuffix:@","])
-    {
-      //remove
-      [description deleteCharactersInRange:NSMakeRange([description length]-1, 1)];
-    }
-
-    //terminate dictionary
-    [description appendString:@"}"];
-
-    //exit event?
-    // add exit code
-    if(ES_EVENT_TYPE_NOTIFY_EXIT == self.event)
-    {
-       //add exit
-       [description appendFormat:@",\"exit code\":%d", self.exit];
-    }
-
-    //terminate process
-    [description appendString:@"}"];
-
-    return description;
-}
-
 @end
-

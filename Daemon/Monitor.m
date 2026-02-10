@@ -273,15 +273,17 @@ es_client_t* esClient = nil;
             return;
         }
         
-        //ignore if notarized and that preference is set
+        //ignore if notarized (or from app store) and that preference is set
         if([preferences.preferences[PREF_NOTARIZATION_MODE] boolValue]) {
             
-            if(process.isNotarized) {
-                os_log_debug(logHandle, "notarization mode set, and process is notarized ...so allowing!");
+            if( process.isNotarized ||
+                process.signingCategory.intValue == ES_CS_VALIDATION_CATEGORY_APP_STORE )
+            {
+                os_log_debug(logHandle, "notarization mode set, and process is notarized (or from app store) ...so allowing!");
                 return;
             }
         }
-        
+    
         //ignore if alert was shown
         if(process.alertShown) {
             return;
@@ -336,12 +338,20 @@ es_client_t* esClient = nil;
     
     os_log(logHandle, "handling FS event: %{public}@ modified %{public}@", process.name, path);
     
+    //file size
+    unsigned long long fileSize = [[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] fileSize];
+    
     //IGNORE: small files
-    // files under 1024, as entropy calculations don't do well on smaller files
-    if([[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] fileSize] < 1024) {
-        
-        os_log(logHandle, "IGNORING: Too small");
-        
+    // entropy calculations don't do well on smaller files
+    if(fileSize < 1024) {
+        os_log_debug(logHandle, "IGNORING: too small (%llu bytes)", fileSize);
+        return;
+    }
+
+    //IGNORE: large files
+    // ransomware output is typically small; large files just slow us down
+    if(fileSize > (50 * 1024 * 1024)) {
+        os_log_debug(logHandle, "IGNORING: too large (%llu bytes)", fileSize);
         return;
     }
     
@@ -472,7 +482,7 @@ es_client_t* esClient = nil;
     }
     
     //platform binary?
-    if(process.isPlatformBinary.boolValue) {
+    if(process.isPlatformBinary) {
             
         //interpreter? still of interest
         // e.g. python, osascript, bash could run malicious scripts
