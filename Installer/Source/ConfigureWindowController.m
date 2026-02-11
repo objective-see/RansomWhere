@@ -37,23 +37,14 @@ extern os_log_t logHandle;
     
     //when supported
     // indicate title bar is transparent (too)
-    if(YES == [self.window respondsToSelector:@selector(titlebarAppearsTransparent)])
+    if([self.window respondsToSelector:@selector(titlebarAppearsTransparent)])
     {
         //set transparency
         self.window.titlebarAppearsTransparent = YES;
     }
     
-    //make first responder
-    // calling this without a timeout sometimes fails :/
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-        
-        //and make it first responder
-        [self.window makeFirstResponder:self.installButton];
-        
-    });
-
     //init configure object
-    if(nil == self.configureObj)
+    if(!self.configureObj)
     {
         //alloc/init Config obj
         configureObj = [[Configure alloc] init];
@@ -78,15 +69,18 @@ extern os_log_t logHandle;
     //init status msg
     [self.statusMsg setStringValue:@"Generically thwart ransomware! 👾"];
     
+    //set delegate
+    [self.window setDelegate:self];
+    
     //uninstall via app?
     // just enable uinstall button
     if(YES == [NSProcessInfo.processInfo.arguments containsObject:CMD_UNINSTALL_VIA_UI])
     {
-        //enable uninstall
-        self.uninstallButton.enabled = YES;
-        
         //disable install
         self.installButton.enabled = NO;
+        
+        //enable uninstall
+        self.uninstallButton.enabled = YES;
         
         //make uninstall button first responder
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
@@ -96,18 +90,29 @@ extern os_log_t logHandle;
             
         });
         
+        return;
     }
     
     //app already installed?
     // enable 'uninstall' button
     // change 'install' button to say 'upgrade'
-    else if(YES == isInstalled)
+    if(isInstalled)
     {
         //enable uninstall
         self.uninstallButton.enabled = YES;
         
         //set to upgrade
         self.installButton.title = ACTION_UPGRADE;
+        
+        //make first responder
+        // calling this without a timeout sometimes fails :/
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+            
+            //and make it first responder
+            [self.window makeFirstResponder:self.installButton];
+            
+        });
+
     }
     
     //otherwise disable uninstall
@@ -117,9 +122,6 @@ extern os_log_t logHandle;
         self.uninstallButton.enabled = NO;
     }
     
-    //set delegate
-    [self.window setDelegate:self];
-
     return;
 }
 
@@ -230,8 +232,8 @@ extern os_log_t logHandle;
                     //hide spinner
                     self.fdaActivityIndicator.hidden = YES;
                     
-                    //hide fda message
-                    self.fdaMessage.hidden = YES;
+                    //change fda message
+                    self.fdaMessage.stringValue = @"☑️ Full Disk Access: granted";
                     
                     //enable 'next' button
                     ((NSButton*)[self.diskAccessView viewWithTag:ACTION_SHOW_SUPPORT]).enabled = YES;

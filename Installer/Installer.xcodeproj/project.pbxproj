@@ -330,7 +330,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#archive build\nif [[ $BUILT_PRODUCTS_DIR = *\"ArchiveIntermediates\"* ]]; then\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    \n#normal build\nelse\n\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere.app\"\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere Helper.app\"\n\n#cp daemon/app\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n\nfi\n";
+			shellScript = "#archive build\nif [[ $BUILT_PRODUCTS_DIR = *\"ArchiveIntermediates\"* ]]; then\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    \n#normal build\nelse\n\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere.app\"\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere Helper.app\"\n\n#cp daemon/app\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n\nfi\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

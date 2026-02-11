@@ -36,6 +36,13 @@ int main(int argc, const char * argv[])
         
         //dbg msg
         os_log_debug(logHandle, "daemon %{public}@ started with %{public}@", NSProcessInfo.processInfo.arguments.firstObject.lastPathComponent, NSProcessInfo.processInfo.arguments);
+        
+        //not root?
+        // (also prevents user launching directly)
+        if(0 != geteuid()) {
+            os_log_error(logHandle, "ERROR: launch daemon must be run as root, not %d", geteuid());
+            goto bail;
+        }
     
         //alloc/init/load prefs
         preferences = [[Preferences alloc] init];

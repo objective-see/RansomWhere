@@ -1,0 +1,8 @@
+Build RansomWhere?
+
+1. Delete Installer from Application Project
+2. Edit Installer build, delete contents of run script  
+3. Build Installer (mode: normal)
+4. Copy "RansomWhere Installer.app" into Application Uninstaller group (and into Xcode)
+   ...and add reference! 
+5. Build Installer (mode: archive)

@@ -7,9 +7,8 @@
       "scale" : "1x"
     },
     {
-      "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "icon_16x16@2x.png",
+      "size" : "16x16",
       "scale" : "2x"
     },
     {
@@ -55,8 +54,9 @@
       "scale" : "1x"
     },
     {
-      "idiom" : "mac",
       "size" : "512x512",
+      "idiom" : "mac",
+      "filename" : "icon_512x512@2x.png",
       "scale" : "2x"
     }
   ],

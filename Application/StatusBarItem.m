@@ -233,7 +233,7 @@ enum menuItems
             NSWorkspaceOpenConfiguration* configuration = nil;
             
             //init path
-            installer = [NSBundle.mainBundle URLForResource:@"RansomWhere? Installer" withExtension:@".app"];
+            installer = [NSBundle.mainBundle URLForResource:@"RansomWhere Installer" withExtension:@".app"];
             
             //init configuration
             configuration = [[NSWorkspaceOpenConfiguration alloc] init];
