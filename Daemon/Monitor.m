@@ -103,6 +103,7 @@ es_client_t* esClient = nil;
     
     //mute self
     es_mute_path(esClient, [NSProcessInfo.processInfo.arguments[0] UTF8String], ES_MUTE_PATH_TYPE_LITERAL);
+    es_mute_path(esClient, "/Applications/RansomWhere Helper.app/Contents/MacOS/RansomWhere Helper", ES_MUTE_PATH_TYPE_LITERAL);
     
     //mute each currently running processes
     // assumption: no existing ransomware is already running
@@ -126,7 +127,6 @@ es_client_t* esClient = nil;
     //happy
     return YES;
 }
-
 
 //handle ES message
 -(void)handleESMessage:(es_client_t *)client message:(const es_message_t *)message {
@@ -158,11 +158,14 @@ es_client_t* esClient = nil;
             if([self processOfInterest:process]) {
                 [self.processCache setObject:process forKey:process.pidVersion];
             }
-            //not of interest
-            // let's go ahead and mute process
+            //not of interest, so mute
+            // (unless its xpcproxy, cuz it doesn't do anything but is respawned x 1000)
             else {
-                os_log_debug(logHandle, "muting %{public}@, as its not of interest", process.name);
-                es_mute_path(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+                
+                if(![process.path isEqualToString:@"/usr/libexec/xpcproxy"]) {
+                    es_mute_path(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+                    os_log_debug(logHandle, "muted %{public}@, as its not of interest", process.name);
+                }
             }
 
             break;
@@ -246,6 +249,13 @@ es_client_t* esClient = nil;
         // not found means we don't care about this process
         Process* process = [self.processCache objectForKey:key];
         if(!process) {
+            
+            //mute
+            // likely just 'older' process
+            es_mute_path(esClient, path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+            
+            os_log_debug(logHandle, "muted %{public}@, as its not in process cache", path.lastPathComponent);
+        
             return;
         }
         
