@@ -72,7 +72,6 @@ es_client_t* esClient = nil;
 }
 
 //enable ES monitor
-// enumerate running process
 // start ES monitor for file events
 -(BOOL)start {
     
@@ -99,14 +98,21 @@ es_client_t* esClient = nil;
         return FALSE;
     }
     
-    //enumerate/cache existing processes
-    [self enumerateExistingProcesses:esClient];
-    
     //clear cache
     es_clear_cache(esClient);
     
     //mute self
     es_mute_path(esClient, [NSProcessInfo.processInfo.arguments[0] UTF8String], ES_MUTE_PATH_TYPE_LITERAL);
+    
+    //mute each currently running processes
+    // assumption: no existing ransomware is already running
+    for(NSData* tokenData in enumerateProcesses()) {
+        
+        audit_token_t token;
+        [tokenData getBytes:&token length:sizeof(audit_token_t)];
+        
+        es_mute_process(esClient, &token);
+    }
     
     //mute /dev (tty, etc)
     es_mute_path(esClient, "/dev/", ES_MUTE_PATH_TYPE_TARGET_PREFIX);
@@ -121,34 +127,6 @@ es_client_t* esClient = nil;
     return YES;
 }
 
-//enumerate / add existing process to cache
--(void)enumerateExistingProcesses:(es_client_t *)client {
-    
-    for(NSData* tokenData in enumerateProcesses()) {
-        
-        audit_token_t token;
-        [tokenData getBytes:&token length:sizeof(audit_token_t)];
-        
-        Process* process = [[Process alloc] initWithToken:token];
-        if(!process) {
-            continue;
-        }
-        
-        //classify/add
-        if([self processOfInterest:process]) {
-            NSNumber* key = @(audit_token_to_pidversion(token));
-            [self.processCache setObject:process forKey:key];
-        }
-        
-        //mute process we don't care about
-        else
-        {
-            os_log(logHandle, "muting running process %{public}@, as its not of interest", process.name);
-            es_mute_path(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
-        }
-        
-    }
-}
 
 //handle ES message
 -(void)handleESMessage:(es_client_t *)client message:(const es_message_t *)message {
@@ -167,7 +145,7 @@ es_client_t* esClient = nil;
         // init process and, if of interest, cache
         case ES_EVENT_TYPE_NOTIFY_EXEC: {
             
-            //os_log(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXEC");
+            //os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXEC");
             
             //init process obj
             Process* process = [[Process alloc] initWithES:message];
@@ -183,7 +161,7 @@ es_client_t* esClient = nil;
             //not of interest
             // let's go ahead and mute process
             else {
-                os_log(logHandle, "muting %{public}@, as its not of interest", process.name);
+                os_log_debug(logHandle, "muting %{public}@, as its not of interest", process.name);
                 es_mute_path(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
             }
 
@@ -192,9 +170,9 @@ es_client_t* esClient = nil;
             
         //process event: exit
         // remove from process cache
-        case ES_EVENT_TYPE_NOTIFY_EXIT:
-        {
-            //os_log(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXIT");
+        case ES_EVENT_TYPE_NOTIFY_EXIT: {
+            
+            //os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXIT");
             
             NSNumber* exitKey = processKey;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (5 * NSEC_PER_SEC)), self.eventQueue, ^{
@@ -206,14 +184,12 @@ es_client_t* esClient = nil;
             
         //close event
         // process fs event
-        case ES_EVENT_TYPE_NOTIFY_CLOSE:
-        {
+        case ES_EVENT_TYPE_NOTIFY_CLOSE: {
             
             //ignore non-modified files
             if(!message->event.close.modified) {
                 return;
             }
-            
             
             //TODO: remove
             // and update debug msg
@@ -234,7 +210,7 @@ es_client_t* esClient = nil;
         case ES_EVENT_TYPE_NOTIFY_RENAME:
             
             //dbg msg
-            //os_log(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_RENAME");
+            //os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_RENAME");
             
             //path: existing file
             if(ES_DESTINATION_TYPE_EXISTING_FILE == message->event.rename.destination_type) {
@@ -281,6 +257,11 @@ es_client_t* esClient = nil;
             {
                 os_log_debug(logHandle, "notarization mode set, and process is notarized (or from app store) ...so allowing!");
                 return;
+            }
+            //TODO: remove
+            else
+            {
+                os_log_debug(logHandle, "notarization mode set, but %{public}@ is *not* notarized (nor from app store) ...signing info: %{public}@ / %@", process.path, process.signingInfo, process.signingCategory);
             }
         }
     
@@ -336,7 +317,7 @@ es_client_t* esClient = nil;
 // note: to get here, its a process of interest
 -(void)handleFSEvent:(Process *)process path:(NSString*)path {
     
-    os_log(logHandle, "handling FS event: %{public}@ modified %{public}@", process.name, path);
+    os_log_debug(logHandle, "handling FS event: %{public}@ modified %{public}@", process.name, path);
     
     //file size
     unsigned long long fileSize = [[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] fileSize];
@@ -357,9 +338,7 @@ es_client_t* esClient = nil;
     
     //IGNORE: non encrypted files
     if(!isEncrypted(path)) {
-        
-        os_log(logHandle, "IGNORING: Not encrypted ");
-        
+        os_log_debug(logHandle, "IGNORING: Not encrypted ");
         return;
     }
     
@@ -471,13 +450,13 @@ es_client_t* esClient = nil;
     
     //already allowed?
     if(RULE_ALLOW == process.rule) {
-        os_log(logHandle, "%{public}@, has 'RULE_ALLOW' set", process.name);
+        os_log_debug(logHandle, "%{public}@, has 'RULE_ALLOW' set", process.name);
         return NO;
     }
     
     //already blocked?
     if(RULE_BLOCK == process.rule) {
-        os_log(logHandle, "%{public}@, has 'RULE_BLOCK' set", process.name);
+        os_log_debug(logHandle, "%{public}@, has 'RULE_BLOCK' set", process.name);
         return YES;
     }
     
@@ -490,8 +469,7 @@ es_client_t* esClient = nil;
             return YES;
         }
         
-        os_log(logHandle, "%{public}@, is platform binary (and not interpreter)", process.name);
-        os_log(logHandle, "signing info: %{public}@", process.signingID);
+        os_log_debug(logHandle, "%{public}@, is platform binary (and not interpreter)", process.name);
         
         //otherwise, not of interest
         return NO;
@@ -556,7 +534,7 @@ es_client_t* esClient = nil;
     //block?
     if(RULE_BLOCK == action.integerValue) {
         
-        //dbg/log msg
+        //log msg
         os_log(logHandle, "user says, 'block', so blocking %{public}@", processPath);
         
         //kill
@@ -569,7 +547,7 @@ es_client_t* esClient = nil;
     //allow
     else
     {
-        //dbg/log msg
+        //log msg
         os_log(logHandle, "user says, 'allow', so allowing %{public}@", processPath);
         
         //resume
@@ -592,7 +570,7 @@ es_client_t* esClient = nil;
         //suspended (SSTOP)?
         if(SSTOP == info.pbi_status) {
             
-            os_log(logHandle, "WARNING: cache evicting suspended process %{public}@ (pid: %d) — resuming to avoid orphan", process.path, process.pid);
+            os_log_debug(logHandle, "WARNING: cache evicting suspended process %{public}@ (pid: %d) — resuming to avoid orphan", process.path, process.pid);
             
             //resume
             kill(process.pid, SIGCONT);

@@ -93,10 +93,9 @@ bail:
         os_log_debug(logHandle, "client toggling RansomWhere? state: %{public}@", updates[PREF_IS_DISABLED]);
         
         //disable?
-        if(YES == [updates[PREF_IS_DISABLED] boolValue])
-        {
-            //dbg msg
-            // and log to file
+        if([updates[PREF_IS_DISABLED] boolValue]) {
+            
+            //log msg
             os_log(logHandle, "disabling RansomWhere?");
             
             //stop
@@ -104,10 +103,9 @@ bail:
         }
         
         //enable?
-        else
-        {
-            //dbg msg
-            // and log to file
+        else {
+            
+            //log
             os_log(logHandle, "enabling RansomWhere?");
             
             //start
@@ -119,9 +117,7 @@ bail:
     [self.preferences addEntriesFromDictionary:updates];
     
     //save
-    if(YES != [self save])
-    {
-        //err msg
+    if(![self save]) {
         os_log_error(logHandle, "ERROR: failed to save preferences");
         goto bail;
     }

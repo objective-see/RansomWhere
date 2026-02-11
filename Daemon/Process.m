@@ -38,70 +38,6 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
 @synthesize auditToken;
 @synthesize signingInfo;
 
-//init with audit token
--(id)initWithToken:(audit_token_t)token {
-    
-    //init super
-    self = [super init];
-    if(nil != self)
-    {
-        //init
-        self.rule = RULE_NOT_FOUND;
-        
-        self.arguments = [NSMutableArray array];
-        self.ancestors = [NSMutableArray array];
-        self.signingInfo = [NSMutableDictionary dictionary];
-        self.encryptedFiles = [NSMutableDictionary dictionary];
-        
-        //pid version
-        self.pidVersion = @(audit_token_to_pidversion(token));
-        
-        //init audit token
-        self.auditToken = [NSData dataWithBytes:&token length:sizeof(audit_token_t)];
-        
-        //init pid
-        self.pid = audit_token_to_pid(token);
-        
-        //init ppid
-        self.ppid = getParentID(self.pid);
-        
-        //path
-        self.path = getProcessPath(self.pid);
-        
-        //now, get name
-        self.name = [self getName];
-        
-        //generate signing info
-        self.signingInfo = generateSigningInfo(self);
-        
-        if(noErr == [self.signingInfo[KEY_SIGNATURE_STATUS] intValue]) {
-         
-            self.signingID = self.signingInfo[KEY_SIGNATURE_IDENTIFIER];
-            self.teamID = self.signingInfo[KEY_SIGNATURE_TEAM_IDENTIFIER];
-            
-            self.signingCategory = self.signingInfo[KEY_SIGNATURE_SIGNER];
-
-            //apple?
-            if(ES_CS_VALIDATION_CATEGORY_PLATFORM == [self.signingCategory intValue]) {
-                self.isPlatformBinary = YES;
-            }
-            
-            //3rd-party
-            // set notarization
-            else {
-                self.isNotarized = [self.signingInfo[KEY_SIGNING_IS_NOTARIZED] boolValue];
-            }
-        }
-       
-        //enumerate ancestors
-        [self enumerateAncestors];
-    }
-    
-    
-    return self;
-    
-}
-
 //init w/ ES message
 -(id)initWithES:(const es_message_t *)message {
     
@@ -156,7 +92,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         //init audit token
         self.auditToken = [NSData dataWithBytes:&process->audit_token length:sizeof(audit_token_t)];
         
-        //now get code ref
+        //now get code ref via audit token
         SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:self.auditToken}), kSecCSDefaultFlags, &codeRef);
         
         //init pid
@@ -202,7 +138,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         //3rd-party
         // check if notarized
         if(!self.isPlatformBinary) {
-            //obtain dynamic code ref from (audit) token
+            //check
             if(codeRef) {
                 self.isNotarized = isNotarized(codeRef, self.csFlags.intValue);
             }

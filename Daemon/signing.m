@@ -13,150 +13,6 @@
 #import <Security/Security.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
-//get the signing info of a process (dynamic)
-NSMutableDictionary* generateSigningInfo(Process* process)
-{
-    //status
-    OSStatus status = !errSecSuccess;
-    
-    //info dictionary
-    NSMutableDictionary* signingInfo = nil;
-    
-    //signing details
-    CFDictionaryRef signingDetails = NULL;
-    
-    //signing authorities
-    NSMutableArray* signingAuths = nil;
-    
-    //init signing status
-    signingInfo = [NSMutableDictionary dictionary];
-    
-    //start with dynamic cs check
-    signingDetails = dynamicCodeCheck(process.auditToken, signingInfo);
-        
-    //extract status
-    status = [signingInfo[KEY_SIGNATURE_STATUS] intValue];
-    
-    //bail on any signing error(s)
-    if(errSecSuccess != [signingInfo[KEY_SIGNATURE_STATUS] intValue])
-    {
-        //bail
-        goto bail;
-    }
-    
-    //extract code signing id
-    if(nil != [(__bridge NSDictionary*)signingDetails objectForKey:(__bridge NSString*)kSecCodeInfoIdentifier])
-    {
-        //extract/save
-        signingInfo[KEY_SIGNATURE_IDENTIFIER] = [(__bridge NSDictionary*)signingDetails objectForKey:(__bridge NSString*)kSecCodeInfoIdentifier];
-    }
-    
-    //extract team signing id
-    if(nil != [(__bridge NSDictionary*)signingDetails objectForKey:(__bridge NSString*)kSecCodeInfoTeamIdentifier])
-    {
-        //extract/save
-        signingInfo[KEY_SIGNATURE_TEAM_IDENTIFIER] = [(__bridge NSDictionary*)signingDetails objectForKey:(__bridge NSString*)kSecCodeInfoTeamIdentifier];
-    }
-    
-    //extract signing authorities
-    signingAuths = extractSigningAuths((__bridge NSDictionary *)(signingDetails));
-    if(0 != signingAuths.count)
-    {
-        //save
-        signingInfo[KEY_SIGNATURE_AUTHORITIES] = signingAuths;
-    }
-    
-bail:
-    
-    //free signing info
-    if(NULL != signingDetails)
-    {
-        //free
-        CFRelease(signingDetails);
-        
-        //unset
-        signingDetails = NULL;
-    }
-    
-    return signingInfo;
-}
-
-//extract signing info/check via dynamic code ref (process auth token)
-CFDictionaryRef dynamicCodeCheck(NSData* auditToken, NSMutableDictionary* signingInfo)
-{
-    //status
-    OSStatus status = !errSecSuccess;
-    
-    //dynamic code ref
-    SecCodeRef dynamicCode = NULL;
-    
-    //signing details
-    CFDictionaryRef signingDetails = NULL;
-    
-    //obtain dynamic code ref from (audit) token
-    status = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit:auditToken}), kSecCSDefaultFlags, &dynamicCode);
-    if(errSecSuccess != status)
-    {
-        //set error
-        signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
-    
-        //bail
-        goto bail;
-    }
-    
-    //validate code
-    status = SecCodeCheckValidity(dynamicCode, kSecCSDefaultFlags, NULL);
-    if(errSecSuccess != status)
-    {
-        //set error
-        signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:status];
-        
-        //bail
-        goto bail;
-    }
-    
-    //happily signed
-    signingInfo[KEY_SIGNATURE_STATUS] = [NSNumber numberWithInt:errSecSuccess];
-    
-    //extract signing info
-    status = SecCodeCopySigningInformation(dynamicCode, kSecCSSigningInformation, &signingDetails);
-    if(errSecSuccess != status)
-    {
-        //bail
-        goto bail;
-    }
-    
-    //cs flags
-    signingInfo[KEY_SIGNING_FLAGS] = [(__bridge NSDictionary*)signingDetails objectForKey:(__bridge NSString*)kSecCodeInfoStatus];
-    
-    //determine signer
-    // apple, app store, dev id, adhoc, etc...
-    signingInfo[KEY_SIGNATURE_SIGNER] = extractSigner(dynamicCode, signingInfo[KEY_SIGNING_FLAGS]);
-        
-    //set notarization status
-    signingInfo[KEY_SIGNING_IS_NOTARIZED] = [NSNumber numberWithBool:isNotarized(dynamicCode, [signingInfo[KEY_SIGNING_FLAGS] intValue])];
-    
-    //extract signing info
-    status = SecCodeCopySigningInformation(dynamicCode, kSecCSSigningInformation, &signingDetails);
-    if(errSecSuccess != status)
-    {
-        //bail
-        goto bail;
-    }
-    
-bail:
-    
-    //free dynamic code
-    if(NULL != dynamicCode)
-    {
-        //free
-        CFRelease(dynamicCode);
-        dynamicCode = NULL;
-    }
-    
-    return signingDetails;
-}
-
 //check if notarized
 // call this after other code checks
 BOOL isNotarized(SecCodeRef dynamicCode, uint32_t csFlags) {
@@ -172,18 +28,13 @@ BOOL isNotarized(SecCodeRef dynamicCode, uint32_t csFlags) {
         SecRequirementCreateWithString(CFSTR("notarized"), kSecCSDefaultFlags, &notarizedReq);
     });
     
-    //sanity check
-    if(!notarizedReq) {
-        return NO;
-    }
-    
     //ad hoc binaries aren't notarized
-    if(CS_ADHOC & csFlags) {
+    if(kSecCodeSignatureAdhoc & csFlags) {
         return NO;
     }
     
     //gotta have hardened runtime to get notarized
-    if(!(CS_RUNTIME & csFlags)){
+    if(!(kSecCodeSignatureRuntime & csFlags)){
         return NO;
     }
     
