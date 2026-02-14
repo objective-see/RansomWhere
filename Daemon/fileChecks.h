@@ -13,8 +13,8 @@
 
 BOOL isGzip(NSData* header);
 BOOL isImage(NSData* header);
+BOOL isBase64(NSString* path);
 BOOL isEncrypted(NSString* path);
-
 
 //gif ('GIF8')
 // ->note: covers 'GIF87a' and 'GIF89a'

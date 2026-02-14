@@ -23,6 +23,9 @@ BOOL isEncrypted(NSString* path)
     //flag
     BOOL encrypted = NO;
     
+    //entropy
+    double entropy = 0.0f;
+    
     //test results
     NSMutableDictionary* results = nil;
     
@@ -34,6 +37,9 @@ BOOL isEncrypted(NSString* path)
         //bail
         goto bail;
     }
+    
+    //extract
+    entropy = [results[@"entropy"] doubleValue];
 
     //dbg msg
     #ifdef DEBUG
@@ -68,8 +74,17 @@ BOOL isEncrypted(NSString* path)
     
     //encrypted files have super high entropy
     // ->so ignore files that have 'low' entropy
-    if([results[@"entropy"] doubleValue] < 7.95)
+    if(entropy < 7.95)
     {
+        //possible base64-encoded encryption?
+        // only run the expensive check in the narrow band
+        if(entropy > 5.9 && entropy < 6.1) {
+            if(isBase64(path)) {
+                encrypted = YES;
+                goto bail;
+            }
+        }
+        
         //ignore
         goto bail;
     }
@@ -105,6 +120,46 @@ bail:
 
     return encrypted;
 }
+
+//base64 encoded (encrypted) data?
+// entropy ~5.95-6.05, and bytes restricted to base64 alphabet
+BOOL isBase64(NSString* path) {
+    
+    //file handle
+    NSFileHandle* handle = [NSFileHandle fileHandleForReadingAtPath:path];
+    if(!handle) {
+        return NO;
+    }
+    
+    //read sample
+    NSData* sample = [handle readDataOfLength:4096];
+    [handle closeFile];
+    
+    if(sample.length < 64) {
+        return NO;
+    }
+    
+    //check byte distribution
+    const unsigned char* bytes = sample.bytes;
+    NSUInteger base64Count = 0;
+    
+    for(NSUInteger i = 0; i < sample.length; i++) {
+        unsigned char c = bytes[i];
+        if((c >= 'A' && c <= 'Z') ||
+           (c >= 'a' && c <= 'z') ||
+           (c >= '0' && c <= '9') ||
+           c == '+' || c == '/' ||
+           c == '=' || c == '\n' || c == '\r') {
+            base64Count++;
+        }
+    }
+    
+    //os_log_debug(logHandle, "%lu /  %lu", (unsigned long)base64Count, sample.length);
+    
+    //nearly all bytes base64 alphabet?
+    return ((double)base64Count / sample.length) > 0.95;
+}
+
 
 //examines header for image signatures (e.g. 'GIF87a')
 // ->see: https://en.wikipedia.org/wiki/List_of_file_signatures for image signatures

@@ -103,16 +103,6 @@ extern os_log_t logHandle;
         
         //set to upgrade
         self.installButton.title = ACTION_UPGRADE;
-        
-        //make first responder
-        // calling this without a timeout sometimes fails :/
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-            
-            //and make it first responder
-            [self.window makeFirstResponder:self.installButton];
-            
-        });
-
     }
     
     //otherwise disable uninstall
@@ -121,6 +111,15 @@ extern os_log_t logHandle;
         //disable
         self.uninstallButton.enabled = NO;
     }
+    
+    //make install/upgrade responder
+    // calling this without a timeout sometimes fails :/
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+        
+        //and make it first responder
+        [self.window makeFirstResponder:self.installButton];
+        
+    });
     
     return;
 }

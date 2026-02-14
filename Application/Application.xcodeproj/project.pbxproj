@@ -25,6 +25,7 @@
 		CD2F8008244551AC009C3D77 /* NSApplicationKeyEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = CD2F8007244551AC009C3D77 /* NSApplicationKeyEvents.m */; };
 		CD2F801724468A8C009C3D77 /* patrons.txt in Resources */ = {isa = PBXBuildFile; fileRef = CD2F801624468A8C009C3D77 /* patrons.txt */; };
 		CD32C2352094062D009CADF6 /* SigningInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD32C2332094062C009CADF6 /* SigningInfoViewController.m */; };
+		CD5993922F40033300730FA3 /* RansomWhere Installer.app in Resources */ = {isa = PBXBuildFile; fileRef = CD5993912F40033300730FA3 /* RansomWhere Installer.app */; };
 		CD6836682391DB6F00CF19C1 /* security.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD6836672391DB6F00CF19C1 /* security.plist */; };
 		CD8FD5D523BAE2D200EFE0FB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD8FD5D323BAE2D100EFE0FB /* Preferences.xib */; };
 		CD8FD5D623BAE2D200EFE0FB /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8FD5D423BAE2D200EFE0FB /* PrefsWindowController.m */; };
@@ -32,7 +33,6 @@
 		CD8FD5F723C05AD900EFE0FB /* RuleRowCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8FD5F223C05AD800EFE0FB /* RuleRowCell.m */; };
 		CD8FD5F823C05AD900EFE0FB /* RulesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8FD5F323C05AD800EFE0FB /* RulesWindowController.m */; };
 		CD8FD5FA23C05AD900EFE0FB /* Rules.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD8FD5F523C05AD900EFE0FB /* Rules.xib */; };
-		CD9168D72F3D3C5D0043EA81 /* RansomWhere Installer.app in Resources */ = {isa = PBXBuildFile; fileRef = CD9168D62F3D3C5D0043EA81 /* RansomWhere Installer.app */; };
 		CDF2D3982F392CC300FF45A4 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */; };
 		CDF2D3992F392CC300FF45A4 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */; };
 		CDF433632F3A84CA00C147DA /* AddRuleWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */; };
@@ -86,6 +86,7 @@
 		CD2F801624468A8C009C3D77 /* patrons.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = patrons.txt; path = ../Shared/patrons.txt; sourceTree = "<group>"; };
 		CD32C2332094062C009CADF6 /* SigningInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SigningInfoViewController.m; sourceTree = "<group>"; };
 		CD32C2342094062C009CADF6 /* SigningInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SigningInfoViewController.h; sourceTree = "<group>"; };
+		CD5993912F40033300730FA3 /* RansomWhere Installer.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = "RansomWhere Installer.app"; sourceTree = "<group>"; };
 		CD6836672391DB6F00CF19C1 /* security.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = security.plist; sourceTree = "<group>"; };
 		CD8FD5D123B585FE00EFE0FB /* FileMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileMonitor.h; path = ../Shared/Libraries/FileMonitor.h; sourceTree = "<group>"; };
 		CD8FD5D223BAE2D100EFE0FB /* PrefsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefsWindowController.h; sourceTree = "<group>"; };
@@ -98,7 +99,6 @@
 		CD8FD5F223C05AD800EFE0FB /* RuleRowCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuleRowCell.m; sourceTree = "<group>"; };
 		CD8FD5F323C05AD800EFE0FB /* RulesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesWindowController.m; sourceTree = "<group>"; };
 		CD8FD5F523C05AD900EFE0FB /* Rules.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Rules.xib; sourceTree = "<group>"; };
-		CD9168D62F3D3C5D0043EA81 /* RansomWhere Installer.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = "RansomWhere Installer.app"; sourceTree = "<group>"; };
 		CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = ../Shared/AboutWindow.xib; sourceTree = SOURCE_ROOT; };
 		CDF2D3962F392CC300FF45A4 /* AboutWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = ../Shared/AboutWindowController.h; sourceTree = SOURCE_ROOT; };
 		CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = ../Shared/AboutWindowController.m; sourceTree = SOURCE_ROOT; };
@@ -228,7 +228,7 @@
 		CD4597F4291DB39300F2A1C6 /* Uninstaller */ = {
 			isa = PBXGroup;
 			children = (
-				CD9168D62F3D3C5D0043EA81 /* RansomWhere Installer.app */,
+				CD5993912F40033300730FA3 /* RansomWhere Installer.app */,
 			);
 			path = Uninstaller;
 			sourceTree = "<group>";
@@ -321,7 +321,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD8FD5D523BAE2D200EFE0FB /* Preferences.xib in Resources */,
-				CD9168D72F3D3C5D0043EA81 /* RansomWhere Installer.app in Resources */,
+				CD5993922F40033300730FA3 /* RansomWhere Installer.app in Resources */,
 				CD6836682391DB6F00CF19C1 /* security.plist in Resources */,
 				7DD2BF971F1FF64300B33214 /* AlertWindow.xib in Resources */,
 				7D16D6951F64E43300DB3161 /* UpdateWindow.xib in Resources */,
@@ -497,7 +497,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1.9.0;
+				CURRENT_PROJECT_VERSION = 1.9.1;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -505,7 +505,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.9.0;
+				MARKETING_VERSION = 1.9.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DAPP_BUILD=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.ransomwhere.helper";
@@ -520,7 +520,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1.9.0;
+				CURRENT_PROJECT_VERSION = 1.9.1;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -528,7 +528,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.9.0;
+				MARKETING_VERSION = 1.9.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DAPP_BUILD=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.ransomwhere.helper";
