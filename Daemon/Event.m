@@ -70,7 +70,7 @@ extern os_log_t logHandle;
     alert[ALERT_PROCESS_NAME] = valueForStringItem(self.process.name);
     
     //add alert msg
-    alert[ALERT_MESSAGE] = @"is rapidly creating encrypted files";
+    alert[ALERT_MESSAGE] = @"is rapidly creating encrypted files...";
     
     //add pid
     alert[ALERT_PROCESS_ID] = [NSNumber numberWithUnsignedInt:self.process.pid];
