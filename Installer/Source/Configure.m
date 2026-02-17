@@ -132,9 +132,6 @@ bail:
     //launch daemon plist
     NSString* launchDaemonPlist = nil;
     
-    //launch daemon plist (beta)
-    NSString* launchDaemonBetaPlist = nil;
-    
     //init path to daemon
     launchDaemon = [INSTALL_DIRECTORY stringByAppendingPathComponent:LAUNCH_DAEMON];
     
