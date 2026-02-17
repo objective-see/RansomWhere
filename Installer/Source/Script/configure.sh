@@ -84,6 +84,8 @@ elif [ "${1}" == "-uninstall" ]; then
     #unload launch daemon & remove its plist
     launchctl bootout system /Library/LaunchDaemons/com.objective-see.ransomwhere.plist
     rm "/Library/LaunchDaemons/com.objective-see.ransomwhere.plist"
+    
+    rm -rf "$INSTALL_DIRECTORY/RansomWhere"
     rm -rf "$INSTALL_DIRECTORY/RansomWhere.app"
     echo "unloaded launch daemon"
 
