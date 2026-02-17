@@ -64,7 +64,7 @@ extern os_log_t logHandle;
     isInstalled = [self.configureObj isInstalled];
     
     //set window title
-    [self window].title = [NSString stringWithFormat:@"version %@", getAppVersion()];
+    [self window].title = [NSString stringWithFormat:@"RansomWhere? version %@", getAppVersion()];
     
     //init status msg
     [self.statusMsg setStringValue:@"Generically thwart ransomware! 👾"];
