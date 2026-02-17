@@ -148,7 +148,7 @@ es_client_t* esClient = nil;
             //os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXEC");
             
             //init process obj
-            Process* process = [[Process alloc] initWithES:message];
+            Process* process = [[Process alloc] init:message];
             if(!process) {
                 return;
             }

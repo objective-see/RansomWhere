@@ -93,8 +93,7 @@
 /* METHODS */
 
 //inits
--(id _Nonnull)initWithToken:(audit_token_t)token;
--(id _Nullable)initWithES:(const es_message_t* _Nonnull)message;
+-(id _Nullable)init:(const es_message_t* _Nonnull)message;
 
 @end
 

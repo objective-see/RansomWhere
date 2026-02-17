@@ -437,7 +437,7 @@
 					"$(PROJECT_DIR)/../Shared/Libraries",
 					"$(SDKROOT)/usr/lib/system",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.9.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DDAEMON_BUILD=1";
@@ -468,7 +468,7 @@
 					"$(PROJECT_DIR)/../Shared/Libraries",
 					"$(SDKROOT)/usr/lib/system",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.9.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DDAEMON_BUILD=1";

@@ -39,7 +39,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
 @synthesize signingInfo;
 
 //init w/ ES message
--(id)initWithES:(const es_message_t *)message {
+-(id)init:(const es_message_t *)message {
     
     //sanity check
     if(ES_EVENT_TYPE_NOTIFY_EXEC != message->event_type) {

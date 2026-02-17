@@ -40,8 +40,8 @@ extern XPCDaemonClient* xpcDaemonClient;
 
 //center window
 // also, transparency
--(void)awakeFromNib
-{
+-(void)awakeFromNib {
+    
     //center
     [self.window center];
     
@@ -59,25 +59,7 @@ extern XPCDaemonClient* xpcDaemonClient;
 
 //delegate method
 // populate/configure alert window
--(void)windowDidLoad
-{
-    //paragraph style (for temporary label)
-    NSMutableParagraphStyle* paragraphStyle = nil;
-    
-    //title attributes (for temporary label)
-    NSMutableDictionary* titleAttributes = nil;
-    
-    //init paragraph style
-    paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    
-    //init dictionary for title attributes
-    titleAttributes = [NSMutableDictionary dictionary];
-    
-    //set target for 'x' button
-    [self.window standardWindowButton:NSWindowCloseButton].target = self;
-    
-    //set action for 'x' button
-    [self.window standardWindowButton:NSWindowCloseButton].action = @selector(handleUserResponse:);
+-(void)windowDidLoad{
     
     //extract process hierarchy
     self.processHierarchy = alert[ALERT_PROCESS_ANCESTORS];
@@ -142,7 +124,7 @@ extern XPCDaemonClient* xpcDaemonClient;
     
     //add list of encrypted files
     NSArray* files = self.alert[ALERT_ENCRYPTED_FILES];
-    NSUInteger count = MIN(files.count, 3);
+    NSUInteger count = MIN(files.count, 4);
 
     NSMutableString* fileList = [NSMutableString string];
     for(NSUInteger i = 0; i < count; i++) {

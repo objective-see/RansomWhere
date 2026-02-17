@@ -81,7 +81,7 @@ extern os_log_t logHandle;
 // note: key is process path
 -(BOOL)add:(NSString*)path action:(NSNumber*)action {
     
-    os_log_debug(logHandle, "adding rule: %{public}@ -> %{public}@", path, (RULE_ALLOW == action) ? @"allow" : @"block");
+    os_log_debug(logHandle, "adding rule: %{public}@ -> %{public}@", path, (RULE_ALLOW == action.intValue) ? @"allow" : @"block");
     
     @synchronized(self.rules){
         self.rules[path] = action;
