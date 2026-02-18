@@ -274,7 +274,6 @@ enum menuItems
             [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:PATREON_URL]];
             break;
             
-            
         default:
             break;
     }

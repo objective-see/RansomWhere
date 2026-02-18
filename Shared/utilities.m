@@ -22,6 +22,7 @@
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <SystemConfiguration/SystemConfiguration.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 #ifndef DAEMON_BUILD
 #import "AppDelegate.h"
@@ -835,8 +836,7 @@ void toggleMenu(NSMenu* menu, BOOL shouldEnable)
     return;
 }
 
-#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
-
+//get icon for a process
 NSImage* getIconForProcess(NSString* path)
 {
     NSImage* icon = nil;
@@ -853,7 +853,7 @@ NSImage* getIconForProcess(NSString* path)
         icon = [NSWorkspace.sharedWorkspace iconForContentType:UTTypeUnixExecutable];
     }
 
-    [icon setSize:NSMakeSize(128, 128)];
+    [icon setSize:NSMakeSize(100, 100)];
     return icon;
 }
 
