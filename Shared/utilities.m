@@ -1920,6 +1920,82 @@ NSData* auditTokenFromPid(pid_t pid) {
     return auditToken;
 }
 
+#endif
 
+#ifndef DAEMON_BUILD
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+//build an array of processes ancestry
+// note: only call from UI session, due to use of carbon APIs
+NSMutableArray* generateProcessHierarchy(pid_t pid, NSString* name)
+{
+    //process hierarchy
+    NSMutableArray* processHierarchy = nil;
+    
+    //current process id
+    pid_t currentPID = -1;
+    
+    //parent pid
+    pid_t parentPID = -1;
+    
+    //process name
+    NSString* parentName = nil;
+    
+    //alloc
+    processHierarchy = [NSMutableArray array];
+
+    //parent
+    NSDictionary* parent = nil;
+    
+    //add current process (leaf)
+    // parent(s) will then be added at front...
+    [processHierarchy addObject:[@{@"pid":[NSNumber numberWithInt:pid], @"name":valueForStringItem(name)} mutableCopy]];
+    
+    //init current to self
+    currentPID = pid;
+    
+    //scan back
+    while(YES)
+    {
+        //get (real) parent
+        parent = getRealParent(currentPID);
+        if(nil == parent)
+        {
+            break;
+        }
+        
+        //get parent pid
+        parentPID = [parent[@"pid"] intValue];
+        
+        //end of heirarchy?
+        if( (0 == parentPID) ||
+            (-1 == parentPID) ||
+            (currentPID == parentPID) )
+        {
+            //bail
+            break;
+        }
+        
+        //get name
+        // first from bundle, then from executable
+        parentName = parent[@"CFBundleName"];
+        if(0 == name.length)
+        {
+            //via executable
+            parentName = [parent[@"CFBundleExecutable"] lastPathComponent];
+        }
+        
+        //add parent
+        // always at front
+        [processHierarchy insertObject:[@{@"pid":[NSNumber numberWithInt:parentPID], @"name":valueForStringItem(parentName)} mutableCopy] atIndex:0];
+        
+        //update
+        currentPID = parentPID;
+    }
+    
+    return processHierarchy;
+}
 
 #endif

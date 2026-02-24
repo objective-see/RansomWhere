@@ -65,6 +65,10 @@ void waitForFile(NSString* path, float maxWait);
 //get (true) parent
 NSDictionary* getRealParent(pid_t pid);
 
+//build an array of processes ancestry
+// note: only call from UI session, due to use of carbon APIs
+NSMutableArray* generateProcessHierarchy(pid_t pid, NSString* name);
+
 //given a bundle path
 // wait for plist, then load bundle
 NSBundle* getBundle(NSString* path, float maxWait);

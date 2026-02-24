@@ -278,41 +278,47 @@ bail:
 
 //invoked when user clicks process ancestry button
 // depending on state, show/populate the popup, or close it
+//invoked when user clicks process ancestry button
+// depending on state, show/populate the popup, or close it
 -(IBAction)ancestryButtonHandler:(id)sender
 {
-    //open popover
-    if(NSControlStateValueOn == self.ancestryButton.state)
-    {
-        //add the index value to each process in the hierarchy
-        // used to populate outline/table
-        for(NSUInteger i = 0; i < processHierarchy.count; i++)
-        {
-            //set index
-            processHierarchy[i][@"index"] = [NSNumber numberWithInteger:i];
-        }
-
-        //set process hierarchy
-        self.ancestryViewController.processHierarchy = processHierarchy;
-        
-        //dynamically (re)size popover
-        [self setPopoverSize];
-        
-        //reload it
-        [self.ancestryOutline reloadData];
-        
-        //auto-expand
-        [self.ancestryOutline expandItem:nil expandChildren:YES];
-        
-        //show popover
-        [self.ancestryPopover showRelativeToRect:[self.ancestryButton bounds] ofView:self.ancestryButton preferredEdge:NSMaxYEdge];
+    //close?
+    if(NSControlStateValueOff == self.ancestryButton.state) {
+        [self.ancestryPopover close];
+        return;
     }
     
-    //close popover
-    else
-    {
-        //close
-        [self.ancestryPopover close];
+    //open...
+    
+    //only one item in process hierachy?
+    // we can probably build a better one in UI session
+    if(self.processHierarchy.count == 1) {
+        
+        self.processHierarchy = generateProcessHierarchy([self.alert[ALERT_PROCESS_ID] intValue], self.alert[ALERT_PROCESS_NAME]);
     }
+    
+    //add the index value to each process in the hierarchy
+    // used to populate outline/table
+    for(NSUInteger i = 0; i < self.processHierarchy.count; i++)
+    {
+        //set index
+        self.processHierarchy[i][@"index"] = [NSNumber numberWithInteger:i];
+    }
+
+    //set process hierarchy
+    self.ancestryViewController.processHierarchy = self.processHierarchy;
+    
+    //dynamically (re)size popover
+    [self setPopoverSize];
+    
+    //reload it
+    [self.ancestryOutline reloadData];
+    
+    //auto-expand
+    [self.ancestryOutline expandItem:nil expandChildren:YES];
+    
+    //show popover
+    [self.ancestryPopover showRelativeToRect:[self.ancestryButton bounds] ofView:self.ancestryButton preferredEdge:NSMaxYEdge];
     
     return;
 }
