@@ -483,7 +483,13 @@ es_client_t* esClient = nil;
 // need to reset process in cache, unmute, etc
 -(void)resetProcess:(NSString*)path {
     
-    //check all running processes
+    os_log_debug(logHandle, "method '%s' invoked", __PRETTY_FUNCTION__);
+    
+    //first unmute via path
+    es_unmute_path(esClient, path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+    os_log_debug(logHandle, "unmuted %{public}@", path);
+    
+    //check all running processes to reset
     for(NSData* tokenData in enumerateProcesses()) {
         
         audit_token_t token;
@@ -502,9 +508,6 @@ es_client_t* esClient = nil;
             
             process.rule = RULE_NOT_FOUND;
             process.alertShown = NO;
-            
-            //unmute
-            es_unmute_process(esClient, &token);
         }
     }
 }

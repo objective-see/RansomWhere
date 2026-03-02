@@ -264,13 +264,13 @@ extern XPCDaemonClient* xpcDaemonClient;
         if(![action boolValue])
         {
             tableCell.imageView.image = [NSImage imageNamed:@"block"];
-            tableCell.textField.stringValue = @"block";
+            tableCell.textField.stringValue = @"Block";
         }
         //allow
         else
         {
             tableCell.imageView.image = [NSImage imageNamed:@"allow"];
-            tableCell.textField.stringValue = @"allow";
+            tableCell.textField.stringValue = @"Allow";
         }
     }
     
