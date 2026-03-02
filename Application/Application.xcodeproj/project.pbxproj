@@ -20,7 +20,6 @@
 		7DD2BF7A1F1EAC9C00B33214 /* XPCDaemonClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD2BF791F1EAC9C00B33214 /* XPCDaemonClient.m */; };
 		7DD2BF971F1FF64300B33214 /* AlertWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DD2BF941F1FF64300B33214 /* AlertWindow.xib */; };
 		7DD2BF981F1FF64300B33214 /* AlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD2BF961F1FF64300B33214 /* AlertWindowController.m */; };
-		CD0C42D92F45313600A47FFA /* RansomWhere Installer.app in Resources */ = {isa = PBXBuildFile; fileRef = CD0C42D82F45313600A47FFA /* RansomWhere Installer.app */; };
 		CD22785E20434CAC00C72C76 /* StatusBarPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD22785B20434CAB00C72C76 /* StatusBarPopover.xib */; };
 		CD22785F20434CAC00C72C76 /* StatusBarPopoverController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD22785D20434CAB00C72C76 /* StatusBarPopoverController.m */; };
 		CD2F8008244551AC009C3D77 /* NSApplicationKeyEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = CD2F8007244551AC009C3D77 /* NSApplicationKeyEvents.m */; };
@@ -35,6 +34,7 @@
 		CD8FD5FA23C05AD900EFE0FB /* Rules.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD8FD5F523C05AD900EFE0FB /* Rules.xib */; };
 		CDF2D3982F392CC300FF45A4 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */; };
 		CDF2D3992F392CC300FF45A4 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */; };
+		CDF3C7922F56445000383631 /* RansomWhere Installer.app in Resources */ = {isa = PBXBuildFile; fileRef = CDF3C7912F56445000383631 /* RansomWhere Installer.app */; };
 		CDF433632F3A84CA00C147DA /* AddRuleWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */; };
 		CDF433652F3A878900C147DA /* AddRule.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF433642F3A878900C147DA /* AddRule.xib */; };
 		CDFA08E1214900BF0089758C /* XPCUser.m in Sources */ = {isa = PBXBuildFile; fileRef = CDFA08DF214900BF0089758C /* XPCUser.m */; };
@@ -78,7 +78,6 @@
 		7DD2BF941F1FF64300B33214 /* AlertWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlertWindow.xib; sourceTree = "<group>"; };
 		7DD2BF951F1FF64300B33214 /* AlertWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertWindowController.h; sourceTree = "<group>"; };
 		7DD2BF961F1FF64300B33214 /* AlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertWindowController.m; sourceTree = "<group>"; };
-		CD0C42D82F45313600A47FFA /* RansomWhere Installer.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = "RansomWhere Installer.app"; sourceTree = "<group>"; };
 		CD22785B20434CAB00C72C76 /* StatusBarPopover.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StatusBarPopover.xib; sourceTree = "<group>"; };
 		CD22785C20434CAB00C72C76 /* StatusBarPopoverController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusBarPopoverController.h; sourceTree = "<group>"; };
 		CD22785D20434CAB00C72C76 /* StatusBarPopoverController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusBarPopoverController.m; sourceTree = "<group>"; };
@@ -102,6 +101,7 @@
 		CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = ../Shared/AboutWindow.xib; sourceTree = SOURCE_ROOT; };
 		CDF2D3962F392CC300FF45A4 /* AboutWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = ../Shared/AboutWindowController.h; sourceTree = SOURCE_ROOT; };
 		CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = ../Shared/AboutWindowController.m; sourceTree = SOURCE_ROOT; };
+		CDF3C7912F56445000383631 /* RansomWhere Installer.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = "RansomWhere Installer.app"; sourceTree = "<group>"; };
 		CDF433612F3A84CA00C147DA /* AddRuleWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AddRuleWindowController.h; sourceTree = "<group>"; };
 		CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddRuleWindowController.m; sourceTree = "<group>"; };
 		CDF433642F3A878900C147DA /* AddRule.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddRule.xib; sourceTree = "<group>"; };
@@ -228,7 +228,7 @@
 		CD4597F4291DB39300F2A1C6 /* Uninstaller */ = {
 			isa = PBXGroup;
 			children = (
-				CD0C42D82F45313600A47FFA /* RansomWhere Installer.app */,
+				CDF3C7912F56445000383631 /* RansomWhere Installer.app */,
 			);
 			path = Uninstaller;
 			sourceTree = "<group>";
@@ -321,7 +321,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD8FD5D523BAE2D200EFE0FB /* Preferences.xib in Resources */,
-				CD0C42D92F45313600A47FFA /* RansomWhere Installer.app in Resources */,
+				CDF3C7922F56445000383631 /* RansomWhere Installer.app in Resources */,
 				CD6836682391DB6F00CF19C1 /* security.plist in Resources */,
 				7DD2BF971F1FF64300B33214 /* AlertWindow.xib in Resources */,
 				7D16D6951F64E43300DB3161 /* UpdateWindow.xib in Resources */,
@@ -497,15 +497,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.0.0;
+				CURRENT_PROJECT_VERSION = 2.0.1;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 2.0.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 2.0.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DAPP_BUILD=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.ransomwhere.helper";
@@ -520,15 +520,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.0.0;
+				CURRENT_PROJECT_VERSION = 2.0.1;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 2.0.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 2.0.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DAPP_BUILD=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.ransomwhere.helper";

@@ -47,12 +47,10 @@
 
 /* METHODS */
 
--(BOOL)start;
--(void)handleResponse:(NSDictionary*)alert;
--(void)resetProcess:(NSString*)path action:(NSInteger)action;
--(void)dispatchFSEvent:(NSNumber*)processKey path:(NSString *)filePath;
-
-//stop
 -(BOOL)stop;
+-(BOOL)start;
+-(void)resetProcess:(NSString*)path;
+-(void)handleResponse:(NSDictionary*)alert;
+-(void)dispatchFSEvent:(NSNumber*)processKey path:(NSString *)filePath;
 
 @end

@@ -71,8 +71,7 @@ bail:
     os_log_debug(logHandle, "created mach service %{public}@", CONFIG_HELPER_ID);
     
     //init requirement
-    // TODO: bump this to v2.0 on release!
-    requirement = [NSString stringWithFormat:@"anchor apple generic and identifier \"%@\" and certificate leaf [subject.CN] = \"%@\" and info [CFBundleShortVersionString] >= \"1.9.0\"", INSTALLER_ID, SIGNING_AUTH];
+    requirement = [NSString stringWithFormat:@"anchor apple generic and identifier \"%@\" and certificate leaf [subject.CN] = \"%@\" and info [CFBundleShortVersionString] >= \"2.0.0\"", INSTALLER_ID, SIGNING_AUTH];
     
     //set requirement
     [self.listener setConnectionCodeSigningRequirement:requirement];

@@ -109,10 +109,9 @@ BOOL isEncrypted(NSString* path)
     // file as very low pi error, or, lowish pi error *and* low chi square
     encrypted = YES;
    
-//bail
 bail:
     
-    //TODO: remove
+    //dbg msg
     os_log_debug(logHandle, "isEncrypted %{public}@: entropy=%{public}@ chi=%{public}@ pi=%{public}@ header=%{public}@",
         path, results[@"entropy"], results[@"chisquare"], results[@"montecarlo"],
         results[@"header"] ? @"yes" : @"no");

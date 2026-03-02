@@ -96,14 +96,12 @@ extern os_log_t logHandle;
     
     os_log_debug(logHandle, "deleting rule: %{public}@", path);
     
-    NSInteger action;
     @synchronized(self.rules) {
-        action = [self.rules[path] integerValue];
         [self.rules removeObjectForKey:path];
     }
     
     //reset
-    [monitor resetProcess:path action:action];
+    [monitor resetProcess:path];
    
     return [self save];
 }

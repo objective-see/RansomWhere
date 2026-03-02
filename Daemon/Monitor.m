@@ -145,8 +145,6 @@ es_client_t* esClient = nil;
         // init process and, if of interest, cache
         case ES_EVENT_TYPE_NOTIFY_EXEC: {
             
-            //os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXEC");
-            
             //init process obj
             Process* process = [[Process alloc] init:message];
             if(!process) {
@@ -175,8 +173,6 @@ es_client_t* esClient = nil;
         // remove from process cache
         case ES_EVENT_TYPE_NOTIFY_EXIT: {
             
-            //os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_EXIT");
-            
             NSNumber* exitKey = processKey;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (5 * NSEC_PER_SEC)), self.eventQueue, ^{
                 [self.processCache removeObjectForKey:exitKey];
@@ -193,11 +189,6 @@ es_client_t* esClient = nil;
             if(!message->event.close.modified) {
                 return;
             }
-            
-            //TODO: remove
-            // and update debug msg
-            NSString* path = convertStringToken(&message->process->executable->path);
-            os_log_debug(logHandle, "ES event: ES_EVENT_TYPE_NOTIFY_CLOSE (w/ modified) from %{public}@", path);
             
             //extract path
             filePath = convertStringToken(&message->event.close.target->path);
@@ -268,11 +259,12 @@ es_client_t* esClient = nil;
                 os_log_debug(logHandle, "notarization mode set, and process is notarized (or from app store) ...so allowing!");
                 return;
             }
-            //TODO: remove
+            /*
             else
             {
                 os_log_debug(logHandle, "notarization mode set, but %{public}@ is *not* notarized (nor from app store) ...signing info: %{public}@ / %@", process.path, process.signingInfo, process.signingCategory);
             }
+            */
         }
     
         //ignore if alert was shown
@@ -356,9 +348,6 @@ es_client_t* esClient = nil;
         
         //add file
         process.encryptedFiles[path] = [NSDate date];
-        
-        //TODO: remove
-        os_log_debug(logHandle, "file is encrypted, added to process (count: %lu)", process.encryptedFiles.count);
         
         //process hit limit?
         if(![self hitEncryptedThreshold:process]) {
@@ -491,8 +480,8 @@ es_client_t* esClient = nil;
 }
 
 //invoked when a rule is deleted
-// need to reset process in cache
--(void)resetProcess:(NSString*)path action:(NSInteger)action {
+// need to reset process in cache, unmute, etc
+-(void)resetProcess:(NSString*)path {
     
     //check all running processes
     for(NSData* tokenData in enumerateProcesses()) {
@@ -506,13 +495,16 @@ es_client_t* esClient = nil;
         if(!process) continue;
         
         //match rule's path?
-        // reset proc rule, etc.
+        // reset all the thingz
         if([process.path isEqualToString:path]) {
             
             os_log_debug(logHandle, "reset cached process %{public}@", path);
             
             process.rule = RULE_NOT_FOUND;
             process.alertShown = NO;
+            
+            //unmute
+            es_unmute_process(esClient, &token);
         }
     }
 }

@@ -145,7 +145,6 @@ bail:
     return;
 }
 
-
 //handler for main menu
 -(IBAction)menuHandler:(id)sender
 {
@@ -157,15 +156,14 @@ bail:
             [self showAbout:nil];
             break;
     
+        //settingd
         case MENU_ITEM_SETTINGS:
             [self showPreferences:nil];
             break;
-            
+           
+        //quit
         case MENU_ITEM_QUIT:
-            //TODO: alert/tell daemon
-            
-            //exit
-            [NSApp terminate:self];
+            [self quit:nil];
             
         default:
             break;
