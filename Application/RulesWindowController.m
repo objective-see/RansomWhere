@@ -52,6 +52,14 @@ extern XPCDaemonClient* xpcDaemonClient;
     return;
 }
 
+//refresh rules each time window gets key
+-(void)windowDidBecomeKey:(NSNotification*)notification {
+
+    os_log_debug(logHandle, "method '%s' invoked, will refresh rules...", __PRETTY_FUNCTION__);
+    
+    [self refresh:nil];
+}
+
 //clear and reload
 -(IBAction)refresh:(id)sender
 {
@@ -71,11 +79,17 @@ extern XPCDaemonClient* xpcDaemonClient;
     //hide overlay
     self.overlay.hidden = YES;
     
-    //load rules after a bit
-    // ...allows UI to show message
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (250 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+    //no sender
+    // (re)load right away
+    if(!sender) {
         [self loadRules];
-    });
+    }
+    //otherwise delay for UI
+    else {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (500 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+        [self loadRules];
+        });
+    }
 }
 
 //load
