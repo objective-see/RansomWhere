@@ -47,6 +47,6 @@
 -(BOOL)start;
 -(void)resetProcess:(NSString*)path;
 -(void)handleResponse:(NSDictionary*)alert;
--(void)dispatchFSEvent:(NSNumber*)processKey path:(NSString *)filePath;
+-(void)dispatchFSEvent:(NSNumber*)processKey processPath:(NSString *)processPath filePath:(NSString*)filePath;
 
 @end

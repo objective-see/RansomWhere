@@ -128,6 +128,7 @@ es_client_t* esClient = nil;
     
     //path
     NSString* filePath = nil;
+    NSString* processPath = nil;
 
     //key
     // defaults to responsible process
@@ -185,11 +186,11 @@ es_client_t* esClient = nil;
                 return;
             }
             
-            //extract path
             filePath = convertStringToken(&message->event.close.target->path);
+            processPath = convertStringToken(&message->process->executable->path);
             
             //dispatch
-            [self dispatchFSEvent:processKey path:filePath];
+            [self dispatchFSEvent:processKey processPath:processPath filePath:filePath];
             
             break;
         }
@@ -210,8 +211,10 @@ es_client_t* esClient = nil;
                 filePath = [convertStringToken(&message->event.rename.destination.new_path.dir->path) stringByAppendingPathComponent:convertStringToken(&message->event.rename.destination.new_path.filename)];
             }
             
+            processPath = convertStringToken(&message->process->executable->path);
+            
             //dispatch
-            [self dispatchFSEvent:processKey path:filePath];
+            [self dispatchFSEvent:processKey processPath:processPath filePath:filePath];
             
             break;
             
@@ -222,25 +225,25 @@ es_client_t* esClient = nil;
 
 //first, see if we care about process
 // if so, check rules / ask user if no rule found
--(void)dispatchFSEvent:(NSNumber*)key path:(NSString *)path {
+-(void)dispatchFSEvent:(NSNumber*)processKey processPath:(NSString *)processPath filePath:(NSString*)filePath {
     
     dispatch_async(self.eventQueue, ^{
         
         //sanity check
-        if(!path.length) {
+        if(!filePath.length) {
             return;
         }
         
         //grab process from cache
         // not found means we don't care about this process
-        Process* process = [self.processCache objectForKey:key];
+        Process* process = [self.processCache objectForKey:processKey];
         if(!process) {
             
             //mute
             // likely just 'older' process
-            es_mute_path_literal(esClient, path.UTF8String);
+            es_mute_path_literal(esClient, processPath.UTF8String);
             
-            os_log_debug(logHandle, "muted %{public}@, as its not in process cache", path.lastPathComponent);
+            os_log_debug(logHandle, "muted %{public}@, as its not in process cache", processPath);
         
             return;
         }
@@ -274,7 +277,7 @@ es_client_t* esClient = nil;
             // and mute
             case RULE_ALLOW:
                 os_log_debug(logHandle, "rule says 'allow' ...so allowing!");
-                es_mute_path_literal(esClient, path.UTF8String);
+                es_mute_path_literal(esClient, process.path.UTF8String);
                 break;
                 
             //block
@@ -302,7 +305,7 @@ es_client_t* esClient = nil;
             case RULE_NOT_FOUND:
             
                 //process
-                [self handleFSEvent:process path:path];
+                [self handleFSEvent:process path:filePath];
                 
                 break;
                 
@@ -483,8 +486,8 @@ es_client_t* esClient = nil;
     
     //platform binary?
     // but not a interpreter
-    if(process.isPlatformBinary && process.isInterpreter) {
-        os_log_debug(logHandle, "%{public}@, is platform binary (and not interpreter)", process.name);
+    if(process.isPlatformBinary && !process.isInterpreter) {
+        os_log_debug(logHandle, "%{public}@, is platform binary (and not interpreter)", process.path);
         return NO;
     }
     
