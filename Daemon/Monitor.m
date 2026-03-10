@@ -40,7 +40,6 @@ es_client_t* esClient = nil;
 
 @implementation Monitor
 
-
 //init function
 -(id)init {
     
@@ -57,15 +56,7 @@ es_client_t* esClient = nil;
         //init event queue
         self.eventQueue = dispatch_queue_create(BUNDLE_ID, DISPATCH_QUEUE_CONCURRENT);
         
-        //interpreters
-        self.interpreters = [NSSet setWithArray:@[
-            @"com.apple.bash", @"com.apple.zsh", @"com.apple.ksh",
-            @"com.apple.tcsh", @"com.apple.sh", @"com.apple.perl",
-            @"com.apple.perl5", @"com.apple.ruby", @"com.apple.php",
-            @"com.apple.python", @"com.apple.python2", @"com.apple.python3",
-            @"com.apple.pythonw", @"com.apple.osascript",
-            @"com.tcltk.tclsh", @"org.python.python"
-        ]];
+        
     }
 
     return self;
@@ -102,8 +93,8 @@ es_client_t* esClient = nil;
     es_clear_cache(esClient);
     
     //mute self
-    es_mute_path(esClient, [NSProcessInfo.processInfo.arguments[0] UTF8String], ES_MUTE_PATH_TYPE_LITERAL);
-    es_mute_path(esClient, "/Applications/RansomWhere Helper.app/Contents/MacOS/RansomWhere Helper", ES_MUTE_PATH_TYPE_LITERAL);
+    es_mute_path_literal(esClient, [NSProcessInfo.processInfo.arguments[0] UTF8String]);
+    es_mute_path_literal(esClient, "/Applications/RansomWhere Helper.app/Contents/MacOS/RansomWhere Helper");
     
     //mute each currently running processes
     // assumption: no existing ransomware is already running
@@ -115,9 +106,13 @@ es_client_t* esClient = nil;
         es_mute_process(esClient, &token);
     }
     
-    //mute /dev (tty, etc)
-    es_mute_path(esClient, "/dev/", ES_MUTE_PATH_TYPE_TARGET_PREFIX);
-        
+    //mute /dev/ (tty, etc)
+    if(@available(macOS 13.0, *)) {
+        if(ES_RETURN_SUCCESS != es_mute_path(esClient, "/dev", ES_MUTE_PATH_TYPE_TARGET_PREFIX)) {
+            os_log_error(logHandle, "ERROR: es_mute_path() failed for /dev");
+        }
+    }
+    
     //subscribe
     if(ES_RETURN_SUCCESS != es_subscribe(esClient, events, sizeof(events)/sizeof(events[0]))) {
         os_log_error(logHandle, "ERROR: es_subscribe() failed");
@@ -161,7 +156,7 @@ es_client_t* esClient = nil;
             else {
                 
                 if(![process.path isEqualToString:@"/usr/libexec/xpcproxy"]) {
-                    es_mute_path(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+                    es_mute_path_literal(client, process.path.UTF8String);
                     os_log_debug(logHandle, "muted %{public}@, as its not of interest", process.name);
                 }
             }
@@ -243,7 +238,7 @@ es_client_t* esClient = nil;
             
             //mute
             // likely just 'older' process
-            es_mute_path(esClient, path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+            es_mute_path_literal(esClient, path.UTF8String);
             
             os_log_debug(logHandle, "muted %{public}@, as its not in process cache", path.lastPathComponent);
         
@@ -276,15 +271,17 @@ es_client_t* esClient = nil;
         switch(process.rule) {
             
             //allow
+            // and mute
             case RULE_ALLOW:
-                os_log_debug(logHandle, "matching (process') rule says, 'allow' ...so allowing!");
+                os_log_debug(logHandle, "rule says 'allow' ...so allowing!");
+                es_mute_path_literal(esClient, path.UTF8String);
                 break;
                 
             //block
             // kill process
             case RULE_BLOCK:
                 
-                os_log_debug(logHandle, "matching (process') rule says, 'block', so blocking %{public}@", process.path);
+                os_log_debug(logHandle, "rule says 'block', so blocking %{public}@", process.path);
                 
                 //kill
                 if(-1 == kill(process.pid, SIGKILL)) {
@@ -444,33 +441,50 @@ es_client_t* esClient = nil;
 // no if allowed by rule, or platform binary (unless interpreter)
 -(BOOL)processOfInterest:(Process*)process {
     
-    //first set (any) rules
-    process.rule = [rules find:process.path];
+    NSString* path = nil;
+    NSInteger rule = RULE_NOT_FOUND;
     
+    //rule (for process) ?
+    rule = [rules find:process.path];
+    if(RULE_NOT_FOUND != rule) {
+        
+        os_log_debug(logHandle, "found rule for %{public}@", process.name);
+
+        process.rule = rule;
+        path = process.path;
+    }
+    
+    //rule (for script) ?
+    else if(process.script.length) {
+        rule = [rules find:process.script];
+        
+        if(RULE_NOT_FOUND != rule) {
+            
+            os_log_debug(logHandle, "found rule script: %{public}@ (host: %{public}@) ", process.script.lastPathComponent, process.path);
+            
+            process.rule = rule;
+            path = process.script;
+        }
+    }
+
     //already allowed?
     if(RULE_ALLOW == process.rule) {
-        os_log_debug(logHandle, "%{public}@, has 'RULE_ALLOW' set", process.name);
+        os_log_debug(logHandle, "%{public}@, has 'RULE_ALLOW' set", path.lastPathComponent);
         return NO;
     }
     
     //already blocked?
     if(RULE_BLOCK == process.rule) {
-        os_log_debug(logHandle, "%{public}@, has 'RULE_BLOCK' set", process.name);
+        os_log_debug(logHandle, "%{public}@, has 'RULE_BLOCK' set", path.lastPathComponent);
         return YES;
     }
     
+    //RULE_NOT_FOUND for process and script
+    
     //platform binary?
-    if(process.isPlatformBinary) {
-            
-        //interpreter? still of interest
-        // e.g. python, osascript, bash could run malicious scripts
-        if([self.interpreters containsObject:process.signingID]) {
-            return YES;
-        }
-        
+    // but not a interpreter
+    if(process.isPlatformBinary && process.isInterpreter) {
         os_log_debug(logHandle, "%{public}@, is platform binary (and not interpreter)", process.name);
-        
-        //otherwise, not of interest
         return NO;
     }
     
@@ -486,9 +500,10 @@ es_client_t* esClient = nil;
     os_log_debug(logHandle, "method '%s' invoked", __PRETTY_FUNCTION__);
     
     //first unmute via path
-    es_unmute_path(esClient, path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
-    os_log_debug(logHandle, "unmuted %{public}@", path);
-    
+    if(@available(macOS 12.0, *)) {
+        es_unmute_path(esClient, path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL);
+    }
+        
     //check all running processes to reset
     for(NSData* tokenData in enumerateProcesses()) {
         
@@ -516,15 +531,25 @@ es_client_t* esClient = nil;
 // kill or resume process, create rule, etc
 -(void)handleResponse:(NSDictionary*)alert {
     
+    NSString* path = nil;
     NSNumber* action = alert[ALERT_ACTION];
-    NSString* processPath = alert[ALERT_PROCESS_PATH];
+    
+    //script?
+    if(alert[ALERT_PROCESS_SCRIPT]) {
+        path = alert[ALERT_PROCESS_SCRIPT];
+    }
+    
+    //process
+    else {
+        path = alert[ALERT_PROCESS_PATH];
+    }
     
     //get process
     Process* process = [self.processCache objectForKey:alert[ALERT_PROCESS_PID_VERSION]];
     
     //first create rule
     if([alert[ALERT_CREATE_RULE] boolValue]) {
-        [rules add:processPath action:action];
+        [rules add:path action:action];
     }
     
     //now check process in cache?
@@ -540,7 +565,7 @@ es_client_t* esClient = nil;
     if(RULE_BLOCK == action.integerValue) {
         
         //log msg
-        os_log(logHandle, "user says, 'block', so blocking %{public}@", processPath);
+        os_log(logHandle, "user says, 'block', so blocking %{public}@", path);
         
         //kill
         if(-1 == kill(process.pid, SIGKILL)) {
@@ -553,7 +578,7 @@ es_client_t* esClient = nil;
     else
     {
         //log msg
-        os_log(logHandle, "user says, 'allow', so allowing %{public}@", processPath);
+        os_log(logHandle, "user says, 'allow', so allowing %{public}@", path);
         
         //resume
         if(-1 == kill(process.pid, SIGCONT)) {

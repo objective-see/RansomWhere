@@ -41,10 +41,6 @@
 //observer for new client/user
 @property(nonatomic, retain)id userObserver;
 
-//interpreters
-@property(nonatomic, retain)NSSet* interpreters;
-
-
 /* METHODS */
 
 -(BOOL)stop;

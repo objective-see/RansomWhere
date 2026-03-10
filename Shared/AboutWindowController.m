@@ -13,9 +13,6 @@
 
 @implementation AboutWindowController
 
-@synthesize patrons;
-@synthesize versionLabel;
-
 //automatically called when nib is loaded
 // ->center window
 -(void)awakeFromNib

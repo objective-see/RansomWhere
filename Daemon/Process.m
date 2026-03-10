@@ -6,6 +6,7 @@
 //  Copyright © 2020 Objective-See. All rights reserved.
 //
 
+@import OSLog;
 
 #import <dlfcn.h>
 #import <libproc.h>
@@ -15,8 +16,18 @@
 #import "consts.h"
 #import "Process.h"
 #import "signing.h"
+#import "Monitor.h"
 #import "utilities.h"
 
+/* GLOBALS */
+
+//monitor
+extern Monitor* monitor;
+
+//log handle
+extern os_log_t logHandle;
+
+/* FUNCTION DEFs */
 
 //pointer to function
 // responsibility_get_pid_responsible_for_pid
@@ -38,6 +49,21 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
 @synthesize auditToken;
 @synthesize signingInfo;
 
+static NSSet* interpreters = nil;
+
++(void)initialize {
+    if (self == [Process class]) {
+        interpreters = [NSSet setWithArray:@[
+            @"com.apple.bash", @"com.apple.zsh", @"com.apple.ksh",
+            @"com.apple.tcsh", @"com.apple.sh", @"com.apple.perl",
+            @"com.apple.perl5", @"com.apple.ruby", @"com.apple.php",
+            @"com.apple.python", @"com.apple.python2", @"com.apple.python3",
+            @"com.apple.pythonw", @"com.apple.osascript",
+            @"com.tcltk.tclsh", @"org.python.python"
+        ]];
+    }
+}
+
 //init w/ ES message
 -(id)init:(const es_message_t *)message {
     
@@ -45,7 +71,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
     if(ES_EVENT_TYPE_NOTIFY_EXEC != message->event_type) {
         return nil;
     }
-    
+
     //init super
     self = [super init];
     if(nil != self)
@@ -87,7 +113,8 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
         self.event = message->event_type;
         
         //extract/format args
-        [self extractArgs:&message->event];
+        // sets `arguments` iVar
+        self.arguments = [self extractArgs:&message->event];
                 
         //init audit token
         self.auditToken = [NSData dataWithBytes:&process->audit_token length:sizeof(audit_token_t)];
@@ -132,7 +159,7 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
             }
         }
         
-        //add platform binary
+        //platform binary?
         self.isPlatformBinary = process->is_platform_binary;
         
         //3rd-party
@@ -144,6 +171,9 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
             }
         }
         
+        //is interpretor?
+        self.isInterpreter = [interpreters containsObject:self.signingID];
+        
         //script
         if( (message->version >= 2) &&
             (ES_EVENT_TYPE_NOTIFY_EXEC == message->event_type) ) {
@@ -153,7 +183,30 @@ pid_t (* _Nullable getRPID)(pid_t pid) = NULL;
                 self.script = convertStringToken(&message->event.exec.script->path);
             }
         }
-    
+        
+        //no script, but this is an interpreter?
+        // try look up script manually, if ES didn't give us one
+        if( (!self.script.length) &&
+            (self.arguments.count >= 2) ) {
+            
+            if(self.isInterpreter) {
+                
+                NSString* cwd = nil;
+                NSArray* scripts = nil;
+                
+                //grab CWD
+                if (message->version >= 3 && message->event.exec.cwd) {
+                    cwd = convertStringToken(&message->event.exec.cwd->path);
+                }
+            
+                //get via args
+                scripts = getScripts(self.pid, self.arguments, cwd);
+                
+                //for now just grab ...first?
+                self.script = scripts.firstObject;
+            }
+        }
+        
         //enumerate ancestors
         [self enumerateAncestors];
         
@@ -212,7 +265,7 @@ bail:
 }
 
 //extract/format args
--(void)extractArgs:(const es_events_t *)event
+-(NSMutableArray*)extractArgs:(const es_events_t *)event
 {
     //number of args
     uint32_t count = 0;
@@ -220,11 +273,12 @@ bail:
     //argument
     NSString* argument = nil;
     
+    //arguments
+    NSMutableArray* arguments = [NSMutableArray array];
+    
     //get # of args
     count = es_exec_arg_count(&event->exec);
-    if(0 == count)
-    {
-        //bail
+    if(!count) {
         goto bail;
     }
     
@@ -239,16 +293,16 @@ bail:
         
         //convert argument
         argument = convertStringToken(&currentArg);
-        if(nil != argument)
+        if(argument)
         {
             //append
-            [self.arguments addObject:argument];
+            [arguments addObject:argument];
         }
     }
     
 bail:
     
-    return;
+    return arguments;
 }
 
 //generate list of ancestors

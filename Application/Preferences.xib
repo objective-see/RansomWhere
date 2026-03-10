@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24128" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24128"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -27,7 +28,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="600" height="250"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <imageView ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tx4-yW-fcJ">
+                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Tx4-yW-fcJ">
                         <rect key="frame" x="100" y="0.0" width="400" height="66"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="66" id="CBh-FE-fZx"/>
@@ -41,6 +42,8 @@
                     </customView>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="Tx4-yW-fcJ" firstAttribute="centerX" secondItem="tJi-Zd-T4Y" secondAttribute="centerX" id="Cfn-uw-yjr"/>
+                    <constraint firstAttribute="bottom" secondItem="Tx4-yW-fcJ" secondAttribute="bottom" id="be9-PL-Wv0"/>
                     <constraint firstAttribute="bottom" secondItem="Tx4-yW-fcJ" secondAttribute="bottom" id="bhO-2E-8fu"/>
                 </constraints>
             </view>

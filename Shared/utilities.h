@@ -39,6 +39,9 @@ uint32_t getQuarantineFlags(NSString* path);
 //mach time to nano-seconds
 uint64_t machTimeToNanoseconds(uint64_t machTime);
 
+//extract script via args
+NSArray* getScripts(pid_t pid, NSMutableArray* args, NSString* cwd);
+
 #endif
 
 /* FUNCTIONS */

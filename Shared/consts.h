@@ -7,8 +7,6 @@
 //  copyright (c) 2026 Objective-See. All rights reserved.
 //
 
-//TODO: cleanup
-
 #ifndef consts_h
 #define consts_h
 
@@ -38,9 +36,6 @@
 
 //signing auth
 #define SIGNING_AUTH @"Developer ID Application: Objective-See, LLC (VBG97UB4TA)"
-
-//log to file flag
-#define LOG_TO_FILE 0x10
 
 //install directory
 #define INSTALL_DIRECTORY @"/Library/Objective-See/RansomWhere"
@@ -210,29 +205,12 @@
 
 /* (HELPER) APP */
 
-//path to osascript
-#define OSASCRIPT @"/usr/bin/osascript"
-
 //path to open
 #define OPEN @"/usr/bin/open"
 
-//log activity button
-#define PREF_LOG_ACTIVITY @"logActivity"
-
 //keys for rule dictionary
 #define RULE_PROCESS_PATH @"processPath"
-#define RULE_PROCESS_NAME @"processName"
-#define RULE_PROCESS_SIGNINGID @"processSigningID"
-#define RULE_ITEM_FILE @"itemFile"
-#define RULE_ITEM_OBJECT @"itemObject"
 #define RULE_ACTION @"action"
-
-//scope for action
-// from dropdown in alert window
-#define ACTION_SCOPE_UNSELECTED -1
-#define ACTION_SCOPE_ALL 0
-#define ACTION_SCOPE_FILE 1
-#define ACTION_SCOPE_PROCESS 2
 
 //keys for alert dictionary
 #define ALERT_UUID @"uuid"
@@ -245,8 +223,9 @@
 #define ALERT_PROCESS_ID @"pid"
 #define ALERT_PROCESS_PATH @"path"
 #define ALERT_PROCESS_ARGS @"args"
-#define ALERT_PROCESS_NAME @"processName"
-#define ALERT_PROCESS_ANCESTORS @"processAncestors"
+#define ALERT_PROCESS_SCRIPT @"script"
+#define ALERT_PROCESS_NAME @"name"
+#define ALERT_PROCESS_ANCESTORS @"ancestors"
 #define ALERT_PROCESS_SIGNING_INFO @"signingInfo"
 
 //signing info (from ESF)
@@ -255,26 +234,9 @@
 #define TEAM_ID @"teamID"
 #define SIGNING_ID @"signingID"
 
-#define ALERT_TYPE @"alertType"
-#define ALERT_TYPE_FILE 1
-#define ALERT_TYPE_PROCESS 2
-
-#define ALERT_ITEM_NAME @"itemName"
-#define ALERT_ITEM_FILE @"itemFile"
-#define ALERT_ITEM_OBJECT @"itemObject"
-#define ALERT_ITEM_FILE_RESTRICTED @"isRestricted"
-
 #define ALERT_USER @"user"
-#define ALERT_IPADDR @"ipAddr"
-#define ALERT_HOSTNAME @"hostName"
-#define ALERT_PORT @"port"
-#define ALERT_PROTOCOL @"protocol"
 #define ALERT_ACTION @"action"
-#define ALERT_ACTION_SCOPE @"actionScope"
 #define ALERT_CREATE_RULE @"createRule"
-
-#define ALERT_PIDS @"pids"
-#define ALERT_HASH @"hash"
 
 //keys for rules
 #define KEY_RULES @"rules"
@@ -295,27 +257,11 @@
 //key for exit code
 #define EXIT_CODE @"exitCode"
 
-//plugin types
-typedef enum {
-    PLUGIN_TYPE_KEXT = 1,
-    PLUGIN_TYPE_LAUNCHD,
-    PLUGIN_TYPE_LOGIN_ITEM,
-    PLUGIN_TYPE_CRON_JOB,
-    PLUGIN_TYPE_APP_LOGIN_ITEM,
-    PLUGIN_TYPE_EVENT_MONITOR,
-    PLUGIN_TYPE_PROCESS_MONITOR,
-    PLUGIN_TYPE_BACKGROUND_TASK
-} PluginType;
-
-
 //path to launchctl
 #define LAUNCHCTL @"/bin/launchctl"
 
 //path to killall
 #define KILL_ALL @"/usr/bin/killall"
-
-//path to log
-#define UNIVERSAL_LOG "/usr/bin/log"
 
 enum {
     RULE_NOT_FOUND = -1,

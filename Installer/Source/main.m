@@ -15,7 +15,6 @@
 #import "utilities.h"
 #import "Configure.h"
 
-//TODO: macOS versions (just via build?)
 
 /* To build:
  

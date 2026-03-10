@@ -849,11 +849,14 @@ NSImage* getIconForProcess(NSString* path)
 
     //otherwise, generic executable icon
     if(!icon) {
-        
-        icon = [NSWorkspace.sharedWorkspace iconForContentType:UTTypeUnixExecutable];
+        if(@available(macOS 11.0, *)) {
+            icon = [NSWorkspace.sharedWorkspace iconForContentType:UTTypeUnixExecutable];
+        } else {
+            icon = [NSWorkspace.sharedWorkspace iconForFileType:@"public.unix-executable"];
+        }
     }
 
-    [icon setSize:NSMakeSize(100, 100)];
+    [icon setSize:NSMakeSize(128, 128)];
     return icon;
 }
 
@@ -1902,7 +1905,6 @@ bail:
 NSData* auditTokenFromPid(pid_t pid) {
     NSData* auditToken = nil;
     audit_token_t token = {0};
-    kern_return_t result = 0;
     task_name_t task = MACH_PORT_NULL;
     
     mach_msg_type_number_t info_size = TASK_AUDIT_TOKEN_COUNT;
@@ -1918,6 +1920,61 @@ NSData* auditTokenFromPid(pid_t pid) {
     }
     
     return auditToken;
+}
+
+//get current working directory of process
+NSString* getCWD(pid_t pid) {
+    
+    struct proc_vnodepathinfo vinfo = {0};
+    
+    if(proc_pidinfo(pid, PROC_PIDVNODEPATHINFO, 0, &vinfo, sizeof(vinfo)) > 0) {
+        NSString* cwd = [NSString stringWithUTF8String:vinfo.pvi_cdir.vip_path];
+        if(cwd.length) {
+            return [cwd stringByResolvingSymlinksInPath];
+        }
+    }
+    
+    return nil;
+}
+
+//extract scripts from process arguments
+NSArray* getScripts(pid_t pid, NSMutableArray* args, NSString* cwd) {
+    
+    if(args.count < 2) {
+        return nil;
+    }
+    
+    if(!cwd) {
+        cwd = getCWD(pid);
+    }
+    
+    BOOL isDirectory = NO;
+    NSMutableArray* scripts = [NSMutableArray array];
+    
+    for(NSUInteger i = 1; i < args.count; i++) {
+        
+        NSString* arg = args[i];
+        
+        //resolve relative paths against cwd
+        NSString* fullPath = nil;
+        if([arg hasPrefix:@"/"]) {
+            fullPath = arg;
+        } else if(cwd) {
+            fullPath = [cwd stringByAppendingPathComponent:arg];
+        } else {
+            continue;
+        }
+        
+        //resolve symlinks for consistent paths
+        fullPath = [fullPath stringByResolvingSymlinksInPath];
+        
+        //must be an existing regular file
+        if([NSFileManager.defaultManager fileExistsAtPath:fullPath isDirectory:&isDirectory] && !isDirectory) {
+            [scripts addObject:fullPath];
+        }
+    }
+    
+    return scripts.count > 0 ? scripts : nil;
 }
 
 #endif

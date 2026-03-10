@@ -11,6 +11,7 @@
 @import Foundation;
 #import "XPCDaemonProto.h"
 
+
 @interface XPCListener : NSObject <NSXPCListenerDelegate>
 {
     
@@ -30,8 +31,6 @@
 -(BOOL)initListener;
 
 //automatically invoked
-// allows NSXPCListener to configure/accept/resume a new incoming NSXPCConnection
-// note: we only allow binaries signed by Objective-See to talk to this!
 -(BOOL)listener:(NSXPCListener *)listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection;
 
 @end

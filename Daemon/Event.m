@@ -77,6 +77,11 @@ extern os_log_t logHandle;
     
     //add path
     alert[ALERT_PROCESS_PATH] = valueForStringItem(self.process.path);
+    
+    //add script
+    if(self.process.script) {
+        alert[ALERT_PROCESS_SCRIPT] = self.process.script;
+    }
 
     //add cs flags
     signingInfo[CS_FLAGS] = self.process.csFlags;

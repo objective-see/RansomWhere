@@ -76,11 +76,32 @@ extern XPCDaemonClient* xpcDaemonClient;
     //set process icon
     self.processIcon.image = getIconForProcess(self.alert[ALERT_PROCESS_PATH]);
     
-    //process signing info
-    [self setSigningIcon];
+    //no script?
+    // use process info
+    if(!self.alert[ALERT_PROCESS_SCRIPT]) {
+        
+        //process signing info
+        [self setSigningIcon];
+        
+        //enable signing info
+        self.signingInfoButton.enabled = YES;
+        
+        //set process name
+        self.processName.stringValue = self.alert[ALERT_PROCESS_NAME];
+    }
     
-    //set process name
-    self.processName.stringValue = self.alert[ALERT_PROCESS_NAME];
+    //script
+    else {
+        
+        //unsigned
+        signingInfoButton.image = [NSImage imageNamed:@"Unsigned"];
+        
+        //disable signing info
+        self.signingInfoButton.enabled = NO;
+        
+        //set name
+        self.processName.stringValue = [self.alert[ALERT_PROCESS_SCRIPT] lastPathComponent];
+    }
     
     //alert message
     self.alertMessage.stringValue = self.alert[ALERT_MESSAGE];
@@ -245,15 +266,21 @@ bail:
     NSString* path = nil;
     NSString* hash = nil;
     
-    //default
-    path = self.processPath.stringValue;
-    
-    //package?
-    // get path of binary from bundle
-    if([NSWorkspace.sharedWorkspace isFilePackageAtPath:self.processPath.stringValue]) {
+    //script?
+    if(self.alert[ALERT_PROCESS_SCRIPT]) {
+        path = self.alert[ALERT_PROCESS_SCRIPT];
+    }
+    //process
+    else {
+        path = self.alert[ALERT_PROCESS_PATH];
         
-        //get path
-        path = getBundleExecutable(self.processPath.stringValue);
+        //package?
+        // get path of binary from bundle
+        if([NSWorkspace.sharedWorkspace isFilePackageAtPath:self.processPath.stringValue]) {
+            
+            //get path
+            path = getBundleExecutable(self.processPath.stringValue);
+        }
     }
     
     //hash
@@ -449,10 +476,7 @@ bail:
     
     //add current user
     alertResponse[ALERT_USER] = [NSNumber numberWithUnsignedInt:getuid()];
-    
-    //add action scope
-    alertResponse[ALERT_ACTION_SCOPE] = [NSNumber numberWithInteger:self.actionScope.indexOfSelectedItem];
-    
+
     //add user response
     alertResponse[ALERT_ACTION] = [NSNumber numberWithLong:((NSButton*)sender).tag];
     

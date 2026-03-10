@@ -71,6 +71,7 @@
 
 //flags
 @property BOOL isNotarized;
+@property BOOL isInterpreter;
 @property BOOL isPlatformBinary;
 
 //signing info
