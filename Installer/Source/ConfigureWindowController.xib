@@ -191,6 +191,15 @@
                         <action selector="configureButtonHandler:" target="-2" id="EKL-3w-hKD"/>
                     </connections>
                 </button>
+                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" preferredMaxLayoutWidth="445" translatesAutoresizingMaskIntoConstraints="NO" id="asS-IX-Ggs">
+                    <rect key="frame" x="291" y="306" width="597" height="15"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="(steps may vary by macOS version)" id="hHR-BP-ml4">
+                        <font key="font" size="12" name="Menlo-Regular"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <point key="canvasLocation" x="393.5" y="250"/>
         </customView>

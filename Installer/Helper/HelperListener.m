@@ -171,25 +171,19 @@ bail:
         
         //obtain dynamic code ref
         status = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(@{(__bridge NSString *)kSecGuestAttributeAudit : [NSData dataWithBytes:&auditToken length:sizeof(audit_token_t)]}), kSecCSDefaultFlags, &codeRef);
-        if(errSecSuccess != status)
-        {
-            //bail
+        if(errSecSuccess != status) {
             goto bail;
         }
         
         //validate code
         status = SecCodeCheckValidity(codeRef, kSecCSDefaultFlags, NULL);
-        if(errSecSuccess != status)
-        {
-            //bail
+        if(errSecSuccess != status) {
             goto bail;
         }
         
         //get code signing info
         status = SecCodeCopySigningInformation(codeRef, kSecCSDynamicInformation, &csInfo);
-        if(errSecSuccess != status)
-        {
-            //bail
+        if(errSecSuccess != status) {
             goto bail;
         }
         
@@ -201,32 +195,30 @@ bail:
         
         //gotta have hardened runtime
         if( !(CS_VALID & csFlags) &&
-            !(CS_RUNTIME & csFlags) )
-        {
-            //bail
+            !(CS_RUNTIME & csFlags) ) {
             goto bail;
         }
         
         //init signing req string
-        requirement = [NSString stringWithFormat:@"anchor apple generic and identifier \"%@\" and certificate leaf [subject.CN] = \"%@\" and info [CFBundleShortVersionString] >= \"2.0.0\"", HELPER_ID, SIGNING_AUTH];
+        requirement = [NSString stringWithFormat:@"anchor apple generic and identifier \"%@\" and certificate leaf [subject.CN] = \"%@\" and info [CFBundleShortVersionString] >= \"2.0.0\"", INSTALLER_ID, SIGNING_AUTH];
         
         //step 1: create task ref
         // uses NSXPCConnection's (private) 'auditToken' iVar
         taskRef = SecTaskCreateWithAuditToken(NULL, ((ExtendedNSXPCConnection*)newConnection).auditToken);
-        if(NULL == taskRef)
-        {
-            //bail
+        if(NULL == taskRef) {
             goto bail;
         }
         
         //step 2: validate
-        // check that client is signed with Objective-See's and it's RansomWhere?
+        // check that client is signed with Objective-See's and it's RansomWhere? helper
         status = SecTaskValidateForRequirement(taskRef, (__bridge CFStringRef)(requirement));
-        if(errSecSuccess != status)
-        {
-            //bail
+        if(errSecSuccess != status) {
+            os_log_error(logHandle, "SecTaskValidateForRequirement failed with %d", status);
             goto bail;
         }
+        
+        //dbg msg
+        os_log_debug(logHandle, "client is trusted...");
     }
     
     //set the interface that the exported object implements

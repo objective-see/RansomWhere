@@ -91,6 +91,11 @@ NSNumber* extractSigner(SecCodeRef code, NSNumber* csFlags) {
         return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_APP_STORE];
     }
 
+    //"is iOS app store"
+    if(errSecSuccess == validateRequirement(code, isiOSAppStore)) {
+        return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_APP_STORE];
+    }
+
     //"is dev id"
     if(errSecSuccess == validateRequirement(code, isDevID)) {
         return [NSNumber numberWithInt:ES_CS_VALIDATION_CATEGORY_DEVELOPER_ID];
