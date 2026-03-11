@@ -15,14 +15,6 @@ INSTALL_DIRECTORY="/Library/Objective-See/RansomWhere"
 #preferences
 PREFERENCES="$INSTALL_DIRECTORY/preferences.plist"
 
-#OS version check
-# only support macOS 15+
-major=$(sw_vers -productVersion | cut -d. -f1)
-if [[ "$major" -lt 15 ]]; then
-    printf "\nERROR: macOS 15+ required\n\n"
-    exit 1
-fi
-
 #auth check
 # gotta be root
 if [ "${EUID}" -ne 0 ]; then
