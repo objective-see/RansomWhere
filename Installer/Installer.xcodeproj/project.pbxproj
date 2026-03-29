@@ -80,7 +80,6 @@
 		CD2F801024465F68009C3D77 /* patrons.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = patrons.txt; path = ../../Shared/patrons.txt; sourceTree = "<group>"; };
 		CD2F8012244670B9009C3D77 /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
 		CD3307AD203567D400F10D71 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CD6CAC9120A42D5000188B0A /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		CD73DA8F2004629D001FFC84 /* HelperInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperInterface.h; sourceTree = "<group>"; };
 		CD73DA902004629D001FFC84 /* HelperInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperInterface.m; sourceTree = "<group>"; };
 		CD73DA9220046339001FFC84 /* HelperListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperListener.m; sourceTree = "<group>"; };
@@ -168,7 +167,6 @@
 				CD73DA97200490B4001FFC84 /* HelperComms.m */,
 				4BE4904C10445D49006BE471 /* Info.plist */,
 				BF65C19011B985C0007C20AB /* MainMenu.xib */,
-				CD6CAC9120A42D5000188B0A /* main.h */,
 				4BE4904D10445D49006BE471 /* main.m */,
 				BF04235411C0531400431286 /* AppDelegate.h */,
 				BF04235511C0531400431286 /* AppDelegate.m */,
@@ -342,7 +340,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#archive build\nif [[ $BUILT_PRODUCTS_DIR = *\"ArchiveIntermediates\"* ]]; then\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    \n#normal build\nelse\n\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere.app\"\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere Helper.app\"\n\n#cp daemon/app\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n\nfi\n\n\n\n";
+			shellScript = "#archive build\nif [[ $BUILT_PRODUCTS_DIR = *\"ArchiveIntermediates\"* ]]; then\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    cp -R -f \"$PROJECT_TEMP_ROOT/UninstalledProducts/macosx/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n    \n#normal build\nelse\n\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere.app\"\nrm -rf  \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources/RansomWhere Helper.app\"\n\n#cp daemon/app\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\ncp -R -f \"$BUILT_PRODUCTS_DIR/RansomWhere Helper.app\" \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\n\nfi\n\n\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

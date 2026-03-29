@@ -364,15 +364,15 @@ bail:
     }
     
     //register daemon
-    if(YES != [self lsRegisterDaemon:YES])
+    if(![self lsRegisterDaemon:YES])
     {
         //err msg
         // ...though not fatal
         os_log_error(logHandle, "ERROR: failed to register daemon");
     }
-    
-    //dbg msg
-    os_log_debug(logHandle, "registered daemon");
+    else {
+        os_log_debug(logHandle, "registered daemon");
+    }
     
     //init path to login item
     loginItem = [@"/Applications" stringByAppendingPathComponent:APP_NAME];

@@ -40,6 +40,7 @@
 
     //load patrons
     // <3 you all :)
+    [self.patrons setSelectable:NO];
     self.patrons.string = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"patrons" ofType:@"txt"] encoding:NSUTF8StringEncoding error:NULL];
     if(nil == self.patrons.string) {
         //default

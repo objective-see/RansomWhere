@@ -10,7 +10,6 @@
 @import Cocoa;
 @import OSLog;
 
-#import "main.h"
 #import "consts.h"
 #import "utilities.h"
 #import "Configure.h"
@@ -33,6 +32,9 @@ os_log_t logHandle = nil;
 
 //main interface
 int main(int argc, char *argv[]) {
+    
+    //init log
+    logHandle = os_log_create(BUNDLE_ID, "config");
     
     return NSApplicationMain(argc, (const char **)argv);
 }
