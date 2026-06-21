@@ -112,32 +112,14 @@ extern XPCDaemonClient* xpcDaemonClient;
     // name and pid
     self.processSummary.stringValue = [NSString stringWithFormat:@"%@ (pid: %@)", self.alert[ALERT_PROCESS_NAME], self.alert[ALERT_PROCESS_ID]];
     
-    //no args?
-    // hide process args label
-    if([self.alert[ALERT_PROCESS_ARGS] count] < 2)
-    {
-        //hide
-        self.processArgsLabel.hidden = YES;
-    }
-       
     //process args
-    // create string of all
-    else
-    {
-        //show
-        self.processArgsLabel.hidden = NO;
-        
-        //add each arg
-        // note: skip first, since the process name
-        [self.alert[ALERT_PROCESS_ARGS] enumerateObjectsUsingBlock:^(NSString* argument, NSUInteger index, BOOL* stop) {
-            
-            //skip first arg
-            if(0 == index) return;
-            
-            //add argument
-            self.processArgs.stringValue = [self.processArgs.stringValue stringByAppendingFormat:@"%@ ", argument];
-            
-        }];
+    // skip first (process name); show "none" if there are no real args
+    NSArray* args = self.alert[ALERT_PROCESS_ARGS];
+    if(args.count < 2) {
+        self.processArgs.stringValue = @"none";
+    }
+    else {
+        self.processArgs.stringValue = [[args subarrayWithRange:NSMakeRange(1, args.count - 1)] componentsJoinedByString:@" "];
     }
     
     //process path

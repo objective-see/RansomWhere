@@ -155,9 +155,17 @@ es_client_t* esClient = nil;
             //not of interest, so mute
             // (unless its xpcproxy, cuz it doesn't do anything but is respawned x 1000)
             else {
-                
+
                 if(![process.path isEqualToString:@"/usr/libexec/xpcproxy"]) {
-                    es_mute_path_literal(client, process.path.UTF8String);
+
+                    //mute (FS) events
+                    if(@available(macOS 12.0, *)) {
+                        es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
+                        es_mute_path_events(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
+                    } else {
+                        es_mute_path_literal(client, process.path.UTF8String);
+                    }
+
                     os_log_debug(logHandle, "muted %{public}@, as its not of interest", process.name);
                 }
             }
@@ -238,13 +246,18 @@ es_client_t* esClient = nil;
         // not found means we don't care about this process
         Process* process = [self.processCache objectForKey:processKey];
         if(!process) {
-            
-            //mute
+
+            //mute (FS) events
             // likely just 'older' process
-            es_mute_path_literal(esClient, processPath.UTF8String);
-            
+            if(@available(macOS 12.0, *)) {
+                es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
+                es_mute_path_events(esClient, processPath.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
+            } else {
+                es_mute_path_literal(esClient, processPath.UTF8String);
+            }
+
             os_log_debug(logHandle, "muted %{public}@, as its not in process cache", processPath);
-        
+
             return;
         }
         
@@ -274,10 +287,15 @@ es_client_t* esClient = nil;
         switch(process.rule) {
             
             //allow
-            // and mute
+            // and mute (FS) events
             case RULE_ALLOW:
                 os_log_debug(logHandle, "rule says 'allow' ...so allowing!");
-                es_mute_path_literal(esClient, process.path.UTF8String);
+                if(@available(macOS 12.0, *)) {
+                    es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
+                    es_mute_path_events(esClient, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
+                } else {
+                    es_mute_path_literal(esClient, process.path.UTF8String);
+                }
                 break;
                 
             //block
@@ -318,12 +336,19 @@ es_client_t* esClient = nil;
 //async handle file event
 // note: to get here, its a process of interest
 -(void)handleFSEvent:(Process *)process path:(NSString*)path {
-    
+
+    //fast bail: alert already pending
+    // process is suspended; remaining ES events are just residual
+    if(process.alertShown) {
+        os_log_debug(logHandle, "IGNORING: alert already shown for %{public}@", process.name);
+        return;
+    }
+
     os_log_debug(logHandle, "handling FS event: %{public}@ modified %{public}@", process.name, path);
-    
+
     //file size
     unsigned long long fileSize = [[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] fileSize];
-    
+
     //IGNORE: small files
     // entropy calculations don't do well on smaller files
     if(fileSize < 1024) {
@@ -337,65 +362,55 @@ es_client_t* esClient = nil;
         os_log_debug(logHandle, "IGNORING: too large (%llu bytes)", fileSize);
         return;
     }
-    
+
     //IGNORE: non encrypted files
     if(!isEncrypted(path)) {
         os_log_debug(logHandle, "IGNORING: Not encrypted ");
         return;
     }
-    
+
     @synchronized (process) {
-        
+
         //add file
         process.encryptedFiles[path] = [NSDate date];
-        
+
         //process hit limit?
         if(![self hitEncryptedThreshold:process]) {
-            
-            os_log_debug(logHandle, "IGNORING: process threshold not hit");
+
+            os_log_debug(logHandle, "IGNORING: process threshold not hit (currently: %lu)", (unsigned long)process.encryptedFiles.count);
             return;
         }
-        
-        //already alerted?
-        if(process.alertShown) {
-            
-            os_log_debug(logHandle, "IGNORING: alert already shown");
-            return;
-        }
-        
-        //flag
-        process.alertShown = YES;
     }
-    
+
     //process hit limit
-    //suspend the process w/ SIGSTOP
+    // suspend the process w/ SIGSTOP (idempotent at kernel level)
     if(-1 == kill(process.pid, SIGSTOP)) {
-        
+
         //err
         os_log_error(logHandle, "ERROR: failed to suspend process %{public}@ (errno: %d)", process.path, errno);
         return;
     }
-    
+
     //dbg msg
     os_log_debug(logHandle, "suspended: %{public}@", process.name);
-    
+
     //event
     Event* event = nil;
-    
+
     //create event
     event = [[Event alloc] init:process];
-    
+
     //deliver alert to user
-    // will trigger (other) XPC method to process response
+    // deliver: is idempotent; sets process.alertShown on success
     if(![events deliver:event]) {
-        
+
         //err
         os_log_error(logHandle, "ERROR: failed to deliver alert to user for %{public}@ ...just allowing process", process.path);
-        
+
         //resume
         kill(process.pid, SIGCONT);
     }
-    
+
     return;
 }
 
@@ -490,7 +505,7 @@ es_client_t* esClient = nil;
         os_log_debug(logHandle, "%{public}@, is platform binary (and not interpreter)", process.path);
         return NO;
     }
-    
+        
     //everything else is of interest
     // unsigned, third-party, ad hoc signed, etc.
     return YES;

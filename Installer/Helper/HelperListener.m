@@ -194,7 +194,7 @@ bail:
         csFlags = [((__bridge NSDictionary *)csInfo)[(__bridge NSString *)kSecCodeInfoStatus] unsignedIntValue];
         
         //gotta have hardened runtime
-        if( !(CS_VALID & csFlags) &&
+        if( !(CS_VALID & csFlags) ||
             !(CS_RUNTIME & csFlags) ) {
             goto bail;
         }

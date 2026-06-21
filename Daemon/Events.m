@@ -40,18 +40,31 @@ XPCUserClient* xpcUserClient;
 }
 
 //via XPC, send an alert
-// response is handled by other callback
+// idempotent: marks process.alertShown on success so concurrent callers
+// don't double-deliver
 -(BOOL)deliver:(Event*)event {
-    
-    //dbg msg
-    os_log_debug(logHandle, "delivering alert to user: %{public}@", event);
-    
-    //send via XPC to user
-    if(![xpcUserClient deliverEvent:event]) {
-        os_log_debug(logHandle, "failed to deliver alert to user (no client?)");
-        return NO;
+
+    @synchronized(self) {
+
+        //already delivered? no-op
+        if(event.process.alertShown) {
+            os_log_debug(logHandle, "alert already shown for %{public}@, skipping", event.process.name);
+            return YES;
+        }
+
+        //dbg msg
+        os_log_debug(logHandle, "delivering alert to user: %{public}@", event);
+
+        //send via XPC to user
+        if(![xpcUserClient deliverEvent:event]) {
+            os_log_debug(logHandle, "failed to deliver alert to user (no client?)");
+            return NO;
+        }
+
+        //flag tied to actual XPC send
+        event.process.alertShown = YES;
     }
-    
+
     return YES;
 }
 

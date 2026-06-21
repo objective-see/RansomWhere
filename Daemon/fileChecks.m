@@ -42,19 +42,16 @@ BOOL isEncrypted(NSString* path)
     entropy = [results[@"entropy"] doubleValue];
 
     //dbg msg
-    #ifdef DEBUG
-    //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"encryption results for %@: %@", path, results]);
-    #endif
-    
+    //os_log_debug(logHandle, "encryption results for %@: %@", path, results);
+
     //ignore image files
     // ->looks for well known headers at start of file
     if( (nil != results[@"header"]) &&
         (YES == isImage(results[@"header"])) )
     {
-        #ifdef DEBUG
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file is an image; %#x", *(unsigned int*)[results[@"header"] bytes]]);
-        #endif
-        
+        //dbg msg
+        //os_log_debug(logHandle, "file is an image; %#x", *(unsigned int*)[results[@"header"] bytes]);
+
         //ignore
         goto bail;
     }
@@ -64,10 +61,8 @@ BOOL isEncrypted(NSString* path)
     if( (nil != results[@"header"]) &&
         (YES == isGzip(results[@"header"])) )
     {
-        #ifdef DEBUG
-        //logMsg(LOG_DEBUG, [NSString stringWithFormat:@"file is an gz; %#x", *(unsigned int*)[results[@"header"] bytes]]);
-        #endif
-        
+        //os_log_debug(logHandle, "file is an gz; %#x", *(unsigned int*)[results[@"header"] bytes]);
+     
         //ignore
         goto bail;
     }

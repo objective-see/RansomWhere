@@ -233,9 +233,9 @@ bail:
         
         //reply to client
         reply([NSNumber numberWithBool:response]);
-        
+
         //bye!
-        exit(SIGTERM);
+        exit(noErrors ? 0 : 1);
         
     });
     
