@@ -26,6 +26,10 @@
 //process object
 @property(nonatomic, retain)Process* process;
 
+//encrypted files (snapshot)
+// immutable copy, taken under the process lock when the threshold was hit
+@property(nonatomic, retain)NSArray* encryptedFiles;
+
 //(startup) item
 @property(nonatomic, retain)Item* item;
 
@@ -35,7 +39,7 @@
 /* METHODS */
 
 //init
--(id)init:(Process*)process;
+-(id)init:(Process*)process encryptedFiles:(NSArray*)encryptedFiles;
 
 //create an (deliverable) obj
 -(NSMutableDictionary*)toAlert;

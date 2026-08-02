@@ -30,18 +30,22 @@ extern os_log_t logHandle;
 @synthesize timestamp;
 
 //init
--(id)init:(Process*)process
+-(id)init:(Process*)process encryptedFiles:(NSArray*)encryptedFiles
 {
     self = [super init];
     if(self)
     {
         //create timestamp
         timestamp = [NSDate date];
-        
+
         //save process
         self.process = process;
+
+        //save (snapshot of) encrypted files
+        // note: captured by caller under the process lock, so safe to hold onto
+        self.encryptedFiles = (nil != encryptedFiles) ? encryptedFiles : @[];
     }
-    
+
     return self;
 }
 
@@ -116,7 +120,10 @@ extern os_log_t logHandle;
     alert[ALERT_PROCESS_ANCESTORS] = [self buildProcessHierarchy:self.process];
     
     //encrypted files
-    alert[ALERT_ENCRYPTED_FILES] = [self.process.encryptedFiles allKeys];
+    // note: a snapshot, taken when the threshold was hit
+    //       never read `process.encryptedFiles` here, as concurrent
+    //       (FS) events may still be mutating it
+    alert[ALERT_ENCRYPTED_FILES] = self.encryptedFiles;
     
     //dbg msg
     os_log_debug(logHandle, "sending alert to user (client): %{public}@", alert);
@@ -137,25 +144,20 @@ extern os_log_t logHandle;
     
     //alloc
     processHierarchy = [NSMutableArray array];
-    
-    //add current process (leaf)
-    // parent(s) will then be added at front...
-    [processHierarchy addObject:[@{@"pid":[NSNumber numberWithInt:process.pid], @"name":valueForStringItem(process.name)} mutableCopy]];
-    
-    //get name and add each ancestor
-    for(NSUInteger i=0; i<process.ancestors.count; i++)
+
+    //add each ancestor, oldest first
+    // note: `ancestors` runs parent -> grandparent -> ..., but the (outline) view
+    //       walks index 0 downwards into its children, so add 'em in reverse
+    for(ancestor in process.ancestors.reverseObjectEnumerator)
     {
-        //skip first one (self)
-        // already have it (with pid/path!)
-        if(0 == i) continue;
-        
-        //extact ancestor
-        ancestor = process.ancestors[i];
-        
         //add
         [processHierarchy addObject:[@{@"pid":ancestor, @"name":valueForStringItem(getProcessPath(ancestor.intValue))} mutableCopy]];
     }
-        
+
+    //add current process last
+    // it's the leaf, i.e. the deepest child
+    [processHierarchy addObject:[@{@"pid":[NSNumber numberWithInt:process.pid], @"name":valueForStringItem(process.name)} mutableCopy]];
+
     //add the index value
     // used to populate outline/table
     for(NSUInteger i = 0; i < processHierarchy.count; i++)

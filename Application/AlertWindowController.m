@@ -477,9 +477,9 @@ bail:
     //send response to daemon
     [xpcDaemonClient alertReply:alertResponse];
     
-    //not temp rule & rules window visible?
-    // then refresh it, as rules have changed
-    if( (YES != [alertResponse[ALERT_CREATE_RULE] boolValue]) &&
+    //rule created & rules window visible?
+    // then refresh it, as rules have (just) changed
+    if( (YES == [alertResponse[ALERT_CREATE_RULE] boolValue]) &&
         (YES == ((AppDelegate*)[[NSApplication sharedApplication] delegate]).rulesWindowController.window.isVisible) )
     {
         //(shortly thereafter) refresh rules window

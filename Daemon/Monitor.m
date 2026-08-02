@@ -51,8 +51,11 @@ es_client_t* esClient = nil;
         self.processCache = [[NSCache alloc] init];
         [self.processCache setDelegate:self];
         [self.processCache setCountLimit:8192];
-        
-        
+
+        //init interpreter paths
+        // grown as we observe interpreters (and script hosts) exec
+        self.interpreterPaths = [NSMutableSet set];
+
         //init event queue
         self.eventQueue = dispatch_queue_create(BUNDLE_ID, DISPATCH_QUEUE_CONCURRENT);
         
@@ -65,15 +68,22 @@ es_client_t* esClient = nil;
 //enable ES monitor
 // start ES monitor for file events
 -(BOOL)start {
-    
+
+    //already running?
+    // bail, else we'd orphan (leak) the existing client
+    if(NULL != esClient) {
+        os_log_debug(logHandle, "ES client already running, so not starting another");
+        return YES;
+    }
+
     //events of interest
     // process event(s): exec/exit
     // file event(s): close & rename
     es_event_type_t events[] = {ES_EVENT_TYPE_NOTIFY_EXEC, ES_EVENT_TYPE_NOTIFY_EXIT, ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
-    
+
     //result
     es_new_client_result_t result = 0;
-    
+
     //create client
     // callback invoked on ES events
     result = es_new_client(&esClient, ^(es_client_t *client, const es_message_t *message) {
@@ -123,6 +133,66 @@ es_client_t* esClient = nil;
     return YES;
 }
 
+//record interpreters (& script hosts)
+// their paths must never be muted, as a mute is by path & permanent, so
+// muting one would blind us to every script it subsequently runs
+-(void)noteInterpreter:(Process*)process {
+
+    //only interpreters & script hosts
+    // note: `script` covers 3rd-party interpreters that we can't ID via signing ID
+    if( (YES != process.isInterpreter) &&
+        (0 == process.script.length) ) {
+        return;
+    }
+
+    //sanity check
+    if(0 == process.path.length) {
+        return;
+    }
+
+    //save
+    @synchronized(self.interpreterPaths) {
+
+        if(YES != [self.interpreterPaths containsObject:process.path]) {
+            os_log_debug(logHandle, "noting interpreter: %{public}@", process.path);
+        }
+
+        [self.interpreterPaths addObject:process.path];
+    }
+}
+
+//mute a path's (FS) events
+// note: refuses to mute interpreters, as that would blind us to their (future) scripts
+-(BOOL)muteFSEvents:(NSString*)path client:(es_client_t*)client {
+
+    //sanity check
+    // note: client can be NULL if we've (since) been stopped
+    if( (NULL == client) ||
+        (0 == path.length) ) {
+        return NO;
+    }
+
+    //never mute an interpreter
+    @synchronized(self.interpreterPaths) {
+
+        if(YES == [self.interpreterPaths containsObject:path]) {
+
+            os_log_debug(logHandle, "NOT muting %{public}@, as it's an interpreter", path);
+            return NO;
+        }
+    }
+
+    //mute (FS) events
+    if(@available(macOS 12.0, *)) {
+        es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
+        es_mute_path_events(client, path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
+    } else {
+        es_mute_path_literal(client, path.UTF8String);
+    }
+
+    return YES;
+}
+
 //handle ES message
 -(void)handleESMessage:(es_client_t *)client message:(const es_message_t *)message {
     
@@ -146,7 +216,11 @@ es_client_t* esClient = nil;
             if(!process) {
                 return;
             }
-            
+
+            //note interpreters
+            // must happen before any mute decision (here, or later on)
+            [self noteInterpreter:process];
+
             //cache if of interest?
             // note, also checks rules/sets process's rule result
             if([self processOfInterest:process]) {
@@ -159,14 +233,10 @@ es_client_t* esClient = nil;
                 if(![process.path isEqualToString:@"/usr/libexec/xpcproxy"]) {
 
                     //mute (FS) events
-                    if(@available(macOS 12.0, *)) {
-                        es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
-                        es_mute_path_events(client, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
-                    } else {
-                        es_mute_path_literal(client, process.path.UTF8String);
+                    // note: won't mute interpreters
+                    if([self muteFSEvents:process.path client:client]) {
+                        os_log_debug(logHandle, "muted %{public}@, as its not of interest", process.name);
                     }
-
-                    os_log_debug(logHandle, "muted %{public}@, as its not of interest", process.name);
                 }
             }
 
@@ -249,14 +319,10 @@ es_client_t* esClient = nil;
 
             //mute (FS) events
             // likely just 'older' process
-            if(@available(macOS 12.0, *)) {
-                es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
-                es_mute_path_events(esClient, processPath.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
-            } else {
-                es_mute_path_literal(esClient, processPath.UTF8String);
+            // note: won't mute interpreters, which may have simply been evicted from the cache
+            if([self muteFSEvents:processPath client:esClient]) {
+                os_log_debug(logHandle, "muted %{public}@, as its not in process cache", processPath);
             }
-
-            os_log_debug(logHandle, "muted %{public}@, as its not in process cache", processPath);
 
             return;
         }
@@ -290,12 +356,12 @@ es_client_t* esClient = nil;
             // and mute (FS) events
             case RULE_ALLOW:
                 os_log_debug(logHandle, "rule says 'allow' ...so allowing!");
-                if(@available(macOS 12.0, *)) {
-                    es_event_type_t mutedEvents[] = {ES_EVENT_TYPE_NOTIFY_CLOSE, ES_EVENT_TYPE_NOTIFY_RENAME};
-                    es_mute_path_events(esClient, process.path.UTF8String, ES_MUTE_PATH_TYPE_LITERAL, mutedEvents, sizeof(mutedEvents)/sizeof(mutedEvents[0]));
-                } else {
-                    es_mute_path_literal(esClient, process.path.UTF8String);
-                }
+
+                //mute (FS) events
+                // note: won't mute interpreters, as the rule may be for a *script*,
+                //       and muting its host would allow *all* future scripts
+                [self muteFSEvents:process.path client:esClient];
+
                 break;
                 
             //block
@@ -369,6 +435,9 @@ es_client_t* esClient = nil;
         return;
     }
 
+    //snapshot of encrypted files, for the alert
+    NSArray* encryptedFiles = nil;
+
     @synchronized (process) {
 
         //add file
@@ -380,6 +449,16 @@ es_client_t* esClient = nil;
             os_log_debug(logHandle, "IGNORING: process threshold not hit (currently: %lu)", (unsigned long)process.encryptedFiles.count);
             return;
         }
+
+        //snapshot files, while we still hold the lock
+        // other (concurrent) events may still be adding, and the alert
+        // must not enumerate a dictionary that's being mutated
+        // note: sorted newest first, as the alert only shows the first few
+        encryptedFiles = [process.encryptedFiles keysSortedByValueUsingComparator:^NSComparisonResult(NSDate* fileA, NSDate* fileB) {
+
+            //reversed, for newest first
+            return [fileB compare:fileA];
+        }];
     }
 
     //process hit limit
@@ -398,7 +477,7 @@ es_client_t* esClient = nil;
     Event* event = nil;
 
     //create event
-    event = [[Event alloc] init:process];
+    event = [[Event alloc] init:process encryptedFiles:encryptedFiles];
 
     //deliver alert to user
     // deliver: is idempotent; sets process.alertShown on success
@@ -429,30 +508,36 @@ es_client_t* esClient = nil;
 //stop
 // and cleanup
 -(BOOL)stop {
-    
+
+    //flag
+    BOOL stopped = YES;
+
+    //not running?
     if(!esClient) {
         return NO;
     }
-    
+
     //unsubscribe
+    // note: log, but keep going, as we still want to tear down the client
     if(ES_RETURN_SUCCESS != es_unsubscribe_all(esClient)) {
         os_log_error(logHandle, "ERROR: es_unsubscribe_all() failed");
-        return NO;
+        stopped = NO;
     }
-    
+
     //delete client
     if(ES_RETURN_SUCCESS != es_delete_client(esClient)) {
         os_log_error(logHandle, "ERROR: es_delete_client() failed");
-        return NO;
+        stopped = NO;
     }
-    
-    //unset
+
+    //unset, even on error
+    // otherwise a subsequent 'start' would orphan (leak) this client
     esClient = nil;
-    
+
     //clear process cache
     [self.processCache removeAllObjects];
 
-    return YES;
+    return stopped;
 }
 
 //is process of interest?
@@ -564,7 +649,7 @@ es_client_t* esClient = nil;
     
     //get process
     Process* process = [self.processCache objectForKey:alert[ALERT_PROCESS_PID_VERSION]];
-    
+
     //first create rule
     if([alert[ALERT_CREATE_RULE] boolValue]) {
         [rules add:path action:action];

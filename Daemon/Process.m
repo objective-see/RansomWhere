@@ -55,7 +55,7 @@ static NSSet* interpreters = nil;
     if (self == [Process class]) {
         interpreters = [NSSet setWithArray:@[
             @"com.apple.bash", @"com.apple.zsh", @"com.apple.ksh",
-            @"com.apple.tcsh", @"com.apple.sh", @"com.apple.perl",
+            @"com.apple.tcsh", @"com.apple.csh", @"com.apple.sh", @"com.apple.perl",
             @"com.apple.perl5", @"com.apple.ruby", @"com.apple.php",
             @"com.apple.python", @"com.apple.python2", @"com.apple.python3",
             @"com.apple.pythonw", @"com.apple.osascript",

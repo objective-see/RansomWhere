@@ -206,8 +206,8 @@ bail:
         //extract flags
         csFlags = [((__bridge NSDictionary *)csInfo)[(__bridge NSString *)kSecCodeInfoStatus] unsignedIntValue];
         
-        //gotta have hardened runtime
-        if( !(CS_VALID & csFlags) &&
+        //gotta be valid *and* have hardened runtime
+        if( !(CS_VALID & csFlags) ||
             !(CS_RUNTIME & csFlags) ) {
             goto bail;
         }
@@ -246,7 +246,7 @@ bail:
     
     //save
     self.client = newConnection;
-    
+
     //in background
     // notify that a new client connected
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),

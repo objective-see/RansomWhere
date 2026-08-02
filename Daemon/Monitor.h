@@ -29,6 +29,11 @@
 //process cache
 @property (nonatomic, retain)NSCache* processCache;
 
+//paths of (observed) interpreters
+// never muted, as a mute is by path & permanent, so muting an interpreter
+// would blind us to every script it subsequently runs
+@property (nonatomic, retain)NSMutableSet* interpreterPaths;
+
 //event queue
 @property (nonatomic, strong) dispatch_queue_t eventQueue;
 

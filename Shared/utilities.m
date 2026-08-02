@@ -475,31 +475,27 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
 {
     //ret var
     BOOL bSetOwner = NO;
-    
-    //owner dictionary
-    NSDictionary* fileOwner = nil;
-    
+
     //sub paths
     NSArray* subPaths = nil;
-    
+
     //full path
     // ->for recursive
     NSString* fullPath = nil;
-    
-    //init permissions dictionary
-    fileOwner = @{NSFileGroupOwnerAccountID:groupID, NSFileOwnerAccountID:ownerID};
-    
+
     //set group/owner
-    if(YES != [[NSFileManager defaultManager] setAttributes:fileOwner ofItemAtPath:path error:NULL])
+    // note: 'lchown' (vs. 'chown'/'setAttributes:'), so symlinks are *not* followed
+    //       otherwise a symlink in the target could redirect this onto any file
+    if(0 != lchown(path.fileSystemRepresentation, ownerID.unsignedIntValue, groupID.unsignedIntValue))
     {
         //err msg
-        os_log_error(logHandle, "ERROR: failed to set ownership for %{public}@ (%{public}@)", path, fileOwner);
+        os_log_error(logHandle, "ERROR: failed to set ownership for %{public}@ (errno: %d)", path, errno);
         goto bail;
     }
-    
+
     //dbg msg
-    os_log_debug(logHandle, "set ownership for %{public}@ (%{public}@)", path, fileOwner);
-    
+    os_log_debug(logHandle, "set ownership for %{public}@ (%@/%@)", path, ownerID, groupID);
+
     //do it recursively
     if(YES == recursive)
     {
@@ -510,19 +506,21 @@ BOOL setFileOwner(NSString* path, NSNumber* groupID, NSNumber* ownerID, BOOL rec
             //add '/'
             path = [NSString stringWithFormat:@"%@/", path];
         }
-        
+
         //get all subpaths
+        // note: 'subpathsAtPath:' does not descend into symlinked directories
         subPaths = [[NSFileManager defaultManager] subpathsAtPath:path];
         for(NSString *subPath in subPaths)
         {
             //init full path
             fullPath = [path stringByAppendingString:subPath];
-            
+
             //set group/owner
-            if(YES != [[NSFileManager defaultManager] setAttributes:fileOwner ofItemAtPath:fullPath error:NULL])
+            // again, 'lchown' so symlinks aren't followed
+            if(0 != lchown(fullPath.fileSystemRepresentation, ownerID.unsignedIntValue, groupID.unsignedIntValue))
             {
                 //err msg
-                os_log_error(logHandle, "ERROR: failed to set ownership for %{public}@ (%{public}@)", fullPath, fileOwner);
+                os_log_error(logHandle, "ERROR: failed to set ownership for %{public}@ (errno: %d)", fullPath, errno);
                 goto bail;
             }
         }

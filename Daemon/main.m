@@ -122,16 +122,20 @@ int main(int argc, const char * argv[])
         }
         
         //run forever
+        // note: 'dispatch_main' never returns
         dispatch_main();
-    
+
 bail:
-    
-    //dbg msg
-    os_log_debug(logHandle, "launch daemon exiting");
-            
+
+    //err msg
+    // note: only way to get here is via a 'goto bail', i.e. a fatal error
+    os_log_error(logHandle, "ERROR: launch daemon exiting");
+
     }//pool
-    
-    return 0;
+
+    //error
+    // as noted above, we only ever get here on a fatal error
+    return -1;
 }
 
 //check for full disk access via ESF
