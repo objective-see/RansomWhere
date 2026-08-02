@@ -215,11 +215,21 @@ bail:
     //bundle
     // get path of binary from bundle
     if([NSWorkspace.sharedWorkspace isFilePackageAtPath:path]) {
-        
+
         //get path
         path = getBundleExecutable(path);
+
+        //couldn't resolve bundle's binary?
+        if(0 == path.length) {
+
+            //error
+            showAlert(NSAlertStyleWarning, NSLocalizedString(@"ERROR: invalid bundle", @"ERROR: invalid bundle"), [NSString stringWithFormat:NSLocalizedString(@"failed to find %@'s binary!", @"failed to find %@'s binary!"), self.path.stringValue], @[NSLocalizedString(@"OK", @"OK")]);
+
+            //bail
+            goto bail;
+        }
     }
-    
+
     //save
     self.rulePath = path;
     self.ruleAction = (self.allowButton.state == NSControlStateValueOn) ? @(RULE_ALLOW) : @(RULE_BLOCK);

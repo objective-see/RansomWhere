@@ -98,6 +98,15 @@ extern os_log_t logHandle;
 // note: key is process path (canonicalized)
 -(BOOL)add:(NSString*)path action:(NSNumber*)action {
 
+    //sanity check
+    // a nil path (e.g. client couldn't resolve a bundle's binary) would
+    // canonicalize to nil, and a nil dictionary key throws
+    if( (0 == path.length) ||
+        (nil == action) ) {
+        os_log_error(logHandle, "ERROR: ignoring 'add rule' request with nil/empty path (or action)");
+        return NO;
+    }
+
     NSString* canon = [[path stringByStandardizingPath] stringByResolvingSymlinksInPath];
 
     os_log_debug(logHandle, "adding rule: %{public}@ -> %{public}@", canon, (RULE_ALLOW == action.intValue) ? @"allow" : @"block");
@@ -112,6 +121,13 @@ extern os_log_t logHandle;
 //delete (+save) rule
 // note: key is process path (canonicalized)
 -(BOOL)delete:(NSString*)path {
+
+    //sanity check
+    // as w/ 'add', a nil dictionary key throws
+    if(0 == path.length) {
+        os_log_error(logHandle, "ERROR: ignoring 'delete rule' request with nil/empty path");
+        return NO;
+    }
 
     NSString* canon = [[path stringByStandardizingPath] stringByResolvingSymlinksInPath];
 
