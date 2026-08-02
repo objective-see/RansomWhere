@@ -41,6 +41,21 @@ BOOL isEncrypted(NSString* path)
     //extract
     entropy = [results[@"entropy"] doubleValue];
 
+    //degenerate results?
+    // with nothing (or too little) to analyze, the stats divide by zero and come
+    // back NaN ...happens if the file was truncated after we checked its size,
+    // and note NaN fails *every* comparison below, so check explicitly here
+    if( (YES == isnan(entropy)) ||
+        (YES == isnan([results[@"chisquare"] doubleValue])) ||
+        (YES == isnan([results[@"montecarlo"] doubleValue])) )
+    {
+        //dbg msg
+        os_log_debug(logHandle, "ignoring %{public}@, as its stats are degenerate (truncated?)", path);
+
+        //ignore
+        goto bail;
+    }
+
     //dbg msg
     //os_log_debug(logHandle, "encryption results for %@: %@", path, results);
 
