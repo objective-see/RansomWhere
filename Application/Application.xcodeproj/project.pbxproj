@@ -32,7 +32,7 @@
 		CD8FD5F723C05AD900EFE0FB /* RuleRowCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8FD5F223C05AD800EFE0FB /* RuleRowCell.m */; };
 		CD8FD5F823C05AD900EFE0FB /* RulesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD8FD5F323C05AD800EFE0FB /* RulesWindowController.m */; };
 		CD8FD5FA23C05AD900EFE0FB /* Rules.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD8FD5F523C05AD900EFE0FB /* Rules.xib */; };
-		CDC82E8F2F6220F900DB61A5 /* RansomWhere Installer.app in Resources */ = {isa = PBXBuildFile; fileRef = CDC82E8E2F6220F900DB61A5 /* RansomWhere Installer.app */; };
+		CD90436730239F96005490BE /* RansomWhere Installer.app in Resources */ = {isa = PBXBuildFile; fileRef = CD90436630239F96005490BE /* RansomWhere Installer.app */; };
 		CDF2D3982F392CC300FF45A4 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */; };
 		CDF2D3992F392CC300FF45A4 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */; };
 		CDF433632F3A84CA00C147DA /* AddRuleWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF433622F3A84CA00C147DA /* AddRuleWindowController.m */; };
@@ -41,13 +41,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		CDA88A782537CE1A00C469BF /* CopyFiles */ = {
+		CDA88A782537CE1A00C469BF /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -98,7 +99,7 @@
 		CD8FD5F223C05AD800EFE0FB /* RuleRowCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuleRowCell.m; sourceTree = "<group>"; };
 		CD8FD5F323C05AD800EFE0FB /* RulesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesWindowController.m; sourceTree = "<group>"; };
 		CD8FD5F523C05AD900EFE0FB /* Rules.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Rules.xib; sourceTree = "<group>"; };
-		CDC82E8E2F6220F900DB61A5 /* RansomWhere Installer.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = "RansomWhere Installer.app"; sourceTree = "<group>"; };
+		CD90436630239F96005490BE /* RansomWhere Installer.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = "RansomWhere Installer.app"; sourceTree = "<group>"; };
 		CDF2D3952F392CC300FF45A4 /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = ../Shared/AboutWindow.xib; sourceTree = SOURCE_ROOT; };
 		CDF2D3962F392CC300FF45A4 /* AboutWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = ../Shared/AboutWindowController.h; sourceTree = SOURCE_ROOT; };
 		CDF2D3972F392CC300FF45A4 /* AboutWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = ../Shared/AboutWindowController.m; sourceTree = SOURCE_ROOT; };
@@ -228,7 +229,7 @@
 		CD4597F4291DB39300F2A1C6 /* Uninstaller */ = {
 			isa = PBXGroup;
 			children = (
-				CDC82E8E2F6220F900DB61A5 /* RansomWhere Installer.app */,
+				CD90436630239F96005490BE /* RansomWhere Installer.app */,
 			);
 			path = Uninstaller;
 			sourceTree = "<group>";
@@ -258,7 +259,7 @@
 				7D7755DF1F02E05B00D0017D /* Sources */,
 				7D7755E01F02E05B00D0017D /* Frameworks */,
 				7D7755E11F02E05B00D0017D /* Resources */,
-				CDA88A782537CE1A00C469BF /* CopyFiles */,
+				CDA88A782537CE1A00C469BF /* Copy Files */,
 			);
 			buildRules = (
 			);
@@ -321,7 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD8FD5D523BAE2D200EFE0FB /* Preferences.xib in Resources */,
-				CDC82E8F2F6220F900DB61A5 /* RansomWhere Installer.app in Resources */,
+				CD90436730239F96005490BE /* RansomWhere Installer.app in Resources */,
 				CD6836682391DB6F00CF19C1 /* security.plist in Resources */,
 				7DD2BF971F1FF64300B33214 /* AlertWindow.xib in Resources */,
 				7D16D6951F64E43300DB3161 /* UpdateWindow.xib in Resources */,
@@ -497,7 +498,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.1.3;
+				CURRENT_PROJECT_VERSION = 2.2.0;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -505,7 +506,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 2.1.3;
+				MARKETING_VERSION = 2.2.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DAPP_BUILD=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.ransomwhere.helper";
@@ -520,7 +521,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.1.3;
+				CURRENT_PROJECT_VERSION = 2.2.0;
 				DEVELOPMENT_TEAM = VBG97UB4TA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -528,7 +529,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 2.1.3;
+				MARKETING_VERSION = 2.2.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DAPP_BUILD=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.objective-see.ransomwhere.helper";
