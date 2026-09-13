@@ -33,6 +33,9 @@
 //determine if installed
 -(BOOL)isInstalled;
 
+//wait for launch daemon to start
+-(BOOL)waitForDaemon:(NSTimeInterval)timeout;
+
 //load/unload launch daemon
 // calls into helper via XPC
 -(BOOL)toggleDaemon:(BOOL)shouldLoad;

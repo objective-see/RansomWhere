@@ -46,6 +46,9 @@ NSArray* getScripts(pid_t pid, NSMutableArray* args, NSString* cwd);
 
 /* FUNCTIONS */
 
+//remove quarantine attribute
+BOOL removeQuarantine(NSString* path);
+
 //give path to app
 // get full path to its binary
 NSString* getBundleExecutable(NSString* appPath);

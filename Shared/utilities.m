@@ -15,6 +15,7 @@
 #import <unistd.h>
 #import <libproc.h>
 #import <sys/stat.h>
+#import <sys/xattr.h>
 #import <bsm/libbsm.h>
 #import <sys/sysctl.h>
 #import <Carbon/Carbon.h>
@@ -1720,6 +1721,36 @@ NSString* convertStringToken(const es_string_token_t* stringToken)
 bail:
     
     return string;
+}
+
+//remove quarantine attribute
+BOOL removeQuarantine(NSString* path) {
+    
+    //sanity check
+    if(!path.length) {
+        return NO;
+    }
+    
+    //remove
+    if(0 != removexattr(path.fileSystemRepresentation, "com.apple.quarantine", 0)) {
+
+        //not an error if attribute wasn't found
+        // or if file is on a read-only volume (e.g. /bin/bash)
+        if(ENOATTR == errno || EPERM == errno) {
+            os_log_debug(logHandle, "quarantine attribute not removed from %{public}@ (errno: %d)", path, errno);
+            return YES;
+        }
+
+        //err msg
+        os_log_error(logHandle, "ERROR: failed to remove quarantine from %{public}@ (%d)", path, errno);
+
+        return NO;
+    }
+    
+    //dbg msg
+    os_log_debug(logHandle, "removed quarantine from %{public}@", path);
+    
+    return YES;
 }
 
 #ifdef DAEMON_BUILD

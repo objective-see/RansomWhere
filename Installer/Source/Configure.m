@@ -85,11 +85,29 @@ extern os_log_t logHandle;
         }
         
         //load launch daemon
-        [self toggleDaemon:YES];
+        if(YES != [self toggleDaemon:YES])
+        {
+            //err msg
+            os_log_error(logHandle, "ERROR: failed to load launch daemon");
+            
+            //bail
+            goto bail;
+        }
         
-        //give daemon a few seconds to start
-        // as it checks for FDA, etc etc
-        [NSThread sleepForTimeInterval:2.00f];
+        //wait for daemon to start
+        // as it checks for FDA, etc etc ...but also so we can confirm it's actually running
+        // (e.g. macOS 27's launchd refuses to spawn from a quarantined plist, which otherwise fails silently)
+        if(YES != [self waitForDaemon:10.0f])
+        {
+            //err msg
+            os_log_error(logHandle, "ERROR: launch daemon was loaded, but is not running (check: 'launchctl print system/%s')", BUNDLE_ID);
+            
+            //bail
+            goto bail;
+        }
+        
+        //dbg msg
+        os_log_debug(logHandle, "launch daemon is running");
         
         //dbg msg
         os_log_debug(logHandle, "installed!");
@@ -270,6 +288,14 @@ bail:
         goto bail;
     }
     
+    //remove quarantine from (embedded) helper, otherwise everything it installs will be quarantined too
+    if(YES != removeQuarantine([NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:[@"Contents/Library/LaunchServices" stringByAppendingPathComponent:CONFIG_HELPER_ID]]))
+    {
+        //err msg
+        // ...but not fatal, so continue
+        os_log_error(logHandle, "ERROR: failed to remove quarantine attribute from embedded helper");
+    }
+    
     //bless
     if(YES != (BOOL)SMJobBless(kSMDomainSystemLaunchd, (__bridge CFStringRef)(CONFIG_HELPER_ID), authRef, &error))
     {
@@ -445,6 +471,47 @@ bail:
 bail:
     
     return result;
+}
+
+//wait for launch daemon to start
+// polls for its process, up to specified timeout
+-(BOOL)waitForDaemon:(NSTimeInterval)timeout
+{
+    //flag
+    BOOL isRunning = NO;
+    
+    //daemon's binary
+    NSString* daemon = nil;
+    
+    //init path to daemon's binary
+    daemon = [INSTALL_DIRECTORY stringByAppendingPathComponent:[LAUNCH_DAEMON stringByAppendingPathComponent:@"Contents/MacOS/RansomWhere"]];
+    
+    //poll (every 0.5s)
+    for(NSUInteger attempt = 0; attempt < (NSUInteger)(timeout / 0.5f); attempt++)
+    {
+        //running?
+        if(0 != getProcessIDs(daemon, -1).count)
+        {
+            //set flag
+            isRunning = YES;
+            
+            //done
+            break;
+        }
+        
+        //nap
+        [NSThread sleepForTimeInterval:0.5f];
+    }
+    
+    //give (now running) daemon a moment to init
+    // as it checks for FDA, etc etc
+    if(YES == isRunning)
+    {
+        //nap
+        [NSThread sleepForTimeInterval:2.0f];
+    }
+    
+    return isRunning;
 }
 
 //load/unload launch daemon
